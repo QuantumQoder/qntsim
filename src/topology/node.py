@@ -106,7 +106,7 @@ class Node(Entity):
         """
 
         # signal to protocol that we've received a message
-        print('node msg', msg)
+        # print('node msg', msg)
         if msg.receiver is not None:
             for protocol in self.protocols:
                 print('protocol', protocol)
@@ -164,7 +164,7 @@ class BSMNode(Node):
 
     def receive_message(self, src: str, msg: "Message") -> None:
         # signal to protocol that we've received a message
-        print("protocols on bsm: ", self.protocols)
+        # print("protocols on bsm: ", self.protocols)
         for protocol in self.protocols:
             protocol.received_message(src, msg)
             # if type(protocol) == msg.owner_type:
@@ -289,8 +289,6 @@ class QuantumRouter(Node):
             # # print('matching', matching)
             for p in matching:
                 p.received_message(src, msg)
-            if msg.protocol_type == "TransportProtocolSrc":
-                print()
                 
 
         else:

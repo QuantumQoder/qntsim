@@ -144,7 +144,7 @@ class TransportManager():
         Method to recieve the acknowledgements of Reject,Abort and Approved from link layer.
         '''
 
-        print('failed inside tranport manager',tp_id,fail_time*1e-12,status)
+        # print('failed inside tranport manager',tp_id,fail_time*1e-12,status)
         for tp_id,tp in self.transportprotocolmap.items():
             # print('id,protocol',tp_id,tp)
             if status == 'REJECT' or status == 'ABORT':

@@ -137,9 +137,7 @@ class Topology():
             name = node_params.pop("name")
             node_type = node_params.pop("type")
 
-            if node_type == "QKDNode":
-                node = QKDNode(name, self.timeline, **node_params)
-            elif node_type == "QuantumRouter":
+            if node_type == "QuantumRouter":
                 node = QuantumRouter(name, self.timeline, **node_params)
             else:
                 node = Node(name, self.timeline)
@@ -473,11 +471,11 @@ class Topology():
                         max_time = info.entangle_time*1e-12
                 
             latency=max_time - starttime
-            print('maxxx', src,dest,starttime,max_time,latency)
+            # print('maxxx', src,dest,starttime,max_time,latency)
             time.append(latency)
-        print('tttttt', time)
+        # print('tttttt', time)
         avgtime=sum(time)/len(time)
-        print('Average latency', avgtime)
+        # print('Average latency', avgtime)
         
 
     def calctime2(self, uniquenode):
@@ -508,7 +506,7 @@ class Topology():
                 #print('maxxx', ResObj.initiator, ResObj.responder,starttime,latency)
         #print('time', time)
         avgtime=sum(time)/len(time)
-        print('Average latency',avgtime)
+        # print('Average latency',avgtime)
 
 
     def throughput(self, li):
@@ -516,7 +514,7 @@ class Topology():
         for pairs in li:
             src=pairs[0]
             dest=pairs[1]
-            print('ccc', src, dest)
+            # print('ccc', src, dest)
             for ReqId,ResObj in self.nodes[src].network_manager.requests.items():
                 print(ResObj.initiator, ResObj.responder)
                 if src == ResObj.initiator:
@@ -532,7 +530,7 @@ class Topology():
                 else:
                     print('dddd')"""
 
-        print('Success/Fail',csuccess,cfail)
+        # print('Success/Fail',csuccess,cfail)
 
 
         """

@@ -145,7 +145,7 @@ class EntanglementSwappingA(EntanglementProtocol):
             raise Exception("Cannot pair protocol %s with %s" % (self.name, other.name))
 
     def start(self) -> None:
-        print("swapping between ", self.left_node,  self.right_node)
+        # print("swapping between ", self.left_node,  self.right_node)
         """Method to start entanglement swapping protocol.
 
         Will run circuit and send measurement results to other protocols.
@@ -159,9 +159,9 @@ class EntanglementSwappingA(EntanglementProtocol):
         assert self.right_memo.entangled_memory["node_id"] == self.right_protocol.own.name
 
         # Loging the qmodes and accepted index data at both ends
-        print("swapping central node at:", self.own.name)
-        print("number of qmodes at:", self.left_node, "qmode:", len(self.left_memo.qmodes), "accepted index: ", self.left_memo.accepted_index)
-        print("number of qmodes at:,", self.right_node, "qmode:", len(self.right_memo.qmodes), "accepted index: ", self.right_memo.accepted_index)
+        # print("swapping central node at:", self.own.name)
+        # print("number of qmodes at:", self.left_node, "qmode:", len(self.left_memo.qmodes), "accepted index: ", self.left_memo.accepted_index)
+        # print("number of qmodes at:,", self.right_node, "qmode:", len(self.right_memo.qmodes), "accepted index: ", self.right_memo.accepted_index)
 
         # Reading out the photons in the memory before the accepted photon at both ends. 
         for i in range(self.left_memo.accepted_index-1):
@@ -170,7 +170,7 @@ class EntanglementSwappingA(EntanglementProtocol):
         for i in range(self.right_memo.accepted_index-1):
             self.right_memo.read()
 
-        print("topmost quantum modes are:", self.left_memo.qmodes[0].is_null, self.right_memo.qmodes[0].is_null)
+        # print("topmost quantum modes are:", self.left_memo.qmodes[0].is_null, self.right_memo.qmodes[0].is_null)
 
         # Generate a random no. (<1) to see if swapping is succesful or not
         x_rand = random()

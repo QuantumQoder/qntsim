@@ -101,7 +101,7 @@ class BBPSSW(EntanglementProtocol):
         self.another = another
 
     def start(self) -> None:
-        print("purificatin has started")
+        # print("purificatin has started")
         """Method to start entanglement purification.
 
         Run the circuit below on two pairs of entangled memories on both sides of protocol.
@@ -130,7 +130,7 @@ class BBPSSW(EntanglementProtocol):
             May update parameters of kept memory.
             Will send message to other protocol instance.
         """
-        print("Purification is Running")
+        # print("Purification is Running")
         log.logger.info(self.own.name + " protocol start with partner {}".format(self.another.own.name))
 
         assert self.another is not None, "other protocol is not set; please use set_others function to set it."

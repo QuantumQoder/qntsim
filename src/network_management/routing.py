@@ -531,7 +531,7 @@ class RoutingTableUpdateProtocol(NewRoutingProtocol):
                 if (nodes,link[0]) in self.own.nx_graph.edges and weight == 0:
                     break
                 else:
-                    print('add vlink',nodes,link[0])
+                    # print('add vlink',nodes,link[0])
                     self.own.nx_graph.add_edge(nodes,link[0],color='red',weight=0)
                     break
 

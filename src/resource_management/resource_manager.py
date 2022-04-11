@@ -146,7 +146,7 @@ class ResourceManager():
         Args:
             rule (Rule): rule to remove.
         """
-        print('Expiree')
+        # print('Expiree')
         created_protocols = self.rule_manager.expire(rule)
         while created_protocols:
             protocol = created_protocols.pop()
@@ -387,7 +387,7 @@ class ResourceManager():
                         protocol.release()
                         return
         elif msg.msg_type is ResourceManagerMsgType.ABORT:
-            print('msg res',msg.reservation)
+            # print('msg res',msg.reservation)
             print(self.reservation_to_events_map[msg.reservation])
             
             # if an abort message is received, remove all the scheduled events from the queue 

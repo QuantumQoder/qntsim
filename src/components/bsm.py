@@ -74,13 +74,9 @@ class BSM(Entity):
     """
 
     _phi_plus = [complex(sqrt(1 / 2)), complex(0), complex(0), complex(sqrt(1 / 2))]
-    print('phi plus',_phi_plus)
     _phi_minus = [complex(sqrt(1 / 2)), complex(0), complex(0), -complex(sqrt(1 / 2))]
-    print('phi plus',_phi_minus)
     _psi_plus = [complex(0), complex(sqrt(1 / 2)), complex(sqrt(1 / 2)), complex(0)]
-    print('phi plus',_psi_plus)
     _psi_minus = [complex(0), complex(sqrt(1 / 2)), -complex(sqrt(1 / 2)), complex(0)]
-    print('phi plus',_psi_minus)
 
     def __init__(self, name, timeline, phase_error=0, detectors=[]):
         """Constructor for base BSM object.
@@ -114,7 +110,6 @@ class BSM(Entity):
                            (complex(sqrt(1 / 2)), complex(0), complex(0), -complex(sqrt(1 / 2))),
                            (complex(0), complex(sqrt(1 / 2)), complex(sqrt(1 / 2)), complex(0)),
                            (complex(0), complex(sqrt(1 / 2)), -complex(sqrt(1 / 2)), complex(0)))
-        print('Bell basis',self.bell_basis)
 
     def init(self):
         """Implementation of Entity interface (see base class)."""

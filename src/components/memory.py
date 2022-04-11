@@ -191,7 +191,7 @@ class Memory(Entity):
             Will notify upper entities of expiration via the `pop` interface.
             Will modify the quantum state of the memory.
         """
-        print('******Expire*****')
+        # print('******Expire*****')
         if self.excited_photon:
             self.excited_photon.is_null = True
 
