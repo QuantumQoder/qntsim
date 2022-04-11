@@ -7,7 +7,7 @@ from typing import List
 
 import numpy as np
 from qutip.qip.circuit import QubitCircuit
-from qutip.qip.operations import gate_qntsim_product
+# from qutip.qip.operations import gate_qntsim_product
 from qutip import Qobj
 
 class Circuit():

@@ -7,7 +7,7 @@ from pyvis.network import Network
 import webbrowser
 
 #random.seed(0)
-network_config = "/home/aman/Sequence/test/Quantum-Networking/example/network_topology.json" #give path to yopur netwrok topology
+network_config = "/home/aman/QNTSim/QNTSim/example/network_topology copy.json" #give path to yopur netwrok topology
 
 
 

@@ -6,8 +6,8 @@ setup(
     author="Qulabs Software India Pvt Ltd",
     description="Quantum Network Simulator for quick prototyping and developement of protocols and applications",
     # packages = find_packages('src'),
-    packages=['qntsim', 'qntsim.app', 'qntsim.kernel', 'qntsim.components',
-              'qntsim.network_management', 'qntsim.entanglement_management', 'qntsim.qkd',
+    packages=['qntsim', 'qntsim.kernel', 'qntsim.components',
+              'qntsim.network_management', 'qntsim.entanglement_management',
               'qntsim.resource_management','qntsim.transport_layer' , 'qntsim.topology', 'qntsim.utils'],
     package_dir={'qntsim': 'src'},
     install_requires=[

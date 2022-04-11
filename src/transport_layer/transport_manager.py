@@ -1,5 +1,3 @@
-from cmath import inf
-from typing_extensions import final
 import qntsim
 from qntsim.kernel.timeline import Timeline
 from qntsim.kernel.process import Process
