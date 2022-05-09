@@ -7,7 +7,7 @@ from pyvis.network import Network
 import webbrowser
 
 #random.seed(0)
-network_config = "/home/aman/QNTSim/QNTSim/example/network_topology copy.json" #give path to yopur netwrok topology
+network_config = "/home/bhanusree/Desktop/QNTv1/QNTSim/example/network_topology copy.json" #give path to yopur netwrok topology
 
 
 
@@ -42,8 +42,9 @@ def set_parameters(topology: Topology):
     SWAP_SUCC_PROB = 0.9
     SWAP_DEGRADATION = 0.99
     for node in topology.get_nodes_by_type("QuantumRouter"):
-        node.network_manager.protocol_stack[1].set_swapping_success_rate(SWAP_SUCC_PROB)
-        node.network_manager.protocol_stack[1].set_swapping_degradation(SWAP_DEGRADATION)
+        pass
+        # node.network_manager.protocol_stack[1].set_swapping_success_rate(SWAP_SUCC_PROB)
+        # node.network_manager.protocol_stack[1].set_swapping_degradation(SWAP_DEGRADATION)
         
   
     ATTENUATION = 1e-5
@@ -59,12 +60,14 @@ set_parameters(network_topo)
 
 
 node1='v0'
-node2='v2'
+node2='v4'
 nm=network_topo.nodes[node1].network_manager
-nm.request(node2, start_time=2e12, end_time=10e12, memory_size=3, target_fidelity= 0.5)
+nm.create_request(node1,node2, start_time=2e12, end_time=10e12, memory_size=2, target_fidelity= 0.8,priority=1,tp_id=0)
+nm.create_request(node1,'v3', start_time=12e12, end_time=23e12, memory_size=3, target_fidelity= 0.8,priority=1,tp_id=0)
 
 tl.init()
 tl.run()
+#nm.create_request(node1,'v3', start_time=12e12, end_time=23e12, memory_size=3, target_fidelity= 0.8,priority=1,tp_id=0)
 
 # For printing memories
 print("v0 memories")

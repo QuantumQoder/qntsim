@@ -1,9 +1,7 @@
 """Code for Barrett-Kok entanglement Generation protocol
-
 This module defines code to support entanglement generation between single-atom memories on distant nodes.
 Also defined is the message type used by this implementation.
 Entanglement generation is asymmetric:
-
 * EntanglementGenerationA should be used on the QuantumRouter (with one node set as the primary) and should be started via the "start" method
 * EntanglementGeneraitonB should be used on the BSMNode and does not need to be started
 """
@@ -40,10 +38,8 @@ class GenerationMsgType(Enum):
 
 class EntanglementGenerationMessage(Message):
     """Message used by entanglement generation protocols.
-
     This message contains all information passed between generation protocol instances.
     Messages of different types contain different information.
-
     Attributes:
         msg_type (GenerationMsgType): defines the message type.
         receiver (str): name of destination protocol instance.
@@ -92,10 +88,8 @@ class EntanglementGenerationMessage(Message):
 
 class EntanglementGenerationA(EntanglementProtocol):
     """Entanglement generation protocol for quantum router.
-
     The EntanglementGenerationA protocol should be instantiated on a quantum router node.
     Instances will communicate with each other (and with the B instance on a BSM node) to generate entanglement.
-
     Attributes:
         own (QuantumRouter): node that protocol instance is attached to.
         name (str): label for protocol instance.
@@ -115,7 +109,6 @@ class EntanglementGenerationA(EntanglementProtocol):
 
     def __init__(self, own: "Node", name: str, middle: str, other: str, memory: "Memory"):
         """Constructor for entanglement generation A class.
-
         Args:
             own (Node): node to attach protocol to.
             name (str): name of protocol instance.
@@ -149,9 +142,13 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.frequency = 2e3
         self.isSuccess = False
 
+        self.state = 0
+
+    def received_message(self):
+        pass
+
     def set_others(self, other: "EntanglementGenerationA") -> None:
         """Method to set other entanglement protocol instance.
-
         Args:
             other (EntanglementGenerationA): other protocol instance.
         """
@@ -163,90 +160,85 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.other_protocol = other
         self.remote_memo_id = other.memories[0].name
         self.primary = self.own.name > self.other
-        # print("primray is set")
+        print("primray is set")
 
     def start(self) -> None:
         """Method to start entanglement generation protocol.
-
         Will start negotiations with other protocol (if primary).
-
         Side Effects:
             Will send message through attached node.
         """
         
         log.logger.info(self.own.name + " protocol start with partner {}".format(self.other))
-        # print("generatin between ", self.own.name, self.other)
+        print("generatin between ", self.own.name, self.other)
         if self not in self.own.protocols:
             return
         
         # If the node is primary, start the entanglement by sending 1st request bsm message
         if self.primary:
-            # print("request sent")
+            self.received_message = self.primary_received_message
+            print("request sent")
             message = EntanglementGenerationMessage(GenerationMsgType.REQUEST_BSM, None, protocol = self)
             self.own.send_message(self.middle, message)
+
+        else:
+            self.received_message = self.secondary_received_message
 
 
     def emit_event(self) -> None:
         """Method to setup memory and emit photons.
-
         If the protocol is in round 1, the memory will be first set to the \|+> state.
         Otherwise, it will apply an x_gate to the memory.
         Regardless of the round, the memory `excite` method will be invoked.
-
         Side Effects:
             May change state of attached memory.
             May cause attached memory to emit photon.
         """
-        # print("!!!!!!!!!!!!!!!! emit event", self.own.name)
+        print("!!!!!!!!!!!!!!!! emit event", self.own.name)
 
         # Assign light sources
         self.own.lightsource.assign_middle(self.middle)
         self.own.lightsource.assign_memory(self.memory)
 
         # emit photons from lightsources
-        # print("memory index is", self.memory.memory_array.memories.index(self.memory))
+        print("memory index is", self.memory.memory_array.memories.index(self.memory))
         self.own.lightsource.emit()
 
     def schedule_and_emit_event(self,  min_time) -> None:
         """Method to setup memory and emit photons.
-
         If the protocol is in round 1, the memory will be first set to the \|+> state.
         Otherwise, it will apply an x_gate to the memory.
         Regardless of the round, the memory `excite` method will be invoked.
-
         Side Effects:
             May change state of attached memory.
             May cause attached memory to emit photon.
         """
-        # print("!!!!!!!!!!!!!!!! emit event", self.own.name)
+        print("!!!!!!!!!!!!!!!! emit event", self.own.name)
 
         # Assign light sources
         self.own.lightsource.assign_middle(self.middle)
         self.own.lightsource.assign_memory(self.memory)
 
         # schedule a qubit 
-        # print("memory index is", self.memory.memory_array.memories.index(self.memory))
+        print("memory index is", self.memory.memory_array.memories.index(self.memory))
         previous_time = self.own.schedule_qubit(self.middle, min_time)
         
         # emit the photon
         status = self.own.lightsource.emit()
-        # print("emit status node:", self.own.name, "mamory:", self.memory.memory_array.memories.index(self.memory), "status:", status)
+        print("emit status node:", self.own.name, "mamory:", self.memory.memory_array.memories.index(self.memory), "status:", status)
 
     def release_bsm(self):
         # Send release bsm message to the BSM
         message = EntanglementGenerationMessage(GenerationMsgType.RELEASE_BSM, None, protocol = self)
         self.own.send_message(self.middle, message)
 
-    def received_message(self, src: str, msg: EntanglementGenerationMessage) -> None:
-        """Method to receive messages.
-
+    def primary_received_message(self, src: str, msg: EntanglementGenerationMessage) -> None:
+        """Method to receive messages on the primary node.
         This method receives messages from other entanglement generation protocols.
         Depending on the message, different actions may be taken by the protocol.
-
         Args:
             src (str): name of the source node sending the message.
             msg (EntanglementGenerationMessage): message received.
-
         Side Effects:
             May schedule various internal and hardware events.
         """
@@ -255,52 +247,21 @@ class EntanglementGenerationA(EntanglementProtocol):
             return
 
         msg_type = msg.msg_type
+
+        if self.state == 3:
+            return
         
         # If BSM has been allocated by the BSM
-        if msg_type is GenerationMsgType.BSM_ALLOCATE:
+        if self.state == 0 and msg_type is GenerationMsgType.BSM_ALLOCATE:
+            print("this is state 0")
             self.qc_delay = self.own.qchannels[self.middle].delay
             frequency = self.memory.frequency
             message = EntanglementGenerationMessage(GenerationMsgType.NEGOTIATE, self.other_protocol.name,
                                                     qc_delay=self.qc_delay, frequency=frequency)
             self.own.send_message(self.other, message)
-            # print("BSM ALLOCATED, STARTING PROTOCOL")
-       
-        # Start negotiating generation parameters
-        elif msg_type is GenerationMsgType.NEGOTIATE:
-            # configure params
-            another_delay = msg.qc_delay
-            self.qc_delay = self.own.qchannels[self.middle].delay
-            cc_delay = int(self.own.cchannels[src].delay)
-            total_quantum_delay = max(self.qc_delay, another_delay)
+            print("BSM ALLOCATED, STARTING PROTOCOL")
 
-            # get time for first excite event
-            min_time = self.own.timeline.now() + total_quantum_delay - self.qc_delay + cc_delay
-            previous_time = self.own.schedule_qubit(self.middle, min_time)
-            # print("min_time:", min_time, "previous_time", previous_time)
-
-            another_emit_time_0 = previous_time + self.qc_delay - another_delay
-            message = EntanglementGenerationMessage(GenerationMsgType.NEGOTIATE_ACK, self.other_protocol.name,
-                                                    emit_time_0=another_emit_time_0)
-            self.own.send_message(src, message)
-
-            # schedule emit
-            process = Process(self, "emit_event", [])
-            event = Event(previous_time, process)
-            self.own.timeline.schedule(event)
-            self.scheduled_events.append(event)
-
-            # In a batch, schedule all qubits for forming entanglement
-            for i in range(100):
-                next_time = previous_time + int(1e12 / self.frequency)
-                # print("time of ", i, "th emission at", self.own.name,"is :", next_time)
-                process = Process(self, "schedule_and_emit_event", [next_time])
-                event = Event(next_time, process)
-                self.own.timeline.schedule(event)
-                self.scheduled_events.append(event)
-                previous_time = next_time
-
-
-        elif msg_type is GenerationMsgType.NEGOTIATE_ACK:
+        elif self.state == 1 and msg_type is GenerationMsgType.NEGOTIATE_ACK:
             # configure params
             self.expected_times = msg.emit_time_0 + self.qc_delay
 
@@ -319,13 +280,13 @@ class EntanglementGenerationA(EntanglementProtocol):
             # In a batch, schedule all qubits for forming entanglement
             for i in range(100):
                 next_time = previous_time + int(1e12 / self.frequency)
-                # print("time of ", i, "th emission at", self.own.name,"is :", next_time)
+                print("time of ", i, "th emission at", self.own.name,"is :", next_time)
                 process = Process(self, "schedule_and_emit_event", [next_time])
                 event = Event(next_time, process)
                 self.own.timeline.schedule(event)
                 self.scheduled_events.append(event)
                 previous_time = next_time
-            # print("PREVIOUS TIME WAS:", previous_time)
+            print("PREVIOUS TIME WAS:", previous_time)
 
             # Let go of the BSM
             process = Process(self, "release_bsm", [])
@@ -333,25 +294,92 @@ class EntanglementGenerationA(EntanglementProtocol):
             self.own.timeline.schedule(event)
             self.scheduled_events.append(event)
 
+
         # When the BSM returns a measurement result
-        elif msg_type is GenerationMsgType.MEAS_RES:
+        elif self.state == 2 and msg_type is GenerationMsgType.MEAS_RES:
             if not self.isSuccess:
-                # print("running entanglement success")
+                print("running entanglement success")
                 self._entanglement_succeed(msg.accepted_index)
                 self.isSuccess = True
-                # print("primary Accepted index :", msg.accepted_index, "qmodes:", len(self.memory.qmodes))
+                print("primary Accepted index :", msg.accepted_index, "qmodes:", len(self.memory.qmodes))
 
                 message = EntanglementGenerationMessage(GenerationMsgType.ENTANGLEMENT_SUCCESS, self.other_protocol.name, accepted_index = msg.accepted_index)
                 self.own.send_message(self.other, message)
 
+        else:
+            print("message type:", msg_type, "state:", self.state, "is_primary:", self.primary, "msg:", msg, "name", self.name)
+            print("protocol:", self)
+            raise Exception("Invalid message {} received by EG on node {} name {}".format(msg_type, self.own.name, self.name))
+
+        self.state += 1
+
+        return True
+
+
+    def secondary_received_message(self, src: str, msg: EntanglementGenerationMessage) -> None:
+        """Method to receive messages on the secondary node.
+        This method receives messages from other entanglement generation protocols.
+        Depending on the message, different actions may be taken by the protocol.
+        Args:
+            src (str): name of the source node sending the message.
+            msg (EntanglementGenerationMessage): message received.
+        Side Effects:
+            May schedule various internal and hardware events.
+        """
+
+        if src not in [self.middle, self.other]:
+            return
+
+        if self.state == 2:
+            return
+
+        msg_type = msg.msg_type
+       
+        # Start negotiating generation parameters
+        if self.state == 0 and msg_type is GenerationMsgType.NEGOTIATE:
+            # configure params
+            another_delay = msg.qc_delay
+            self.qc_delay = self.own.qchannels[self.middle].delay
+            cc_delay = int(self.own.cchannels[src].delay)
+            total_quantum_delay = max(self.qc_delay, another_delay)
+
+            # get time for first excite event
+            min_time = self.own.timeline.now() + total_quantum_delay - self.qc_delay + cc_delay
+            previous_time = self.own.schedule_qubit(self.middle, min_time)
+            print("min_time:", min_time, "previous_time", previous_time)
+
+            another_emit_time_0 = previous_time + self.qc_delay - another_delay
+            message = EntanglementGenerationMessage(GenerationMsgType.NEGOTIATE_ACK, self.other_protocol.name,
+                                                    emit_time_0=another_emit_time_0)
+            self.own.send_message(src, message)
+
+            # schedule emit
+            process = Process(self, "emit_event", [])
+            event = Event(previous_time, process)
+            self.own.timeline.schedule(event)
+            self.scheduled_events.append(event)
+
+            # In a batch, schedule all qubits for forming entanglement
+            for i in range(100):
+                next_time = previous_time + int(1e12 / self.frequency)
+                print("time of ", i, "th emission at", self.own.name,"is :", next_time)
+                process = Process(self, "schedule_and_emit_event", [next_time])
+                event = Event(next_time, process)
+                self.own.timeline.schedule(event)
+                self.scheduled_events.append(event)
+                previous_time = next_time
+
         # Success message received
-        elif msg_type is GenerationMsgType.ENTANGLEMENT_SUCCESS:
+        elif self.state == 1 and msg_type is GenerationMsgType.ENTANGLEMENT_SUCCESS:
             self._entanglement_succeed(msg.accepted_index)
-            # print("secondary Accepted index :", msg.accepted_index, "qmodes:", len(self.memory.qmodes))
+            print("secondary Accepted index :", msg.accepted_index, "qmodes:", len(self.memory.qmodes))
             self.isSuccess = True
             
         else:
+            print("message type:", msg_type, "state:", self.state, "is_primary:", self.primary)
             raise Exception("Invalid message {} received by EG on node {}".format(msg_type, self.own.name))
+
+        self.state += 1
 
         return True
 
@@ -369,12 +397,12 @@ class EntanglementGenerationA(EntanglementProtocol):
                 self.own.timeline.remove_event(event)
 
     def _entanglement_succeed(self, accepted_index):
-        # print("!!!!!!!!!!!!!!!!!!!SUCCEEDED!!!!!!!!!!!!!!!!!!!!!!!!")
+        print("!!!!!!!!!!!!!!!!!!!SUCCEEDED!!!!!!!!!!!!!!!!!!!!!!!!")
         log.logger.info(self.own.name + " successful entanglement of memory {}".format(self.memory))
         self.memory.entangled_memory["node_id"] = self.other
         self.memory.entangled_memory["memo_id"] = self.remote_memo_id
         self.memory.fidelity = self.memory.raw_fidelity
-        self.memory.accepted_index = accepted_index
+        self.memory.accepted_index = accepted_index  
 
         self.update_resource_manager(self.memory, 'ENTANGLED')
 
@@ -388,10 +416,8 @@ class EntanglementGenerationA(EntanglementProtocol):
 
 class EntanglementGenerationB(EntanglementProtocol):
     """Entanglement generation protocol for BSM node.
-
     The EntanglementGenerationB protocol should be instantiated on a BSM node.
     Instances will communicate with the A instance on neighboring quantum router nodes to generate entanglement.
-
     Attributes:
         own (BSMNode): node that protocol instance is attached to.
         name (str): label for protocol instance.
@@ -400,7 +426,6 @@ class EntanglementGenerationB(EntanglementProtocol):
 
     def __init__(self, own: "Node", name: str, others: List[str]):
         """Constructor for entanglement generation B protocol.
-
         Args:
             own (Node): attached node.
             name (str): name of protocol instance.
@@ -415,13 +440,13 @@ class EntanglementGenerationB(EntanglementProtocol):
         self.frequency = int(1e12 / 2e2)
         self.accepted_indices = 0
         self.current_protocol = None
+        self.current_primary = None
         self.reservations = []
         self.first_received = False
 
 
     def bsm_update(self, bsm: 'SingleAtomBSM', info: Dict[str, Any]):
         """Method to receive detection events from BSM on node.
-
         Args:
             bsm (SingleAtomBSM): bsm object calling method.
             info (Dict[str, any]): information passed from bsm.
@@ -429,7 +454,7 @@ class EntanglementGenerationB(EntanglementProtocol):
 
         res = info["res"]
         time = info["time"]
-        # print("got photon at", time)
+        print("got photon at", time)
         resolution = self.own.bsm.resolution
 
         # If this is the first detection
@@ -454,20 +479,20 @@ class EntanglementGenerationB(EntanglementProtocol):
 
         # if only one photon received in the window, entanglement success, send message
         elif time > self.previous_detection_time + self.frequency:
-            # print("!!!!!!!!!!!!!!!Entanglement SUCESS!!!!!!!!!!!!!!!!!!!")
-            for i, node in enumerate(self.others):
-                # print("sneding accepted indices: ", self.accepted_indices)
-                message = EntanglementGenerationMessage(GenerationMsgType.MEAS_RES, None, protocol = self.current_protocol, res=res, time=time,
-                                                        accepted_index=self.accepted_indices)
-                self.own.send_message(node, message)
-                self.first_received = False
+            print("!!!!!!!!!!!!!!!Entanglement SUCESS!!!!!!!!!!!!!!!!!!!")
+            # for i, node in enumerate(self.others):
+            print("sneding accepted indices: ", self.accepted_indices)
+            message = EntanglementGenerationMessage(GenerationMsgType.MEAS_RES, None, protocol = self.current_protocol, res=res, time=time,
+                                                    accepted_index=self.accepted_indices)
+            self.own.send_message(self.current_primary, message)
+            self.first_received = False
 
         # if 2 photons received, entnaglement failure, move to next one
         else:
-            # print("!!!!!!!!!!!!!!!Entanglement FAILURE!!!!!!!!!!!!!!!!!!!")
+            print("!!!!!!!!!!!!!!!Entanglement FAILURE!!!!!!!!!!!!!!!!!!!")
             self.first_received = False
             self.accepted_indices += 1
-            # print("Others are:", self.others, "present accepted index = ", self.accepted_indices)
+            print("Others are:", self.others, "present accepted index = ", self.accepted_indices)
             
     def received_message(self, src: str, msg: EntanglementGenerationMessage):
         msg_type = msg.msg_type
@@ -479,14 +504,16 @@ class EntanglementGenerationB(EntanglementProtocol):
                 message = EntanglementGenerationMessage(GenerationMsgType.BSM_ALLOCATE, None, protocol = msg.protocol)
                 self.own.send_message(msg.protocol.own.name, message)
                 self.current_protocol = msg.protocol
-                # print("MESAGE SENT TO NODE")
+                self.current_primary = msg.protocol.own.name
+                # print("name of primary is: ", msg.protocol.own.name)
+                print("MESAGE SENT TO NODE")
             self.reservations.append(msg.protocol)
-            # print("protocol appended: ", msg.protocol)
+            print("protocol appended: ", msg.protocol)
 
         # Once attempt to entanglement generation is complete, the BSM is released. Check if other process exist
         # in reservations queue. If yes, start one on top. Else, return 
         elif msg_type is GenerationMsgType.RELEASE_BSM:
-            # print("protocol removed:", msg.protocol)
+            print("protocol removed:", msg.protocol)
             self.reservations.remove(msg.protocol)
             self.accepted_indices = 0
             self.previous_detection_time = None
@@ -494,6 +521,7 @@ class EntanglementGenerationB(EntanglementProtocol):
                 message = EntanglementGenerationMessage(GenerationMsgType.BSM_ALLOCATE, None, protocol = self.reservations[0])
                 self.own.send_message(self.reservations[0].own.name, message)
                 self.current_protocol = self.reservations[0]
+                self.current_primary = self.reservations[0].own.name
 
     def start(self) -> None:
         pass
