@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from ..components.memory import Memory
 from ..message import Message
 import itertools
-
+from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
       
 
 class ProtocolMsgType(Enum):
@@ -25,13 +25,11 @@ class ProtocolMsgType(Enum):
 
 
  
-class ProtocolMessage(Message):
+class Message():
 
     """Message used by Transport layer protocols.
-
     This message contains all information passed between transport protocol instances.
     Messages of different types contain different information.
-
     Attributes:
         msg_type (GenerationMsgType): defines the message type.
         receiver (str): name of destination protocol instance.
@@ -39,44 +37,20 @@ class ProtocolMessage(Message):
         dest_obj : destination node protocol instance.
     """
 
-    def __init__(self, msg_type: ProtocolMsgType, receiver:str, **kwargs):
-        Message.__init__(self,msg_type,receiver)
-        self.protocol_type=TransportProtocol
-        if msg_type is ProtocolMsgType.REQ:
-            
-            self.objsrc=kwargs.get("objsrc")
-            
-        elif msg_type is ProtocolMsgType.REQACK:
-            
-            self.objdest=kwargs.get("objdest")
-            self.objsrc=kwargs.get("objsrc")
-            
-        elif msg_type is ProtocolMsgType.SYN:
-            
-            self.src_obj=kwargs.get("src_obj")
-            self.dest_obj=kwargs.get("dest_obj")
-            
-        elif msg_type is ProtocolMsgType.SYNACK:
-         
-            self.src_obj=kwargs.get("src_obj")
-            self.dest_obj=kwargs.get("dest_obj")
-            self.dest_timer=kwargs.get("dest_timer")
-            
-        elif msg_type is ProtocolMsgType.ACK:
-            
-            self.src_obj=kwargs.get("src_obj")
-            self.dest_obj=kwargs.get("dest_obj")
-            self.final_timer=kwargs.get("final_timer")
-           
 
+    def __init__(self, receiver_type : Enum, receiver : Enum, msg_type , **kwargs) -> None:
         
+        self.receiver_type =receiver_type
+        self.receiver = receiver
+        self.msg_type = msg_type
+        self.kwargs = kwargs
+              
 
+    
 class TransportManager():
     
     """
     Class to define the transport manager.
-
-
     Attributes:
         name (str): label for manager instance.
         owner (QuantumRouter): node that transport manager is attached to.
@@ -104,24 +78,23 @@ class TransportManager():
         end_time(int) : end time for the request
         """
         self.tp_id=next(self.id)
-        # print('create request',self.owner.name,dest,self.tp_id,endtime)
+        print('create request')
         transport_protocol_src=TransportProtocol(self.owner, responder,start_time,size,end_time,priority,target_fidelity, timeout) #Create source protocol instance
         self.owner.protocols.append(transport_protocol_src)         #Adding the protocol to the list of protocols
         self.transportprotocolmap[self.tp_id]=transport_protocol_src
-        message=ProtocolMessage(ProtocolMsgType.REQ,"transport_manager",objsrc=transport_protocol_src)   #Sending msgtype REQ to start destination protocol
-        self.owner.send_message(responder,message)
+        message=Message(MsgRecieverType.MANAGER, ManagerType.TransportManager,ProtocolMsgType.REQ,src_obj=transport_protocol_src) 
+        print('message',message.msg_type,message.receiver,message.receiver_type)  #Sending msgtype REQ to start destination protocol
+        self.owner.message_handler.send_message(responder,message)
 
 
-    def received_message(self,src,msg: ProtocolMessage):
+    def received_message(self,src,msg: Message):
         
         """Method to receive messages.
-
         This method receives messages from transport manager.
         Depending on the message, different actions may be taken by the protocol.
-
         Args:
             src (str): name of the source node sending the message.
-            msg (ProtocolMessage): message received.
+            msg (Message): message received.
         """
 
         msg_type=msg.msg_type
@@ -129,16 +102,22 @@ class TransportManager():
 
         if msg_type is ProtocolMsgType.REQ:
             # print('Session between src and dest',self.owner.name,msg.objsrc.owner.name,msg.objsrc.starttime*1e-12,msg.objsrc.size,msg.objsrc.timeout*1e-12)
-            transport_protocol_dest=TransportProtocol(self.owner, msg.objsrc.owner.name,msg.objsrc.starttime,msg.objsrc.endtime,msg.objsrc.size,msg.objsrc.priority,msg.objsrc.target_fidelity,msg.objsrc.timeout)  #Creating destination protocol
+            print('Message passing working')
+            src_obj=msg.kwargs.get('src_obj')
+            print('src obj', src_obj.owner.name,src_obj.starttime,src_obj.endtime,src_obj.size,src_obj.priority,src_obj.target_fidelity)
+            transport_protocol_dest=TransportProtocol(self.owner, src_obj.owner.name,src_obj.starttime,src_obj.endtime,src_obj.size,src_obj.priority,src_obj.target_fidelity,src_obj.timeout)  #Creating destination protocol
             self.owner.protocols.append(transport_protocol_dest)
-            message=ProtocolMessage(ProtocolMsgType.REQACK,"transport_manager",objdest=transport_protocol_dest,objsrc=msg.objsrc)
-            self.owner.send_message(src,message)
+            message=Message(MsgRecieverType.MANAGER, ManagerType.TransportManager,ProtocolMsgType.REQACK,dest_obj=transport_protocol_dest,src_obj=src_obj)
+            self.owner.message_handler.send_message(src,message)
             
 
         elif msg_type is ProtocolMsgType.REQACK:
-            # print('REQACK recieved from destination node',msg.objsrc,msg.objsrc.owner.name,msg.objdest.owner.name)
-            msg.objsrc.create_session(msg.objdest)  #Call create session of the transport protocol after both protocol instance has been created.
-            
+            print('REQACK recieved from destination node')
+            src_obj=msg.kwargs.get('src_obj')
+            dest_obj=msg.kwargs.get('dest_obj')
+            src_obj.create_session(dest_obj)  #Call create session of the transport protocol after both protocol instance has been created.
+            # self.owner.message_handler.manager_is_over(msg.receiver)
+
     def notify_tm(self,fail_time,tp_id,status):
         '''
         Method to recieve the acknowledgements of Reject,Abort and Approved from link layer.
@@ -153,9 +132,7 @@ class TransportManager():
 
                 process=Process(tp,'notify_tp',[fail_time,status])
                 event=Event(tp.starttime+self.owner.timeline.now(),process)
-                #self.owner.timeline.schedule(event)
-                self.own.timeline.schedule_counter += 1
-                self.own.timeline.events.push(event)
+                self.owner.timeline.schedule(event)
                 break
         
 
@@ -163,8 +140,6 @@ class TransportManager():
 class TransportProtocol(TransportManager):
 
     """Transport protocol for quantum router.
-
-
     Attributes:
         own (QuantumRouter): node that protocol instance is attached to.
         name (str): label for protocol instance.
@@ -191,24 +166,21 @@ class TransportProtocol(TransportManager):
 
         """ 
         Creates a session between source and destination protocol. Sends classical messgae to start 3 way handshake to decide the timeout of the request.
-
         """
 
-        # print('session created',self,self.owner.name,dest_obj.owner.name)
-        message=ProtocolMessage(ProtocolMsgType.SYN,None,src_obj=self,dest_obj=dest_obj)
-        dest_obj.owner.send_message(self.owner.name,message)
+        print('session created',dest_obj.owner.name, self.name)
+        message=Message(MsgRecieverType.PROTOCOL,self.name,ProtocolMsgType.SYN,src_obj=self,dest_obj=dest_obj)
+        dest_obj.owner.message_handler.send_message(self.owner.name,message)
        
     
-    def received_message(self,src,msg: ProtocolMessage):
+    def received_message(self,src,msg: Message):
 
         """Method to receive messages.
-
         This method receives messages from transport protocols.
         Depending on the message, different actions may be taken by the protocol.
-
         Args:
             src (str): name of the source node sending the message.
-            msg (ProtocolMessage): message received.
+            msg (Message): message received.
         """
 
 
@@ -224,27 +196,33 @@ class TransportProtocol(TransportManager):
         
 
         if msg_type is ProtocolMsgType.SYN:
-            # print('SYN between',self.owner.name,src)            
+            print('SYN between',self.owner.name,src)            
             dest_timer=self.owner.timeline.now()
-            message=ProtocolMessage(ProtocolMsgType.SYNACK,None,src_obj=msg.src_obj,dest_obj=msg.dest_obj,dest_timer=dest_timer)
+            src_obj=msg.kwargs.get('src_obj')
+            dest_obj=msg.kwargs.get('dest_obj')
+            message=Message(MsgRecieverType.PROTOCOL,self.name,ProtocolMsgType.SYNACK,src_obj=src_obj,dest_obj=dest_obj,dest_timer=dest_timer)
             # print('ccccc',self.owner.name,src)
-            self.owner.send_message(src,message)
+            self.owner.message_handler.send_message(src,message)
             # msg.src_obj.create_requests()
 
 
         elif msg_type is ProtocolMsgType.SYNACK:
-            # print('SYNACK received',self.owner.name,src)
+            print('SYNACK received',self.owner.name,src)
             src_timer=self.owner.timeline.now()
-            final_timer=msg.src_obj.starttime*1e-12 + self.timeout*1e-12
+            src_obj=msg.kwargs.get('src_obj')
+            dest_obj=msg.kwargs.get('dest_obj')
+            dest_time=msg.kwargs.get('dest_timer')
+            final_timer=src_obj.starttime*1e-12 + self.timeout*1e-12
             # print('final timer', final_timer)
-            message=ProtocolMessage(ProtocolMsgType.ACK,None,src_obj=msg.src_obj,dest_obj=msg.dest_obj,final_timer=final_timer)
-            self.owner.send_message(src,message)
+           
+            message=Message(MsgRecieverType.PROTOCOL,self.name,ProtocolMsgType.ACK,src_obj=src_obj,dest_obj=dest_obj,final_timer=final_timer)
+            self.owner.message_handler.send_message(src,message)
 
         
         
         elif msg_type is ProtocolMsgType.ACK:
             tn=self.owner.timeline.now()
-            # print('ACKs time',self.owner.name,src,msg.final_timer,tn*1e-12,self)
+            print('ACKs time',self.owner.name,src,tn*1e-12,self)
             self.create_requests()
                  
         # elif msg_type is ProtocolMsgType.RETRY:
@@ -264,7 +242,7 @@ class TransportProtocol(TransportManager):
                 # process=Process(nm,'request', [self.other,self.starttime,self.endtime,self.size,.5,self.priority,id] )
                 # event=Event(8e12,process,0)
                 # self.owner.timeline.schedule(event)
-                nm.request(self.other, start_time=self.starttime , end_time=self.endtime, memory_size=self.size, target_fidelity=self.target_fidelity,priority=self.priority,tp_id=id)
+                nm.create_request(self.owner.name,self.other, start_time=self.starttime , end_time=self.endtime, memory_size=self.size, target_fidelity=self.target_fidelity,priority=self.priority,tp_id=id)
                 self.reqcount+=1
 
     def notify_tp(self,ftime,status):
@@ -285,10 +263,10 @@ class TransportProtocol(TransportManager):
         Method to create request for the retrials.
         '''
         # print('Inside retrials',status,self,self.starttime,self.owner.name,self.other)
-        message=ProtocolMessage(ProtocolMsgType.RETRY,None)
+        message=Message(ProtocolMsgType.RETRY,None)
         
 
-        # self.owner.send_message(self.other,message)
+        # self.owner.message_handler.send_message(self.other,message)
         while status != 'APPROVED' and self.retry < 5:
            
             self.retry +=1
@@ -304,6 +282,3 @@ class TransportProtocol(TransportManager):
                     # process=Process(nm,'request',[self.other,self.starttime,self.endtime,self.size,.5,self.priority,id])
                     # event=Event(self.starttime+self.owner.timeline.now(),process,0)
                     # self.owner.timeline.schedule(event)
-                    
-
-  

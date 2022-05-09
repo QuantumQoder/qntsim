@@ -24,7 +24,7 @@ import json
 import math
 from ..kernel._event import Event
 from ..kernel.process import Process
-
+from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
 class UpdateRoutingMessageType(Enum):
     UPDATE_ROUTING_TABLE=auto()
@@ -36,7 +36,12 @@ class UpdateRoutingMessage(Message):
         # print('Update routing message',self.receiver,node,vneighbors)
         self.vneighbors=vneighbors
 
-
+class Message():
+    def __init__(self, receiver_type : Enum, receiver : Enum, msg_type , **kwargs):
+        self.receiver_type =receiver_type
+        self.receiver = receiver
+        self.msg_type = msg_type
+        self.kwargs = kwargs
     
 class StaticRoutingMessage(Message):
     """Message used for communications between routing protocol instances.
@@ -399,7 +404,7 @@ class NewRoutingProtocol(StackProtocol):
                         for nodes in self.own.neighborhood_list:
                             if nodes==items:
                                 msg.marker=nodes
-                self.own.send_message(path[1],msg)
+                self.own.message_handler.send_message(path[1],msg)
             # print('Message Info msg.path: ----------', self.own.name,msg.temp_path,self.own.neighborhood_list) 
             # print('marker node',msg.marker,self.own.name)
 
@@ -502,14 +507,14 @@ class RoutingTableUpdateProtocol(NewRoutingProtocol):
         G=self.own.nx_graph
         [*vneighbors]=self.own.find_virtual_neighbors() 
         neighbor_list=self.find_neighbors()
-        print('neighborhoodlist',self.own.name, neighbor_list,neighbors)
+        # print('neighborhoodlist',self.own.name, neighbor_list,neighbors)
         # print('vneighbor',self.own.name,vneighbors,self.own.virtualneighbors,self.own.timeline.now()*1e-12)
         # print('updaterouting',self.own.name,vneighbors,self.own.timeline.now()*1e-12)
        
         for node in G.nodes:
             if node != self.own.name:
-                msg=UpdateRoutingMessage(UpdateRoutingMessageType.UPDATE_ROUTING_TABLE, None,node,self.own.virtualneighbors)
-                self.own.send_message(node,msg)
+                msg=Message(MsgRecieverType.PROTOCOL,ProtocolType.RoutingTableUpdateProtocol,UpdateRoutingMessageType.UPDATE_ROUTING_TABLE,node=node,v_neighbor=self.own.virtualneighbors)
+                self.own.message_handler.send_message(node,msg)
                 # print('nds',node,self.own.name,vneighbors)
 
         for node in self.own.nx_graph:
@@ -546,16 +551,17 @@ class RoutingTableUpdateProtocol(NewRoutingProtocol):
         self.own.timeline.schedule_counter += 1
         self.own.timeline.events.push(event)
         self.vlink_data={}
-        print("--end of send message func in rtup----")
+        # print("--end of send message func in rtup----")
 
 
-    def received_message(self,src,msg: UpdateRoutingMessage):
+    def received_message(self,src,msg: Message):
         # print('received message2',src,msg.vneighbors,self.own.timeline.now()*1e-12)
         # vlink_data={}
         if msg.msg_type is UpdateRoutingMessageType.UPDATE_ROUTING_TABLE:
             # print('received message1',msg.vneighbors)
             key=src
-            if msg.vneighbors:
+            vneighbors=msg.kwargs.get('v_neighbor')
+            if vneighbors:
                 # print('not empty',src,msg.vneighbors,self.own.timeline.now()*1e-12)
                 # vlink_data[src].append(msg.vneighbors)
                 self.vlink_data[src]=msg.vneighbors

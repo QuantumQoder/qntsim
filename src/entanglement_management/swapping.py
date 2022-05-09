@@ -1,12 +1,9 @@
 """Code for entanglement swapping.
-
 This module defines code for entanglement swapping.
 Success is pre-determined based on network parameters.
 The entanglement swapping protocol is an asymmetric protocol:
-
 * The EntanglementSwappingA instance initiates the protocol and performs the swapping operation.
 * The EntanglementSwappingB instance waits for the swapping result from EntanglementSwappingA.
-
 The swapping results decides the following operations of EntanglementSwappingB.
 Also defined in this module is the message type used by these protocols.
 """
@@ -26,7 +23,7 @@ from ..message import Message
 from .entanglement_protocol import EntanglementProtocol
 from ..utils import log
 from ..components.circuit import Circuit
-
+from ..topology.message_queue_handler import ManagerType, ProtocolType, MsgRecieverType
 
 class SwappingMsgType(Enum):
     """Defines possible message types for entanglement generation."""
@@ -34,11 +31,9 @@ class SwappingMsgType(Enum):
     SWAP_RES = auto()
 
 
-class EntanglementSwappingMessage(Message):
+class Message():
     """Message used by entanglement swapping protocols.
-
     This message contains all information passed between swapping protocol instances.
-
     Attributes:
         msg_type (SwappingMsgType): defines the message type.
         receiver (str): name of destination protocol instance.
@@ -48,16 +43,14 @@ class EntanglementSwappingMessage(Message):
         expire_time (int): expiration time of the new memory pair.
     """
 
-    def __init__(self, msg_type: SwappingMsgType, receiver: str, **kwargs):
-        Message.__init__(self, msg_type, receiver)
-        if self.msg_type is SwappingMsgType.SWAP_RES:
-            self.fidelity = kwargs.get("fidelity")
-            self.remote_node = kwargs.get("remote_node")
-            self.remote_memo = kwargs.get("remote_memo")
-            self.expire_time = kwargs.get("expire_time")
-            self.meas_res = kwargs.get("meas_res")
-        else:
-            raise Exception("Entanglement swapping protocol create unkown type of message: %s" % str(msg_type))
+    def __init__(self, receiver_type: Enum, receiver: Enum, msg_type, **kwargs) -> None:
+
+        self.receiver_type = receiver_type
+        self.receiver = receiver
+        self.msg_type = msg_type
+        self.kwargs = kwargs
+
+   
 
     def __str__(self):
         if self.msg_type == SwappingMsgType.SWAP_RES:
@@ -69,14 +62,11 @@ class EntanglementSwappingMessage(Message):
 
 class EntanglementSwappingA(EntanglementProtocol):
     """Entanglement swapping protocol for middle router.
-
     The entanglement swapping protocol is an asymmetric protocol.
     EntanglementSwappingA should be instantiated on the middle node, where it measures a memory from each pair to be swapped.
     Results of measurement and swapping are sent to the end routers.
-
     Variables:
         EntanglementSwappingA.circuit (Circuit): circuit that does swapping operations.
-
     Attributes:
         own (QuantumRouter): node that protocol instance is attached to.
         name (str): label for protocol instance.
@@ -95,7 +85,6 @@ class EntanglementSwappingA(EntanglementProtocol):
     def __init__(self, own: "Node", name: str, left_memo: "Memory", right_memo: "Memory", success_prob=1,
                  degradation=0.95):
         """Constructor for entanglement swapping A protocol.
-
         Args:
             own (Node): node that protocol is attached to.
             name (str): label for swapping protocol instance.
@@ -132,7 +121,6 @@ class EntanglementSwappingA(EntanglementProtocol):
 
     def set_others(self, other: "EntanglementSwappingB") -> None:
         """Method to set one other protocol.
-
         Args:
             other (EntanglementSwappingB): protocol to add to other list.
         """
@@ -147,9 +135,7 @@ class EntanglementSwappingA(EntanglementProtocol):
     def start(self) -> None:
         # print("swapping between ", self.left_node,  self.right_node)
         """Method to start entanglement swapping protocol.
-
         Will run circuit and send measurement results to other protocols.
-
         Side Effects:
             Will call `update_resource_manager` method.
             Will send messages to other protocols.
@@ -186,13 +172,13 @@ class EntanglementSwappingA(EntanglementProtocol):
             expire_time = min(self.left_memo.get_expire_time(), self.right_memo.get_expire_time())  
 
             # Sending messages to both nodes with the new fidelities, and entanglement parters
-            msg_l = EntanglementSwappingMessage(SwappingMsgType.SWAP_RES, self.left_protocol.name,
+            msg_l = Message(MsgRecieverType.PROTOCOL, self.left_protocol.name, SwappingMsgType.SWAP_RES, left_protocol=self.left_protocol.name,
                                                 fidelity=fidelity,
                                                 remote_node=self.right_memo.entangled_memory["node_id"],
                                                 remote_memo=self.right_memo.entangled_memory["memo_id"],
                                                 expire_time=expire_time,
                                                 meas_res=[])
-            msg_r = EntanglementSwappingMessage(SwappingMsgType.SWAP_RES, self.right_protocol.name,
+            msg_r = Message(MsgRecieverType.PROTOCOL, self.right_protocol.name ,SwappingMsgType.SWAP_RES, right_protocol=self.right_protocol.name,
                                                 fidelity=fidelity,
                                                 remote_node=self.left_memo.entangled_memory["node_id"],
                                                 remote_memo=self.left_memo.entangled_memory["memo_id"],
@@ -200,12 +186,13 @@ class EntanglementSwappingA(EntanglementProtocol):
                                                 meas_res=[])
         else:
             # if swapping fails, simply return the messages with the updated fidelities as 0 at both ends (set them to raw)
-            msg_l = EntanglementSwappingMessage(SwappingMsgType.SWAP_RES, self.left_protocol.name, fidelity=0)
-            msg_r = EntanglementSwappingMessage(SwappingMsgType.SWAP_RES, self.right_protocol.name, fidelity=0)
+            expire_time = min(self.left_memo.get_expire_time(), self.right_memo.get_expire_time())
+            msg_l = Message(MsgRecieverType.PROTOCOL, self.left_protocol.name,SwappingMsgType.SWAP_RES, left_protocol=self.left_protocol.name, fidelity=0,expire_time=expire_time)
+            msg_r = Message(MsgRecieverType.PROTOCOL, self.right_protocol.name,SwappingMsgType.SWAP_RES, right_protocol=self.right_protocol.name, fidelity=0,expire_time=expire_time)
 
         # Sed the messages
-        self.own.send_message(self.left_node, msg_l)
-        self.own.send_message(self.right_node, msg_r)
+        self.own.message_handler.send_message(self.left_node, msg_l)
+        self.own.message_handler.send_message(self.right_node, msg_r)
 
         # Update the middle node's memries to raw
         self.update_resource_manager(self.left_memo, "RAW")
@@ -219,11 +206,9 @@ class EntanglementSwappingA(EntanglementProtocol):
     @lru_cache(maxsize=128)
     def updated_fidelity(self, f1: float, f2: float) -> float:
         """A simple model updating fidelity of entanglement.
-
         Args:
             f1 (float): fidelity 1.
             f2 (float): fidelity 2.
-
         Returns:
             float: fidelity of swapped entanglement.
         """
@@ -237,13 +222,10 @@ class EntanglementSwappingA(EntanglementProtocol):
 
     def memory_expire(self, memory: "Memory") -> None:
         """Method to receive memory expiration events.
-
         Releases held memories on current node.
         Memories at the remote node are released as well.
-
         Args:
             memory (Memory): memory that expired.
-
         Side Effects:
             Will invoke `update` method of attached resource manager.
             Will invoke `release_remote_protocol` or `release_remote_memory` method of resource manager.
@@ -274,15 +256,12 @@ class EntanglementSwappingA(EntanglementProtocol):
 
 class EntanglementSwappingB(EntanglementProtocol):
     """Entanglement swapping protocol for middle router.
-
     The entanglement swapping protocol is an asymmetric protocol.
     EntanglementSwappingB should be instantiated on the end nodes, where it waits for swapping results from the middle node.
-
     Variables:
             EntanglementSwappingB.x_cir (Circuit): circuit that corrects state with an x gate.
             EntanglementSwappingB.z_cir (Circuit): circuit that corrects state with z gate.
             EntanglementSwappingB.x_z_cir (Circuit): circuit that corrects state with an x and z gate.
-
     Attributes:
         own (QuantumRouter): node that protocol instance is attached to.
         name (str): label for protocol instance.
@@ -301,7 +280,6 @@ class EntanglementSwappingB(EntanglementProtocol):
 
     def __init__(self, own: "Node", name: str, hold_memo: "Memory"):
         """Constructor for entanglement swapping B protocol.
-
         Args:
             own (Node): node protocol is attached to.
             name (str): name of protocol instance.
@@ -319,36 +297,38 @@ class EntanglementSwappingB(EntanglementProtocol):
 
     def set_others(self, another: "EntanglementSwappingA") -> None:
         """Method to set one other protocol.
-
         Args:
             other (EntanglementSwappingA): protocol to set as other.
         """
 
         self.another = another
 
-    def received_message(self, src: str, msg: "EntanglementSwappingMessage") -> None:
+    def received_message(self, src: str, msg: "Message") -> None:
         """Method to receive messages from EntanglementSwappingA.
-
         Args:
             src (str): name of node sending message.
             msg (EntanglementSwappingMesssage): message sent.
-
         Side Effects:
             Will invoke `update_resource_manager` method.
         """
-
+        print('Swapping message kwargs', msg.msg_type, msg.kwargs)
+        fidelity=msg.kwargs['fidelity']
+        expire_time=msg.kwargs['expire_time']
+        remote_node=msg.kwargs['remote_node']
+        remote_memo=msg.kwargs['remote_memo']
         log.logger.debug(
-            self.own.name + " protocol received_message from node {}, fidelity={}".format(src, msg.fidelity))
+            self.own.name + " protocol received_message from node {}, fidelity={}".format(src, fidelity))
 
         assert src == self.another.own.name
 
         # The only message the end nodes get is to update the memories on the end nodes with the respective outcomes. 
-        if msg.fidelity > 0 and self.own.timeline.now() < msg.expire_time:
+        
+        if fidelity > 0 and self.own.timeline.now() < expire_time:
             # case if fideliies are not 0 (swapping succesful)
-            self.memory.fidelity = msg.fidelity
-            self.memory.entangled_memory["node_id"] = msg.remote_node
-            self.memory.entangled_memory["memo_id"] = msg.remote_memo
-            self.memory.update_expire_time(msg.expire_time)
+            self.memory.fidelity = fidelity
+            self.memory.entangled_memory["node_id"] = remote_node
+            self.memory.entangled_memory["memo_id"] = remote_memo
+            self.memory.update_expire_time(expire_time)
             self.update_resource_manager(self.memory, "ENTANGLED")
         else:
             # case if swapping fails
@@ -359,10 +339,8 @@ class EntanglementSwappingB(EntanglementProtocol):
 
     def memory_expire(self, memory: "Memory") -> None:
         """Method to deal with expired memories.
-
         Args:
             memory (Memory): memory that expired.
-
         Side Effects:
             Will update memory in attached resource manager.
         """

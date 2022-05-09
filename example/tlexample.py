@@ -39,9 +39,9 @@ def set_parameters(topology: Topology):
    
     SWAP_SUCC_PROB = 0.9
     SWAP_DEGRADATION = 0.99
-    for node in topology.get_nodes_by_type("QuantumRouter"):
-        node.network_manager.protocol_stack[1].set_swapping_success_rate(SWAP_SUCC_PROB)
-        node.network_manager.protocol_stack[1].set_swapping_degradation(SWAP_DEGRADATION)
+    # for node in topology.get_nodes_by_type("QuantumRouter"):
+    #     node.network_manager.protocol_stack[1].set_swapping_success_rate(SWAP_SUCC_PROB)
+    #     node.network_manager.protocol_stack[1].set_swapping_degradation(SWAP_DEGRADATION)
         
   
     ATTENUATION = 1e-5
@@ -69,9 +69,15 @@ set_parameters(network_topo)
 
 
 node1='v0'
-node2='v4'
+node2='v1'
 tm=network_topo.nodes[node1].transport_manager
 tm.request(node2, start_time=3e12,size=5, end_time=10e12, priority=0 , target_fidelity= 0.7, timeout=2e12) 
+
+
+node1='v2'
+node2='v3'
+tm=network_topo.nodes[node1].transport_manager
+tm.request(node2, start_time=6e12,size=5, end_time=10e12, priority=0 , target_fidelity= 0.7, timeout=2e12) 
 
 
 

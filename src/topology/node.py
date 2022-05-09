@@ -25,12 +25,12 @@ from ..components.light_source import LightSource, SPDCSource2
 from ..components.detector import QSDetectorPolarization, QSDetectorTimeBin
 from ..resource_management.resource_manager import ResourceManager
 from ..transport_layer.transport_manager import TransportManager
-from ..network_management.network_manager import NewNetworkManager
+
 from ..entanglement_management.generation import GenerationMsgType
 from ..utils.encoding import *
 from ..network_management.request import RRPMsgType
 from ..network_management.network_manager import NetworkManager
-
+from .message_queue_handler import MessageQueueHandler
 
 class Node(Entity):
     """Base node type.
@@ -85,17 +85,7 @@ class Node(Entity):
 
         self.qchannels[another] = qchannel
 
-    def send_message(self, dst: str, msg: "Message", priority=inf) -> None:
-        """Method to send classical message.
-
-        Args:
-            dst (str): name of destination node for message.
-            msg (Message): message to transmit.
-            priority (int): priority for transmitted message (default inf).
-        """
-        if priority == inf:
-            priority = self.timeline.schedule_counter
-        self.cchannels[dst].transmit(msg, self, priority)
+    
 
     def receive_message(self, src: str, msg: "Message") -> None:
         """Method to receive message from classical channel.
@@ -165,7 +155,8 @@ class BSMNode(Node):
         self.bsm = SingleAtomBSM("%s_bsm" % name, timeline)
         self.eg = EntanglementGenerationB(self, "{}_eg".format(name), other_nodes)
         self.bsm.attach(self.eg)
-
+        self.message_handler = MessageQueueHandler(self)
+        
     def receive_message(self, src: str, msg: "Message") -> None:
         # signal to protocol that we've received a message
         # print("protocols on bsm: ", self.protocols)
@@ -238,7 +229,7 @@ class QuantumRouter(Node):
         app (any): application in use on node.
     """
 
-    def __init__(self, name, tl, memo_size=10):
+    def __init__(self, name, tl, memo_size=50):
         """Constructor for quantum router class.
 
         Args:
@@ -255,6 +246,7 @@ class QuantumRouter(Node):
         self.resource_manager = ResourceManager(self)
         self.network_manager = NetworkManager(self)
         self.transport_manager=TransportManager(self)
+        self.message_handler = MessageQueueHandler(self)
         self.map_to_middle_node = {}
         self.app = None
         self.lightsource = SPDCSource2(self, name, tl)
@@ -297,50 +289,7 @@ class QuantumRouter(Node):
     def receive_message(self, src: str, msg: "Message") -> None:
         # print('receive msg', msg.receiver,msg.protocol_type)
         #print("Quantum roter receive message")
-        if msg.msg_type== RRPMsgType.RESERVE:
-
-            print("message type",msg.msg_type, msg.receiver)
-        
-
-        if msg.receiver == "resource_manager":
-            self.resource_manager.received_message(src, msg)
-        elif msg.receiver == "reservation_manager":
-            #self.reservation_manager.index()
-            #path.index(self.request.node)
-            for reservation in self.reservation_manager:
-                if reservation.request== msg.payload:
-                    reservation.receive_message(msg)
-                    break
-
-
-        elif msg.receiver == "network_manager":
-            print("Quantum roter receive N message")
-            self.network_manager.received_message(src, msg)
-        elif msg.receiver == "transport_manager":
-            self.transport_manager.received_message(src, msg)
-        elif msg.msg_type == GenerationMsgType.MEAS_RES or msg.msg_type == GenerationMsgType.BSM_ALLOCATE:
-            try:
-                msg.protocol.received_message(src, msg)
-                return
-            except:
-                pass 
-        # else:
-        if msg.receiver is None:
-            matching = [p for p in self.protocols if type(p) == msg.protocol_type]
-            # print('ms protocol type',msg.protocol_type)
-            # for p in self.protocols:
-            #     # print('type p',type(p))
-            #     p.received_message(src, msg)
-            # # print('matching', matching)
-            for p in matching:
-                p.received_message(src, msg)
-                
-
-        else:
-            for protocol in self.protocols:
-                if protocol.name == msg.receiver:
-                    protocol.received_message(src, msg)
-                    break
+        self.message_handler.push_message(src,msg)
 
     def init(self):
         """Method to initialize quantum router node.

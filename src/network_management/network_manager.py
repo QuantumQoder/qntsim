@@ -17,26 +17,13 @@ if TYPE_CHECKING:
 
 from ..message import Message
 from .routing import StaticRoutingProtocol,NewRoutingProtocol,RoutingTableUpdateProtocol
-from .reservation import ResourceReservationProtocol, ResourceReservationMessage, RSVPMsgType, Reservation
+from .reservation import ResourceReservationProtocol, RSVPMsgType, Reservation
 from ..transport_layer.transport_manager import TransportProtocol
-from ..resource_management.resource_manager import ResourceManagerMsgType, ResourceManagerMessage
+from ..resource_management.resource_manager import ResourceManagerMsgType
 from ..kernel._event import Event
 from ..kernel.process import Process
 from .request import Request ,RoutingProtocol,ReservationProtocol,RRPMsgType
 
-
-class NetworkManagerMessage(Message):
-    """Message used by the network manager.
-
-    Attributes:
-        message_type (Enum): message type required by base message type.
-        receiver (str): name of destination protocol instance.
-        payload (Message): message to be passed through destination network manager.
-    """
-
-    def __init__(self, msg_type: Enum, receiver: str, payload: "Message"):
-        Message.__init__(self, msg_type, receiver)
-        self.payload = payload
 
 
 class NetworkManager():
@@ -83,65 +70,7 @@ class NetworkManager():
             self.protocol_stack[0].lower_protocols.append(self)
             self.protocol_stack[-1].upper_protocols.append(self)
 
-    def push(self, **kwargs):
-        """Method to receive pushes from lowest protocol in protocol stack.
 
-        Will create message to send to another node.
-
-        Keyword Args:
-            msg (any): message to deliver.
-            dst (str): name of destination node.
-        """
-
-        message = NetworkManagerMessage(Enum, "network_manager", kwargs["msg"])
-        # print('nm',self.owner.name,kwargs["dst"])
-        self.owner.send_message(kwargs["dst"], message)
-
-    def pop(self, **kwargs):
-        """Method to receive pops from highest protocol in protocol stack.
-
-        Will get reservation from message and attempt to meet it.
-
-        Keyword Args:
-            msg (any): message containing reservation.
-        """
-
-        msg = kwargs.get("msg")
-        assert isinstance(msg, ResourceReservationMessage)
-        reservation = msg.reservation
-        if reservation.initiator == self.owner.name:
-            if msg.msg_type == RSVPMsgType.APPROVE:
-                # when the path has been approved, you check if the connection has been aborted
-                # Get the path formed during path discovery
-                self.owner.get_reserve_res(reservation, True)
-                path = msg.path
-                
-                
-                # print("NETWORK MANAGER PATH: ", path,self.abort,reservation,reservation.start_time*1e-12)
-                # If the path has been aborted
-                if self.abort:
-                    # print("THIS CONNECTION GOT ABORTED",self.abort)
-                    # print(self.abort,self.preempted_reservation)
-
-                    # create and send a message to all the nodes in the path that the connection has been aborted
-                    msg = ResourceManagerMessage(ResourceManagerMsgType.ABORT, receiver = "resource_manager", protocol = None, reservation = self.preempted_reservation)
-                    self.owner.resource_manager.received_message(self.owner.name, msg)
-                    self.notify_nm('ABORT',msg.reservation.id,msg.reservation)
-                    for i in path[1:]: 
-                        self.owner.send_message(i, msg)
-                    self.abort=False
-                else:
-                    # the connection is not aborted and we can move forward
-
-                    # msg = ResourceManagerMessage(ResourceManagerMsgType.RESPONSE, receiver = "resource_manager", protocol = None, reservation = reservation)
-                    # self.owner.resource_manager.received_message(self.owner.name, msg)
-
-                    print('')
-                    
-            else:
-                self.owner.get_reserve_res(reservation, False)
-        elif reservation.responder == self.owner.name:
-            self.owner.get_other_reservation(reservation)
 
     def received_message(self, src: str, msg: "Message"):
         """Method to receive transmitted network reservation method.
@@ -165,41 +94,12 @@ class NetworkManager():
 
         self.protocol_stack[0].pop(src=src, msg=msg.payload)"""
         if msg.msg_type==RRPMsgType.RESERVE :
-            print("received at ", self.owner.name,msg.payload)
+            print("received at ", self.owner.name,msg.kwargs)
             self.process_request(msg)
         #self.process_request(msg
         
 
-    def request(self, responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float,priority: int,tp_id: int) -> None:
-    # def request(self, responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float, ) -> None:
-        """Method to make an entanglement request.
-
-        Will defer request to top protocol in protocol stack.
-
-        Args:
-            responder (str): name of node to establish entanglement with.
-            start_time (int): simulation start time of entanglement.
-            end_time (int): simulation end time of entanglement.
-            memory_size (int): number of entangledd memory pairs to create.
-            target_fidelity (float): desired fidelity of entanglement.
-
-        Side Effects:
-            Will invoke `push` method of -1 indexed protocol in `protocol_stack`.
-        """
-        """
-        reservation = Reservation(initiator,responder, start_time, end_time, memory_size, target_fidelity,isvirtual)
-        #reqid=Reservation.id
-        reqobj=reservation.Reservation()
-        requests={'reqid':reqid,'reqobj':reqobj}
-        print('aaa', requests)
-        """
-        # self.net_id=next(self.id)
-        # self.abort=False
-        self.tp_id=tp_id
-        # print('tpsid',self.tp_id)
-        # self.notify_nm(tp_id=tp_id)
-        self.protocol_stack[-1].push(responder, start_time, end_time, memory_size, target_fidelity,False, priority)#$$Shouldnt isvirtual be a _isvirtual?
-
+   
     #Add notify method
     def notify_nm(self,status,ReqId,ResObj):
         
@@ -266,11 +166,11 @@ class NetworkManager():
 
         resource_reservation_protocol.start()
 
-    def process_request(self ,msg: "RRMessage"): 
-        
-        print(msg.payload)
+    def process_request(self ,msg: "Message"): 
+        payload=msg.kwargs['request']
+        print('process request payload', payload)
         #print(user_request)
-        user_request = msg.payload
+        user_request = payload
         #tmp_path =msg.temp_path
         #print(msg.payload)
         #print(user_request)
@@ -300,131 +200,4 @@ class NetworkManager():
         self.owner.timeline.events.push(event)
         self.owner.protocols.append(routing_update)
 
-    """def v_receive(msg):
-        msg_type=RESERVE
-        self.process_request(msg"""
-
-
-
-    #self.owner=initiator
-
-    #request Object
-    #user_request = Request(initiator,responder,start_time,end_time,memory_size,target_fidelity)
-    #print(user_request)
-    # Routing Protocol Object
-   # routing_protocol=NewRoutingProtocol()
-
-    # Resource Reservation Protocol Object
-   # resource_reservation_protocol = ResourceReservationProtocol(self.owner,user_request,routing_protocol)
-
-    # ResourceReservationProtocol.Start()
-   # resource_reservation_protocol.start()
-    
-
-
-def NewNetworkManager(owner: "QuantumRouter") -> "NetworkManager":
-    """Function to create a new network manager.
-
-    Will create a network manager with default protocol stack.
-    This stack inclused a reservation and routing protocol.
-
-    Args:
-        owner (QuantumRouter): node to attach network manager to.
-
-    Returns:
-        NetworkManager: network manager object created.
-    """
-
-    manager = NetworkManager(owner, [])
-    "Commented code is the static Routing protocol"
-    # routing = StaticRoutingProtocol(owner, owner.name + ".StaticRoutingProtocol", {})
-    # rsvp = ResourceReservationProtocol(owner, owner.name + ".RSVP")
-    # routing.upper_protocols.append(rsvp)
-    # rsvp.lower_protocols.append(routing)
-    # manager.load_stack([routing, rsvp])
-
-    "Initializing our routing protocol"
-    routing = NewRoutingProtocol(owner, owner.name + ".NewRoutingProtocol") 
-    """Instance of new routing protocol"""
-    routing_update=RoutingTableUpdateProtocol(owner,owner.name)     
-    """
-    Instance of routing update protocol that runs independently at regular time interval.
-    """
-    rsvp = ResourceReservationProtocol(owner, owner.name + ".RSVP")
-    routing.upper_protocols.append(rsvp)
-    rsvp.lower_protocols.append(routing)
-    manager.load_stack([routing, rsvp])
-    """
-    To initiate the routing update protocol we create an event of routing update which
-    calls the sendmessage of the RoutingTableUpdateProtocol in routing.py.
-    """
-    protocol_start_time=0
-    #process = Process(routing_update, "sendmessage",[])
-    #event = Event(protocol_start_time+owner.timeline.now(), process)
-    event = Event(protocol_start_time+owner.timeline.now(), routing_update, "sendmessage",[])
-    #owner.timeline.schedule(event)
-    owner.timeline.schedule_counter += 1
-    owner.timeline.events.push(event)
-    owner.protocols.append(routing_update)
-    return manager #network manager initiate the above event
-
-def schedule_rtup(self):
-    print("---------------rtup--------------")
-    routing_update=RoutingTableUpdateProtocol(owner,owner.name)
-    protocol_start_time=0
-    #process = Process(routing_update, "sendmessage",[])
-    #event = Event(protocol_start_time+owner.timeline.now(), process)
-    event = Event(protocol_start_time+owner.timeline.now(), routing_update, "sendmessage",[])
-    #owner.timeline.schedule(event)
-    owner.timeline.schedule_counter += 1
-    owner.timeline.events.push(event)
-    owner.protocols.append(routing_update)
-
-
-
-
-def create_request(self,initiator:str, responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float,priority: int,tp_id: int):
-
-    #self.owner=initiator
-
-    #request Object
-    user_request = Request(initiator,responder,start_time,end_time,memory_size,target_fidelity,priority,tp_id)
-    print(user_request)
-
-    # Routing Protocol Object
-    routing_protocol=NewRoutingProtocol(self.owner,initiator,responder)
-
-    # Resource Reservation Protocol Object
-    resource_reservation_protocol = ReservationProtocol(self.owner,user_request,routing_protocol)
-
-    # ResourceReservationProtocol.Start()
-   # resource_reservation_protocol.start()
-
-
-"""
-def process_request(msg): # used by next hop Node newtork manger to process , inherit's request object from classical message
-    
-    #msg is RESERVE
-    user_request = msg.info["request"]
-    # Resource Reservation Protocol Object
-    
-    # Routing Protocol Object
-    routing_protocol=NewRoutingProtocol()
-
-    resource_reservation_protocol = ResourceReservationProtocol(self.owner,user_request,routing_protocol)
    
-    # ResourceReservationProtocol.Start()
-    resource_reservation_protocol.start()
-"""
-"""
-def v_receive(msg):
-
-    msg_type=RESERVE
-
-    self.process_request(msg)"""
-
-
-    
-
-
-

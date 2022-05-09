@@ -7,7 +7,7 @@ from pyvis.network import Network
 import webbrowser
 
 #random.seed(0)
-network_config = "/home/bhanusree/Desktop/QNTv1/QNTSim/example/network_topology copy.json" #give path to yopur netwrok topology
+network_config = "/home/aman/QNTSim/QNTSim/example/network_topology copy.json" #give path to yopur netwrok topology
 
 
 
@@ -60,10 +60,14 @@ set_parameters(network_topo)
 
 
 node1='v0'
-node2='v4'
+node2='v2'
 nm=network_topo.nodes[node1].network_manager
 nm.create_request(node1,node2, start_time=2e12, end_time=10e12, memory_size=2, target_fidelity= 0.8,priority=1,tp_id=0)
-nm.create_request(node1,'v3', start_time=12e12, end_time=23e12, memory_size=3, target_fidelity= 0.8,priority=1,tp_id=0)
+
+node1='v0'
+node2='v3'
+nm=network_topo.nodes[node1].network_manager
+nm.create_request(node1,node2, start_time=3e12, end_time=10e12, memory_size=3, target_fidelity= 0.8,priority=1,tp_id=0)
 
 tl.init()
 tl.run()

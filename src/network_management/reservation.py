@@ -689,7 +689,7 @@ class ResourceReservationProtocol(StackProtocol):
 
                 protocol = EntanglementSwappingA(None, "ESA.%s.%s" % (memories[0].name, memories[1].name),
                                                  memories[0], memories[1],
-                                                 success_prob=self.es_succ_prob, degradation=self.es_degradation)
+                                                 success_prob=.99, degradation=.99)
                 dsts = [info.remote_node for info in memories_info]
                 req_funcs = [req_func1, req_func2]
                 return protocol, dsts, req_funcs

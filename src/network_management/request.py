@@ -1,6 +1,6 @@
 from typing import List, TYPE_CHECKING
 if TYPE_CHECKING:
-    from ..topology.node import QuantumRouter
+    from ..topology.node import QuantumRouter,Node
 
 from enum import Enum,auto
 from ..message import Message
@@ -11,10 +11,11 @@ from ..kernel._event import Event
 from ..entanglement_management.generation import EntanglementGenerationA
 from ..entanglement_management.purification import BBPSSW
 from ..entanglement_management.swapping import EntanglementSwappingA, EntanglementSwappingB
+from ..resource_management.memory_manager import MemoryManager, MemoryInfo
 import itertools
 import json
 import math
-
+from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
 
 class Request():
@@ -41,7 +42,7 @@ class Request():
 
 class RoutingProtocol():
     
-    def __init__(self, node: "Node", initiator:str,responder: str,temp_path:"[List(Node)]",marker:"Node"):
+    def __init__(self, node: "Node", initiator:str,responder: str,temp_path:"List(Node)",marker:"Node"):
         """Constructor for routing protocol.
 
         Args:
@@ -103,6 +104,7 @@ class RoutingProtocol():
         
         G=self.node.nx_graph
         skip=[]
+        print('source ',self.src, self.node.name)
         if self.node.name == self.src:
             path=nx.dijkstra_path(G,self.node.name,self.dst) 
             '''We initially calculate the temporary path using Dijkstra's algorithm.'''
@@ -123,7 +125,8 @@ class RoutingProtocol():
 
                             self.marker=nodes
             #self.own.send_message(path[1],msg)
-            print("marker nodes",self.marker)   
+            print("marker nodes",self.temp_path,self.marker)   
+        print('temp path',self.temp_path,self.node.name)
         indexx=self.temp_path.index(self.node.name)
         # print('indx',self.own.name,indexx,len(msg.temp_path))
 
@@ -190,6 +193,25 @@ class RRPMsgType(Enum):
     #SKIP_ROUTING=auto()
     
 
+class Message():
+
+    """Message used by Transport layer protocols.
+    This message contains all information passed between transport protocol instances.
+    Messages of different types contain different information.
+    Attributes:
+        msg_type (GenerationMsgType): defines the message type.
+        receiver (str): name of destination protocol instance.
+        src_obj : source node protocol instance
+        dest_obj : destination node protocol instance.
+    """
+
+
+    def __init__(self, receiver_type : Enum, receiver : Enum, msg_type , **kwargs) -> None:
+        
+        self.receiver_type =receiver_type
+        self.receiver = receiver
+        self.msg_type = msg_type
+        self.kwargs = kwargs
 
 class RRMessage(Message):
     """Message used by resource reservation protocol.
@@ -855,10 +877,12 @@ class ReservationProtocol():     #(Protocol):
 
                         self.node.resource_manager.reservation_id_to_memory_map[self.request.id] = []
                         self.node.resource_manager.reservation_id_to_memory_map[self.request.id].append(index_list[i][1])
-
-
+                    else:
+                        self.node.resource_manager.reservation_id_to_memory_map[self.request.id].append(index_list[i][1])
+                
+            
                 return True    
-        #print(demand_count)
+        print('reservation to memory map',self.node.resource_manager.reservation_id_to_memory_map)
         
         if (demand_count>0):
 
@@ -879,13 +903,13 @@ class ReservationProtocol():     #(Protocol):
                 #msgr=RRMessage(RRPMsgType.RESERVE,next_node,self.request) #msg_type="RESERVE"
                 
                 #print("message type , receiver", msgr.msg_type ,msgr.receiver)
-                msg=RRMessage(RRPMsgType.RESERVE,"network_manager",self.request)
+                msg=Message(MsgRecieverType.MANAGER, ManagerType.NetworkManager, RRPMsgType.RESERVE,request=self.request)
                 msg.temp_path=self.routing.temp_path
                 msg.marker=self.routing.marker
                 print("msg.msg_typed",msg.msg_type,msg)
                 self.request.path.append(self.node)
                 self.request.pathnames.append(self.node.name)
-                self.node.send_message(next_node,msg)
+                self.node.message_handler.send_message(next_node,msg)
                 #send_message(self, dst: str, msg: "Message", priority=inf)
                 #self.node.messagehandler.send_message(receiver_node,request , msg_type)####send message to next hop node's network manager (send message function?network manager or protocol)
              
@@ -896,7 +920,7 @@ class ReservationProtocol():     #(Protocol):
                 self.request.pathnames.append(self.node.name)
                 index=self.request.path.index(self.node)
                 prev_node=self.request.path[index-1]
-                msg=RRMessage(RRPMsgType.CREATE_TASKS,"reservation_manager",self.request)
+                msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.CREATE_TASKS,request=self.request)
                 print(" final message type fp , receiver", msg.msg_type ,msg.receiver)
                 #index=path.index(self.node.name)
                 #print(path[index+1])
@@ -908,13 +932,13 @@ class ReservationProtocol():     #(Protocol):
                 self.load_rules(rules,self.request)
                 print("tasks created at" ,self.node.name )
                 #call task and dependency creation method
-                self.node.send_message(prev_node.name,msg)
+                self.node.message_handler.send_message(prev_node.name,msg)
                 #send classical message to previous node path[index-1]'s Reservation protocol to createtasks 
                 #in receive msg check this condn
                 #send(msg_type)
                           
         else :
-            msg=RRMessage(RRPMsgType.FAIL,"reservation_manager",self.request)
+            msg=RRMessage(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.FAIL,request=self.request)
             
             #(RESORCES NOT AVAILABLE)
             #msg_type="FAIL"
@@ -934,8 +958,8 @@ class ReservationProtocol():     #(Protocol):
     def receive_message(self ,msg :"RRPMsgType"):
 
         if msg.msg_type==RRPMsgType.CREATE_TASKS :
-
-            self.request=msg.payload
+            payload=msg.kwargs['request']
+            self.request=payload
 
             if self.node.name==self.request.initiator:
                 #create tasks
@@ -952,8 +976,8 @@ class ReservationProtocol():     #(Protocol):
                 self.load_rules(rules,self.request)
                 #call tasks and dependency
                 print("tasks created at ",self.node.name)
-                msg=RRMessage(RRPMsgType.CREATE_TASKS,"reservation_manager",self.request)
-                self.node.send_message(prev_node.name,msg)
+                msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.CREATE_TASKS,request=self.request)
+                self.node.message_handler.send_message(prev_node.name,msg)
                 
             
                 #previous_node=self.request.path[previous_node_index]
@@ -986,7 +1010,7 @@ class ReservationProtocol():     #(Protocol):
                 index=self.request.path.index(self.node)
                 prev_node=self.request.path[index-1]
                 print("removed resources at ",self.node.name)
-                msg=RRMessage(RRPMsgType.FAIL,"reservation_manager",self.request)
+                msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.FAIL,"reservation_manager",request=self.request)
                 self.node.send_message(prev_node.name,msg)
 
 
