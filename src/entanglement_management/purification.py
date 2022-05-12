@@ -117,7 +117,7 @@ class BBPSSW(EntanglementProtocol):
             May update parameters of kept memory.
             Will send message to other protocol instance.
         """
-        # print("Purification is Running")
+        print("Purification is Running")
         log.logger.info(self.own.name + " protocol start with partner {}".format(self.another.own.name))
 
         assert self.another is not None, "other protocol is not set; please use set_others function to set it."
@@ -146,14 +146,15 @@ class BBPSSW(EntanglementProtocol):
 
         # generate random number to check if purification is succesful or not
         x_rand = random()
-
+    
         # check if purification succesful or not
         if x_rand < self.success_probability(msg.F):
-
+            print("purification receive 1")
             # if yes, update the fidelities.
             self.kept_memo.fidelity = self.improved_fidelity(self.kept_memo.fidelity)
             self.update_resource_manager(self.kept_memo, state="ENTANGLED")
         else:
+            print("purification receive 2")
             # else, turn the kept memory's status to raw
             self.update_resource_manager(self.kept_memo, state="RAW")
 

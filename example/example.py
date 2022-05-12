@@ -7,7 +7,7 @@ from pyvis.network import Network
 import webbrowser
 
 #random.seed(0)
-network_config = "/home/aman/QNTSim/QNTSim/example/network_topology copy.json" #give path to yopur netwrok topology
+network_config = "/home/bhanusree/Desktop/QNTv1/QNTSim/example/network_topology copy.json" #give path to yopur netwrok topology
 
 
 
@@ -60,14 +60,14 @@ set_parameters(network_topo)
 
 
 node1='v0'
-node2='v2'
+node2='v4'
 nm=network_topo.nodes[node1].network_manager
-nm.create_request(node1,node2, start_time=2e12, end_time=10e12, memory_size=2, target_fidelity= 0.8,priority=1,tp_id=0)
-
+nm.create_request(node1,node2, start_time=2e12, end_time=10e12, memory_size=2, target_fidelity= 0.7,priority=1,tp_id=0)
+"""
 node1='v0'
 node2='v3'
 nm=network_topo.nodes[node1].network_manager
-nm.create_request(node1,node2, start_time=3e12, end_time=10e12, memory_size=3, target_fidelity= 0.8,priority=1,tp_id=0)
+nm.create_request(node1,node2, start_time=3e12, end_time=10e12, memory_size=3, target_fidelity= 0.8,priority=1,tp_id=0)"""
 
 tl.init()
 tl.run()
@@ -77,5 +77,29 @@ tl.run()
 print("v0 memories")
 print("Index:\tEntangled Node:\tFidelity:\tEntanglement Time:\tState:")
 for info in network_topo.nodes["v0"].resource_manager.memory_manager:
+    print("{:6}\t{:15}\t{:9}\t{}\t{}".format(str(info.index), str(info.remote_node),
+                                        str(info.fidelity), str(info.entangle_time * 1e-12),str(info.state)))
+
+print("v1 memories")
+print("Index:\tEntangled Node:\tFidelity:\tEntanglement Time:\tState:")
+for info in network_topo.nodes["v1"].resource_manager.memory_manager:
+    print("{:6}\t{:15}\t{:9}\t{}\t{}".format(str(info.index), str(info.remote_node),
+                                        str(info.fidelity), str(info.entangle_time * 1e-12),str(info.state)))
+
+print("v2 memories")
+print("Index:\tEntangled Node:\tFidelity:\tEntanglement Time:\tState:")
+for info in network_topo.nodes["v2"].resource_manager.memory_manager:
+    print("{:6}\t{:15}\t{:9}\t{}\t{}".format(str(info.index), str(info.remote_node),
+                                        str(info.fidelity), str(info.entangle_time * 1e-12),str(info.state)))
+
+print("v3 memories")
+print("Index:\tEntangled Node:\tFidelity:\tEntanglement Time:\tState:")
+for info in network_topo.nodes["v3"].resource_manager.memory_manager:
+    print("{:6}\t{:15}\t{:9}\t{}\t{}".format(str(info.index), str(info.remote_node),
+                                        str(info.fidelity), str(info.entangle_time * 1e-12),str(info.state)))
+
+print("v4 memories")
+print("Index:\tEntangled Node:\tFidelity:\tEntanglement Time:\tState:")
+for info in network_topo.nodes["v4"].resource_manager.memory_manager:
     print("{:6}\t{:15}\t{:9}\t{}\t{}".format(str(info.index), str(info.remote_node),
                                         str(info.fidelity), str(info.entangle_time * 1e-12),str(info.state)))
