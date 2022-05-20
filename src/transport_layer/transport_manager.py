@@ -123,16 +123,19 @@ class TransportManager():
         Method to recieve the acknowledgements of Reject,Abort and Approved from link layer.
         '''
 
-        # print('failed inside tranport manager',tp_id,fail_time*1e-12,status)
-        for tp_id,tp in self.transportprotocolmap.items():
-            # print('id,protocol',tp_id,tp)
-            if status == 'REJECT' or status == 'ABORT':
-                # print('tm notify reject',(tp.starttime+self.owner.timeline.now())*1e-12)
+        print('failed inside tranport manager',tp_id,fail_time*1e-12,status,self.transportprotocolmap,self.owner.name)
+        for tpid,tp in self.transportprotocolmap.items():
+            print('id,protocol',tp_id,tp,status)
+            
+            if tp_id==tpid and (status == 'REJECT' or status == 'ABORT'):
+                print('tm notify reject',(tp.starttime+self.owner.timeline.now())*1e-12)
                 # Creating an event for notify method of transport protocol for retrials.
 
-                process=Process(tp,'notify_tp',[fail_time,status])
-                event=Event(tp.starttime+self.owner.timeline.now(),process)
-                self.owner.timeline.schedule(event)
+                #process=Process(tp,'notify_tp',[fail_time,status])
+                #event=Event(tp.starttime+self.owner.timeline.now(),process)
+                event=Event(tp.starttime+self.owner.timeline.now(),tp,'notify_tp',[fail_time,status])
+                self.owner.timeline.events.push(event)
+                #self.owner.timeline.schedule(event)
                 break
         
 
@@ -233,7 +236,7 @@ class TransportProtocol(TransportManager):
         '''
         Method to create request by calling the network manager.
         '''
-        # print('reqcount',self.reqcount)
+        print('reqcount',self.reqcount)
         for id,pro in self.owner.transport_manager.transportprotocolmap.items():
             # print('qq',id,pro,self)
             if self == pro and self.reqcount==0:  # Self.reqcount to stop multiple calls for same request.
@@ -243,6 +246,7 @@ class TransportProtocol(TransportManager):
                 # event=Event(8e12,process,0)
                 # self.owner.timeline.schedule(event)
                 nm.create_request(self.owner.name,self.other, start_time=self.starttime , end_time=self.endtime, memory_size=self.size, target_fidelity=self.target_fidelity,priority=self.priority,tp_id=id)
+                
                 self.reqcount+=1
 
     def notify_tp(self,ftime,status):
@@ -251,7 +255,7 @@ class TransportProtocol(TransportManager):
         '''
         
         time_now=self.owner.timeline.now()
-        # print('protocol notify',ftime*1e-12,self.starttime*1e-12,self.timeout*1e-12,time_now*1e-12)
+        print('protocol notify',ftime*1e-12,self.starttime*1e-12,self.timeout*1e-12,time_now*1e-12)
         if time_now < self.starttime + self.timeout: #If the current time is less than starttime+timeout go for retriails
             # print('for retrials',self.owner.timeline.now()*1e-12)
             self.retrials(status)
@@ -262,23 +266,24 @@ class TransportProtocol(TransportManager):
         '''
         Method to create request for the retrials.
         '''
-        # print('Inside retrials',status,self,self.starttime,self.owner.name,self.other)
-        message=Message(ProtocolMsgType.RETRY,None)
+        print('Inside retrials',status,self,self.starttime,self.owner.name,self.other)
+        #message=Message(ProtocolMsgType.RETRY,None)
         
 
         # self.owner.message_handler.send_message(self.other,message)
+        #print()
         while status != 'APPROVED' and self.retry < 5:
            
             self.retry +=1
             self.starttime += 0.2e12 #Added value to starttime to stop assertion error for timeline time less than reservation start time.
-            # print('retry count',self.retry,self.starttime*1e-12,self.endtime*1e-12,self.owner.timeline.now()*1e-12)
+            print('retry count',self.retry,self.starttime*1e-12,self.endtime*1e-12,self.owner.timeline.now()*1e-12)
             for id,pro in self.owner.transport_manager.transportprotocolmap.items():
                 # print('ww',id,pro)
                 if self==pro and self.starttime < self.endtime:
                     
-                    # print('retrying',self.owner.name,self.other,self.starttime*1e-12,self.owner.timeline.now()*1e-12)
+                    print('retrying',pro.owner,pro.other,self.owner.name,self.other,self.starttime*1e-12,self.owner.timeline.now()*1e-12)
                     nm=self.owner.network_manager
-                    nm.request(self.other, start_time=self.starttime , end_time=self.endtime, memory_size=self.size, target_fidelity=.5,priority=self.priority,tp_id=id)
+                    nm.create_request(self.owner.name,self.other, start_time=self.starttime , end_time=self.endtime, memory_size=self.size, target_fidelity=.5,priority=self.priority,tp_id=id)
                     # process=Process(nm,'request',[self.other,self.starttime,self.endtime,self.size,.5,self.priority,id])
                     # event=Event(self.starttime+self.owner.timeline.now(),process,0)
                     # self.owner.timeline.schedule(event)

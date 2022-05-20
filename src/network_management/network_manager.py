@@ -106,7 +106,10 @@ class NetworkManager():
         # This method would receive notification from the reservation protocols about the status of the request.
         # Depending upon the nature of the status of the request it would propagate that message to the transport manager notify method.
         # 
-        self.networkmap[ReqId]=[self.tp_id,status]
+
+        ####bug
+        #self.networkmap[ReqId]=[self.tp_id,status]
+        self.networkmap[ReqId]=[ResObj.tp_id,status]
         print('netwrok map',self.networkmap)
         # for ReqId,ResObj in self.requests.items():
         #     print('REqId',ReqId,self.tp_id,status,ResObj.isvirtual)
@@ -117,13 +120,16 @@ class NetworkManager():
             self.owner.virtualneighbors.append(ResObj.responder)
             self.owner.virtualneighbors=list(set(self.owner.virtualneighbors))
             # print('virtual neighbours',self.owner.name,self.owner.virtualneighbors,self.owner.timeline.now()*1e-12)
-        # print('Network map',self.networkmap)
+        print('Network map',self.networkmap)
         for key,value in self.networkmap.items():
-            # print('id status',key , value[1])
+            print('id status',key , value[1])
+            print("network map",self.networkmap.items())
+            print( "notify_nm ",ResObj.initiator,ResObj.responder,status,ResObj.status,value[1])
             if value[1]== 'REJECT' or value[1]=='ABORT': # For reject and abort call notify of the transport manager
                 fail_time=self.owner.timeline.now()
-                # print('faileds',fail_time*1e-12,value[1])
+                print('faileds,tp_id,status,resobj.tpid',fail_time*1e-12,value[0],value[1],ResObj.tp_id)
                 self.owner.transport_manager.notify_tm(fail_time,value[0],value[1])
+
             
                 
         
@@ -151,6 +157,10 @@ class NetworkManager():
     def create_request(self,initiator:str, responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float,priority: int,tp_id: int):
         
         user_request = Request(initiator,responder,start_time,end_time,memory_size,target_fidelity,priority,tp_id)
+
+        self.requests.update({user_request.id:user_request})
+        
+        user_request.status='INITIATED'
         
         print("user request ", user_request.initiator,user_request.path,user_request.responder)
 
@@ -159,6 +169,7 @@ class NetworkManager():
         #nextnode=routing_protocol.next_hop()
 
         #print(nextnode)
+
 
         resource_reservation_protocol = ReservationProtocol(self.owner,user_request,routing_protocol)
 

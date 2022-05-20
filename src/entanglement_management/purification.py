@@ -129,8 +129,9 @@ class BBPSSW(EntanglementProtocol):
         dst = self.kept_memo.entangled_memory["node_id"]
 
         # send message to other node to perform BBPSSW protocol 
-        message = Message(MsgRecieverType.PROTOCOL, self.name, BBPSSWMsgType.PURIFICATION_RES, another=self.another.name, F = self.kept_memo.fidelity)
+        message = Message(MsgRecieverType.PROTOCOL, self.another.name, BBPSSWMsgType.PURIFICATION_RES, another=self.another.name, F = self.kept_memo.fidelity)
         self.own.message_handler.send_message(dst, message)
+        print("bbpssw start",self.name,dst, self.another.name )
 
     def received_message(self, src: str, msg: Message) -> None:
         """Method to receive messages.
@@ -140,7 +141,7 @@ class BBPSSW(EntanglementProtocol):
         Side Effects:
             Will call `update_resource_manager` method.
         """
-
+        print("receive message bbpssw",self.own.name)
         assert src == self.another.own.name
         self.update_resource_manager(self.meas_memo, "RAW")
 
@@ -148,7 +149,7 @@ class BBPSSW(EntanglementProtocol):
         x_rand = random()
     
         # check if purification succesful or not
-        if x_rand < self.success_probability(msg.F):
+        if x_rand < self.success_probability(msg.kwargs["F"]):
             print("purification receive 1")
             # if yes, update the fidelities.
             self.kept_memo.fidelity = self.improved_fidelity(self.kept_memo.fidelity)
