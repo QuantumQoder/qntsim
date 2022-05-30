@@ -1030,6 +1030,7 @@ class ReservationProtocol():     #(Protocol):
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.FAIL,request=self.request)
                 self.node.message_handler.send_message(prev_node.name,msg)
 
+        self.node.message_handler.process_msg(msg.receiver_type,msg.receiver)
 
 
 

@@ -177,25 +177,29 @@ class ResourceManager():
         flag=False
         memo_info = self.memory_manager.get_info_by_memory(memory)
         #print(memo_info.state)
-        #print('lllllll',self.reservation_to_memory_map)
+        #print('lllllll',self.reservation_id_to_memory_map)
         for ReqId,memlist in self.reservation_id_to_memory_map.items():
-            print('Res to mem', self.reservation_id_to_memory_map[ReqId],memo_info.index)
+            #print('Res to mem', self.reservation_id_to_memory_map[ReqId],memo_info.index)
             if memo_info.index in memlist:
 
                 currentreqid=ReqId
-                print('Resss',memo_info.index, memlist, currentreqid)
+                #print('Resss',memo_info.index, memlist, currentreqid)
             
         # print(f'Entanglement genereated for {currentreqid} at memory index {memo_info.index}')
         #print(self.reservation_to_memory_map[currentreqid])
         #print('Memory map', self.owner.network_manager)
+        #print(" mem map",self.reservation_id_to_memory_map[currentreqid])
         for mem in self.reservation_id_to_memory_map[currentreqid]:
             # print('Remote memory state',self.memory_manager.__getitem__(mem).state)
             if self.memory_manager.__getitem__(mem).state == 'ENTANGLED':
-                # print('Same Reqid')
+                #print('Entagngle count',len(self.reservation_id_to_memory_map[currentreqid]))
+                #print('Entagngle count',estate)
                 estate +=1
+                #print('Entagngle count',estate)
+                
                 
                 if estate==len(self.reservation_id_to_memory_map[currentreqid]):
-                    # print('ESuccess')
+                    #print('ESuccess', estate,len(self.reservation_id_to_memory_map[currentreqid]),currentreqid)
                     flag=True
         if flag:
             # print('current id',currentreqid,self.owner.timeline.now()*1e-12)
@@ -231,11 +235,11 @@ class ResourceManager():
                 for info in memories_info:
                     #if state == 'ENTANGLED':
                         #print(f'To occupied called for the memory index {info.index} at the node {self.owner.name}')
-                    """if type(rule.protocols[0]).__name__ == 'EntanglementSwappingB':
-                        print('type of rule: ', type(rule.protocols[0]).__name__)
-                        print('Rule name is: ', rule.protocols)
-                        print('Update to Occupied from update() method at time: ', self.owner.timeline.now())
-                        print(f'Shifting state to OCCUPIED for memory index  inside update() :{info.index} for the node: {self.owner.name}')"""
+                        #if type(rule.protocols[0]).__name__ == 'EntanglementSwappingB':
+                        #print('type of rule: ', type(rule.protocols[0]).__name__)
+                        #print('Rule name is: ', rule.protocols)
+                        #print('Update to Occupied from update() method at time: ', self.owner.timeline.now())
+                        #print(f'Shifting state to OCCUPIED for memory index  inside update() :{info.index} for the node: {self.owner.name}')
             
                     info.to_occupied()
                 return
@@ -290,6 +294,7 @@ class ResourceManager():
             #print('protocol name: ', protocol.name)
             #print('ResourceManagerMsgType.REQUEST')"""
 
+        #print("waiting protocols and pending protocols", self.waiting_protocols,self.pending_protocols)
         self.owner.message_handler.send_message(req_dst, msg)
 
     def received_message(self, src: str, msg: "Message") -> None:
@@ -299,12 +304,13 @@ class ResourceManager():
             src (str): name of the node that sent the message.
             msg (ResourceManagerMessage): message received.
         """
-
+        #print("resource manager receive method",msg.kwargs['protocol'].name,msg.msg_type ,self.owner.name)
         if msg.msg_type is ResourceManagerMsgType.REQUEST:
             req_condition_func=msg.kwargs.get('req_condition_func')
             protocol = req_condition_func(self.waiting_protocols)
             ini_protocol=msg.kwargs['protocol']
             print('ini_protocol',ini_protocol)
+            #print("Resourcemanager request receive",ini_protocol.name,self.owner.name)
             ##print(protocol)
             if protocol is not None:
                
@@ -315,10 +321,13 @@ class ResourceManager():
                 self.waiting_protocols.remove(protocol)
                 self.owner.protocols.append(protocol)
                 ##print('#######Protocol Start method to be called##########')
-                print('Protocol Name: ', protocol.name)
+                #print('Protocol Name: Resource manager ',ini_protocol.name,protocol.name,self.owner.name)
+                #print("receive message queue if loop",self.owner.message_handler.manager_queue,self.owner.name )
                 protocol.start()
+                #print("receive message queue if loop 2",self.owner.message_handler.manager_queue,self.owner.name )
+                self.owner.message_handler.process_msg(msg.receiver_type,msg.receiver)
                 return
-
+            #print(" out of loop: ",ini_protocol.name,protocol.name,self.owner.name)
             """#print('######Here we send protocol with approval as false##########')
             #print('Reply to Protocol Name: ', msg.ini_protocol.name)"""
             new_msg = Message(MsgRecieverType.MANAGER,ManagerType.ResourceManager, ResourceManagerMsgType.RESPONSE, protocol=ini_protocol,
@@ -328,12 +337,17 @@ class ResourceManager():
             print('Resource manager Response')
             ini_protocol=msg.kwargs['protocol']
             is_approved=msg.kwargs['is_approved']
+            #print("is_approved",is_approved,ini_protocol)
             paired_protocol=msg.kwargs['paired_protocol']
             protocol = ini_protocol
 
+            #print('ini_protocol response',ini_protocol)
+            #print("Resourcemanager response receive",ini_protocol.name,self.owner.name)
+
             if protocol not in self.pending_protocols:
                 if is_approved:
-                    self.release_remote_protocol(src, paired_protocol)
+                    self.release_remote_protocol(src, paired_protocol)                  
+                self.owner.message_handler.process_msg(msg.receiver_type,msg.receiver)
                 return
 
             if is_approved:
@@ -342,10 +356,14 @@ class ResourceManager():
                     self.pending_protocols.remove(protocol)
                     self.owner.protocols.append(protocol)
                     protocol.own = self.owner
+                    #print('Protocol Name: Resource manager Response ',ini_protocol.name,protocol.name,self.owner.name)
+                    #print("receive message queue elif loop",self.owner.message_handler.manager_queue,self.owner.name )
+                    #protocol.start()
+                    #print("receive message queue elif loop 2",self.owner.message_handler.manager_queue,self.owner.name )
                     protocol.start()
             else:
-                print('#######Protocol Not called##########')
-                ##print('Protocol Name: ', protocol.name)
+                print('#######Protocol Not called##########',protocol.name)
+                print('Protocol Name de: ', protocol.name)
                 protocol.rule.protocols.remove(protocol)
                 for memory in protocol.memories:
                     # print('mmmmm')
@@ -356,7 +374,7 @@ class ResourceManager():
                         self.update(None, memory, "RAW")
                     else:
                         #print('msg.is_approved: ', msg.is_approved)
-                        #print('memory: ', memory)
+                        #print('memory: Entangled ', memory)
                         self.update(None, memory, "ENTANGLED")
                 self.pending_protocols.remove(protocol)
         elif msg.msg_type is ResourceManagerMsgType.RELEASE_PROTOCOL:
@@ -370,6 +388,7 @@ class ResourceManager():
                 for memory in protocol.memories:
                     if memory.name == target_id:
                         protocol.release()
+                        self.owner.message_handler.process_msg(msg.receiver_type,msg.receiver)
                         return
         elif msg.msg_type is ResourceManagerMsgType.ABORT:
             # print('msg res',msg.reservation)
@@ -386,6 +405,9 @@ class ResourceManager():
             for memory_index in self.reservation_to_memory_map[reservation]:
                 self.update(None, self.memory_manager.memory_array.memories[memory_index], "RAW")
             del self.reservation_to_memory_map[reservation]
+
+        #print("resoure man recv queue",self.owner.message_handler.manager_queue,self.owner.name)   
+        self.owner.message_handler.process_msg(msg.receiver_type,msg.receiver)
 
     def memory_expire(self, memory: "Memory"):
         """Method to receive memory expiration events."""

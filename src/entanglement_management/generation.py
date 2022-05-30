@@ -181,7 +181,9 @@ class EntanglementGenerationA(EntanglementProtocol):
             self.received_message = self.primary_received_message
             print("request sent",self.middle,self.own.name, type(self))
             ###message change
-            message = Message(MsgRecieverType.PROTOCOL, self.name, GenerationMsgType.REQUEST_BSM, protocol = self)
+            receiver=self.middle+"_eg"
+            #message = Message(MsgRecieverType.PROTOCOL, self.name, GenerationMsgType.REQUEST_BSM, protocol = self)
+            message = Message(MsgRecieverType.PROTOCOL, receiver, GenerationMsgType.REQUEST_BSM, protocol = self)
             self.own.message_handler.send_message(self.middle, message)
         else:
 
@@ -234,7 +236,9 @@ class EntanglementGenerationA(EntanglementProtocol):
     def release_bsm(self):
         # Send release bsm message to the BSM
         ##message change
-        message = Message(MsgRecieverType.PROTOCOL, self.name, GenerationMsgType.RELEASE_BSM, protocol = self)
+        receiver=self.middle+"_eg"
+        #message = Message(MsgRecieverType.PROTOCOL, self.name, GenerationMsgType.RELEASE_BSM, protocol = self)
+        message = Message(MsgRecieverType.PROTOCOL, receiver, GenerationMsgType.RELEASE_BSM, protocol = self)
         self.own.message_handler.send_message(self.middle, message)
 
     def primary_received_message(self, src: str, msg: Message) -> None: ##message
@@ -343,6 +347,8 @@ class EntanglementGenerationA(EntanglementProtocol):
             #raise Exception("Invalid message {} received by EG on node {} to state {}".format(msg_type, self.own.name,self.state))
         
         self.state += 1
+        
+        self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
 
         return True
 
@@ -416,10 +422,11 @@ class EntanglementGenerationA(EntanglementProtocol):
         else:
             print("message type:", msg_type, "state:", self.state, "is_primary:", self.primary)
             print("EGA exception")
-            raise Exception("Invalid message {} received by EG on node {} at state {}".format(msg_type, self.own.name,self.state))
+            #raise Exception("Invalid message {} received by EG on node {} at state {}".format(msg_type, self.own.name,self.state))
 
         self.state += 1
 
+        self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
         return True
  
 
@@ -541,6 +548,7 @@ class EntanglementGenerationB(EntanglementProtocol):
             
     def received_message(self, src: str, msg: Message):
         msg_type = msg.msg_type
+        #print("egb ",msg.receiver,msg.receiver_type,self.name,msg_type)
 
         # If new request comes for access to BSM, check if some process already blocking the BSM. 
         # if yes, append this process to self.reservations, else, allocate it right away. 
@@ -573,6 +581,8 @@ class EntanglementGenerationB(EntanglementProtocol):
                 self.own.message_handler.send_message(self.reservations[0].own.name, message)
                 self.current_protocol = self.reservations[0]
                 self.current_primary = self.reservations[0].own.name
+        #print("egb",msg.receiver)       
+        self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
 
     def start(self) -> None:
         pass

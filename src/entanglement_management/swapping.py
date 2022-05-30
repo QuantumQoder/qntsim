@@ -217,7 +217,7 @@ class EntanglementSwappingA(EntanglementProtocol):
 
     def received_message(self, src: str, msg: "Message") -> None:
         """Method to receive messages (should not be used on A protocol)."""
-
+        self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
         raise Exception("EntanglementSwappingA protocol '{}' should not receive messages.".format(self.name))
 
     def memory_expire(self, memory: "Memory") -> None:
@@ -333,6 +333,8 @@ class EntanglementSwappingB(EntanglementProtocol):
         else:
             # case if swapping fails
             self.update_resource_manager(self.memory, "RAW")
+            
+        self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
 
     def start(self) -> None:
         log.logger.info(self.own.name + " end protocol start with partner {}".format(self.another.own.name))

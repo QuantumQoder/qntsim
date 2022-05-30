@@ -117,7 +117,8 @@ class TransportManager():
             dest_obj=msg.kwargs.get('dest_obj')
             src_obj.create_session(dest_obj)  #Call create session of the transport protocol after both protocol instance has been created.
             # self.owner.message_handler.manager_is_over(msg.receiver)
-
+        
+        self.owner.message_handler.process_msg(msg.receiver_type,msg.receiver)
     def notify_tm(self,fail_time,tp_id,status):
         '''
         Method to recieve the acknowledgements of Reject,Abort and Approved from link layer.
@@ -230,6 +231,7 @@ class TransportProtocol(TransportManager):
                  
         # elif msg_type is ProtocolMsgType.RETRY:
         #     print('Retry Message')
+        self.owner.message_handler.process_msg(msg.receiver_type,msg.receiver)
 
 
     def create_requests(self):

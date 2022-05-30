@@ -158,6 +158,8 @@ class BBPSSW(EntanglementProtocol):
             print("purification receive 2")
             # else, turn the kept memory's status to raw
             self.update_resource_manager(self.kept_memo, state="RAW")
+            
+        self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
 
     def memory_expire(self, memory: "Memory") -> None:
         """Method to receive memory expiration events.

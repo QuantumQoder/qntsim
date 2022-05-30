@@ -31,6 +31,7 @@ from ..utils.encoding import *
 from ..network_management.request import RRPMsgType
 from ..network_management.network_manager import NetworkManager
 from .message_queue_handler import MessageQueueHandler
+from ..resource_management.resource_manager import MsgRecieverType ,ResourceManagerMsgType
 
 class Node(Entity):
     """Base node type.
@@ -160,8 +161,8 @@ class BSMNode(Node):
     def receive_message(self, src: str, msg: "Message") -> None:
         # signal to protocol that we've received a message
         # print("protocols on bsm: ", self.protocols)
-        for protocol in self.protocols:
-            protocol.received_message(src, msg)
+        #for protocol in self.protocols:
+            #protocol.received_message(src, msg)
             # if type(protocol) == msg.owner_type:
             #     if protocol.received_message(src, msg):
             #         return
@@ -169,6 +170,8 @@ class BSMNode(Node):
         # if we reach here, we didn't successfully receive the message in any protocol
         ##print(src, msg)
         # raise Exception("Unkown protocol")
+    
+        self.message_handler.push_message(src,msg)
 
     def receive_qubit(self, src: str, qubit):
         """Method to receive qubit from quantum channel.
@@ -289,6 +292,9 @@ class QuantumRouter(Node):
     def receive_message(self, src: str, msg: "Message") -> None:
         # print('receive msg', msg.receiver,msg.protocol_type)
         #print("Quantum roter receive message")
+        #if msg.receiver_type==MsgRecieverType.MANAGER and msg.msg_type==ResourceManagerMsgType.REQUEST:
+            #protocol=msg.kwargs['protocol']
+            #print ("msg Quantum Router node receive , protocol",protocol.name)
         self.message_handler.push_message(src,msg)
 
     def init(self):

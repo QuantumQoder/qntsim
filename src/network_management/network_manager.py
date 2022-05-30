@@ -96,7 +96,7 @@ class NetworkManager():
         if msg.msg_type==RRPMsgType.RESERVE :
             print("received at ", self.owner.name,msg.kwargs)
             self.process_request(msg)
-        #self.process_request(msg
+        self.owner.message_handler.process_msg(msg.receiver_type,msg.receiver)
         
 
    
