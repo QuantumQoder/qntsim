@@ -349,6 +349,8 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.memory.accepted_index = accepted_index
 
         self.update_resource_manager(self.memory, 'ENTANGLED')
+        print('_entanglement_succeed:  len(self.subtask.protocols): ', len(self.subtask.protocols))
+        self.subtask.on_complete(1)
 
     def _entanglement_fail(self):
         for event in self.scheduled_events:
@@ -356,6 +358,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         log.logger.info(self.own.name + " failed entanglement of memory {}".format(self.memory))
         
         self.update_resource_manager(self.memory, 'RAW')
+        self.subtask.on_complete(-1)
 
 
 class EntanglementGenerationB(EntanglementProtocol):

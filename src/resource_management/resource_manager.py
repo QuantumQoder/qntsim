@@ -75,8 +75,8 @@ class ResourceManager():
         self.owner = owner
         self.memory_manager = MemoryManager(owner.memory_array)
         self.memory_manager.set_resource_manager(self)
-        self.rule_manager = RuleManager()
-        self.rule_manager.set_resource_manager(self)
+        # self.rule_manager = RuleManager()
+        # self.rule_manager.set_resource_manager(self)
         # protocols that are requesting remote resource
         self.pending_protocols = []
         # protocols that are waiting request from remote resource
@@ -86,62 +86,62 @@ class ResourceManager():
         self.reservation_id_to_memory_map={}
         self.reservation_to_events_map = {}
 
-    def load(self, rule: "Rule") -> bool:
-        """Method to load rules for entanglement management.
-        Attempts to add rules to the rule manager.
-        Will automatically execute rule action if conditions met.
-        Args:
-            rule (Rule): rule to load.
-        Returns:
-            bool: if rule was loaded successfully.
-        """
-        #print("This is the rule------", rule)
-        # print(rule.action, rule.get_reservation().initiator, "----------------->", rule.get_reservation().responder)
-        self.rule_manager.load(rule)
+    # def load(self, rule: "Rule") -> bool:
+    #     """Method to load rules for entanglement management.
+    #     Attempts to add rules to the rule manager.
+    #     Will automatically execute rule action if conditions met.
+    #     Args:
+    #         rule (Rule): rule to load.
+    #     Returns:
+    #         bool: if rule was loaded successfully.
+    #     """
+    #     #print("This is the rule------", rule)
+    #     # print(rule.action, rule.get_reservation().initiator, "----------------->", rule.get_reservation().responder)
+    #     self.rule_manager.load(rule)
         
-        for memory_info in self.memory_manager:            
-            memories_info = rule.is_valid(memory_info)
-            if len(memories_info) > 0:
+    #     for memory_info in self.memory_manager:            
+    #         memories_info = rule.is_valid(memory_info)
+    #         if len(memories_info) > 0:
 
-                rule.do(memories_info)    
+    #             rule.do(memories_info)    
 
-                #if type(rule.protocols[0]).__name__ == 'EntanglementSwappingB':
-                #    print(f'Found memory indices for Ent EntanglementSwappingB for the node: {self.owner.name}')           
+    #             #if type(rule.protocols[0]).__name__ == 'EntanglementSwappingB':
+    #             #    print(f'Found memory indices for Ent EntanglementSwappingB for the node: {self.owner.name}')           
 
-                for info in memories_info:
-                    #print('type of rule: ', type(rule.protocols[0]).__name__)
-                    #print('Rule name is: ', rule.protocols)
-                    #print('Update to Occupied from load() method')
-                    #print(f'Shifting state to OCCUPIED for memory index  inside load() :{info.index} for the node: {self.owner.name}')
+    #             for info in memories_info:
+    #                 #print('type of rule: ', type(rule.protocols[0]).__name__)
+    #                 #print('Rule name is: ', rule.protocols)
+    #                 #print('Update to Occupied from load() method')
+    #                 #print(f'Shifting state to OCCUPIED for memory index  inside load() :{info.index} for the node: {self.owner.name}')
         
-                    #Only change the status of memory to occupied if it is not an instance of ESB
-                    #if type(rule.protocols[0]).__name__ != 'EntanglementSwappingB':
-                    info.to_occupied()                
+    #                 #Only change the status of memory to occupied if it is not an instance of ESB
+    #                 #if type(rule.protocols[0]).__name__ != 'EntanglementSwappingB':
+    #                 info.to_occupied()                
 
-        return True
+    #     return True
 
-    def expire(self, rule: "Rule") -> None:
-        """Method to remove expired rule.
-        Will update rule in rule manager.
-        Will also update and modify protocols connected to the rule (if they have already been created).
-        Args:
-            rule (Rule): rule to remove.
-        """
-        # print('Expiree')
-        created_protocols = self.rule_manager.expire(rule)
-        while created_protocols:
-            protocol = created_protocols.pop()
-            if protocol in self.waiting_protocols:
-                self.waiting_protocols.remove(protocol)
-            elif protocol in self.pending_protocols:
-                self.pending_protocols.remove(protocol)
-            elif protocol in self.owner.protocols:
-                self.owner.protocols.remove(protocol)
-            else:
-                raise Exception("Unknown place of protocol")
+    # def expire(self, rule: "Rule") -> None:
+    #     """Method to remove expired rule.
+    #     Will update rule in rule manager.
+    #     Will also update and modify protocols connected to the rule (if they have already been created).
+    #     Args:
+    #         rule (Rule): rule to remove.
+    #     """
+    #     # print('Expiree')
+    #     created_protocols = self.rule_manager.expire(rule)
+    #     while created_protocols:
+    #         protocol = created_protocols.pop()
+    #         if protocol in self.waiting_protocols:
+    #             self.waiting_protocols.remove(protocol)
+    #         elif protocol in self.pending_protocols:
+    #             self.pending_protocols.remove(protocol)
+    #         elif protocol in self.owner.protocols:
+    #             self.owner.protocols.remove(protocol)
+    #         else:
+    #             raise Exception("Unknown place of protocol")
 
-            for memory in protocol.memories:
-                self.update(protocol, memory, "RAW")
+    #         for memory in protocol.memories:
+    #             self.update(protocol, memory, "RAW")
 
     def update(self, protocol: "EntanglementProtocol", memory: "Memory", state: str) -> None:
         """Method to update state of memory after completion of entanglement management protocol.
@@ -160,8 +160,10 @@ class ResourceManager():
         if protocol:
             memory.detach(protocol)
             memory.attach(memory.memory_array)
-            if protocol in protocol.rule.protocols:
-                protocol.rule.protocols.remove(protocol)
+            #if protocol in protocol.rule.protocols:
+            if protocol in protocol.subtask.protocols:
+                #protocol.rule.protocols.remove(protocol)
+                protocol.subtask.protocols.remove(protocol)
 
         if protocol in self.owner.protocols:
             self.owner.protocols.remove(protocol)
@@ -221,24 +223,24 @@ class ResourceManager():
 
         #if memo_info in reservation_to_memory_map:
 
-        for rule in self.rule_manager:
-            # print(rule.action, rule.get_reservation().initiator, "->", rule.get_reservation().responder)
-            memories_info = rule.is_valid(memo_info)
+        # for rule in self.rule_manager:
+        #     # print(rule.action, rule.get_reservation().initiator, "->", rule.get_reservation().responder)
+        #     memories_info = rule.is_valid(memo_info)
             
-            if len(memories_info) > 0:
-                # print("accepted rue: ", rule.action, rule.get_reservation().initiator, "->", rule.get_reservation().responder)
-                rule.do(memories_info)
-                for info in memories_info:
-                    #if state == 'ENTANGLED':
-                        #print(f'To occupied called for the memory index {info.index} at the node {self.owner.name}')
-                    """if type(rule.protocols[0]).__name__ == 'EntanglementSwappingB':
-                        print('type of rule: ', type(rule.protocols[0]).__name__)
-                        print('Rule name is: ', rule.protocols)
-                        print('Update to Occupied from update() method at time: ', self.owner.timeline.now())
-                        print(f'Shifting state to OCCUPIED for memory index  inside update() :{info.index} for the node: {self.owner.name}')"""
+        #     if len(memories_info) > 0:
+        #         # print("accepted rue: ", rule.action, rule.get_reservation().initiator, "->", rule.get_reservation().responder)
+        #         rule.do(memories_info)
+        #         for info in memories_info:
+        #             #if state == 'ENTANGLED':
+        #                 #print(f'To occupied called for the memory index {info.index} at the node {self.owner.name}')
+        #             """if type(rule.protocols[0]).__name__ == 'EntanglementSwappingB':
+        #                 print('type of rule: ', type(rule.protocols[0]).__name__)
+        #                 print('Rule name is: ', rule.protocols)
+        #                 print('Update to Occupied from update() method at time: ', self.owner.timeline.now())
+        #                 print(f'Shifting state to OCCUPIED for memory index  inside update() :{info.index} for the node: {self.owner.name}')"""
             
-                    info.to_occupied()
-                return
+        #             info.to_occupied()
+        #         return
 
         self.owner.get_idle_memory(memo_info)
         """
@@ -303,8 +305,10 @@ class ResourceManager():
         if msg.msg_type is ResourceManagerMsgType.REQUEST:
             req_condition_func=msg.kwargs.get('req_condition_func')
             protocol = req_condition_func(self.waiting_protocols)
+            
             ini_protocol=msg.kwargs['protocol']
             print('ini_protocol',ini_protocol)
+            
             ##print(protocol)
             if protocol is not None:
                
@@ -346,7 +350,8 @@ class ResourceManager():
             else:
                 print('#######Protocol Not called##########')
                 ##print('Protocol Name: ', protocol.name)
-                protocol.rule.protocols.remove(protocol)
+                #protocol.rule.protocols.remove(protocol)
+                protocol.subtask.protocols.remove(protocol)
                 for memory in protocol.memories:
                     # print('mmmmm')
                     memory.detach(protocol)

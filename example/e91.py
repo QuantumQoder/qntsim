@@ -8,7 +8,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-network_config = "/home/aman/SeQUeNCe/Quantum-Networking/example/e91_topology.json"
+network_config = "../e91_topology.json"
 
 tl = Timeline(20e12)
 network_topo = Topology("network_topo", tl)

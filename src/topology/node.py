@@ -31,6 +31,7 @@ from ..utils.encoding import *
 from ..network_management.request import RRPMsgType
 from ..network_management.network_manager import NetworkManager
 from .message_queue_handler import MessageQueueHandler
+from ..resource_management.task_manager import TaskManager
 
 class Node(Entity):
     """Base node type.
@@ -245,6 +246,7 @@ class QuantumRouter(Node):
         self.reservation_manager=[]
         self.resource_manager = ResourceManager(self)
         self.network_manager = NetworkManager(self)
+        self.task_manager = TaskManager(self)
         self.transport_manager=TransportManager(self)
         self.message_handler = MessageQueueHandler(self)
         self.map_to_middle_node = {}

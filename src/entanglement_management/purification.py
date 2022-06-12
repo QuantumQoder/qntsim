@@ -153,10 +153,14 @@ class BBPSSW(EntanglementProtocol):
             # if yes, update the fidelities.
             self.kept_memo.fidelity = self.improved_fidelity(self.kept_memo.fidelity)
             self.update_resource_manager(self.kept_memo, state="ENTANGLED")
+            print('purification succeeded: ', self.subtask.name)
+            self.subtask.on_complete(1, params = self.meas_memo)
         else:
             print("purification receive 2")
             # else, turn the kept memory's status to raw
             self.update_resource_manager(self.kept_memo, state="RAW")
+            print('purification failed: ', self.subtask.name)
+            self.subtask.on_complete(-1, params = self.meas_memo)
 
     def memory_expire(self, memory: "Memory") -> None:
         """Method to receive memory expiration events.
