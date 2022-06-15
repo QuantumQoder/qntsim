@@ -108,6 +108,7 @@ class Topology():
             #-----------------------------------------------
             node.all_pair_shortest_dist = all_pair_dist
             node.neighbors = list(G.neighbors(node.name))
+            node.delay_graph=self.cc_delay_graph
             #-----------------------------------------------
             # table = self.generate_forwarding_table(node.name)
             # for dst, next_node in table.items():

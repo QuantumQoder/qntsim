@@ -122,13 +122,14 @@ class NetworkManager():
             # print('virtual neighbours',self.owner.name,self.owner.virtualneighbors,self.owner.timeline.now()*1e-12)
         print('Network map',self.networkmap)
         for key,value in self.networkmap.items():
-            print('id status',key , value[1])
-            print("network map",self.networkmap.items())
-            print( "notify_nm ",ResObj.initiator,ResObj.responder,status,ResObj.status,value[1])
-            if value[1]== 'REJECT' or value[1]=='ABORT': # For reject and abort call notify of the transport manager
+            #print('id status',key , value[1])
+            #print("network map",self.networkmap.items())
+            #print( "notify_nm ",ResObj.initiator,ResObj.responder,status,ResObj.status,value[1],value[0])
+            if value[0]==ResObj.tp_id and ( value[1]== 'REJECT' or value[1]=='ABORT'): # For reject and abort call notify of the transport manager
                 fail_time=self.owner.timeline.now()
                 print('faileds,tp_id,status,resobj.tpid',fail_time*1e-12,value[0],value[1],ResObj.tp_id)
                 self.owner.transport_manager.notify_tm(fail_time,value[0],value[1])
+                break
 
             
                 
@@ -154,15 +155,19 @@ class NetworkManager():
         self.protocol_stack[-1].push(responder, start_time, end_time, memory_size, target_fidelity, True,1)#$$
     
     
-    def create_request(self,initiator:str, responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float,priority: int,tp_id: int):
+    def create_request(self,initiator:str, responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float,priority: int,tp_id: int,congestion_retransmission:int,remaining_demand_size:int):
         
-        user_request = Request(initiator,responder,start_time,end_time,memory_size,target_fidelity,priority,tp_id)
+        user_request = Request(initiator,responder,start_time,end_time,memory_size,target_fidelity,priority,tp_id,congestion_retransmission)
+
+
+        user_request.status='INITIATED'
+
+        user_request.remaining_demand_size=remaining_demand_size
 
         self.requests.update({user_request.id:user_request})
         
-        user_request.status='INITIATED'
         
-        print("user request ", user_request.initiator,user_request.path,user_request.responder)
+        print("user request id ,tp_id ,src,path,des,size ",user_request.id,user_request.tp_id, user_request.initiator,user_request.path,user_request.responder,user_request.memory_size,memory_size)
 
         routing_protocol=RoutingProtocol(self.owner,initiator,responder,[],self.owner.name)
 
@@ -175,11 +180,13 @@ class NetworkManager():
 
         self.owner.reservation_manager.append(resource_reservation_protocol)
 
+       
+
         resource_reservation_protocol.start()
 
     def process_request(self ,msg: "Message"): 
         payload=msg.kwargs['request']
-        print('process request payload', payload)
+        #print('process request payload', payload)
         #print(user_request)
         user_request = payload
         #tmp_path =msg.temp_path
@@ -188,7 +195,7 @@ class NetworkManager():
         # Resource Reservation Protocol Object
     
         # Routing Protocol Object
-        print("in request temp_path,marker",user_request,self.owner.name,msg.temp_path,msg.marker)
+        #print("in request temp_path,marker",user_request,self.owner.name,msg.temp_path,msg.marker)
         routing_protocol=RoutingProtocol(self.owner,user_request.initiator,user_request.responder,msg.temp_path,msg.marker)
 
         resource_reservation_protocol = ReservationProtocol(self.owner,user_request,routing_protocol)

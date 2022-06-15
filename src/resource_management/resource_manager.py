@@ -175,15 +175,36 @@ class ResourceManager():
          # check if any rules have been met
         currentreqid,estate=0,0
         flag=False
+        temp=False
         memo_info = self.memory_manager.get_info_by_memory(memory)
         #print(memo_info.state)
         #print('lllllll',self.reservation_id_to_memory_map)
-        for ReqId,memlist in self.reservation_id_to_memory_map.items():
-            #print('Res to mem', self.reservation_id_to_memory_map[ReqId],memo_info.index)
-            if memo_info.index in memlist:
 
-                currentreqid=ReqId
-                #print('Resss',memo_info.index, memlist, currentreqid)
+
+        # currentreqid  is reqid when update is called 
+
+        
+        #for ReqId,memlist in self.reservation_id_to_memory_map.items():
+            #print('Res to mem', self.reservation_id_to_memory_map[ReqId],memo_info.index)
+            #time_now = self.owner.timeline.now()
+            #self.owner.vmemory_list
+            #if memo_info.index in memlist:
+                #self.owner.vmemory_list(memo_info.index).reservations[]
+                #currentreqid1=ReqId
+                #print("resource manager current req id",currentreqid)
+                #print('Resss',memo_info.index, memlist, currentreqid)"""
+        #print("resource manager current req id",currentreqid1)
+        for req in self.owner.vmemory_list[memo_info.index].reservations:
+              
+            time_now = self.owner.timeline.now()
+            if req.start_time<= time_now and req.end_time>=time_now:
+
+                currentreqid=req.id 
+                print("check current req id ",currentreqid ,self.owner.name,req.initiator)
+                break
+
+        print("check current req id ",currentreqid,self.owner.name,req.initiator)
+
             
         # print(f'Entanglement genereated for {currentreqid} at memory index {memo_info.index}')
         #print(self.reservation_to_memory_map[currentreqid])
@@ -196,7 +217,7 @@ class ResourceManager():
                 #print('Entagngle count',estate)
                 estate +=1
                 #print('Entagngle count',estate)
-                
+                temp=True
                 
                 if estate==len(self.reservation_id_to_memory_map[currentreqid]):
                     #print('ESuccess', estate,len(self.reservation_id_to_memory_map[currentreqid]),currentreqid)
@@ -204,9 +225,11 @@ class ResourceManager():
         if flag:
             # print('current id',currentreqid,self.owner.timeline.now()*1e-12)
             # self.owner.network_manager.notify(status='APPROVED')
+            #print("approved",self.owner.network_manager.requests)
             for ReqId,ResObj in self.owner.network_manager.requests.items():
                 if ReqId == currentreqid:
-                    ResObj.status='APPROVED'  
+                    ResObj.status='APPROVED' 
+                    print("ResObj.tp_id",self.owner.network_manager.requests,ResObj.tp_id) 
                     # if ResObj.isvirtual:
                     self.owner.network_manager.notify_nm('APPROVED',ReqId,ResObj)
                     # print('Res status',ResObj.initiator,ResObj.responder)
@@ -224,6 +247,23 @@ class ResourceManager():
             #print(f'To entangled called for the memory index {memo_info.index} at the node {self.owner.name}')
 
         #if memo_info in reservation_to_memory_map:
+
+        else:
+                t=0
+                for ReqId,ResObj in self.owner.network_manager.requests.items():
+                    
+                    #if ReqId!= currentreqid:
+                        #print("resource manager reqid ,cuurentid ,node",currentreqid,ReqId,self.owner.name,self.owner.network_manager.requests.items())
+                    if ReqId == currentreqid:
+                        t=1
+                        if temp:
+                            #print("resource manager status pc",ReqId,currentreqid,ResObj.initiator,ResObj.status)
+                            ResObj.status='PARTIALCOMPLETE' 
+                            #print("ResObj.tp_id",self.owner.network_manager.requests,ResObj.tp_id) 
+                            # if ResObj.isvirtual:
+                            self.owner.network_manager.notify_nm('PARTIALCOMPLETE',ReqId,ResObj)
+                if t==0:
+                    print(" resource manager not satisfy")
 
         for rule in self.rule_manager:
             # print(rule.action, rule.get_reservation().initiator, "->", rule.get_reservation().responder)

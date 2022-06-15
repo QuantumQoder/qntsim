@@ -16,13 +16,15 @@ import itertools
 import json
 import math
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
+#from ..transport_layer.transport_manager import CongestionMsgType
 
 
 class Request():
 
 
     newid=itertools.count()
-    def __init__(self, initiator:str,responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float,priority: int,tp_id: int):
+    
+    def __init__(self, initiator:str,responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float,priority: int,tp_id: int,congestion_retransmission:int):
         
         self.initiator  = initiator
         self.responder  = responder
@@ -37,6 +39,9 @@ class Request():
         self.status=None
         self.isvirtual=False
         self.id=next(self.newid)
+        self.congestion=0
+        self.congestion_retransmission=congestion_retransmission
+        self.remaining_demand_size=0
 
 
 
@@ -936,12 +941,20 @@ class ReservationProtocol():     #(Protocol):
                 """
                 rules=self.create_rules(self.request.pathnames,self.request)
                 self.load_rules(rules,self.request)
-                print("tasks created at" ,self.node.name )
+                print("tasks created at node , prev_node" ,self.node.name ,prev_node.name,self.request.pathnames )
                 #call task and dependency creation method
                 self.node.message_handler.send_message(prev_node.name,msg)
                 #send classical message to previous node path[index-1]'s Reservation protocol to createtasks 
                 #in receive msg check this condn
                 #send(msg_type)
+                #print("congestion_retransmission in sucess",self.request.congestion_retransmission)
+                """if self.request.congestion_retransmission==1:
+                    print("congestion sucess")
+                    msg1=Message(MsgRecieverType.MANAGER, ManagerType.TransportManager,CongestionMsgType.SUCCESS,request=self.request)
+                    self.node.message_handler.send_message(self.request.initiator,msg1)"""
+                #self.node.transport_manager.recv_success_reallocation(self.request.memory_size,self.request)
+                
+
                           
         else :
 
@@ -958,7 +971,13 @@ class ReservationProtocol():     #(Protocol):
             #self.rnode.send_message(path[len(path)-1].name ,msg)
             if self.node.name==self.request.initiator:
                 print("------node at which it is failing---",self.node.name,self.request.responder)
-                self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
+                if self.request.congestion_retransmission!=1:
+
+                    self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
+                """if self.request.congestion_retransmission==1:
+                    msg1=Message(MsgRecieverType.MANAGER, ManagerType.TransportManager,CongestionMsgType.FAIL,request=self.request)
+                    self.node.message_handler.send_message(src.name,msg1)"""
+                    
                 return
             else :
                 #index=self.request.path.index(self.node)
@@ -966,6 +985,11 @@ class ReservationProtocol():     #(Protocol):
                 #prev_node=self.request.path[index-1]
                 prev_node=self.request.path[index]
                 self.node.message_handler.send_message(prev_node.name,msg)
+                """if self.request.congestion_retransmission==1:
+                    msg1=Message(MsgRecieverType.MANAGER, ManagerType.TransportManager,CongestionMsgType.FAIL,request=self.request)
+                    self.node.message_handler.send_message(src.name,msg1)"""
+                    
+            self.request.congestion = 1
 
     
     def receive_message(self ,msg :"RRPMsgType"):
@@ -979,6 +1003,11 @@ class ReservationProtocol():     #(Protocol):
                 print("tasks created at ",self.node.name)
                 rules=self.create_rules(self.request.pathnames,self.request)
                 self.load_rules(rules,self.request)
+                if self.request.congestion_retransmission==1:
+
+                    print("congestion_retransmission in sucess",self.request.congestion_retransmission)
+                    remaining_demand_size=self.request.remaining_demand_size-self.request.memory_size
+                    self.node.transport_manager.recv_success_reallocation(self.request.memory_size,self.request,remaining_demand_size)
 
             else:
                 index=self.request.path.index(self.node)
@@ -1011,13 +1040,22 @@ class ReservationProtocol():     #(Protocol):
             print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
             if self.node.name==self.request.initiator:
                 #create tasks
-                print("removed resources at ",self.node.name)
+                print("removed resources at ",self.node.name ,self.request.id)
                 #vmemoryarray[index_list[i][1]].reservations.remove(req.reser)
                 print('inside reservation reject received at src',self.node.name,self.request.id,self.request.initiator,self.request.responder)
-                self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
+                #self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
                 for vmemory in self.vmemorylist:
                     if self.request in vmemory.reservations:
                         vmemory.reservations.remove(self.request)
+                    """if self.request.congestion_retransmission==1:
+                    msg1=Message(MsgRecieverType.MANAGER, ManagerType.TransportManager,CongestionMsgType.FAIL,request=self.request)
+                    self.node.message_handler.send_message(self.node.name,msg1)"""
+
+                #self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
+                if self.request.congestion_retransmission==1:
+                    self.node.transport_manager.recv_fail_reallocation(self.request.memory_size,self.request,self.request.remaining_demand_size)
+                else:
+                    self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
                 
 
             else:
