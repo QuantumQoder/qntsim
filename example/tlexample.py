@@ -1,17 +1,18 @@
+
 from operator import itemgetter
 import qntsim
 from qntsim.kernel.timeline import Timeline
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
 #random.seed(0)
-network_config = "/home/aman/FinalSIm/Quantum-Networking-main/Quantum-Networking-main/example/network_topology copy.json"
+network_config = "/home/aman/QNTSim/QNTSim/example/simple_topology.json"
 
 n,k,lamda=10,6,40
 
 tl = Timeline(10e12)
 network_topo = Topology("network_topo", tl)
 network_topo.load_config(network_config)
-#network_topo.create_random_topology(n)
+# network_topo.create_random_topology(n,network_config)
 
 
 
@@ -65,19 +66,71 @@ set_parameters(network_topo)
 # nm.createvirtualrequest(node2, start_time=2e12, end_time=10e12, memory_size=3, target_fidelity= 0.5)
 
 
+# node1='a'
+# node2='s1'
+# nm=network_topo.nodes[node1].network_manager
+# nm.createvirtualrequest(node1, node2, start_time=2e12, end_time=10e12, memory_size=5, target_fidelity=0.5)
 
 
 
-node1='v0'
-node2='v1'
+# tl.init()
+# tl.run()
+
+# table=[]
+# print('a memories')
+# for info in network_topo.nodes["a"].resource_manager.memory_manager:
+#     if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+#         table.append([info.index,'a',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+# # print('Tbale', table)
+# print(tabulate(table, headers=['Index','Source node', 'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+# table=[]
+# print('b memories')
+# for info in network_topo.nodes["b"].resource_manager.memory_manager:
+#     if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+#         table.append([info.index,'b',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+# # print('Tbale', table)
+# print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+
+# table=[]
+# print('s1 memories')
+# for info in network_topo.nodes["s1"].resource_manager.memory_manager:
+#     if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+#         table.append([info.index,'s1',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+# # print('Tbale', table)
+# print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+# table=[]
+# print('s2 memories')
+# for info in network_topo.nodes["s2"].resource_manager.memory_manager:
+#     if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+#         table.append([info.index,'s2',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+# # print('Tbale', table)
+# print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+# table=[]
+# print('s3 memories')
+# for info in network_topo.nodes["s3"].resource_manager.memory_manager:
+#     if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+#         table.append([info.index,'s3',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+# print('Tbale', table)
+# print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+
+
+
+
+
+node1='a'
+node2='b'
 tm=network_topo.nodes[node1].transport_manager
-tm.request(node2, start_time=3e12,size=5, end_time=10e12, priority=0 , target_fidelity= 0.7, timeout=2e12) 
+tm.request(node2, start_time=5e12,size=10, end_time=10e12, priority=0 , target_fidelity= 0.5, timeout=2e12) 
 
+# node1='a'
+# node2='b'
+# tm=network_topo.nodes[node1].transport_manager
+# tm.request(node2, start_time=5e12,size=5, end_time=10e12, priority=0 , target_fidelity= 0.6, timeout=2e12) 
 
-node1='v2'
-node2='v3'
-tm=network_topo.nodes[node1].transport_manager
-tm.request(node2, start_time=6e12,size=5, end_time=10e12, priority=0 , target_fidelity= 0.7, timeout=2e12) 
+# node1='v2'
+# node2='v3'
+# tm=network_topo.nodes[node1].transport_manager
+# tm.request(node2, start_time=6e12,size=5, end_time=10e12, priority=0 , target_fidelity= 0.7, timeout=2e12) 
 
 
 
@@ -95,7 +148,8 @@ tm.request(node2, start_time=6e12,size=5, end_time=10e12, priority=0 , target_fi
 # tm.request(node2,5e12,5,10e12,0,.7,5e9)
 
 
-
+# virt_graph=network_topo.get_virtual_graph()
+# network_topo.plot_graph(virt_graph)
 
 
 
@@ -103,40 +157,41 @@ tm.request(node2, start_time=6e12,size=5, end_time=10e12, priority=0 , target_fi
 tl.init()
 tl.run()
 table=[]
-print('v0 memories')
-for info in network_topo.nodes["v0"].resource_manager.memory_manager:
-    if info.fidelity > 0:
-        table.append([info.index,'v0',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+print('a memories')
+for info in network_topo.nodes["a"].resource_manager.memory_manager:
+    if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+        table.append([info.index,'a',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
 # print('Tbale', table)
 print(tabulate(table, headers=['Index','Source node', 'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
 table=[]
-print('v1 memories')
-for info in network_topo.nodes["v1"].resource_manager.memory_manager:
-    if info.fidelity > 0:
-        table.append([info.index,'v1',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+print('b memories')
+for info in network_topo.nodes["b"].resource_manager.memory_manager:
+    if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+        table.append([info.index,'b',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
 # print('Tbale', table)
 print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
 table=[]
-print('v2 memories')
-for info in network_topo.nodes["v2"].resource_manager.memory_manager:
-    if info.fidelity > 0:
-        table.append([info.index,'v2',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+print('s1 memories')
+for info in network_topo.nodes["s1"].resource_manager.memory_manager:
+    if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+        table.append([info.index,'s1',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
 # print('Tbale', table)
 print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
-table=[]
-print('v3 memories')
-for info in network_topo.nodes["v3"].resource_manager.memory_manager:
-    if info.fidelity > 0:
-        table.append([info.index,'v3',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+# table=[]
+# print('s2 memories')
+# for info in network_topo.nodes["s2"].resource_manager.memory_manager:
+#     if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+#         table.append([info.index,'s2',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+# # print('Tbale', table)
+# print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+# table=[]
+# print('s3 memories')
+# for info in network_topo.nodes["s3"].resource_manager.memory_manager:
+#     if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+#         table.append([info.index,'s3',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
 # print('Tbale', table)
-print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
-table=[]
-print('v4 memories')
-for info in network_topo.nodes["v4"].resource_manager.memory_manager:
-    if info.fidelity > 0:
-        table.append([info.index,'v4',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
-# print('Tbale', table)
-print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+# print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+
 '''
 tranmap={}
 netmap={}
@@ -163,13 +218,10 @@ table4=(list(map(list,set(map(tuple,table3)))))
 print(table4)
 # table3=list(set(table3))
 print(tabulate(table4, headers=['Transport ID', 'Network ID' , 'Source Node', 'Entanglement With' ,'Retry count','Priority','Status'], tablefmt='grid'))
-
-
 table2=[]
 def outputmaps():
     for i in range(0,5):
         node='v'+str(i)
-
         for reqid,resobj in network_topo.nodes[node].network_manager.requests.items():
             
             tp_id=network_topo.nodes[node].network_manager.networkmap.get(reqid)[0]
@@ -177,7 +229,6 @@ def outputmaps():
             TpObj=network_topo.nodes[node].transport_manager.transportprotocolmap.get(tp_id)
             table2.append([tp_id, reqid, TpObj.owner.name, TpObj.other, TpObj.retry, TpObj.priority, Status])
             file = open("requestlog.txt","w")
-
             file.write(" reqid: " + str(reqid) + "," + "-- transport protocol request-- "  + " Status: " +str(Status)+ "," + " tpid: " + str(tp_id) + "," + " source: " + str(TpObj.owner.name) + "," + " starttime: " + str(TpObj.starttime) + "," + " dest: "+str(TpObj.other)+","+" endtime: " + str(TpObj.endtime)+ "," + " priority: "+str(TpObj.priority)+ ","+" retry: "+str(TpObj.retry)+","+" reqcount: "+str(TpObj.reqcount)+"\n")
             file.write(" reqid: " + str(reqid) + "," + "-- reservation  request-- " + " reservation-request initiator: "+ str(resobj.initiator) + "," +" node with which entanglement is requested :"+str(resobj.responder)+"," + " simulation time at which entanglement should be attempted: "+str(resobj.start_time)+","+" simulation time at which resources may be released: "+ str(resobj.end_time)+","+"fidelity:"+str(resobj.fidelity)+"," + " status: "+str(resobj.status)+"," +" isvirtual: "+str(resobj.isvirtual)+"," +" memory_size: "+str(resobj.memory_size)+"," +" priority: "+str(resobj.priority))
             # table2.append([tp_id, reqid, TpObj.owner.name, TpObj.other, TpObj.starttime ,TpObj.endtime, TpObj.retry, TpObj.priority, Status])
@@ -186,10 +237,7 @@ def outputmaps():
             file.close
             # print("reqid:",reqid,"Status:",Status,"tpid:",tp_id, "source:",TpObj.owner.name, "starttime:",TpObj.starttime,"dest:",TpObj.other,"endtime:",TpObj.endtime,"priority:",TpObj.priority,"retry:",TpObj.retry,"reqcount:",TpObj.reqcount)
             # print("reqid:",reqid," reservation request initiator node:",resobj.initiator,"node with which entanglement is requested :",resobj.responder,"time at which entanglement should be attempted:",resobj.start_time,"simulation time at which resources may be released:", resobj.end_time,"fidelity:",resobj.fidelity,"status:",resobj.status,"isvirtual:",resobj.isvirtual,"memory_size:",resobj.memory_size,"priority:",resobj.priority)
-
-
 outputmaps()
 table3=sorted(table2, key=itemgetter(0))
 print(tabulate(table3, headers=['Transport ID', 'Network ID' , 'Source Node', 'Entanglement With' ,'Retry count','Priority','Status'], tablefmt='grid'))
-
 '''

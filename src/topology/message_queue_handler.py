@@ -1,3 +1,4 @@
+
 from enum import Enum, auto
 from math import inf
 from collections import defaultdict
@@ -46,6 +47,7 @@ class MessageQueueHandler():
 
         if priority == inf:
             priority = self.owner.timeline.schedule_counter
+        # print('send message', dst, self.owner.name, self.owner.cchannels)
         self.owner.cchannels[dst].transmit(msg, self.owner, priority)
    
     def push_message(self, src, msg):

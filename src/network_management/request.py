@@ -1,4 +1,6 @@
 from typing import List, TYPE_CHECKING
+
+
 if TYPE_CHECKING:
     from ..topology.node import QuantumRouter,Node
 
@@ -24,23 +26,28 @@ class Request():
 
     newid=itertools.count()
     
-    def __init__(self, initiator:str,responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float,priority: int,tp_id: int,congestion_retransmission:int):
-        
+    def __init__(self, initiator:str,responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float,**kwargs):        
         self.initiator  = initiator
         self.responder  = responder
         self.start_time = start_time
         self.end_time = end_time
         self.memory_size=memory_size
         self.fidelity = target_fidelity
-        self.priority=priority
-        self.tp_id=tp_id
+        # self.priority = priority
+        # self.tp_id = tp_id
+        if "priority" in kwargs:
+            self.priority=kwargs["priority"]
+        if "tp_id" in kwargs:
+            self.tp_id=kwargs["tp_id"]
         self.path=[] #doubly linked list of Nodes (List(Nodes))
         self.pathnames=[]
         self.status=None
-        self.isvirtual=False
+        # if "isvirtual" in kwargs:
+        self.isvirtual=kwargs.get("isvirtual", False)
         self.id=next(self.newid)
         self.congestion=0
-        self.congestion_retransmission=congestion_retransmission
+        if "congestion_retransmission" in kwargs:
+            self.congestion_retransmission=kwargs["congestion_retransmission"]
         self.remaining_demand_size=0
 
 
@@ -50,7 +57,6 @@ class RoutingProtocol():
     
     def __init__(self, node: "Node", initiator:str,responder: str,temp_path:"List(Node)",marker:"Node"):
         """Constructor for routing protocol.
-
         Args:
             own (Node): node protocol is attached to.
             name (str): name of protocol instance.
@@ -137,7 +143,14 @@ class RoutingProtocol():
         # print('indx',self.own.name,indexx,len(msg.temp_path))
 
         # If the node is the first node in the temp path, we run the next_hop method, which gives us the next node using Djisktr's algorithm
-            
+        print('It is end node',type(self.src),self.node,type(self.node))
+        if self.node.is_endnode:
+            dst=self.node.service_node
+            print('end node dst',dst)
+
+        if not self.node.is_endnode:
+            print('Service node')
+
         if self.node.name == self.temp_path[0]:
             dst=self.nexthop(self.node.name,self.temp_path[-1])
             print("dst 1",dst)
@@ -151,6 +164,9 @@ class RoutingProtocol():
             #If the node is not the source, marker or end node, we skip the routing.
         elif indexx > 0 and indexx < len(self.temp_path)-1:
             dst=self.temp_path[indexx+1]
+            if dst == self.node.end_node:
+                print('next node is end node',dst, self.node.name)
+                dst=self.node.end_node
             print("dst 3",dst)
             # print('mddle',self.own.name,dst,indexx)
                 
@@ -221,10 +237,8 @@ class Message():
 
 class RRMessage(Message):
     """Message used by resource reservation protocol.
-
     This message contains all information passed between reservation protocol instances.
     Messages of different types contain different information.
-
     Attributes:
         msg_type (GenerationMsgType): defines the message type.
         receiver (str): name of destination protocol instance.
@@ -242,7 +256,6 @@ class RRMessage(Message):
 
 class NetworkManagerMessage(Message):
     """Message used by the network manager.
-
     Attributes:
         message_type (Enum): message type required by base message type.
         receiver (str): name of destination protocol instance.
@@ -255,7 +268,6 @@ class NetworkManagerMessage(Message):
 
 class MemoryTimeCard():
     """Class for tracking reservations on a specific memory.
-
     Attributes:
         memory_index (int): index of memory being tracked (in memory array).
         reservations (List[Reservation]): list of reservations for the memory.
@@ -263,7 +275,6 @@ class MemoryTimeCard():
 
     def __init__(self, memory_index: int):
         """Constructor for time card class.
-
         Args:
             memory_index (int): index of memory to track.
         """
@@ -271,7 +282,8 @@ class MemoryTimeCard():
         self.memory_index = memory_index
         self.reservations = []
     def has_virtual_reservation(self):
-        for res in self.reservations:
+        print('inside has virtual reservation')
+        for res in self.requests:
             if res.isvirtual:
                 return True
         return False
@@ -292,13 +304,10 @@ class ReservationProtocol():     #(Protocol):
 
     def create_rules(self, path: List[str], reservation: "Request") -> List["Rule"]:
         """Method to create rules for a successful request.
-
         Rules are used to direct the flow of information/entanglement in the resource manager.
-
         Args:
             path (List[str]): list of node names in entanglement path.
             reservation (Reservation): approved reservation.
-
         Returns:
             List[Rule]: list of rules created by the method.
         """
@@ -314,15 +323,18 @@ class ReservationProtocol():     #(Protocol):
         memories_indices_free=[]
 
         for card in self.vmemorylist:
-            #print("1")
-            #print('111111', card)
+            print("vmeorylist",self.node.name,reservation.initiator,reservation.responder)
+            print('111111', reservation in card.reservations)
             if reservation in card.reservations:
                 memory_indices.append(card.memory_index)
-                # print("To maintain the virtual link indices")
+                print("To maintain the virtual link indices",card.has_virtual_reservation(), reservation.isvirtual,reservation.initiator,reservation.responder,card.memory_index)
                 if card.has_virtual_reservation() and not reservation.isvirtual:
+                    print(' inside hasd virt reser')
                     virtual_indices.append(card.memory_index)
                     if card.memory_index > last_virtual_index:
+                        print('Last virtual index all conditions satiesfied')
                         last_virtual_index= card.memory_index
+        print('Last virtual index', self.node.name,reservation.initiator,reservation.responder,last_virtual_index)
                 # elif card.has_virtual_reservation() and reservation.isvirtual:
                 #     print('Another virtual request arrived')
                 
@@ -361,6 +373,7 @@ class ReservationProtocol():     #(Protocol):
                     #begin, end = last_virtual_index + 1 , (last_virtual_index+1) + reservation.memory_size
                     if memory_info.state == "RAW" and memory_info.index in memory_indices[last_virtual_index + 1 : last_virtual_index + reservation.memory_size + 1]:
                         #Check for node B's memory
+                        print('1st eg rule',reservation.initiator,reservation.responder,memory_info.index)
                         """#print('self.own.name here is : ', self.own.name)
                         if self.own.name == 'd':
                             #print(f'In rule condition for Entanglement Generation  at node e for d')
@@ -376,8 +389,9 @@ class ReservationProtocol():     #(Protocol):
                     # print('Current node in eg_ruleaction for index>0', self.own.name)
                     memories = [info.memory for info in memories_info]
                     memory = memories[0]
+                    print('map tp middle',[path[index - 1]])
                     mid = self.node.map_to_middle_node[path[index - 1]]
-                    # print('---------EntanglementGenerationA----------for pair: ', (self.own.name, path[index - 1]))
+                    print('---------EntanglementGenerationA----------for pair: ', (self.node.name, path[index - 1]))
                     ##print('---------Middle node for this----------', mid)
                     protocol = EntanglementGenerationA(None, "EGA." + memory.name, mid, path[index - 1], memory)
                     return [protocol, [None], [None]]
@@ -416,7 +430,7 @@ class ReservationProtocol():     #(Protocol):
                                 #print('last_virtual_index, reservation.memory_size: ',last_virtual_index, reservation.memory_size)
                                 #print('acceptable indexes: ', memory_indices[last_virtual_index + reservation.memory_size:])
                         """
-                        # print(f'free memory indices of {self.own.name}', memories_indices_free)
+                        print(f'free memory indices of {self.node.name}', memories_indices_free)
                         #if memory_info.state == "RAW" and memory_info.index in memory_indices[reservation.memory_size:]:
                         if memory_info.state == "RAW" and memory_info.index in memory_indices[(last_virtual_index+1) + reservation.memory_size:]:
                             #Check for node B's memory
@@ -427,7 +441,7 @@ class ReservationProtocol():     #(Protocol):
                             #print('memory_info.state: ', memory_info.state)
                             #print('memory_info.remote_node: ', memory_info.remote_node)
                             """
-                            
+                            print('eg rule condition2', self.node.name,reservation.initiator,reservation.responder)
                             return [memory_info]
                         else:
                             return []
@@ -443,6 +457,7 @@ class ReservationProtocol():     #(Protocol):
                     memories = [info.memory for info in memories_info]
                     memory = memories[0]
                     #memory = memories[-1]
+                    print('rule action',self.node.map_to_middle_node)
                     mid = self.node.map_to_middle_node[path[index + 1]]
                     # print('1---------EntanglementGenerationA----------for pair: ', (self.own.name, path[index + 1]))
                     ##print('---------Middle node for this---------- ', mid)
@@ -555,7 +570,7 @@ class ReservationProtocol():     #(Protocol):
             protocol = EntanglementSwappingB(None, "ESB." + memory.name, memory)
             return [protocol, [None], [None]]
 
-        # print('Current node in Swapping', self.own.name)
+        print('Current node in Swapping', self.node.name)
         if index == 0:
             def es_rule_condition(memory_info: "MemoryInfo", manager: "MemoryManager"):
                 #if self.own.name == 'h' and memory_info.state == "ENTANGLED":
@@ -775,10 +790,8 @@ class ReservationProtocol():     #(Protocol):
 
     def load_rules(self, rules: List["Rule"], reservation: "Request") -> None:
         """Method to add created rules to resource manager.
-
         This method will schedule the resource manager to load all rules at the reservation start time.
         The rules will be set to expire at the reservation end time.
-
         Args:
             rules (List[Rules]): rules to add.
             reservation (Reservation): reservation that created the rules.
@@ -846,42 +859,55 @@ class ReservationProtocol():     #(Protocol):
             demand_count=self.request.memory_size*2
 
         #print("demand count by request",demand_count,self.request)
-
+       
         for vmemory in self.vmemorylist:
+            physical_requests=[]
+            
+            isCardVirtual = False
+            print('requestsss1', self.node.name,self.request.initiator,self.request.responder)
+            for res in vmemory.reservations:
+                if res.isvirtual:#$ or self.reservation.isvirtual
+                    isCardVirtual = True
+                    pass
+                else:
+                    physical_requests.append(res)
+            if isCardVirtual and  self.request.isvirtual:
+                return -1, isCardVirtual
+
 
             start =0
-            end = len(vmemory.reservations)-1
-
+            end = len(physical_requests)-1
             while start<=end :
                 mid=(start+end)//2 
-                if vmemory.reservations[mid].start_time>self.request.end_time :
+                print('mid',mid,start,end)
+                if physical_requests[mid].start_time>self.request.end_time :
                     
                     end=mid-1
 
-                elif vmemory.reservations[mid].end_time<self.request.start_time :
+                elif physical_requests[mid].end_time<self.request.start_time :
 
                     start=mid+1
 
-                elif max(vmemory.reservations[mid].start_time,self.request.start_time)<min(vmemory.reservations[mid].end_time,self.request.end_time):
+                elif max(physical_requests[mid].start_time,self.request.start_time)<min(physical_requests[mid].end_time,self.request.end_time):
                     start=-1
                     break
         
                 else:
                     
                     pass 
-  
+    
             if (start>=0):
                 
                 index_list.append((start,vmemory.memory_index))
                 demand_count=demand_count-1
             
-            
+            print('line 902')
             if(demand_count==0):
 
                 for i in range(0,len(index_list)) :
                     print(index_list,index_list[i],)
-                    #print("memory index",vmemorylist[index_list[i][1]])
-                    #print("list index" ,index_list[i][0] )
+                    # print("memory index",vmemorylist[index_list[i][1]])
+                    print("list index" ,index_list[i][0] )
                     self.vmemorylist[index_list[i][1]].reservations.insert(index_list[i][0],self.request)
                     if self.request.id not in self.node.resource_manager.reservation_id_to_memory_map:
 
@@ -890,9 +916,9 @@ class ReservationProtocol():     #(Protocol):
                     else:
                         self.node.resource_manager.reservation_id_to_memory_map[self.request.id].append(index_list[i][1])
                 
-            
+                print('reservation to memory map',self.node.name,self.node.resource_manager.reservation_id_to_memory_map)
+        
                 return True    
-        print('reservation to memory map',self.node.resource_manager.reservation_id_to_memory_map)
         
         if (demand_count>0):
 
@@ -1070,16 +1096,3 @@ class ReservationProtocol():     #(Protocol):
 
         self.node.message_handler.process_msg(msg.receiver_type,msg.receiver)
 
-
-
-
-    
-    
-
-
-
-
-        
-        
-
-       

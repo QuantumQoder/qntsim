@@ -1,5 +1,4 @@
 """Definition of the Network Manager.
-
 This module defines the NetworkManager class, an implementation of the SeQUeNCe network management module.
 Also included in this module is the message type used by the network manager and a function for generating network managers with default protocols.
 """
@@ -28,10 +27,8 @@ from .request import Request ,RoutingProtocol,ReservationProtocol,RRPMsgType
 
 class NetworkManager():
     """Network manager implementation class.
-
     The network manager is responsible for the operations of a node within a broader quantum network.
     This is done through a `protocol_stack` of protocols, which messages are passed and packaged through.
-
     Attributes:
         name (str): name of the network manager instance.
         owner (QuantumRouter): node that protocol instance is attached to.
@@ -41,7 +38,6 @@ class NetworkManager():
     id=itertools.count()
     def __init__(self, owner: "QuantumRouter"):
         """Constructor for network manager.
-
         Args:
             owner (QuantumRouter): node network manager is attached to.
             protocol_stack (List[StackProtocol]): stack of protocols to use for processing.
@@ -60,7 +56,6 @@ class NetworkManager():
 
     def load_stack(self, stack: "List[StackProtocol]"):
         """Method to load a defined protocol stack.
-
         Args:
             stack (List[StackProtocol]): new protocol stack.
         """
@@ -74,13 +69,10 @@ class NetworkManager():
 
     def received_message(self, src: str, msg: "Message"):
         """Method to receive transmitted network reservation method.
-
         Will pop message to lowest protocol in protocol stack.
-
         Args:
             src (str): name of source node for message.
             msg (NetworkManagerMessage): message received.
-
         Side Effects:
             Will invoke `pop` method of 0 indexed protocol in `protocol_stack`.
         """
@@ -91,7 +83,6 @@ class NetworkManager():
             # print("received a message to abort the connection")
             # self.notify_nm(status='ABORT')
             return
-
         self.protocol_stack[0].pop(src=src, msg=msg.payload)"""
         if msg.msg_type==RRPMsgType.RESERVE :
             print("received at ", self.owner.name,msg.kwargs)
@@ -109,7 +100,8 @@ class NetworkManager():
 
         ####bug
         #self.networkmap[ReqId]=[self.tp_id,status]
-        self.networkmap[ReqId]=[ResObj.tp_id,status]
+        if not ResObj.isvirtual:
+            self.networkmap[ReqId]=[ResObj.tp_id,status]
         print('netwrok map',self.networkmap)
         # for ReqId,ResObj in self.requests.items():
         #     print('REqId',ReqId,self.tp_id,status,ResObj.isvirtual)
@@ -136,18 +128,15 @@ class NetworkManager():
         
         #call transport manager notify
 
-    def createvirtualrequest(self, responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float) -> None:#$$
+    def createvirtualrequest(self, initiator, responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float) -> None:#$$
         """Method to make an entanglement request.
-
         Will defer request to top protocol in protocol stack.
-
         Args:
             responder (str): name of node to establish entanglement with.
             start_time (int): simulation start time of entanglement.
             end_time (int): simulation end time of entanglement.
             memory_size (int): number of entangledd memory pairs to create.
             target_fidelity (float): desired fidelity of entanglement.
-
         Side Effects:
             Will invoke `push` method of -1 indexed protocol in `protocol_stack`.
         """
@@ -157,7 +146,7 @@ class NetworkManager():
     
     def create_request(self,initiator:str, responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float,priority: int,tp_id: int,congestion_retransmission:int,remaining_demand_size:int):
         
-        user_request = Request(initiator,responder,start_time,end_time,memory_size,target_fidelity,priority,tp_id,congestion_retransmission)
+        user_request = Request(initiator,responder,start_time,end_time,memory_size,target_fidelity,priority=priority,tp_id=tp_id,congestion_retransmission=congestion_retransmission)
 
 
         user_request.status='INITIATED'
@@ -167,7 +156,7 @@ class NetworkManager():
         self.requests.update({user_request.id:user_request})
         
         
-        print("user request id ,tp_id ,src,path,des,size ",user_request.id,user_request.tp_id, user_request.initiator,user_request.path,user_request.responder,user_request.memory_size,memory_size)
+        # print("user request id ,tp_id ,src,path,des,size ",user_request.id,user_request.tp_id, user_request.initiator,user_request.path,user_request.responder,user_request.memory_size,memory_size)
 
         routing_protocol=RoutingProtocol(self.owner,initiator,responder,[],self.owner.name)
 
@@ -217,5 +206,3 @@ class NetworkManager():
         self.owner.timeline.schedule_counter += 1
         self.owner.timeline.events.push(event)
         self.owner.protocols.append(routing_update)
-
-   

@@ -298,7 +298,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             self.scheduled_events.append(event)
 
             # In a batch, schedule all qubits for forming entanglement
-            for i in range(100):
+            for i in range(400):
                 next_time = previous_time + int(1e12 / self.frequency)
                 # print("time of ", i, "th emission at", self.own.name,"is :", next_time)
                 # process = Process(self, "schedule_and_emit_event", [next_time])

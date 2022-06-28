@@ -505,7 +505,7 @@ class RoutingTableUpdateProtocol(NewRoutingProtocol):
         '''
         neighbors=self.own.neighbors
         G=self.own.nx_graph
-        [*vneighbors]=self.own.find_virtual_neighbors() 
+        # [*vneighbors]=self.own.find_virtual_neighbors() 
         neighbor_list=self.find_neighbors()
         # print('neighborhoodlist',self.own.name, neighbor_list,neighbors)
         # print('vneighbor',self.own.name,vneighbors,self.own.virtualneighbors,self.own.timeline.now()*1e-12)

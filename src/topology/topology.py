@@ -1,12 +1,13 @@
 """Definition of the Topology class.
-
 This module provides a definition of the Topology class, which can be used to manage a network's structure.
 Topology instances automatically perform many useful network functions.
 """
 
+from itertools import combinations
 from typing import TYPE_CHECKING
 
 import json5
+
 
 if TYPE_CHECKING:
     from ..kernel.timeline import Timeline
@@ -23,10 +24,8 @@ import webbrowser
 
 class Topology():
     """Class for managing network topologies.
-
     The topology class provies a simple interface for managing the nodes and connections in a network.
     A network may also be generated using an external json file.
-
     Attributes:
         name (str): label for topology.
         timeline (Timeline): timeline to be used for all objects in network.
@@ -38,7 +37,6 @@ class Topology():
 
     def __init__(self, name: str, timeline: "Timeline"):
         """Constructor for topology class.
-
         Args:
             name (str): label for topology.
             timeline (Timeline): timeline for simulation.
@@ -61,38 +59,65 @@ class Topology():
 
 
 
-    def create_random_topology(self, n):  
+    def create_random_topology(self, n, config):  
         labels={}
         G=nx.barabasi_albert_graph(n,2)
-       
+        config = json5.load(open(config))
         for node in G.nodes:
-            labels[node]="v"+str(node)
-        
-
+            labels[node]="s"+str(node)
+            for keys in config["end_node"]:
+                labels[node]=keys
+        # print('ba graph',G.nodes)
         #self.draw_graph(G)
         #nx.draw(G, labels=labels, with_labels=True)
         #plt.show()
         
          # create nodes
         for node_name in G.nodes:
-            node = QuantumRouter("v"+str(node_name), self.timeline)          
+            node = ServiceNode("s"+str(node_name), self.timeline)          
             self.add_node(node)
+        for nodes in config["end_node"]:
+            # print('end node params',nodes)
+            node = EndNode(nodes,self.timeline)
+            # print(' topology end node', node)
+            self.add_node(node)
+
 
         #adding cchannels
         for i in G.nodes:
             for j in G.nodes:
                 if i==j:                    
                     continue
+                # print('topology', i , j)
                 cchannel_params = {"delay": 1e9, "distance": 1e3}
-                self.add_classical_channel("v"+str(i) , "v"+str(j), **cchannel_params)
-
+                self.add_classical_channel("s"+str(i) , "s"+str(j), **cchannel_params)
+                for end,service in config['end_node'].items():
+                    self.add_classical_channel(end,"s"+str(i), **cchannel_params)
+                    self.add_classical_channel(end,"s"+str(j), **cchannel_params)
+                    self.add_classical_channel("s"+str(j),end, **cchannel_params)
+                    self.add_classical_channel("s"+str(i),end, **cchannel_params)
+                    # self.add_classical_channel(end,end, **cchannel_params)
+        for end, service in config['end_node'].items():
+            # print('key value', end, service)
+            cchannel_params = {"delay": 1e9, "distance": 1e3}
+            self.add_classical_channel(end,service, **cchannel_params)
+            self.add_classical_channel(service,end, **cchannel_params)
+            res=list(combinations(*[config['end_node']],2))
+            # print('combinations',res[0])
+            for i,(a,b) in enumerate(res):
+                self.add_classical_channel(a,b, **cchannel_params)
+                self.add_classical_channel(b,a, **cchannel_params)
 
         # create qconnections (two way quantum channel)
       
-        for (src,dst) in G.edges:     
+        for (src,dst) in G.edges: 
+            # print('src dst',src, dst, G.edges)    
             qconnection_params = {"attenuation": 1e-5, "distance": 70}     
-            self.add_quantum_connection("v"+str(src), "v"+str(dst), **qconnection_params)
-
+            self.add_quantum_connection("s"+str(src), "s"+str(dst), **qconnection_params)
+        for key, value in config['end_node'].items():
+            # print('q connectiom key value', key, value, qconnection_params)
+            qconnection_params = {"attenuation": 1e-5, "distance": 70}
+            self.add_quantum_connection(key,value, **qconnection_params)
 
 
          # generate forwarding tables
@@ -102,13 +127,47 @@ class Topology():
         self.all_pair_shortest_distance=all_pair_dist
         # self.djiktras_path=self.djiktras()
         #-------------------------------
-        for node in self.get_nodes_by_type("QuantumRouter"):
-            # print('tplgy',node)
-            node.nx_graph=self.nx_graph
-            #-----------------------------------------------
-            node.all_pair_shortest_dist = all_pair_dist
-            node.neighbors = list(G.neighbors(node.name))
-            node.delay_graph=self.cc_delay_graph
+        for node in self.nodes.values():
+            # print('nodes',type(node))
+            if type(node) != BSMNode:
+                node.all_pair_shortest_dist = all_pair_dist
+                node.nx_graph=self.nx_graph
+                node.delay_graph=self.cc_delay_graph
+                # print('delay graph',node.name)
+                node.neighbors = list(G.neighbors(node.name))
+            # if type(node) == EndNode:
+            #     # node.all_pair_shortest_dist = all_pair_dist
+            #     # node.nx_graph=self.nx_graph
+            #     # node.delay_graph=self.cc_delay_graph
+            #     print('Add service node',config['end_node'])
+        for key, value in config['end_node'].items():
+            # print('end node key value',node.name, key, value )
+            # if node.name == key:
+            # print('check', node.name, key, value)
+            self.nodes[key].service_node = value
+    
+        #     if type(node) == EndNode:
+        #         print('Add service node',config['end_node'])
+        #         for key, value in config['end_node'].items():
+        #             print('end node key value',node.name, key, value )
+        #             if node.name == key:
+        #                 print('check', node.name, key, value)
+        #                 node.service_node = value
+        #                 break
+        #     if type(node) ==  ServiceNode:
+        #         for key, value in config['end_node'].items():
+        #             if node.name == value:
+        #                 node.end_node =key
+        #                 break
+        #         print('service noce end node',node.end_node)
+
+
+        # for node in self.get_nodes_by_type("QuantumRouter"):
+        #     # print('tplgy',node)
+        #     node.nx_graph=self.nx_graph
+        #     #-----------------------------------------------
+        #     node.all_pair_shortest_dist = all_pair_dist
+        #     node.neighbors = list(G.neighbors(node.name))
             #-----------------------------------------------
             # table = self.generate_forwarding_table(node.name)
             # for dst, next_node in table.items():
@@ -119,52 +178,63 @@ class Topology():
 
     def load_config(self, config_file: str) -> None:
         """Method to load a network configuration file.
-
         Network should be specified in json format.
         Will populate nodes, qchannels, cchannels, and graph fields.
         Will also generate and install forwarding tables for quantum router nodes.
-
         Args:
             config_file (str): path to json file specifying network.
-
         Side Effects:
             Will modify graph, graph_no_middle, qchannels, and cchannels attributes.
         """
 
-        topo_config = json5.load(open(config_file))
+        config = json5.load(open(config_file))
         delay_list=[]
         # create nodes
-        for node_params in topo_config["nodes"]:
-            name = node_params.pop("name")
-            node_type = node_params.pop("type")
-
-            if node_type == "QuantumRouter":
-                node = QuantumRouter(name, self.timeline, **node_params)
-            else:
-                node = Node(name, self.timeline)
-            
+        for params in config["service_node"]:
+            # print('params',params)
+            node = ServiceNode(params,self.timeline)
             self.add_node(node)
+        for params in config["end_node"]:
+            # print('end node params',params)
+            node = EndNode(params,self.timeline)
+            self.add_node(node)
+        # for node_params in config["nodes"]:
+        #     name = node_params.pop("name")
+        #     node_type = node_params.pop("type")
 
+        #     if node_type == "EndNode":
+        #         node = EndNode(name, self.timeline, **node_params)
+        #     elif node_type == "ServiceNode":
+        #         node = ServiceNode(name, self.timeline, **node_params)
+        #     else:
+        #         node = Node(name, self.timeline)
+        #     print('Topology node1',node,node_type)
+        #     self.add_node(node)
+        # print('adding connections')
         # create discrete cconnections (two way classical channel)
-        if "cconnections" in topo_config:
-            for cchannel_params in topo_config["cconnections"]:
+        if "cconnections" in config:
+            for cchannel_params in config["cconnections"]:
                 node1 = cchannel_params.pop("node1")
                 node2 = cchannel_params.pop("node2")
+                # print('cconnections',node1,node2)
                 self.add_classical_connection(node1, node2, **cchannel_params)
 
         # create discrete cchannels
-        if "cchannels" in topo_config:
-            for cchannel_params in topo_config["cchannels"]:
+        # print('adding cc connections')
+        if "cchannels" in config:
+            for cchannel_params in config["cchannels"]:
                 node1 = cchannel_params.pop("node1")
                 node2 = cchannel_params.pop("node2")
+                # print(' cchanels', node1,node2)
                 self.add_classical_channel(node1, node2, **cchannel_params)
 
         # create cchannels from a RT table
-        if "cchannels_table" in topo_config:
-            table_type = topo_config["cchannels_table"].get("type", "RT")
+        # print('adding cc channels')
+        if "cchannels_table" in config:
+            table_type = config["cchannels_table"].get("type", "RT")
             assert table_type == "RT", "non-RT tables not yet supported"
-            labels = topo_config["cchannels_table"]["labels"]
-            table = topo_config["cchannels_table"]["table"]
+            labels = config["cchannels_table"]["labels"]
+            table = config["cchannels_table"]["table"]
             assert len(labels) == len(table)                 # check that number of rows is correct
 
             for i in range(len(table)):
@@ -176,39 +246,76 @@ class Topology():
                     delay_list.append(delay)
                     # print('delay',node.name,delay_list)                 # divide RT time by 2
                     cchannel_params = {"delay": delay, "distance": 1e3}
+                    # print('Labels',labels[i],labels[j])
                     self.add_classical_channel(labels[i], labels[j], **cchannel_params)
 
         # create qconnections (two way quantum channel)
-        if "qconnections" in topo_config:
-            for qchannel_params in topo_config["qconnections"]:
+        # print('Adding q connection')
+        if "qconnections" in config:
+            for qchannel_params in config["qconnections"]:
                 node1 = qchannel_params.pop("node1")
                 node2 = qchannel_params.pop("node2")
+                # print('qconnection',node1,node2)
                 self.add_quantum_connection(node1, node2, **qchannel_params)
         
         # create qchannels
-        if "qchannels" in topo_config:
-            for qchannel_params in topo_config["qchannels"]:
+        if "qchannels" in config:
+            for qchannel_params in config["qchannels"]:
                 node1 = qchannel_params.pop("node1")
                 node2 = qchannel_params.pop("node2")
+                # print('qchannels',node1,node2)
                 self.add_quantum_channel(node1, node2, **qchannel_params)
 
         # generate forwarding tables
         #-------------------------------
         all_pair_dist, G = self.all_pair_shortest_dist()
+        # print('all pair distance', all_pair_dist, G)
         self.nx_graph=G
+        # print('self.nx_graph',self.nx_graph,self.name)
+        
         #-------------------------------
-        for node in self.get_nodes_by_type("QuantumRouter"):
-            #-----------------------------------------------
-            node.all_pair_shortest_dist = all_pair_dist
-            node.nx_graph=self.nx_graph
-            node.delay_graph=self.cc_delay_graph
-            # print('delay graph',node.delay_graph)
-            node.neighbors = list(G.neighbors(node.name))
-            # print('kkkkkkk',node.name,node.neighbors)
-            key=node.name
-            # node.all_neighbor[key]=node.neighbors
-            for items in node.neighbors:
-                node.all_neighbor.setdefault(key,{})[node.name]=items
+        
+        for node in self.nodes.values():
+            # print('nodes',type(node))
+            if type(node) != BSMNode:
+                node.all_pair_shortest_dist = all_pair_dist
+                node.nx_graph=self.nx_graph
+                node.delay_graph=self.cc_delay_graph
+                # print('delay graph',node.name)
+                node.neighbors = list(G.neighbors(node.name))
+            if type(node) == EndNode:
+                # print('Add service node',config['end_node'])
+                for key, value in config['end_node'].items():
+                    # print('end node key value',node.name, key, value )
+                    if node.name == key:
+                        # print('check', node.name, key, value)
+                        node.service_node = value
+                        break
+            if type(node) ==  ServiceNode:
+                for key, value in config['end_node'].items():
+                    if node.name == value:
+                        node.end_node =key
+                        break
+                # print('service noce end node',node.end_node)
+                        
+                # for key,value in config.items():
+                #     print('end node params',key,value)
+                #     if node.name in params:
+                #         node.service_node = params
+                #         break
+        
+        # for node in self.get_nodes_by_type("QuantumRouter"):
+        #     #-----------------------------------------------
+        #     node.all_pair_shortest_dist = all_pair_dist
+        #     node.nx_graph=self.nx_graph
+        #     node.delay_graph=self.cc_delay_graph
+        #     # print('delay graph',node.delay_graph)
+        #     node.neighbors = list(G.neighbors(node.name))
+        #     # print('kkkkkkk',node.name,node.neighbors)
+        #     key=node.name
+        #     # node.all_neighbor[key]=node.neighbors
+        #     for items in node.neighbors:
+        #         node.all_neighbor.setdefault(key,{})[node.name]=items
             #-----------------------------------------------
             # table = self.generate_forwarding_table(node.name)
             # for dst, next_node in table.items():
@@ -216,7 +323,6 @@ class Topology():
 
     def add_node(self, node: "Node") -> None:
         """Method to add a node to the network.
-
         Args:
             node (Node): node to add.
         """
@@ -230,18 +336,19 @@ class Topology():
 
     def add_quantum_connection(self, node1: str, node2: str, **kwargs) -> None:
         """Method to add a two-way quantum channel connection between nodes.
-
         NOTE: kwargs are passed to constructor for quantum channel, may be used to specify channel parameters.
-
         Args:
             node1 (str): first node in pair to connect.
             node2 (str): second node in pair to connect.
         """
-
+        # print('add quantum connection', node1, node2)
         assert node1 in self.nodes, node1 + " not a valid node"
         assert node2 in self.nodes, node2 + " not a valid node"
 
-        if (type(self.nodes[node1]) == QuantumRouter) and (type(self.nodes[node2]) == QuantumRouter):
+        if ((type(self.nodes[node1]) == EndNode) and (type(self.nodes[node2]) == EndNode) or 
+            (type(self.nodes[node1]) == EndNode) and (type(self.nodes[node2]) == ServiceNode) or
+            (type(self.nodes[node1]) == ServiceNode) and (type(self.nodes[node2]) == EndNode) or
+            (type(self.nodes[node1]) == ServiceNode) and (type(self.nodes[node2]) == ServiceNode)):
             # update non-middle graph
             self.graph_no_middle[node1][node2] = kwargs["distance"]
             self.graph_no_middle[node2][node1] = kwargs["distance"]
@@ -256,26 +363,30 @@ class Topology():
 
             # add quantum channels
             for node in [node1, node2]:
+                # print('node kwrgs',node,name_middle,kwargs)
                 self.add_quantum_channel(node, name_middle, **kwargs)
 
             # update params
             del kwargs["attenuation"]
             if node1 in self._cc_graph and node2 in self._cc_graph[node1]:
-                kwargs["delay"] = (self._cc_graph[node1][node2] + self._cc_graph[node2][node1]) / 4
+                # print('node1 node2', node1, node2, self._cc_graph[node1][node2])
+                temp1=self._cc_graph[node1][node2] 
+                temp2= self._cc_graph[node2][node1]
+                kwargs["delay"] = (temp1 + temp2) / 4
+                # print('kwargs delay', kwargs["delay"])
 
             # add classical channels (for middle node connectivity)
             for node in [node1, node2]:
                 self.add_classical_connection(name_middle, node, **kwargs)
 
         else:
+            # print('Node1 node2',node1, node2)
             self.add_quantum_channel(node1, node2, **kwargs)
             self.add_quantum_channel(node2, node1, **kwargs)
 
     def add_quantum_channel(self, node1: str, node2: str, **kwargs) -> None:
         """Method to add a one-way quantum channel connection.
-
         NOTE: kwargs are passed to constructor for quantum channel, may be used to specify channel parameters.
-
         Args:
             node1 (str): first node in pair to connect (sender).
             node2 (str): second node in pair to connect (receiver).
@@ -293,9 +404,7 @@ class Topology():
 
     def add_classical_connection(self, node1: str, node2: str, **kwargs) -> None:
         """Method to add a two-way classical channel between nodes.
-
         NOTE: kwargs are passed to constructor for classical channel, may be used to specify channel parameters.
-
         Args:
             node1 (str): first node in pair to connect.
             node2 (str): second node in pair to connect.
@@ -306,14 +415,12 @@ class Topology():
 
     def add_classical_channel(self, node1: str, node2: str, **kwargs) -> None:
         """Method to add a one-way classical channel between nodes.
-
         NOTE: kwargs are passed to constructor for classical channel, may be used to specify channel parameters.
-
         Args:
             node1 (str): first node in pair to connect.
             node2 (str): second node in pair to connect.
         """
-
+        # print('add classical',node1,node2,self.nodes)
         assert node1 in self.nodes and node2 in self.nodes
 
         name = "_".join(["cc", node1, node2])
@@ -322,7 +429,9 @@ class Topology():
         self.cchannels.append(cchannel)
 
         # edit graph
+        # print('add classical channel',node1,node2)
         self._cc_graph[node1][node2] = cchannel.delay 
+        # print('_cc_graph',self._cc_graph)
         if type(self.nodes[node1]) != BSMNode and type(self.nodes[node2]) != BSMNode:
             self.cc_delay_graph[node1][node2]=cchannel.delay
             # print('ccdelay',self.cc_delay_graph)
@@ -332,9 +441,7 @@ class Topology():
 
     def generate_forwarding_table(self, starting_node: str) -> dict:
         """Method to create forwarding table for static routing protocol.
-
         Generates a mapping of destination nodes to next node for routing using Dijkstra's algorithm.
-
         Args:
             node (str): name of node for which to generate table.
         """
@@ -380,7 +487,7 @@ class Topology():
     #-----------------------------------------------
     def generate_nx_graph(self):
         G = nx.Graph()
-        # print('gengph',self.cc_delay_graph)
+        # print('gengph',G, G.nodes)
         for node in self.nodes.keys():
 
             if type(self.nodes[node]) == BSMNode:
@@ -566,7 +673,6 @@ class Topology():
         colors = nx.get_edge_attributes(nx_graph,'color').values()
         ##print("Colors",colors)
         weights = nx.get_edge_attributes(nx_graph,'weight').values()
-
         nx.draw(nx_graph, edge_color=colors, with_labels = True)
         #nx.draw(nx_graph,with_labels=True)
         plt.show(graph.html)
@@ -575,8 +681,5 @@ class Topology():
 """
         colors = nx.get_edge_attributes(nx_graph,'color').values()
         weights = nx.get_edge_attributes(nx_graph,'weight').values()
-
         nx.draw(nx_graph, edge_color=colors, with_labels = True)
 """
-
-    
