@@ -13,7 +13,7 @@ This is done through instances of the MemoryInfo class, which track a single mem
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .resource_manager import ResourceManager
-    from ..components.memory import Memory, MemoryArray
+    from ..components.bk_memory import Memory, MemoryArray
 
 
 class MemoryManager():

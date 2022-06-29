@@ -1,11 +1,9 @@
 
-from operator import itemgetter
-import qntsim
 from qntsim.kernel.timeline import Timeline
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
 #random.seed(0)
-network_config = "/home/aman/QNTSim/QNTSim/example/simple_topology.json"
+network_config = "/home/aman/QNTSim/QNTSim/example/3node.json"
 
 n,k,lamda=10,6,40
 
@@ -120,7 +118,7 @@ set_parameters(network_topo)
 node1='a'
 node2='b'
 tm=network_topo.nodes[node1].transport_manager
-tm.request(node2, start_time=5e12,size=10, end_time=10e12, priority=0 , target_fidelity= 0.5, timeout=2e12) 
+tm.request(node2, start_time=5e12,size=5, end_time=10e12, priority=0 , target_fidelity= 0.5, timeout=2e12) 
 
 # node1='a'
 # node2='b'

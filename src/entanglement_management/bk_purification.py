@@ -1,5 +1,4 @@
 """Code for BBPSSW entanglement purification.
-
 This module defines code to support the BBPSSW protocol for entanglement purification.
 Success results are pre-determined based on network parameters.
 Also defined is the message type used by the BBPSSW code.
@@ -12,14 +11,14 @@ from functools import lru_cache
 from numpy.random import random
 
 if TYPE_CHECKING:
-    from ..components.memory import Memory
+    from ..components.bk_memory import Memory
     from ..topology.node import Node
 
 from ..message import Message
 from .entanglement_protocol import EntanglementProtocol
 from ..utils import log
 from ..components.circuit import Circuit
-
+from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
 class BBPSSWMsgType(Enum):
     """Defines possible message types for entanglement purification"""
@@ -27,33 +26,41 @@ class BBPSSWMsgType(Enum):
     PURIFICATION_RES = auto()
 
 
-class BBPSSWMessage(Message):
+class Message():
     """Message used by entanglement purification protocols.
-
     This message contains all information passed between purification protocol instances.
-
     Attributes:
         msg_type (BBPSSWMsgType): defines the message type.
         receiver (str): name of destination protocol instance.
     """
+    def __init__(self, receiver_type: Enum, receiver: Enum, msg_type, **kwargs) -> None:
 
-    def __init__(self, msg_type: BBPSSWMsgType, receiver: str, **kwargs):
-        Message.__init__(self, msg_type, receiver)
-        if self.msg_type is BBPSSWMsgType.PURIFICATION_RES:
-            self.meas_res = kwargs['meas_res']
-        else:
-            raise Exception("BBPSSW protocol create unknown type of message: %s" % str(msg_type))
+        self.receiver_type = receiver_type
+        self.receiver = receiver
+        self.msg_type = msg_type
+        self.kwargs = kwargs
+# class BBPSSWMessage(Message):
+#     """Message used by entanglement purification protocols.
+#     This message contains all information passed between purification protocol instances.
+#     Attributes:
+#         msg_type (BBPSSWMsgType): defines the message type.
+#         receiver (str): name of destination protocol instance.
+#     """
+
+#     def __init__(self, msg_type: BBPSSWMsgType, receiver: str, **kwargs):
+#         Message.__init__(self, msg_type, receiver)
+#         if self.msg_type is BBPSSWMsgType.PURIFICATION_RES:
+#             self.meas_res = kwargs['meas_res']
+#         else:
+#             raise Exception("BBPSSW protocol create unknown type of message: %s" % str(msg_type))
 
 
 class BBPSSW(EntanglementProtocol):
     """Purification protocol instance.
-
     This class provides an implementation of the BBPSSW purification protocol.
     It should be instantiated on a quantum router node.
-
     Variables:
         BBPSSW.circuit (Circuit): circuit that purifies entangled memories.
-
     Attributes:
         own (QuantumRouter): node that protocol instance is attached to.
         name (str): label for protocol instance.
@@ -69,7 +76,6 @@ class BBPSSW(EntanglementProtocol):
 
     def __init__(self, own: "Node", name: str, kept_memo: "Memory", meas_memo: "Memory"):
         """Constructor for purification protocol.
-
         Args:
             own (Node): node protocol is attached to.
             name (str): name of protocol instance.
@@ -92,7 +98,6 @@ class BBPSSW(EntanglementProtocol):
 
     def set_others(self, another: "BBPSSW") -> None:
         """Method to set other entanglement protocol instance.
-
         Args:
             another (BBPSSW): other purification protocol instance.
         """
@@ -101,9 +106,7 @@ class BBPSSW(EntanglementProtocol):
 
     def start(self) -> None:
         """Method to start entanglement purification.
-
         Run the circuit below on two pairs of entangled memories on both sides of protocol.
-
         o -------(x)----------| M |
         .         |
         .   o ----.----------------
@@ -112,9 +115,7 @@ class BBPSSW(EntanglementProtocol):
         .   o
         .
         o
-
         The overall circuit is shown below:
-
          o -------(x)----------| M |
          .         |
          .   o ----.----------------
@@ -123,7 +124,6 @@ class BBPSSW(EntanglementProtocol):
          .   o ----.----------------
          .         |
          o -------(x)----------| M |
-
         Side Effects:
             May update parameters of kept memory.
             Will send message to other protocol instance.
@@ -142,35 +142,35 @@ class BBPSSW(EntanglementProtocol):
         self.meas_res = self.meas_res[self.meas_memo.qstate_key]
         dst = self.kept_memo.entangled_memory["node_id"]
 
-        message = BBPSSWMessage(BBPSSWMsgType.PURIFICATION_RES, self.another.name, meas_res=self.meas_res)
-        self.own.send_message(dst, message)
+        message = Message(MsgRecieverType.PROTOCOL, self.another.name, BBPSSWMsgType.PURIFICATION_RES, another=self.another.name, meas_res=self.meas_res)
+        self.own.message_handler.send_message(dst, message)
 
-    def received_message(self, src: str, msg: BBPSSWMessage) -> None:
+    def received_message(self, src: str, msg: Message) -> None:
         """Method to receive messages.
-
         Args:
             src (str): name of node that sent the message.
             msg (BBPSSW message): message received.
-
         Side Effects:
             Will call `update_resource_manager` method.
         """
 
-        log.logger.info(self.own.name + " received result message, succeeded: {}".format(self.meas_res == msg.meas_res))
+        #log.logger.info(self.own.name + " received result message, succeeded: {}".format(self.meas_res == msg.meas_res))
         assert src == self.another.own.name
         self.update_resource_manager(self.meas_memo, "RAW")
-        if self.meas_res == msg.meas_res:
+        if self.meas_res == msg.kwargs["meas_res"]:
+            print('receive pur if')
             self.kept_memo.fidelity = self.improved_fidelity(self.kept_memo.fidelity)
             self.update_resource_manager(self.kept_memo, state="ENTANGLED")
         else:
+            print('receive pur else')
             self.update_resource_manager(self.kept_memo, state="RAW")
+            
+        self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
 
     def memory_expire(self, memory: "Memory") -> None:
         """Method to receive memory expiration events.
-
         Args:
             memory (Memory): memory that has expired.
-
         Side Effects:
             Will call `update_resource_manager` method.
         """
@@ -191,7 +191,6 @@ class BBPSSW(EntanglementProtocol):
         """Method to calculate probability of purification success.
         
         Formula comes from Dur and Briegel (2007) page 14.
-
         Args:
             F (float): fidelity of entanglement.
         """
@@ -204,7 +203,6 @@ class BBPSSW(EntanglementProtocol):
         """Method to calculate fidelity after purification.
         
         Formula comes from Dur and Briegel (2007) formula (18) page 14.
-
         Args:
             F (float): fidelity of entanglement.
         """

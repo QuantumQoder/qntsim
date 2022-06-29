@@ -18,14 +18,14 @@ if TYPE_CHECKING:
     from ..components.memory import Memory
 
 from ..kernel.entity import Entity
-from ..components.memory import MemoryArray
-from ..components.bsm import SingleAtomBSM
+from ..components.bk_memory import MemoryArray
+from ..components.bk_bsm import SingleAtomBSM
 from ..components.light_source import LightSource, SPDCSource2
 from ..components.detector import QSDetectorPolarization, QSDetectorTimeBin
 from ..resource_management.resource_manager import ResourceManager
 from ..transport_layer.transport_manager import TransportManager
 
-from ..entanglement_management.generation import GenerationMsgType
+from ..entanglement_management.bk_generation import GenerationMsgType
 from ..utils.encoding import *
 from ..network_management.request import RRPMsgType
 from ..network_management.network_manager import NetworkManager
@@ -139,7 +139,7 @@ class BSMNode(Node):
             other_nodes (str): 2-member list of node names for adjacent quantum routers.
         """
 
-        from ..entanglement_management.generation import EntanglementGenerationB
+        from ..entanglement_management.bk_generation import EntanglementGenerationB
         Node.__init__(self, name, timeline)
         self.bsm = SingleAtomBSM("%s_bsm" % name, timeline)
         self.eg = EntanglementGenerationB(self, "{}_eg".format(name), other_nodes)
