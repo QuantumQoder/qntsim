@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from ..topology.node import QuantumRouter
 
 from .photon import Photon
-from .circuit import Circuit
+from .circuit import BaseCircuit
 from ..kernel.entity import Entity
 from ..kernel._event import Event
 from ..kernel.process import Process
@@ -111,8 +111,8 @@ class Memory(Entity):
         entangled_memory (Dict[str, Any]): tracks entanglement state of memory.
     """
 
-    _meas_circuit = Circuit(1)
-    _meas_circuit.measure(0)
+    #_meas_circuit = Circuit(1)
+    #_meas_circuit.measure(0)
 
     def __init__(self, name: str, timeline: "Timeline", fidelity: float, frequency: float,
                  efficiency: float, coherence_time: int, wavelength: int):
@@ -154,6 +154,11 @@ class Memory(Entity):
         self.excited_photon = None
         self.result={}
         self.next_excite_time = 0
+        Circuit =BaseCircuit.create(self.timeline.type)
+        print("memory circuit",BaseCircuit.create(self.timeline.type))
+        self._meas_circuit = Circuit(1)
+        self._meas_circuit.measure(0)
+
 
     def init(self):
         pass
@@ -176,7 +181,7 @@ class Memory(Entity):
             return
 
         # measure quantum state
-        res = self.timeline.quantum_manager.run_circuit(Memory._meas_circuit, [self.qstate_key])
+        res = self.timeline.quantum_manager.run_circuit(self._meas_circuit, [self.qstate_key])
         # print(f'previous BSM: {self.previous_bsm}')
         # print('res: ',res,' ,self.qstate_key: ', self.qstate_key)
         state = res[self.qstate_key]

@@ -17,12 +17,13 @@ if TYPE_CHECKING:
 
 from .kernel_utils import EventList
 from ..utils import log
-from .quantum_manager import QuantumManagerKet, QuantumManagerDensity
+from .quantum_kernel import QuantumKernel
+from .quantum_manager import QuantumManagerDensity
 
 
 class Timeline:
 
-    def __init__(self, stop_time=inf, formalism='ket_vector'):
+    def __init__(self, stop_time=inf,backend=str, formalism='ket_vector'):
         
         self.events = EventList()
         self.entities = []
@@ -32,8 +33,14 @@ class Timeline:
         self.run_counter = 0
         self.is_running = False
         
+        self.type=backend
+
         if formalism == 'ket_vector':
-            self.quantum_manager = QuantumManagerKet()
+            #self.quantum_manager =QuantumKernel.create("Qutip")()
+            print('timeline manager',QuantumKernel.create(self.type))
+            #self.quantum_manager =QuantumKernel.create(self.type)()
+            self.quantum_manager =QuantumKernel.create(self.type)()
+            #self.quantum_manager = QuantumManagerKet()
         elif formalism == 'density_matrix':
             self.quantum_manager = QuantumManagerDensity()
         else:

@@ -3,11 +3,11 @@ from qntsim.kernel.timeline import Timeline
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
 #random.seed(0)
-network_config = "/home/aman/QNTSim/QNTSim/example/3node.json"
+network_config = "/home/bhanusree/Desktop/QNTv1/QNTSim-Demo/QNTSim/example/4node.json"
 
 n,k,lamda=10,6,40
 
-tl = Timeline(10e12)
+tl = Timeline(10e12,"Qutip")
 network_topo = Topology("network_topo", tl)
 network_topo.load_config(network_config)
 # network_topo.create_random_topology(n,network_config)

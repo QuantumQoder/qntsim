@@ -20,7 +20,7 @@ from .entanglement_protocol import EntanglementProtocol
 from ..message import Message
 from ..kernel.event import Event
 from ..kernel.process import Process
-from ..components.circuit import Circuit
+from ..components.circuit import BaseCircuit
 from ..utils import log
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
@@ -108,11 +108,11 @@ class EntanglementGenerationA(EntanglementProtocol):
     
     # TODO: use a function to update resource manager
 
-    _plus_state = [sqrt(1/2), sqrt(1/2)]
-    _flip_circuit = Circuit(1)
-    _flip_circuit.x(0)
-    _z_circuit = Circuit(1)
-    _z_circuit.z(0)
+    #_plus_state = [sqrt(1/2), sqrt(1/2)]
+    #_flip_circuit = Circuit(1)
+    #_flip_circuit.x(0)
+    #_z_circuit = Circuit(1)
+    #_z_circuit.z(0)
 
 
     def __init__(self, own: "Node", name: str, middle: str, other: str, memory: "Memory"):
@@ -151,6 +151,14 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.debug = False
 
         self._qstate_key = self.memory.qstate_key
+        
+        Circuit =BaseCircuit.create(self.memory.timeline.type)
+        print("gen circuit",BaseCircuit.create(self.memory.timeline.type))
+        self._plus_state = [sqrt(1/2), sqrt(1/2)]
+        self._flip_circuit = Circuit(1)
+        self._flip_circuit.x(0)
+        self._z_circuit = Circuit(1)
+        self._z_circuit.z(0)
 
     def set_others(self, other: "EntanglementGenerationA") -> None:
         """Method to set other entanglement protocol instance.
@@ -212,9 +220,9 @@ class EntanglementGenerationA(EntanglementProtocol):
             # successful entanglement            
             # state correction
             if self.primary:
-                self.own.timeline.quantum_manager.run_circuit(EntanglementGenerationA._flip_circuit, [self._qstate_key])
+                self.own.timeline.quantum_manager.run_circuit(self._flip_circuit, [self._qstate_key])
             elif self.bsm_res[0] != self.bsm_res[1]:
-                self.own.timeline.quantum_manager.run_circuit(EntanglementGenerationA._z_circuit, [self._qstate_key])
+                self.own.timeline.quantum_manager.run_circuit(self._z_circuit, [self._qstate_key])
             print("Entanglement succes frome end", self.bsm_res[0],self.bsm_res[1])
             self._entanglement_succeed()
             
@@ -238,10 +246,10 @@ class EntanglementGenerationA(EntanglementProtocol):
         """
 
         if self.ent_round == 1:
-            self.memory.update_state(EntanglementGenerationA._plus_state)
+            self.memory.update_state(self._plus_state)
             # ####print('Emit event plus state',EntanglementGenerationA._plus_state)
         else:
-            self.own.timeline.quantum_manager.run_circuit(EntanglementGenerationA._flip_circuit, [self._qstate_key])
+            self.own.timeline.quantum_manager.run_circuit(self._flip_circuit, [self._qstate_key])
             # ####print('flip circuit', EntanglementGenerationA._flip_circuit, self._qstate_key)
         self.memory.excite(self.middle)
 

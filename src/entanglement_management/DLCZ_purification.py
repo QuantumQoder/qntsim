@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 from ..message import Message
 from .entanglement_protocol import EntanglementProtocol
 from ..utils import log
-from ..components.circuit import Circuit
+from ..components.circuit import BaseCircuit
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
 class BBPSSWMsgType(Enum):
@@ -58,9 +58,9 @@ class BBPSSW(EntanglementProtocol):
         meas_res (int): measurement result from circuit.
     """
 
-    circuit = Circuit(2)
-    circuit.cx(0, 1)
-    circuit.measure(1)
+    #circuit = Circuit(2)
+    #circuit.cx(0, 1)
+    #circuit.measure(1)
 
     def __init__(self, own: "Node", name: str, kept_memo: "Memory", meas_memo: "Memory"):
         """Constructor for purification protocol.
@@ -80,6 +80,11 @@ class BBPSSW(EntanglementProtocol):
         self.F = None
         # if self.meas_memo is None:
         #     self.memories.pop()
+        Circuit =BaseCircuit.create(self.own.timeline.type)
+        print("pur circuit",BaseCircuit.create(self.own.timeline.type))
+        self.circuit = Circuit(2)
+        self.circuit.cx(0, 1)
+        self.circuit.measure(1)
 
     def is_ready(self) -> bool:
         return self.another is not None

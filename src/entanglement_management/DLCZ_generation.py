@@ -19,7 +19,7 @@ from .entanglement_protocol import EntanglementProtocol
 from ..message import Message
 from ..kernel.event import Event
 from ..kernel.process import Process
-from ..components.circuit import Circuit
+from ..components.circuit import BaseCircuit
 from ..utils import log
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
@@ -102,11 +102,11 @@ class EntanglementGenerationA(EntanglementProtocol):
     
     # TODO: use a function to update resource manager
 
-    _plus_state = [sqrt(1/2), sqrt(1/2)]
-    _flip_circuit = Circuit(1)
-    _flip_circuit.x(0)
-    _z_circuit = Circuit(1)
-    _z_circuit.z(0)
+    #_plus_state = [sqrt(1/2), sqrt(1/2)]
+    #_flip_circuit = Circuit(1)
+    #_flip_circuit.x(0)
+    #_z_circuit = Circuit(1)
+    #_z_circuit.z(0)
 
 
     def __init__(self, own: "Node", name: str, middle: str, other: str, memory: "Memory"):
@@ -145,6 +145,13 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.isSuccess = False
 
         self.state = 0
+        Circuit =BaseCircuit.create(self.memory.timeline.type)
+        print("gen circuit",BaseCircuit.create(self.memory.timeline.type))
+        self._plus_state = [sqrt(1/2), sqrt(1/2)]
+        self._flip_circuit = Circuit(1)
+        self._flip_circuit.x(0)
+        self._z_circuit = Circuit(1)
+        self._z_circuit.z(0)
 
     def received_message(self):
         pass

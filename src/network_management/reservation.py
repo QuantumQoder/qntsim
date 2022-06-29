@@ -12,9 +12,9 @@ if TYPE_CHECKING:
     from ..resource_management.memory_manager import MemoryInfo, MemoryManager
 
 from ..resource_management.rule_manager import Rule
-from ..entanglement_management.generation import EntanglementGenerationA
-from ..entanglement_management.purification import BBPSSW
-from ..entanglement_management.swapping import EntanglementSwappingA, EntanglementSwappingB
+from ..entanglement_management.bk_generation import EntanglementGenerationA
+from ..entanglement_management.bk_purification import BBPSSW
+from ..entanglement_management.bk_swapping import EntanglementSwappingA, EntanglementSwappingB
 from ..message import Message
 from ..protocol import StackProtocol
 from ..kernel._event import Event

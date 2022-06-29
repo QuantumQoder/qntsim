@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 from ..message import Message
 from .entanglement_protocol import EntanglementProtocol
 from ..utils import log
-from ..components.circuit import Circuit
+from ..components.circuit import BaseCircuit
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
 class SwappingMsgType(Enum):
@@ -107,11 +107,11 @@ class EntanglementSwappingA(EntanglementProtocol):
         degradation (float): degradation factor of memory fidelity after the swapping operation.
     """
 
-    circuit = Circuit(2)
-    circuit.cx(0, 1)
-    circuit.h(0)
-    circuit.measure(0)
-    circuit.measure(1)
+    #circuit = Circuit(2)
+    #circuit.cx(0, 1)
+    #circuit.h(0)
+    #circuit.measure(0)
+    #circuit.measure(1)
 
     def __init__(self, own: "Node", name: str, left_memo: "Memory", right_memo: "Memory", success_prob=1,
                  degradation=0.95):
@@ -146,6 +146,14 @@ class EntanglementSwappingA(EntanglementProtocol):
         self.is_success = False
         self.left_protocol = None
         self.right_protocol = None
+        Circuit =BaseCircuit.create(self.left_memo.timeline.type)
+        print("swap circuit",BaseCircuit.create(self.left_memo.timeline.type))
+
+        self.circuit = Circuit(2)
+        self.circuit.cx(0, 1)
+        self.circuit.h(0)
+        self.circuit.measure(0)
+        self.circuit.measure(1)
 
     def is_ready(self) -> bool:
         return self.left_protocol is not None and self.right_protocol is not None
@@ -300,15 +308,15 @@ class EntanglementSwappingB(EntanglementProtocol):
         hold_memory (Memory): quantum memory to be swapped.
     """
 
-    x_cir = Circuit(1)
-    x_cir.x(0)
+    #x_cir = Circuit(1)
+    #x_cir.x(0)
 
-    z_cir = Circuit(1)
-    z_cir.z(0)
+    #z_cir = Circuit(1)
+    #z_cir.z(0)
 
-    x_z_cir = Circuit(1)
-    x_z_cir.x(0)
-    x_z_cir.z(0)
+    #x_z_cir = Circuit(1)
+    #x_z_cir.x(0)
+    #x_z_cir.z(0)
 
     def __init__(self, own: "Node", name: str, hold_memo: "Memory"):
         """Constructor for entanglement swapping B protocol.
@@ -323,6 +331,18 @@ class EntanglementSwappingB(EntanglementProtocol):
         self.memories = [hold_memo]
         self.memory = hold_memo
         self.another = None
+        Circuit =BaseCircuit.create(self.memory.timeline.type)
+        print("swap circuit",BaseCircuit.create(self.memory.timeline.type))
+        self.x_cir = Circuit(1)
+        self.x_cir.x(0)
+
+        self.z_cir = Circuit(1)
+        self.z_cir.z(0)
+
+        self.x_z_cir = Circuit(1)
+        self.x_z_cir.x(0)
+        self.x_z_cir.z(0)
+
 
     def is_ready(self) -> bool:
         return self.another is not None
