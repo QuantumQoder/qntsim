@@ -111,7 +111,7 @@ class BSM(Entity):
                            (complex(sqrt(1 / 2)), complex(0), complex(0), -complex(sqrt(1 / 2))),
                            (complex(0), complex(sqrt(1 / 2)), complex(sqrt(1 / 2)), complex(0)),
                            (complex(0), complex(sqrt(1 / 2)), -complex(sqrt(1 / 2)), complex(0)))
-        # #print('Bell basis',self.bell_basis)
+        # ##print('Bell basis',self.bell_basis)
 
     def init(self):
         """Implementation of Entity interface (see base class)."""
@@ -135,7 +135,7 @@ class BSM(Entity):
         if not any([reference.location == photon.location for reference in self.photons]):
             self.photons.append(photon)
 
-        ##print(f'BSM parent get() and photons: {self.photons}')
+        ###print(f'BSM parent get() and photons: {self.photons}')
 
     @abstractmethod
     def trigger(self, detector: Detector, info: Dict[str, Any]):
@@ -149,7 +149,7 @@ class BSM(Entity):
 
     def notify(self, info: Dict[str, Any]):
         for observer in self._observers:
-            #print("bsm notify",observer.name,len(self._observers))
+            ##print("bsm notify",observer.name,len(self._observers))
             observer.bsm_update(self, info)
 
     def update_detectors_params(self, arg_name: str, value: Any) -> None:
@@ -189,7 +189,7 @@ class PolarizationBSM(BSM):
             May call get method of one or more attached detector(s).
             May alter the quantum state of photon and any stored photons.
         """
-        ##print('PolarizationBSM')
+        ###print('PolarizationBSM')
         super().get(photon)
 
         if len(self.photons) != 2:
@@ -243,7 +243,7 @@ class PolarizationBSM(BSM):
             # Psi+
             elif abs(detector_last - detector_num) == 1:
                 info = {'entity': 'BSM', 'info_type': 'BSM_res', 'res': 0, 'time': time}
-                ##print(f'Polarization BSM value: Psi+')
+                ###print(f'Polarization BSM value: Psi+')
                 self.notify(info)
 
         self.last_res = [time, detector_num]
@@ -280,7 +280,7 @@ class TimeBinBSM(BSM):
             May call get method of one or more attached detector(s).
             May alter the quantum state of photon and any stored photons.
         """
-        ##print('TimeBinBSM')
+        ###print('TimeBinBSM')
         super().get(photon)
 
         if len(self.photons) != 2:
@@ -405,13 +405,13 @@ class SingleAtomBSM(BSM):
             May call get method of one or more attached detector(s).
             May alter the quantum state of photon and any stored photons, as well as their corresponding memories.
         """
-        ##print('SingleAtomBSM')
+        ###print('SingleAtomBSM')
         super().get(photon)
 
         memory = photon.memory
 
         # check if we're in first stage. If we are and not null, send photon to random detector
-        ##print('Is photon null? ', photon.is_null)
+        ###print('Is photon null? ', photon.is_null)
         if not photon.is_null:
             detector_num = random.choice([0, 1])
             memory.previous_bsm = detector_num

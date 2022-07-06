@@ -153,7 +153,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         self._qstate_key = self.memory.qstate_key
         
         Circuit =BaseCircuit.create(self.memory.timeline.type)
-        print("gen circuit",BaseCircuit.create(self.memory.timeline.type))
+        # #print("gen circuit",BaseCircuit.create(self.memory.timeline.type))
         self._plus_state = [sqrt(1/2), sqrt(1/2)]
         self._flip_circuit = Circuit(1)
         self._flip_circuit.x(0)
@@ -183,19 +183,19 @@ class EntanglementGenerationA(EntanglementProtocol):
 
         log.logger.info(self.own.name + " protocol start with partner {}".format(self.other))
         print(self.own.name + " Generation protocol start with partner {}".format(self.other),self.name, self.middle)
-        ###print('start protocol',self.other_protocol.name,self.name)
+        ####print('start protocol',self.other_protocol.name,self.name)
         # to avoid start after remove protocol
         if self not in self.own.protocols:
             return
         bsm_protocol=self.middle + "_eg"
-        ###print('bsm protocol', bsm_protocol)
+        ####print('bsm protocol', bsm_protocol)
         # start negotiations
         if self.primary:
             # send NEGOTIATE message
             self.qc_delay = self.own.qchannels[self.middle].delay
             frequency = self.memory.frequency
             message = Message(MsgRecieverType.PROTOCOL, self.other_protocol.name, GenerationMsgType.NEGOTIATE, other_protocol = self.other_protocol.name, qc_delay=self.qc_delay, frequency=frequency)
-            ###print('Emessage',message,self.name,self.middle,self.other)
+            ####print('Emessage',message,self.name,self.middle,self.other)
             self.own.message_handler.send_message(self.other, message)
             message = Message(MsgRecieverType.PROTOCOL, bsm_protocol, GenerationMsgType.CALL_BSM, protocol=self, other_protocol=self.other_protocol)
             self.own.message_handler.send_message(self.middle, message)
@@ -215,7 +215,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             self.bsm_res[0] = 1
         if self.bsm_res[1] == -1:
             self.bsm_res[1] = 1"""
-        ###print('end called',self.name,self.own.name,self.own.timeline.now()*1e-12,self.bsm_res[0],self.bsm_res[1])
+        ####print('end called',self.name,self.own.name,self.own.timeline.now()*1e-12,self.bsm_res[0],self.bsm_res[1])
         if self.bsm_res[0] != -1 and self.bsm_res[1] != -1:
             # successful entanglement            
             # state correction
@@ -223,12 +223,12 @@ class EntanglementGenerationA(EntanglementProtocol):
                 self.own.timeline.quantum_manager.run_circuit(self._flip_circuit, [self._qstate_key])
             elif self.bsm_res[0] != self.bsm_res[1]:
                 self.own.timeline.quantum_manager.run_circuit(self._z_circuit, [self._qstate_key])
-            print("Entanglement succes frome end", self.bsm_res[0],self.bsm_res[1])
+            # #print("Entanglement succes frome end", self.bsm_res[0],self.bsm_res[1])
             self._entanglement_succeed()
             
         else:
             # entanglement failed
-            ###print('Entanglement failed called from end()')
+            ####print('Entanglement failed called from end()')
             self._entanglement_fail()
 
     def next_round(self) -> None:
@@ -247,10 +247,10 @@ class EntanglementGenerationA(EntanglementProtocol):
 
         if self.ent_round == 1:
             self.memory.update_state(self._plus_state)
-            # ####print('Emit event plus state',EntanglementGenerationA._plus_state)
+            # #####print('Emit event plus state',EntanglementGenerationA._plus_state)
         else:
             self.own.timeline.quantum_manager.run_circuit(self._flip_circuit, [self._qstate_key])
-            # ####print('flip circuit', EntanglementGenerationA._flip_circuit, self._qstate_key)
+            # #####print('flip circuit', EntanglementGenerationA._flip_circuit, self._qstate_key)
         self.memory.excite(self.middle)
 
     def received_message(self, src: str, msg: Message) -> None:
@@ -268,13 +268,13 @@ class EntanglementGenerationA(EntanglementProtocol):
             return
 
         msg_type = msg.msg_type
-        ####print('msg_type',msg_type)
-        ####print('self.other',self.other, self.name)
+        #####print('msg_type',msg_type)
+        #####print('self.other',self.other, self.name)
         log.logger.debug(self.own.name + " EG protocol received_message of type {} from node {}, round={}".format(msg.msg_type, src, self.ent_round + 1))
 
         if msg_type is GenerationMsgType.NEGOTIATE:
             # configure params
-            ####print('negotiate starts')
+            #####print('negotiate starts')
             qc_delay=msg.kwargs["qc_delay"]
             frequency=msg.kwargs["frequency"]
             another_delay = qc_delay
@@ -316,7 +316,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             end_time = self.expected_times[1] + self.own.cchannels[self.middle].delay + 10
             # process = Process(self, "end", [])
             event = Event(end_time, self, "end", [])
-            ###print('negotiate end time',end_time*1e-12,self.own.timeline.now()*1e-12)
+            ####print('negotiate end time',end_time*1e-12,self.own.timeline.now()*1e-12)
             self.own.timeline.events.push(event)
             self.scheduled_events.append(event)
 
@@ -326,7 +326,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             message = Message(MsgRecieverType.PROTOCOL, self.other_protocol.name, GenerationMsgType.NEGOTIATE_ACK, other_protocol=self.other_protocol.name,
                                                     emit_time_0=another_emit_time_0, emit_time_1=another_emit_time_1)
             self.own.message_handler.send_message(src, message)
-            ###print('Negotiate ends')
+            ####print('Negotiate ends')
         elif msg_type is GenerationMsgType.NEGOTIATE_ACK:
             # configure params
             msg_emit_time_0=msg.kwargs["emit_time_0"]
@@ -361,13 +361,13 @@ class EntanglementGenerationA(EntanglementProtocol):
             end_time = self.expected_times[1] + self.own.cchannels[self.middle].delay + 10
             # process = Process(self, "end", [])
             event = Event(end_time, self, "end", [])
-            ##print('negotiate ack end time',end_time*1e-12,self.own.timeline.now()*1e-12)
+            ###print('negotiate ack end time',end_time*1e-12,self.own.timeline.now()*1e-12)
             self.own.timeline.events.push(event)
             self.scheduled_events.append(event)
-            ##print('Negotiate ack ends')
+            ###print('Negotiate ack ends')
 
         elif msg_type is GenerationMsgType.MEAS_RES:
-            ##print('At meas',self.own.name,self.own.timeline.now()*1e-12)
+            ###print('At meas',self.own.name,self.own.timeline.now()*1e-12)
             res = msg.kwargs["res"]
             time = msg.kwargs["time"]
             resolution = msg.kwargs["resolution"]
@@ -392,27 +392,27 @@ class EntanglementGenerationA(EntanglementProtocol):
             count = 0
             # temp_valid_trigger_time=True
             for i, expected_time in enumerate(self.expected_times):
-                ##print(f'Detection time: {time} , Expected Time: {expected_time}',self.expected_times)
-                ##print(f'For node: {self.own.name} with node: {src}')
+                ###print(f'Detection time: {time} , Expected Time: {expected_time}',self.expected_times)
+                ###print(f'For node: {self.own.name} with node: {src}')
                 temp_valid_trigger_time = valid_trigger_time(time, expected_time, resolution)
-                ##print('temp_valid_trigger_time: ', temp_valid_trigger_time)
+                ###print('temp_valid_trigger_time: ', temp_valid_trigger_time)
                 if temp_valid_trigger_time:
-                    ##print(f'For node: {self.own.name} with node: {src} count: {count} and round: {self.ent_round}')
+                    ###print(f'For node: {self.own.name} with node: {src} count: {count} and round: {self.ent_round}')
                     count += 1
                     # record result if we don't already have one
                     if self.bsm_res[i] == -1:
-                        ##print(f'Setting up the value: {res} at i={i}',self.bsm_res)
+                        ###print(f'Setting up the value: {res} at i={i}',self.bsm_res)
                         self.bsm_res[i] = res
                         # if self.primary:
-                        #     ##print(f' primary After Setting up the value: {res} at i={i}',self.name,self.own.timeline.now()*1e-12,self.own.name,self.bsm_res)
+                        #     ###print(f' primary After Setting up the value: {res} at i={i}',self.name,self.own.timeline.now()*1e-12,self.own.name,self.bsm_res)
                         # else:
-                            ##print(f' secondary After Setting up the value: {res} at i={i}',self.name,self.own.timeline.now()*1e-12,self.own.name,self.bsm_res)
+                            ###print(f' secondary After Setting up the value: {res} at i={i}',self.name,self.own.timeline.now()*1e-12,self.own.name,self.bsm_res)
                         #self._entanglement_succeed()
                     else:
                         # entanglement failed
-                        ##print('bsm_res', self.bsm_res)
-                        ####print('self.expected_times', self.expected_times)
-                        ##print('Entanglement failed called from "elif msg_type is GenerationMsgType.MEAS_RES:"')
+                        ###print('bsm_res', self.bsm_res)
+                        #####print('self.expected_times', self.expected_times)
+                        ###print('Entanglement failed called from "elif msg_type is GenerationMsgType.MEAS_RES:"')
                         self._entanglement_fail()
 
         else:
@@ -436,23 +436,23 @@ class EntanglementGenerationA(EntanglementProtocol):
 
     def _entanglement_succeed(self):
         log.logger.info(self.own.name + " successful entanglement of memory {}".format(self.memory))
-        #####print(self.own.name + " successful entanglement of memory with the node: ",self.other," {} ".format(self.memory))
+        print(self.own.name + " successful entanglement of memory with the node: ",self.other," {} ".format(self.memory))
         self.memory.entangled_memory["node_id"] = self.other
         self.memory.entangled_memory["memo_id"] = self.remote_memo_id
         self.memory.fidelity = self.memory.raw_fidelity
 
         self.update_resource_manager(self.memory, 'ENTANGLED')
-        print(self.own.name + " entanglement success ",self.other, self.name, self.other_protocol.name)
+        # #print(self.own.name + " entanglement success ",self.other, self.name, self.other_protocol.name)
 
     def _entanglement_fail(self):
         for event in self.scheduled_events:
-            # ##print('Nemtamgle fieldb ent')
+            # ###print('Nemtamgle fieldb ent')
             self.own.timeline.events.remove(event)
-        ###print(self.own.name + " entanglement fail  ",self.other, self.name, self.other_protocol.name)
+        print(self.own.name + " entanglement fail  ",self.other, self.name, self.other_protocol.name)
         log.logger.info(self.own.name + " failed entanglement of memory {}".format(self.memory))
         
-        print(self.own.name + " failed entanglement of memory with the node: ",self.other," {} ".format(self.memory.name))
-        # ###print(f'Time of entanglement failure: {self.own.timeline.now()}')
+        # #print(self.own.name + " failed entanglement of memory with the node: ",self.other," {} ".format(self.memory.name))
+        # ####print(f'Time of entanglement failure: {self.own.timeline.now()}')
         self.update_resource_manager(self.memory, 'RAW')
 
 
@@ -493,14 +493,14 @@ class EntanglementGenerationB(EntanglementProtocol):
         res = info["res"]
         time = info["time"]
         resolution = self.own.bsm.resolution
-        ##print('Inside bsm update',self.others,self.other_protocol,self.protocol)
+        ###print('Inside bsm update',self.others,self.other_protocol,self.protocol)
         #for i, node in enumerate(self.others):
             # for other_protocols in self.other_protocol:
             # if node not in str(self.other_protocol):
-            # ##print(f'{self.own.name} sends MEAS_RES to {node}',i)
+            # ###print(f'{self.own.name} sends MEAS_RES to {node}',i)
             # message = Message(MsgRecieverType.PROTOCOL, self.other_protocol, GenerationMsgType.MEAS_RES, res=res, time=time,
             #                                         resolution=resolution)
-            # ##print('If Message sent to',node, message.receiver,self.other_protocol)
+            # ###print('If Message sent to',node, message.receiver,self.other_protocol)
             # self.own.message_handler.send_message(node, message)
             #tempother_protocol=self.other_protocol
             #tempprotocol=self.protocol
@@ -508,16 +508,16 @@ class EntanglementGenerationB(EntanglementProtocol):
                 #tempprotocol=self.other_protocol
             #elif self.others[1] not in self.other_protocol:
                 #tempother_protocol=self.protocol
-            ###print(f'{self.own.name} sends MEAS_RES to {node}',i)
-        ##print('bsm update',self.protocol,self.other_protocol)
+            ####print(f'{self.own.name} sends MEAS_RES to {node}',i)
+        ###print('bsm update',self.protocol,self.other_protocol)
         message = Message(MsgRecieverType.PROTOCOL, self.other_protocol.name, GenerationMsgType.MEAS_RES, res=res, time=time,
                                                 resolution=resolution,protocol_type=type(self.other_protocol))
-        ##print('If Message sent to',self.others[0],self.other_protocol)
+        ###print('If Message sent to',self.others[0],self.other_protocol)
         self.own.message_handler.send_message(self.others[0], message)
 
         message = Message(MsgRecieverType.PROTOCOL, self.protocol.name, GenerationMsgType.MEAS_RES, res=res, time=time,
                                                 resolution=resolution,protocol_type=type(self.protocol))
-        ##print('If Message sent to',self.others[1], self.protocol)
+        ###print('If Message sent to',self.others[1], self.protocol)
         self.own.message_handler.send_message(self.others[1], message)
 
             
@@ -525,7 +525,7 @@ class EntanglementGenerationB(EntanglementProtocol):
             # else:
             #     message = Message(MsgRecieverType.PROTOCOL, self.protocol, GenerationMsgType.MEAS_RES, res=res, time=time,
             #                                             resolution=resolution)
-            #     ##print('Else Message sent to',node, message.receiver.name,self.protocol.name)
+            #     ###print('Else Message sent to',node, message.receiver.name,self.protocol.name)
             #     self.own.message_handler.send_message(node, message)
 
     def received_message(self, src: str, msg: Message):
@@ -538,7 +538,7 @@ class EntanglementGenerationB(EntanglementProtocol):
            
             self.protocol=protocol
             self.other_protocol=other_protocol
-            ##print('Inside GenB recieved message',other_protocol,protocol,src)
+            ###print('Inside GenB recieved message',other_protocol,protocol,src)
         #self.protocol = protocol
         #self.other_protocol = other_protocol
         self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)

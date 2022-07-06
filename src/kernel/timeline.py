@@ -22,7 +22,7 @@ from .quantum_manager import QuantumManagerDensity
 
 
 class Timeline:
-
+    # declare protocol
     def __init__(self, stop_time=inf,backend=str, formalism='ket_vector'):
         
         self.events = EventList()
@@ -37,7 +37,7 @@ class Timeline:
 
         if formalism == 'ket_vector':
             #self.quantum_manager =QuantumKernel.create("Qutip")()
-            print('timeline manager',QuantumKernel.create(self.type))
+            #print('timeline manager',QuantumKernel.create(self.type))
             #self.quantum_manager =QuantumKernel.create(self.type)()
             self.quantum_manager =QuantumKernel.create(self.type)()
             #self.quantum_manager = QuantumManagerKet()

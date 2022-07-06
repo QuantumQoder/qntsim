@@ -268,7 +268,7 @@ class QuantumManagerKetQutip(QuantumKernel):
         all_keys = []
 
         # go through keys and get all unique qstate objects
-        print('prepare circuit qutip')
+        #print('prepare circuit qutip')
         for key in keys:
             qstate = self.states[key]
             if qstate.keys[0] not in all_keys:
@@ -307,7 +307,7 @@ class QuantumManagerKetQutip(QuantumKernel):
 
     def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:
         super().run_circuit(circuit, keys)
-        print('run circuit')
+        #print('run circuit')
         new_state, all_keys, circ_mat = self._prepare_circuit(circuit, keys)
 
         new_state = circ_mat @ new_state

@@ -118,7 +118,7 @@ class Timeline:
             assert self.time <= event.time, f"invalid event time for process scheduled on {event.owner}"
 
             if event._is_removed:
-                # print("invalid event found")
+                # #print("invalid event found")
                 continue
 
             self.time = event.time
@@ -130,8 +130,8 @@ class Timeline:
 
             self.run_counter += 1
 
-        # #print('number of event', self.event_counter)
-        # #print('log:',log)
+        # ##print('number of event', self.event_counter)
+        # ##print('log:',log)
 
         self.is_running = False
         time_elapsed = time_ns() - tick
@@ -178,7 +178,7 @@ class Timeline:
             stop_time = 'NaN' if self.stop_time == float('inf') else self.ns_to_human_time(self.convert_to_nanoseconds(self.stop_time))
             process_bar = f'{CARRIAGE_RETURN}execution time: {execution_time};     simulation time: {simulation_time} / {stop_time}'
 
-            #print(f'{process_bar}', end=CARRIAGE_RETURN)
+            ##print(f'{process_bar}', end=CARRIAGE_RETURN)
             stdout.flush()
             sleep(SLEEP_SECONDS)
 

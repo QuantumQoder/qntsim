@@ -81,7 +81,7 @@ class BBPSSW(EntanglementProtocol):
         # if self.meas_memo is None:
         #     self.memories.pop()
         Circuit =BaseCircuit.create(self.own.timeline.type)
-        print("pur circuit",BaseCircuit.create(self.own.timeline.type))
+        #print("pur circuit",BaseCircuit.create(self.own.timeline.type))
         self.circuit = Circuit(2)
         self.circuit.cx(0, 1)
         self.circuit.measure(1)
@@ -98,7 +98,7 @@ class BBPSSW(EntanglementProtocol):
         self.another = another
 
     def start(self) -> None:
-        # print("purificatin has started")
+        # #print("purificatin has started")
         """Method to start entanglement purification.
         Run the circuit below on two pairs of entangled memories on both sides of protocol.
         o -------(x)----------| M |
@@ -122,7 +122,7 @@ class BBPSSW(EntanglementProtocol):
             May update parameters of kept memory.
             Will send message to other protocol instance.
         """
-        print("Purification is Running")
+        #print("Purification is Running")
         log.logger.info(self.own.name + " protocol start with partner {}".format(self.another.own.name))
 
         assert self.another is not None, "other protocol is not set; please use set_others function to set it."
@@ -136,7 +136,7 @@ class BBPSSW(EntanglementProtocol):
         # send message to other node to perform BBPSSW protocol 
         message = Message(MsgRecieverType.PROTOCOL, self.another.name, BBPSSWMsgType.PURIFICATION_RES, another=self.another.name, F = self.kept_memo.fidelity)
         self.own.message_handler.send_message(dst, message)
-        print("bbpssw start",self.name,dst, self.another.name )
+        #print("bbpssw start",self.name,dst, self.another.name )
 
     def received_message(self, src: str, msg: Message) -> None:
         """Method to receive messages.
@@ -146,7 +146,7 @@ class BBPSSW(EntanglementProtocol):
         Side Effects:
             Will call `update_resource_manager` method.
         """
-        print("receive message bbpssw",self.own.name)
+        #print("receive message bbpssw",self.own.name)
         assert src == self.another.own.name
         self.update_resource_manager(self.meas_memo, "RAW")
 
@@ -155,12 +155,12 @@ class BBPSSW(EntanglementProtocol):
     
         # check if purification succesful or not
         if x_rand < self.success_probability(msg.kwargs["F"]):
-            print("purification receive 1")
+            #print("purification receive 1")
             # if yes, update the fidelities.
             self.kept_memo.fidelity = self.improved_fidelity(self.kept_memo.fidelity)
             self.update_resource_manager(self.kept_memo, state="ENTANGLED")
         else:
-            print("purification receive 2")
+            #print("purification receive 2")
             # else, turn the kept memory's status to raw
             self.update_resource_manager(self.kept_memo, state="RAW")
             

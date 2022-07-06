@@ -33,7 +33,7 @@ class UpdateRoutingMessage(Message):
     def __init__(self, msg_type: UpdateRoutingMessageType, receiver,node,vneighbors):
         super().__init__(msg_type, receiver)
         self.protocol_type=RoutingTableUpdateProtocol
-        # print('Update routing message',self.receiver,node,vneighbors)
+        # #print('Update routing message',self.receiver,node,vneighbors)
         self.vneighbors=vneighbors
 
 class Message():
@@ -58,7 +58,7 @@ class StaticRoutingMessage(Message):
         self.skip=[]
         # if self.msg_type==RoutingMessageType.UPDATE_ROUTING_TABLE:
         #     # virtual neighbor self.own.virtualneighbors
-        #     print('self.own.virtualneighbors',self.own.virtualneighbors)
+        #     #print('self.own.virtualneighbors',self.own.virtualneighbors)
 # class RoutingUpdateMessage(Message):
 
 #     def __init__(self, msg_type: Enum, sender: str):
@@ -93,13 +93,13 @@ class StaticRoutingProtocol(StackProtocol):
 
         assert dst not in self.forwarding_table
         self.forwarding_table[dst] = next_node
-        ##print('----------Next Hop-------------', next_node)
+        ###print('----------Next Hop-------------', next_node)
 
     def update_forwarding_rule(self, dst: str, next_node: str):
         """updates dst to map to next_node in forwarding table."""
 
         self.forwarding_table[dst] = next_node
-        ##print('----------Next Hop-------------', next_node)
+        ###print('----------Next Hop-------------', next_node)
 
     def push(self, dst: str, msg: "Message"):
         """Method to receive message from upper protocols.
@@ -122,17 +122,17 @@ class StaticRoutingProtocol(StackProtocol):
         assert dst != self.own.name
 
 
-        ##print('(dst, self.own.name) -----', (dst, self.own.name))
-        #-----------#print(self.own.all_pair_shortest_dist)
+        ###print('(dst, self.own.name) -----', (dst, self.own.name))
+        #-----------##print(self.own.all_pair_shortest_dist)
         #dst = self.forwarding_table[dst]
 
         visited = []
 
         #If section will run during forward propagation
         if msg.msg_type == RSVPMsgType.REQUEST: 
-            ##print('Message Info : ----------', msg.msg_type) 
-            ##print('Inside Routing --------------------qcaps---------------- ', msg.qcaps[-1].node)
-            ##print('type(Message) : ----------', type(msg))
+            ###print('Message Info : ----------', msg.msg_type) 
+            ###print('Inside Routing --------------------qcaps---------------- ', msg.qcaps[-1].node)
+            ###print('type(Message) : ----------', type(msg))
                   #msg.reservation.memory_size is the demand size
             visited = [qcap.node for qcap in msg.qcaps]
 
@@ -140,17 +140,17 @@ class StaticRoutingProtocol(StackProtocol):
 
         #Else section will run during backward propagation
         elif msg.msg_type == RSVPMsgType.APPROVE:
-            #print('path: ', msg.path)
+            ##print('path: ', msg.path)
             #Return the prevous node of current node 
             curr_ele_index = msg.path.index(self.own.name)
-            print('Back routing phase: Next node  is ----', curr_ele_index,msg.path[curr_ele_index-1])
+            #print('Back routing phase: Next node  is ----', curr_ele_index,msg.path[curr_ele_index-1])
             dst = msg.path[curr_ele_index-1]        
 
         
         new_msg = StaticRoutingMessage(Enum, self.name, msg)
         
-        ##print('--------------self.own.name------------', self.own.name)
-        ##print('--------------dst------------', dst)
+        ###print('--------------self.own.name------------', self.own.name)
+        ###print('--------------dst------------', dst)
         self._push(dst=dst, msg=new_msg)
 
     #--------------------------------------------------
@@ -164,18 +164,18 @@ class StaticRoutingProtocol(StackProtocol):
 
         is_next_virtual = True
         all_pair_path = self.own.all_pair_shortest_dist
-        # print('all pair path',all_pair_path)
+        # #print('all pair path',all_pair_path)
         neighbors = self.own.neighbors
-        # print('neighbours',self.own.name,neighbors)
+        # #print('neighbours',self.own.name,neighbors)
         
         virtual_neighbors = self.own.find_virtual_neighbors()
         #if curr_node == 'h':
-        #    #print('virtual_neighbors: ', virtual_neighbors)
+        #    ##print('virtual_neighbors: ', virtual_neighbors)
 
         nodewise_dest_distance = all_pair_path[dest]
         nodewise_dest_distance = json.loads(json.dumps(nodewise_dest_distance))
 
-        ##print('Demand: --------------- ', demand)
+        ###print('Demand: --------------- ', demand)
     
         
         #Greedy Step:
@@ -183,34 +183,34 @@ class StaticRoutingProtocol(StackProtocol):
     
         least_dist = math.inf
         best_hop = None
-        ##print('Current Node: ', curr_node)
+        ###print('Current Node: ', curr_node)
         for node in nodewise_dest_distance:
-            ##print((node,neighbor_dict[node]))
+            ###print((node,neighbor_dict[node]))
             if (node in virtual_neighbors.keys()) or (node in neighbors):
-                ##print('Virtual neighbor found: ', node)
+                ###print('Virtual neighbor found: ', node)
                 dist = nodewise_dest_distance[node]
                 if dist < least_dist:
                     best_hop = node
                     least_dist = dist
 
         """if best_hop != None:
-            #print('virtual_neighbors[best_hop] --------------- ', virtual_neighbors[best_hop])"""
+            ##print('virtual_neighbors[best_hop] --------------- ', virtual_neighbors[best_hop])"""
         #If such a virtual neighbor does not exist or cannot satisfy our demands then pick 
         #the best physical neighbor and generate entanglements through it
         #Or if we pick an already traversed neighbor
         
-        ##print('Visited ----------------------', visited)
+        ###print('Visited ----------------------', visited)
         best_hop_virtual_link_size = 0
         if best_hop in virtual_neighbors:
             best_hop_virtual_link_size = virtual_neighbors[best_hop]
 
         if best_hop == None or  best_hop_virtual_link_size < demand or ( best_hop in visited):
             is_next_virtual = False
-            """#print('Dist Matrix for destination node(',dest,') :  ')
-            #print(nodewise_dest_distance)
-            #print('Neighbors of current node(',curr_node,'):  ', neighbors)"""
+            """##print('Dist Matrix for destination node(',dest,') :  ')
+            ##print(nodewise_dest_distance)
+            ##print('Neighbors of current node(',curr_node,'):  ', neighbors)"""
             for node in nodewise_dest_distance:
-                ##print((node,neighbor_dict[node]))
+                ###print((node,neighbor_dict[node]))
                 if node in neighbors:
                     dist = nodewise_dest_distance[node]
                     if dist < least_dist:
@@ -219,13 +219,13 @@ class StaticRoutingProtocol(StackProtocol):
 
 
         
-        # print()
-        # print('---------Next Hop Calculation using Modified Greedy------------')
-        # print('Curr Node: ', curr_node,', picked neighbor: ', best_hop, ', distance b/w picked neighbor and destination ', least_dist)
+        # #print()
+        # #print('---------Next Hop Calculation using Modified Greedy------------')
+        # #print('Curr Node: ', curr_node,', picked neighbor: ', best_hop, ', distance b/w picked neighbor and destination ', least_dist)
         
-        """#print('Virtual Neighbors of current node: ', self.own.find_virtual_neighbors())
-        #print('---------------------------------------------------------------')
-        #print()"""
+        """##print('Virtual Neighbors of current node: ', self.own.find_virtual_neighbors())
+        ##print('---------------------------------------------------------------')
+        ##print()"""
 
 
         return best_hop
@@ -293,9 +293,9 @@ class NewRoutingProtocol(StackProtocol):
         nodewise_dest_distance = json.loads(json.dumps(nodewise_dest_distance))
         neighbors = self.own.neighbors
         vneighbors=self.own.virtualneighbors
-        # print('virtual neighbors',vneighbors,self.own.timeline.now()*1e-12)
+        # #print('virtual neighbors',vneighbors,self.own.timeline.now()*1e-12)
         G=self.own.nx_graph
-        # print('nx graph',self.own.nx_graph)
+        # #print('nx graph',self.own.nx_graph)
         """
         The code below is used to populate local_neighbor_table.
         We iterate through the neighbors of node. If that node exist in the nodewise_dest_distance, if it a virtual link we assign distance as 0, else we assign the distance from the nodewise_dest_distance between those nodes.
@@ -310,40 +310,40 @@ class NewRoutingProtocol(StackProtocol):
                     else:    
                         self.local_neighbor_table.setdefault(key,{})[node]=dist
                     break  
-        # print('Local Neighbor Table',self.local_neighbor_table)
+        # #print('Local Neighbor Table',self.local_neighbor_table)
     
     '''
     Old function to generate graph. Now we obtain the physical graph from the topology.
 
     def generate_graph(self):
         G=self.own.nx_graph
-        # print('local table',self.local_neighbor_table)
+        # #print('local table',self.local_neighbor_table)
         # for node, neighbor in self
         # .local_neighbor_table.items():
-        #     # print('aa',node, neighbor,G.nodes,G.edges)
+        #     # #print('aa',node, neighbor,G.nodes,G.edges)
         #     if node not in G.nodes:
-        #         # print('nodes',node)
+        #         # #print('nodes',node)
         #         G.add_node(node)
-        #         # print('gnode',G.nodes)
+        #         # #print('gnode',G.nodes)
         #         for neighnode,dist in neighbor.items():
-        #             # print('bb',neighnode,dist)
+        #             # #print('bb',neighnode,dist)
         #             G.add_edge(node,neighnode,color='red',weight=dist)
-        #         # print('gedge',G.edges)
-        # print('Gnodes',G.nodes,G.edges)
+        #         # #print('gedge',G.edges)
+        # #print('Gnodes',G.nodes,G.edges)
         # for node1, value in self.own.all_pair_shortest_dist.items():
-        #     # print('apsd',node1,value)
+        #     # #print('apsd',node1,value)
         #     for node2,dist in value.items():
-        #         # print('aspd',node1,node2,dist,G.nodes,G.edges)
+        #         # #print('aspd',node1,node2,dist,G.nodes,G.edges)
         #         if node1 not in G.nodes:
-        #             # print('new nodes',self.own.name,node1,node2,dist,G.nodes,G.edges,self.own.neighbors)
+        #             # #print('new nodes',self.own.name,node1,node2,dist,G.nodes,G.edges,self.own.neighbors)
         #             G.add_node(node1)
         #         if (node1,node2) not in G.edges and node1 != node2 and node1 in self.own.neighbors:
-        #             # print('edge2', node1, node2,self.own.neighbors)
+        #             # #print('edge2', node1, node2,self.own.neighbors)
         #             G.add_edge(node1,node2,color='red',weight=dist)
         # # nx.draw(G, labels=labels, with_labels=True)
         # plt.savefig('ggg.png')
-        print('gnodes,gedges', G.nodes , G.edges)
-        print(G)
+        #print('gnodes,gedges', G.nodes , G.edges)
+        #print(G)
         return G
 
     '''
@@ -365,7 +365,7 @@ class NewRoutingProtocol(StackProtocol):
 
         #Compute the next hop here using our logic
         #Pick the best possible nieghbor according to physical distance
-        # print('--------------self.own.name------------', self.own.name,self.own.neighborhood_list)
+        # #print('--------------self.own.name------------', self.own.name,self.own.neighborhood_list)
         
 
 
@@ -382,11 +382,11 @@ class NewRoutingProtocol(StackProtocol):
                 path=nx.dijkstra_path(G,self.own.name,dst) 
                 '''We initially calculate the temporary path using Dijkstra's algorithm.'''
 
-                # print('lll',path,msg.reservation)
+                # #print('lll',path,msg.reservation)
                 # for node in path:
                 #     if node!= self.own.name and node!=dst:
                 #         skip.append(node)
-                # print('kklk',skip,path[1])
+                # #print('kklk',skip,path[1])
                 # msg= ResourceReservationMessage(RSVPMsgType.REQUEST, self.name, msg.reservation,temp_path=path)
                 ''' We append this temporary path to message class temporary path'''
                 msg.temp_path=path
@@ -397,7 +397,7 @@ class NewRoutingProtocol(StackProtocol):
                 we add this marker node to the msg.
                 '''
                 for items in msg.temp_path:
-                    # print('items',items,self.own.neighborhood_list)
+                    # #print('items',items,self.own.neighborhood_list)
                     # self.own.marker=items
                     msg.marker=items
                     if self.own.neighborhood_list:
@@ -405,12 +405,12 @@ class NewRoutingProtocol(StackProtocol):
                             if nodes==items:
                                 msg.marker=nodes
                 self.own.message_handler.send_message(path[1],msg)
-            # print('Message Info msg.path: ----------', self.own.name,msg.temp_path,self.own.neighborhood_list) 
-            # print('marker node',msg.marker,self.own.name)
+            # #print('Message Info msg.path: ----------', self.own.name,msg.temp_path,self.own.neighborhood_list) 
+            # #print('marker node',msg.marker,self.own.name)
 
 
             indexx=msg.temp_path.index(self.own.name)
-            # print('indx',self.own.name,indexx,len(msg.temp_path))
+            # #print('indx',self.own.name,indexx,len(msg.temp_path))
 
             # If the node is the first node in the temp path, we run the next_hop method, which gives us the next node using Djisktr's algorithm
             
@@ -419,33 +419,33 @@ class NewRoutingProtocol(StackProtocol):
                 
             # If the node is the marker node we do the routing again by calling next_hop method
             elif self.own.name == msg.marker:
-                # print('At marker node',self.own.name,self.own.marker)
+                # #print('At marker node',self.own.name,self.own.marker)
                 dst=self.next_hop(self.own.name,msg.temp_path[-1])
 
             #If the node is not the source, marker or end node, we skip the routing.
             elif indexx > 0 and indexx < len(msg.temp_path)-1:
                 dst=msg.temp_path[indexx+1]
-                # print('mddle',self.own.name,dst,indexx)
+                # #print('mddle',self.own.name,dst,indexx)
                 
             #For end node
             elif indexx==len(msg.temp_path)-1:
-                # print('last node')
+                # #print('last node')
                 dst=msg.temp_path[-1]
                 
         #Else section will run during backward propagation
         elif msg.msg_type == RSVPMsgType.APPROVE:
-            # print('path11: ', msg.path)
+            # #print('path11: ', msg.path)
             #Return the prevous node of current node 
             curr_ele_index = msg.path.index(self.own.name)
-            # print('Back routing phase: Next node  is ----', curr_ele_index,msg.path[curr_ele_index-1])
+            # #print('Back routing phase: Next node  is ----', curr_ele_index,msg.path[curr_ele_index-1])
             dst = msg.path[curr_ele_index-1]        
-            # print('dst',dst)
+            # #print('dst',dst)
         
 
 
         
         new_msg = StaticRoutingMessage(Enum, self.name, msg)
-        # print('routing msg enum',Enum,self.own.name,dst,new_msg)
+        # #print('routing msg enum',Enum,self.own.name,dst,new_msg)
        
         self._push(dst=dst, msg=new_msg)
 
@@ -454,7 +454,7 @@ class NewRoutingProtocol(StackProtocol):
 
         G=self.own.nx_graph
         path=nx.dijkstra_path(G,src,dest)
-        # print('dijkstas path',path,path[1],path[-1])
+        # #print('dijkstas path',path,path[1],path[-1])
       
         return path[1]
         
@@ -487,14 +487,14 @@ class RoutingTableUpdateProtocol(NewRoutingProtocol):
         This method is used to calculate the local neighborhood of a node.
         We get the delay from the topology and we check if that delay is less than the update time. If it is less we append it to the neighborhood_list. If more it lies outside of the neighborhood circle.
         '''
-        # print('dgraph',self.own.name,self.update_time,self.own.delay_graph)
+        # #print('dgraph',self.own.name,self.update_time,self.own.delay_graph)
         neighborhood_list=[]
         for node,dest_delay in self.own.delay_graph.items():
             if self.own.name == node:
                 for dst,delay in dest_delay.items():
-                    # print('dddf',delay*1e-12,self.update_time*1e-12)
+                    # #print('dddf',delay*1e-12,self.update_time*1e-12)
                     if delay<self.update_time:
-                        # print('findneighbors',node,dst)
+                        # #print('findneighbors',node,dst)
                         neighborhood_list.append(dst)
         self.own.neighborhood_list=neighborhood_list
         return neighborhood_list
@@ -507,22 +507,22 @@ class RoutingTableUpdateProtocol(NewRoutingProtocol):
         G=self.own.nx_graph
         # [*vneighbors]=self.own.find_virtual_neighbors() 
         neighbor_list=self.find_neighbors()
-        # print('neighborhoodlist',self.own.name, neighbor_list,neighbors)
-        # print('vneighbor',self.own.name,vneighbors,self.own.virtualneighbors,self.own.timeline.now()*1e-12)
-        # print('updaterouting',self.own.name,vneighbors,self.own.timeline.now()*1e-12)
+        # #print('neighborhoodlist',self.own.name, neighbor_list,neighbors)
+        # #print('vneighbor',self.own.name,vneighbors,self.own.virtualneighbors,self.own.timeline.now()*1e-12)
+        # #print('updaterouting',self.own.name,vneighbors,self.own.timeline.now()*1e-12)
        
         for node in G.nodes:
             if node != self.own.name:
                 msg=Message(MsgRecieverType.PROTOCOL,ProtocolType.RoutingTableUpdateProtocol,UpdateRoutingMessageType.UPDATE_ROUTING_TABLE,node=node,v_neighbor=self.own.virtualneighbors)
                 self.own.message_handler.send_message(node,msg)
-                # print('nds',node,self.own.name,vneighbors)
+                # #print('nds',node,self.own.name,vneighbors)
 
         for node in self.own.nx_graph:
-            # print('edges',self.own.nx_graph.edges)
+            # #print('edges',self.own.nx_graph.edges)
             # if self.own.virtualneighbors:
-            #     print('nodedge',node,self.own.name,self.own.virtualneighbors)
+            #     #print('nodedge',node,self.own.name,self.own.virtualneighbors)
             #     if (self.own.name,self.own.virtualneighbors[0]) in self.own.nx_graph.edges:
-            #         print('add vlink',self.own.name,self.own.virtualneighbors[0])
+            #         #print('add vlink',self.own.name,self.own.virtualneighbors[0])
             #         G.add_edge(self.own.name,self.own.virtualneighbors[0],color='red',weight=0)
             #         break
 
@@ -533,11 +533,11 @@ class RoutingTableUpdateProtocol(NewRoutingProtocol):
                 weight=self.own.nx_graph.get_edge_data(nodes,link[0])
                 G=self.own.nx_graph
                 weight=self.own.nx_graph[nodes][link[0]]['weight']
-                # print('node,link',nodes,link[0],weight)
+                # #print('node,link',nodes,link[0],weight)
                 if (nodes,link[0]) in self.own.nx_graph.edges and weight == 0:
                     break
                 else:
-                    # print('add vlink',nodes,link[0])
+                    # #print('add vlink',nodes,link[0])
                     self.own.nx_graph.add_edge(nodes,link[0],color='red',weight=0)
                     break
 
@@ -551,20 +551,20 @@ class RoutingTableUpdateProtocol(NewRoutingProtocol):
         self.own.timeline.schedule_counter += 1
         self.own.timeline.events.push(event)
         self.vlink_data={}
-        # print("--end of send message func in rtup----")
+        # #print("--end of send message func in rtup----")
 
 
     def received_message(self,src,msg: Message):
-        # print('received message2',src,msg.vneighbors,self.own.timeline.now()*1e-12)
+        # #print('received message2',src,msg.vneighbors,self.own.timeline.now()*1e-12)
         # vlink_data={}
         if msg.msg_type is UpdateRoutingMessageType.UPDATE_ROUTING_TABLE:
-            # print('received message1',msg.vneighbors)
+            # #print('received message1',msg.vneighbors)
             key=src
             vneighbors=msg.kwargs.get('v_neighbor')
             if vneighbors:
-                # print('not empty',src,msg.vneighbors,self.own.timeline.now()*1e-12)
+                # #print('not empty',src,msg.vneighbors,self.own.timeline.now()*1e-12)
                 # vlink_data[src].append(msg.vneighbors)
                 self.vlink_data[src]=msg.vneighbors
         
         # if self.vlink_data:
-        #     print('hjhj',self.vlink_data,self.own.timeline.now()*1e-12)
+        #     #print('hjhj',self.vlink_data,self.own.timeline.now()*1e-12)

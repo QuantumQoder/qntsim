@@ -93,7 +93,7 @@ class BBPSSW(EntanglementProtocol):
         if self.meas_memo is None:
             self.memories.pop()
         Circuit =BaseCircuit.create(self.own.timeline.type)
-        print("pur circuit",BaseCircuit.create(self.own.timeline.type))
+        # #print("pur circuit",BaseCircuit.create(self.own.timeline.type))
         self.circuit = Circuit(2)
         self.circuit.cx(0, 1)
         self.circuit.measure(1)
@@ -163,11 +163,11 @@ class BBPSSW(EntanglementProtocol):
         assert src == self.another.own.name
         self.update_resource_manager(self.meas_memo, "RAW")
         if self.meas_res == msg.kwargs["meas_res"]:
-            print('receive pur if')
+            # #print('receive pur if')
             self.kept_memo.fidelity = self.improved_fidelity(self.kept_memo.fidelity)
             self.update_resource_manager(self.kept_memo, state="ENTANGLED")
         else:
-            print('receive pur else')
+            # #print('receive pur else')
             self.update_resource_manager(self.kept_memo, state="RAW")
             
         self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
