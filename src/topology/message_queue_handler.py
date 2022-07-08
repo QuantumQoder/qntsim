@@ -157,34 +157,10 @@ class MessageQueueHandler():
 
                     ###self.protocol_queue[msg.receiver][0].append((msg,src))
 
-                    if str(msg.msg_type) == 'GenerationMsgType.MEAS_RES':
-                        #print("prorotocol queuue", msg.receiver, len(self.protocol_queue[msg.receiver][0]),src,self.owner.name)
-                         
-                        matching = [p for p in self.owner.protocols if type(p) == msg.kwargs["protocol_type"]]
-                        #print("matching",matching,msg.kwargs["protocol_type"])
-                        for p in matching:
-                            p.received_message(src, msg) 
-                    else:
-                        self.protocol_queue[msg.receiver][0].append((msg,src))
-                        """
-                        for protocol in self.owner.protocols:
-                            print("mnmnmnnm", msg.msg_type, protocol.name, msg.receiver,src,self.owner.name)
-                            if protocol.name==msg.receiver:
-                                print("kjhfskjh", msg.msg_type, protocol.name, msg.receiver,src,self.owner.name)
-                                #protocol.received_message(src,msg)"""
-                    """
-                    #self.protocol_queue[msg.receiver][1]=1
-                    #self.protocol_queue[msg.receiver]
-                    """
-                    """
-                    if str(msg.msg_type) == 'GenerationMsgType.MEAS_RES':
-                        print("prorotocol queuue", msg.receiver, len(self.protocol_queue[msg.receiver][0]),src,self.owner.name)
-                        for protocol in self.owner.protocols:
-                            print("mnmnmnnm", msg.msg_type, protocol.name, msg.receiver,src,self.owner.name)
-                            if protocol.name==msg.receiver:
-                                print("kjhfskjh", msg.msg_type, protocol.name, msg.receiver,src,self.owner.name)
-                                protocol.received_message(src,msg)"""
-                            
+                     
+                    
+                    self.protocol_queue[msg.receiver][0].append((msg,src))
+
                    
                     return 
 
@@ -193,74 +169,28 @@ class MessageQueueHandler():
                 else :
                     self.protocol_queue[msg.receiver][1]=1
 
-                    if str(msg.msg_type) == 'GenerationMsgType.MEAS_RES':
-
-                        #print("ifel res message", msg.msg_type,src,self.owner.name,msg.receiver)
+                    for protocol in self.owner.protocols:
+                        if protocol.name==msg.receiver:
+                            protocol.received_message(src,msg)
                         
-                        matching = [p for p in self.owner.protocols if type(p) == msg.kwargs["protocol_type"]]
-                        
-                        for p in matching:
-
-                            #if protocol.name==msg.receiver:
-                                #matching = [p for p in self.protocols if type(p) == msg.protocol_type]
-                                #for p in matching:
-                            p.received_message(src, msg)
-                        
-                    #self.protocol_queue[msg.receiver].append([[msg],1])
-                    #self.protocol_queue[msg.receiver][1]=1
-                    #print("else send measure res message", msg.msg_type, msg.receiver)
-                    
-                    else:
-
-                        for protocol in self.owner.protocols:
-                            if protocol.name==msg.receiver:
-                                # if str(msg.msg_type) == 'GenerationMsgType.MEAS_RES':
-                                    #print("checke2 measure res message", type(protocol),msg.msg_type, protocol.name, msg.receiver)
-                                protocol.received_message(src,msg)
-                            #else:
-                                #print("protocol check2",self.owner.name,protocol.name)
-                    #return 
-
-
-                #self.lock.release()    
-                #lock end
-
             else:
-                #lock start
-                #self.lock.acquire()
-                #print("push msg.receiver",msg.receiver)
-                # if str(msg.msg_type)== 'GenerationMsgType.NEGOTIATE':
-                #     #print("checks",msg.msg_type,msg.receiver)
-                # if str(msg.msg_type) == 'GenerationMsgType.MEAS_RES':
-                    #print("else res message", msg.msg_type,msg.receiver)
                 
                 self.protocol_queue[msg.receiver]=[[],1]
-                #print("msg receiver",msg.receiver)
+                
                 for protocol in self.owner.protocols:
                     
                     if protocol.name==msg.receiver:
-                        # if str(msg.msg_type) == 'GenerationMsgType.MEAS_RES':
-                            # print("checke1 measure res message", msg.msg_type,src,self.owner.name)
+                        
                         protocol.received_message(src,msg)
-                    # else:
-                    #     print("protocol check",self.owner.name,protocol.name)
-                #self.lock.release()
-                #lock end         
-    
+                    
     def process_msg(self,receiver_type,receiver):
 
         receiver_type=receiver_type
         receiver=receiver
 
-        #if receiver_type == MsgRecieverType.MANAGER:
-            #if len(self.manager_queue[receiver.name][0])>0:
-
-                #print("manager queue in proc msg",self.manager_queue,self.manager_queue[receiver.name],self.owner.name)
-            #print (" length of queue", receiver.name,len(self.manager_queue[receiver.name][0]))
-
+       
         if receiver_type == MsgRecieverType.PROTOCOL:
-            # if receiver_type == GenerationMsgType.MEAS_RES:
-            #     print("process measure res message")
+            
             protocol_id=receiver
             #print("process msg ,",protocol_id,len(self.protocol_queue[protocol_id][0]))
             if len(self.protocol_queue[protocol_id][0])==0 :
@@ -311,20 +241,4 @@ class MessageQueueHandler():
                             reservation.receive_message(msg)
                             break     
                         
-    # def protocol_is_over(self, protocol_id):
-    #     if not self.protocol_queue:
-    #         pass
-    #     else:
-    #         self.flag = 0
-
-    #     pass
-
-    # def manager_is_over(self, manager_id):
-    #     print('Manager is over',manager_id.name)
-    #     print()
-    #     if manager_id.name in self.manager_queue:
-    #         print('manager present')
-    #         msg=self.manager_queue[manager_id.name][0]
-    #         print('Manager over message',msg)
-    #     else:
-    #         self.manager_queue[manager_id.name][1]=0
+ 

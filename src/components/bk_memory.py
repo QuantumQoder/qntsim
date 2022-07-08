@@ -155,7 +155,7 @@ class Memory(Entity):
         self.result={}
         self.next_excite_time = 0
         Circuit =BaseCircuit.create(self.timeline.type)
-        print("memory circuit",BaseCircuit.create(self.timeline.type))
+        #print("memory circuit",BaseCircuit.create(self.timeline.type))
         self._meas_circuit = Circuit(1)
         self._meas_circuit.measure(0)
 

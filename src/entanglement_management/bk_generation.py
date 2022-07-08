@@ -32,9 +32,9 @@ class GenerationMsgType(Enum):
     NEGOTIATE_ACK = auto()
     MEAS_RES = auto()
     BSM_ALLOCATE = auto()
-    CALL_BSM =auto()
-
-
+    RELEASE_BSM = auto()
+    REQUEST_BSM = auto()
+    
 class Message():
     """Message used by entanglement generation protocols.
     This message contains all information passed between generation protocol instances.
@@ -153,7 +153,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         self._qstate_key = self.memory.qstate_key
         
         Circuit =BaseCircuit.create(self.memory.timeline.type)
-        print("gen circuit",BaseCircuit.create(self.memory.timeline.type))
+        #print("gen circuit",BaseCircuit.create(self.memory.timeline.type))
         self._plus_state = [sqrt(1/2), sqrt(1/2)]
         self._flip_circuit = Circuit(1)
         self._flip_circuit.x(0)
@@ -191,15 +191,21 @@ class EntanglementGenerationA(EntanglementProtocol):
         ###print('bsm protocol', bsm_protocol)
         # start negotiations
         if self.primary:
-            # send NEGOTIATE message
-            self.qc_delay = self.own.qchannels[self.middle].delay
-            frequency = self.memory.frequency
-            message = Message(MsgRecieverType.PROTOCOL, self.other_protocol.name, GenerationMsgType.NEGOTIATE, other_protocol = self.other_protocol.name, qc_delay=self.qc_delay, frequency=frequency)
-            ###print('Emessage',message,self.name,self.middle,self.other)
-            self.own.message_handler.send_message(self.other, message)
-            message = Message(MsgRecieverType.PROTOCOL, bsm_protocol, GenerationMsgType.CALL_BSM, protocol=self, other_protocol=self.other_protocol)
+            #print("primary",self.own.name)
+            receiver=self.middle+"_eg"
+            message = Message(MsgRecieverType.PROTOCOL, receiver, GenerationMsgType.REQUEST_BSM, protocol = self,other_protocol = self.other_protocol)
             self.own.message_handler.send_message(self.middle, message)
-
+        
+       
+    def release_bsm(self):
+        # Send release bsm message to the BSM
+        ##message change
+        #print("release_bsm",self.name)
+        receiver=self.middle+"_eg"
+        #message = Message(MsgRecieverType.PROTOCOL, self.name, GenerationMsgType.RELEASE_BSM, protocol = self)
+        message = Message(MsgRecieverType.PROTOCOL, receiver, GenerationMsgType.RELEASE_BSM, protocol = self,other_protocol = self.other_protocol)
+        self.own.message_handler.send_message(self.middle, message)
+       
             
     def end(self) -> None:
         """Method to end entanglement generation protocol.
@@ -228,7 +234,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             
         else:
             # entanglement failed
-            ###print('Entanglement failed called from end()')
+            print('Entanglement failed called from end()')
             self._entanglement_fail()
 
     def next_round(self) -> None:
@@ -268,11 +274,22 @@ class EntanglementGenerationA(EntanglementProtocol):
             return
 
         msg_type = msg.msg_type
-        ####print('msg_type',msg_type)
+        #print('msg_type',msg_type,self.name)
         ####print('self.other',self.other, self.name)
         log.logger.debug(self.own.name + " EG protocol received_message of type {} from node {}, round={}".format(msg.msg_type, src, self.ent_round + 1))
 
-        if msg_type is GenerationMsgType.NEGOTIATE:
+        if  msg_type is GenerationMsgType.BSM_ALLOCATE:
+
+            self.qc_delay = self.own.qchannels[self.middle].delay
+            frequency = self.memory.frequency
+            ###message
+            message = Message(MsgRecieverType.PROTOCOL, self.other_protocol.name, GenerationMsgType.NEGOTIATE, other_protocol=self.other_protocol.name,
+                                                    qc_delay=self.qc_delay, frequency=frequency,protocol=self)
+            self.own.message_handler.send_message(self.other, message)
+            
+            
+
+        elif msg_type is GenerationMsgType.NEGOTIATE:
             # configure params
             ####print('negotiate starts')
             qc_delay=msg.kwargs["qc_delay"]
@@ -324,13 +341,14 @@ class EntanglementGenerationA(EntanglementProtocol):
             another_emit_time_0 = emit_time_0 + self.qc_delay - another_delay
             another_emit_time_1 = emit_time_1 + self.qc_delay - another_delay
             message = Message(MsgRecieverType.PROTOCOL, self.other_protocol.name, GenerationMsgType.NEGOTIATE_ACK, other_protocol=self.other_protocol.name,
-                                                    emit_time_0=another_emit_time_0, emit_time_1=another_emit_time_1)
+                                                    emit_time_0=another_emit_time_0, emit_time_1=another_emit_time_1,total=total)
             self.own.message_handler.send_message(src, message)
             ###print('Negotiate ends')
         elif msg_type is GenerationMsgType.NEGOTIATE_ACK:
             # configure params
             msg_emit_time_0=msg.kwargs["emit_time_0"]
             msg_emit_time_1=msg.kwargs["emit_time_1"]
+            total=msg.kwargs["total"]
             self.expected_times[0] = msg_emit_time_0 + self.qc_delay
             self.expected_times[1] = msg_emit_time_1 + self.qc_delay
 
@@ -360,14 +378,23 @@ class EntanglementGenerationA(EntanglementProtocol):
             # schedule end of protocol
             end_time = self.expected_times[1] + self.own.cchannels[self.middle].delay + 10
             # process = Process(self, "end", [])
+            
+            print("end time and offset",msg_emit_time_1+int(1e12 /total),end_time)
+            event = Event(msg_emit_time_1+int(1e12 /total), self, "release_bsm", [])
+            self.own.timeline.events.push(event)
+            # self.own.timeline.schedule(event)
+            self.scheduled_events.append(event)
+
             event = Event(end_time, self, "end", [])
             ##print('negotiate ack end time',end_time*1e-12,self.own.timeline.now()*1e-12)
             self.own.timeline.events.push(event)
             self.scheduled_events.append(event)
             ##print('Negotiate ack ends')
 
+            ### scheduling at end of protocol
+            
         elif msg_type is GenerationMsgType.MEAS_RES:
-            ##print('At meas',self.own.name,self.own.timeline.now()*1e-12)
+            #print('At meas',self.own.name)
             res = msg.kwargs["res"]
             time = msg.kwargs["time"]
             resolution = msg.kwargs["resolution"]
@@ -403,10 +430,10 @@ class EntanglementGenerationA(EntanglementProtocol):
                     if self.bsm_res[i] == -1:
                         ##print(f'Setting up the value: {res} at i={i}',self.bsm_res)
                         self.bsm_res[i] = res
-                        # if self.primary:
-                        #     ##print(f' primary After Setting up the value: {res} at i={i}',self.name,self.own.timeline.now()*1e-12,self.own.name,self.bsm_res)
-                        # else:
-                            ##print(f' secondary After Setting up the value: {res} at i={i}',self.name,self.own.timeline.now()*1e-12,self.own.name,self.bsm_res)
+                        if self.primary:
+                            print(f' primary After Setting up the value: {res} at i={i}',self.name,self.own.timeline.now()*1e-12,self.own.name,self.bsm_res)
+                        else:
+                            print(f' secondary After Setting up the value: {res} at i={i}',self.name,self.own.timeline.now()*1e-12,self.own.name,self.bsm_res)
                         #self._entanglement_succeed()
                     else:
                         # entanglement failed
@@ -478,8 +505,12 @@ class EntanglementGenerationB(EntanglementProtocol):
         assert len(others) == 2
         self.others = others  # end nodes
         self.other_protocol = []
-        self.protocol= None
+        #self.protocol= None
         self.own.protocols.append(self)
+        self.current_protocol = None
+        self.current_primary = None
+        self.secondary_protocol=None
+        self.reservations = []
 
     def bsm_update(self, bsm: 'SingleAtomBSM', info: Dict[str, Any]):
         """Method to receive detection events from BSM on node.
@@ -493,54 +524,63 @@ class EntanglementGenerationB(EntanglementProtocol):
         res = info["res"]
         time = info["time"]
         resolution = self.own.bsm.resolution
-        ##print('Inside bsm update',self.others,self.other_protocol,self.protocol)
-        #for i, node in enumerate(self.others):
-            # for other_protocols in self.other_protocol:
-            # if node not in str(self.other_protocol):
-            # ##print(f'{self.own.name} sends MEAS_RES to {node}',i)
-            # message = Message(MsgRecieverType.PROTOCOL, self.other_protocol, GenerationMsgType.MEAS_RES, res=res, time=time,
-            #                                         resolution=resolution)
-            # ##print('If Message sent to',node, message.receiver,self.other_protocol)
-            # self.own.message_handler.send_message(node, message)
-            #tempother_protocol=self.other_protocol
-            #tempprotocol=self.protocol
-            #if self.others[0] not in self.protocol:
-                #tempprotocol=self.other_protocol
-            #elif self.others[1] not in self.other_protocol:
-                #tempother_protocol=self.protocol
-            ###print(f'{self.own.name} sends MEAS_RES to {node}',i)
-        ##print('bsm update',self.protocol,self.other_protocol)
-        message = Message(MsgRecieverType.PROTOCOL, self.other_protocol.name, GenerationMsgType.MEAS_RES, res=res, time=time,
-                                                resolution=resolution,protocol_type=type(self.other_protocol))
-        ##print('If Message sent to',self.others[0],self.other_protocol)
-        self.own.message_handler.send_message(self.others[0], message)
-
-        message = Message(MsgRecieverType.PROTOCOL, self.protocol.name, GenerationMsgType.MEAS_RES, res=res, time=time,
-                                                resolution=resolution,protocol_type=type(self.protocol))
-        ##print('If Message sent to',self.others[1], self.protocol)
-        self.own.message_handler.send_message(self.others[1], message)
-
-            
-                # break
-            # else:
-            #     message = Message(MsgRecieverType.PROTOCOL, self.protocol, GenerationMsgType.MEAS_RES, res=res, time=time,
-            #                                             resolution=resolution)
-            #     ##print('Else Message sent to',node, message.receiver.name,self.protocol.name)
-            #     self.own.message_handler.send_message(node, message)
-
-    def received_message(self, src: str, msg: Message):
         
-        # raise Exception("EntanglementGenerationB protocol '{}' should not receive message".format(self.name))
-        if msg.msg_type is GenerationMsgType.CALL_BSM:
+        #message = Message(MsgRecieverType.PROTOCOL, self.other_protocol.name, GenerationMsgType.MEAS_RES, res=res, time=time,
+                                                #resolution=resolution,protocol_type=type(self.other_protocol))
+        ##print('If Message sent to',self.others[0],self.other_protocol)
+        #self.own.message_handler.send_message(self.others[0], message)
 
-            other_protocol=msg.kwargs["other_protocol"]
-            protocol=msg.kwargs["protocol"]
-           
-            self.protocol=protocol
-            self.other_protocol=other_protocol
-            ##print('Inside GenB recieved message',other_protocol,protocol,src)
-        #self.protocol = protocol
-        #self.other_protocol = other_protocol
+        #message = Message(MsgRecieverType.PROTOCOL, self.protocol.name, GenerationMsgType.MEAS_RES, res=res, time=time,
+                                                #resolution=resolution,protocol_type=type(self.protocol))
+        ##print('If Message sent to',self.others[1], self.protocol)
+        #self.own.message_handler.send_message(self.others[1], message)
+        message = Message(MsgRecieverType.PROTOCOL, self.current_protocol.name, GenerationMsgType.MEAS_RES, res=res, time=time,
+                                                    resolution=resolution)
+        self.own.message_handler.send_message(self.current_primary, message)
+        message = Message(MsgRecieverType.PROTOCOL, self.secondary_protocol.name, GenerationMsgType.MEAS_RES, res=res, time=time,
+                                                    resolution=resolution)
+        self.own.message_handler.send_message(self.secondary_protocol.own.name, message)
+   
+    def received_message(self, src: str, msg: Message):
+        msg_type = msg.msg_type
+        #print("egb ",msg.receiver,msg.receiver_type,self.name,msg_type)
+
+        # If new request comes for access to BSM, check if some process already blocking the BSM. 
+        # if yes, append this process to self.reservations, else, allocate it right away. 
+        if msg_type is GenerationMsgType.REQUEST_BSM:
+            protocol=msg.kwargs['protocol']
+            other_protocol=msg.kwargs['other_protocol']
+            if len(self.reservations) == 0:
+                message = Message(MsgRecieverType.PROTOCOL, protocol.name, GenerationMsgType.BSM_ALLOCATE, protocol = protocol)
+                print('BSM allocate', protocol.name, self.name)
+                self.own.message_handler.send_message(protocol.own.name, message)
+                self.current_protocol = protocol
+                self.current_primary = protocol.own.name
+                self.secondary_protocol=other_protocol
+                print("MESAGE SENT TO NODE")
+            else:
+                for res in self.reservations:
+                    print("res protocol deatails name ",protocol,protocol.name)
+            self.reservations.append(protocol)
+
+            print("protocol appended: ", protocol.name)
+
+        # Once attempt to entanglement generation is complete, the BSM is released. Check if other process exist
+        # in reservations queue. If yes, start one on top. Else, return 
+        elif msg_type is GenerationMsgType.RELEASE_BSM:
+            protocol=msg.kwargs['protocol']
+            other_protocol=msg.kwargs['other_protocol']
+            print("protocol removed:", protocol,self.reservations)
+            self.reservations.remove(protocol)
+            self.accepted_indices = 0
+            self.previous_detection_time = None
+            if len(self.reservations) > 0:
+                message = Message(MsgRecieverType.PROTOCOL, self.reservations[0].name, GenerationMsgType.BSM_ALLOCATE, protocol = self.reservations[0])
+                self.own.message_handler.send_message(self.reservations[0].own.name, message)
+                self.current_protocol = self.reservations[0]
+                self.current_primary = self.reservations[0].own.name
+                self.secondary_protocol=self.reservations[0].other_protocol
+        #print("egb",msg.receiver)       
         self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
 
     def start(self) -> None:

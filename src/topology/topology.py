@@ -22,6 +22,7 @@ from pyvis.network import Network
 import webbrowser
 #----------------------------
 
+
 class Topology():
     """Class for managing network topologies.
     The topology class provies a simple interface for managing the nodes and connections in a network.

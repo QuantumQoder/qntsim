@@ -11,9 +11,9 @@ from math import sqrt
 from typing import List, TYPE_CHECKING, Dict, Any
 from aenum import Enum
 if TYPE_CHECKING:
-    from ..components.memory import Memory
+    from ..components.DLCZ_memory import Memory
     from ..topology.node import Node
-    from ..components.bsm import SingleAtomBSM
+    from ..components.DLCZ_bsm import SingleAtomBSM
 
 from .entanglement_protocol import EntanglementProtocol
 from ..message import Message
@@ -271,6 +271,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             return
         
         print("bug check",msg_type is GenerationMsgType.MEAS_RES,self.state)
+        
         if self.state==0 and msg_type is GenerationMsgType.BSM_ALLOCATE:
             self.qc_delay = self.own.qchannels[self.middle].delay
             frequency = self.memory.frequency

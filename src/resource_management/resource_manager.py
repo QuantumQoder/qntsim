@@ -7,9 +7,13 @@ This module also defines the message type used by the resource manager.
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Callable, List
 if TYPE_CHECKING:
-    from ..components.bk_memory import Memory
     from ..topology.node import QuantumRouter
     from .rule_manager import Rule
+from ..kernel.timeline import Timeline
+if Timeline.DLCZ:
+    from ..components.DLCZ_memory import Memory
+elif Timeline.bk:
+    from ..components.bk_memory import Memory
 
 from ..entanglement_management.entanglement_protocol import EntanglementProtocol
 from ..message import Message
@@ -193,17 +197,17 @@ class ResourceManager():
                 #currentreqid1=ReqId
                 #print("resource manager current req id",currentreqid)
                 #print('Resss',memo_info.index, memlist, currentreqid)"""
-        #print("resource manager current req id",currentreqid1)
+        
         for req in self.owner.vmemory_list[memo_info.index].reservations:
-              
+            #print("resource manager current req id",self.owner.name,memo_info.index,req.id)  
             time_now = self.owner.timeline.now()
             if req.start_time<= time_now and req.end_time>=time_now:
 
                 currentreqid=req.id 
-                print("check current req id ",currentreqid ,self.owner.name,req.initiator)
-                break
+                #print("check current req id ",currentreqid ,self.owner.name,req.initiator)
+                #break
 
-        print("check current req id ",currentreqid,self.owner.name,req.initiator)
+        #print("check current req id ",currentreqid,self.owner.name,req.initiator)
 
             
         # print(f'Entanglement genereated for {currentreqid} at memory index {memo_info.index}')
@@ -229,7 +233,7 @@ class ResourceManager():
             for ReqId,ResObj in self.owner.network_manager.requests.items():
                 if ReqId == currentreqid:
                     ResObj.status='APPROVED' 
-                    print("ResObj.tp_id",self.owner.network_manager.requests,ResObj.tp_id) 
+                    #print("ResObj.tp_id",self.owner.network_manager.requests,ResObj.tp_id) 
                     # if ResObj.isvirtual:
                     self.owner.network_manager.notify_nm('APPROVED',ReqId,ResObj)
                     # print('Res status',ResObj.initiator,ResObj.responder)
@@ -262,8 +266,8 @@ class ResourceManager():
                             #print("ResObj.tp_id",self.owner.network_manager.requests,ResObj.tp_id) 
                             # if ResObj.isvirtual:
                             self.owner.network_manager.notify_nm('PARTIALCOMPLETE',ReqId,ResObj)
-                if t==0:
-                    print(" resource manager not satisfy")
+                #if t==0:
+                    #print(" resource manager not satisfy")
 
         for rule in self.rule_manager:
             # print(rule.action, rule.get_reservation().initiator, "->", rule.get_reservation().responder)
@@ -349,7 +353,7 @@ class ResourceManager():
             req_condition_func=msg.kwargs.get('req_condition_func')
             protocol = req_condition_func(self.waiting_protocols)
             ini_protocol=msg.kwargs['protocol']
-            print('ini_protocol',ini_protocol)
+            #print('ini_protocol',ini_protocol)
             #print("Resourcemanager request receive",ini_protocol.name,self.owner.name)
             ##print(protocol)
             if protocol is not None:
@@ -374,7 +378,7 @@ class ResourceManager():
                                              is_approved=False, paired_protocol=None)
             self.owner.message_handler.send_message(src, new_msg)
         elif msg.msg_type is ResourceManagerMsgType.RESPONSE:
-            print('Resource manager Response')
+            #print('Resource manager Response')
             ini_protocol=msg.kwargs['protocol']
             is_approved=msg.kwargs['is_approved']
             #print("is_approved",is_approved,ini_protocol)
@@ -402,8 +406,8 @@ class ResourceManager():
                     #print("receive message queue elif loop 2",self.owner.message_handler.manager_queue,self.owner.name )
                     protocol.start()
             else:
-                print('#######Protocol Not called##########',protocol.name)
-                print('Protocol Name de: ', protocol.name)
+                #print('#######Protocol Not called##########',protocol.name)
+                #print('Protocol Name de: ', protocol.name)
                 protocol.rule.protocols.remove(protocol)
                 for memory in protocol.memories:
                     # print('mmmmm')
@@ -433,7 +437,7 @@ class ResourceManager():
         elif msg.msg_type is ResourceManagerMsgType.ABORT:
             # print('msg res',msg.reservation)
             reservation=msg.kwargs['reservation']
-            print(self.reservation_to_events_map[reservation])
+            #print(self.reservation_to_events_map[reservation])
             
             # if an abort message is received, remove all the scheduled events from the queue 
             # containing rules for the preepted reservation 

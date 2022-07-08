@@ -13,8 +13,12 @@ This is done through instances of the MemoryInfo class, which track a single mem
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .resource_manager import ResourceManager
-    from ..components.bk_memory import Memory, MemoryArray
 
+from ..kernel.timeline import Timeline
+if Timeline.DLCZ:
+    from ..components.DLCZ_memory import Memory, MemoryArray
+elif Timeline.bk:
+    from ..components.bk_memory import Memory, MemoryArray
 
 class MemoryManager():
     """Class to manage a node's memories.

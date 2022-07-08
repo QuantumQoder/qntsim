@@ -65,7 +65,7 @@ class BaseCircuit():
 
     @classmethod
     def create(cls,type):
-        print(" base ckt type",type)
+        #print(" base ckt type",type)
         Circuit_class=None
         if type=='Qiskit':
             Circuit_class=Circuit
@@ -251,7 +251,7 @@ class QutipCircuit(BaseCircuit):
         Returns:
             np.ndarray: the matrix for the circuit operations.
         """
-        print('get unitary')
+        #print('get unitary')
         if self._cache is None:
             if len(self.gates) == 0:
                 self._cache = np.identity(2 ** self.size)

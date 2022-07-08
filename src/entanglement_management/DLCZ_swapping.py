@@ -16,7 +16,7 @@ import numpy as np
 from random import random
 
 if TYPE_CHECKING:
-    from ..components.memory import Memory
+    from ..components.DLCZ_memory import Memory
     from ..topology.node import Node
 
 from ..message import Message

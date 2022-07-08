@@ -10,9 +10,15 @@ from ..message import Message
 import networkx as nx
 from ..resource_management.rule_manager import Rule
 from ..kernel._event import Event
-from ..entanglement_management.bk_generation import EntanglementGenerationA
-from ..entanglement_management.bk_purification import BBPSSW
-from ..entanglement_management.bk_swapping import EntanglementSwappingA, EntanglementSwappingB
+from ..kernel.timeline import Timeline
+if Timeline.DLCZ:
+    from ..entanglement_management.DLCZ_generation import EntanglementGenerationA
+    from ..entanglement_management.DLCZ_purification import BBPSSW
+    from ..entanglement_management.DLCZ_swapping import EntanglementSwappingA, EntanglementSwappingB
+elif Timeline.bk:
+    from ..entanglement_management.bk_generation import EntanglementGenerationA
+    from ..entanglement_management.bk_purification import BBPSSW
+    from ..entanglement_management.bk_swapping import EntanglementSwappingA, EntanglementSwappingB
 from ..resource_management.memory_manager import MemoryManager, MemoryInfo
 import itertools
 import json
@@ -323,18 +329,18 @@ class ReservationProtocol():     #(Protocol):
         memories_indices_free=[]
 
         for card in self.vmemorylist:
-            print("vmeorylist",self.node.name,reservation.initiator,reservation.responder)
-            print('111111', reservation in card.reservations)
+            #print("vmeorylist",self.node.name,reservation.initiator,reservation.responder)
+            #print('111111', reservation in card.reservations)
             if reservation in card.reservations:
                 memory_indices.append(card.memory_index)
-                print("To maintain the virtual link indices",card.has_virtual_reservation(), reservation.isvirtual,reservation.initiator,reservation.responder,card.memory_index)
+                #print("To maintain the virtual link indices",card.has_virtual_reservation(), reservation.isvirtual,reservation.initiator,reservation.responder,card.memory_index)
                 if card.has_virtual_reservation() and not reservation.isvirtual:
-                    print(' inside hasd virt reser')
+                    #print(' inside hasd virt reser')
                     virtual_indices.append(card.memory_index)
                     if card.memory_index > last_virtual_index:
-                        print('Last virtual index all conditions satiesfied')
+                        #print('Last virtual index all conditions satiesfied')
                         last_virtual_index= card.memory_index
-        print('Last virtual index', self.node.name,reservation.initiator,reservation.responder,last_virtual_index)
+        #print('Last virtual index', self.node.name,reservation.initiator,reservation.responder,last_virtual_index)
                 # elif card.has_virtual_reservation() and reservation.isvirtual:
                 #     print('Another virtual request arrived')
                 
@@ -430,7 +436,7 @@ class ReservationProtocol():     #(Protocol):
                                 #print('last_virtual_index, reservation.memory_size: ',last_virtual_index, reservation.memory_size)
                                 #print('acceptable indexes: ', memory_indices[last_virtual_index + reservation.memory_size:])
                         """
-                        print(f'free memory indices of {self.node.name}', memories_indices_free)
+                        #print(f'free memory indices of {self.node.name}', memories_indices_free)
                         #if memory_info.state == "RAW" and memory_info.index in memory_indices[reservation.memory_size:]:
                         if memory_info.state == "RAW" and memory_info.index in memory_indices[(last_virtual_index+1) + reservation.memory_size:]:
                             #Check for node B's memory
@@ -441,7 +447,7 @@ class ReservationProtocol():     #(Protocol):
                             #print('memory_info.state: ', memory_info.state)
                             #print('memory_info.remote_node: ', memory_info.remote_node)
                             """
-                            print('eg rule condition2', self.node.name,reservation.initiator,reservation.responder)
+                            #print('eg rule condition2', self.node.name,reservation.initiator,reservation.responder)
                             return [memory_info]
                         else:
                             return []
@@ -453,17 +459,17 @@ class ReservationProtocol():     #(Protocol):
                                           EntanglementGenerationA) and protocol.other == self.node.name and protocol.rule.get_reservation() == reservation:
                                 return protocol
                     
-                    print('Current node in eg_ruleaction for indexnot > 0', self.node.name)
+                    #print('Current node in eg_ruleaction for indexnot > 0', self.node.name)
                     memories = [info.memory for info in memories_info]
                     memory = memories[0]
                     #memory = memories[-1]
-                    print('rule action',self.node.map_to_middle_node)
+                    #print('rule action',self.node.map_to_middle_node)
                     mid = self.node.map_to_middle_node[path[index + 1]]
                     # print('1---------EntanglementGenerationA----------for pair: ', (self.own.name, path[index + 1]))
                     ##print('---------Middle node for this---------- ', mid)
                     protocol = EntanglementGenerationA(None, "EGA." + memory.name, mid, path[index + 1], memory)
                     return [protocol, [path[index + 1]], [req_func]]
-                print('---------EntanglementGenerationA----------for pair: ', (self.node.name, path[index + 1]))
+                #print('---------EntanglementGenerationA----------for pair: ', (self.node.name, path[index + 1]))
                 rule = Rule(10, eg_rule_action, eg_rule_condition)
                 rules.append(rule)
         # print('last_virtual_index', last_virtual_index)
@@ -475,7 +481,7 @@ class ReservationProtocol():     #(Protocol):
             # print("adding rules for purification")
             def ep_rule_condition(memory_info: "MemoryInfo", manager: "MemoryManager"):
                 #if (memory_info.index in memory_indices[:reservation.memory_size]
-                print("ep_rule_condition")
+                #print("ep_rule_condition")
                 if (memory_info.index in memory_indices[last_virtual_index + 1 : last_virtual_index + reservation.memory_size + 1]):
                     # print("purification index satisified")
                     if memory_info.state == "ENTANGLED":         
@@ -527,7 +533,7 @@ class ReservationProtocol():     #(Protocol):
 
                 name = "EP.%s.%s" % (memories[0].name, memories[1].name)
                 protocol = BBPSSW(None, name, memories[0], memories[1])
-                print("ep protocol name",protocol.name)
+                #print("ep protocol name",protocol.name)
                 dsts = [memories_info[0].remote_node]
                 req_funcs = [req_func]
                 return protocol, dsts, req_funcs
@@ -560,7 +566,7 @@ class ReservationProtocol():     #(Protocol):
             rules.append(rule)
 
         
-        print(f'For {self.node.name}: --- len(rules): {len(rules)}')
+        #print(f'For {self.node.name}: --- len(rules): {len(rules)}')
 
 
         # create rules for entanglement swapping
@@ -570,7 +576,7 @@ class ReservationProtocol():     #(Protocol):
             protocol = EntanglementSwappingB(None, "ESB." + memory.name, memory)
             return [protocol, [None], [None]]
 
-        print('Current node in Swapping', self.node.name)
+        #print('Current node in Swapping', self.node.name)
         if index == 0:
             def es_rule_condition(memory_info: "MemoryInfo", manager: "MemoryManager"):
                 #if self.own.name == 'h' and memory_info.state == "ENTANGLED":
@@ -864,7 +870,7 @@ class ReservationProtocol():     #(Protocol):
             physical_requests=[]
             
             isCardVirtual = False
-            print('requestsss1', self.node.name,self.request.initiator,self.request.responder)
+            #print('requestsss1', self.node.name,self.request.initiator,self.request.responder)
             for res in vmemory.reservations:
                 if res.isvirtual:#$ or self.reservation.isvirtual
                     isCardVirtual = True
@@ -879,7 +885,7 @@ class ReservationProtocol():     #(Protocol):
             end = len(physical_requests)-1
             while start<=end :
                 mid=(start+end)//2 
-                print('mid',mid,start,end)
+                #print('mid',mid,start,end)
                 if physical_requests[mid].start_time>self.request.end_time :
                     
                     end=mid-1
@@ -901,13 +907,13 @@ class ReservationProtocol():     #(Protocol):
                 index_list.append((start,vmemory.memory_index))
                 demand_count=demand_count-1
             
-            print('line 902')
+            #print('line 902')
             if(demand_count==0):
 
                 for i in range(0,len(index_list)) :
-                    print(index_list,index_list[i],)
+                    #print(index_list,index_list[i],)
                     # print("memory index",vmemorylist[index_list[i][1]])
-                    print("list index" ,index_list[i][0] )
+                    #print("list index" ,index_list[i][0] )
                     self.vmemorylist[index_list[i][1]].reservations.insert(index_list[i][0],self.request)
                     if self.request.id not in self.node.resource_manager.reservation_id_to_memory_map:
 
@@ -922,7 +928,7 @@ class ReservationProtocol():     #(Protocol):
         
         if (demand_count>0):
 
-            print(demand_count,"demand count")
+            #print(demand_count,"demand count")
             index_list.clear()
             return False
         
@@ -938,11 +944,11 @@ class ReservationProtocol():     #(Protocol):
                 next_node=self.routing.tempnexthop()
                 #msgr=RRMessage(RRPMsgType.RESERVE,next_node,self.request) #msg_type="RESERVE"
                 
-                print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
+                #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.NetworkManager, RRPMsgType.RESERVE,request=self.request)
                 msg.temp_path=self.routing.temp_path
                 msg.marker=self.routing.marker
-                print("msg.msg_typed",msg.msg_type,msg)
+                #print("msg.msg_typed",msg.msg_type,msg)
                 self.request.path.append(self.node)
                 self.request.pathnames.append(self.node.name)
                 self.node.message_handler.send_message(next_node,msg)
@@ -951,14 +957,14 @@ class ReservationProtocol():     #(Protocol):
              
             if (self.request.responder==self.node.name):
                 
-                print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
-                print ("destination",self.node.name)
+                #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
+                #print ("destination",self.node.name)
                 self.request.path.append(self.node)
                 self.request.pathnames.append(self.node.name)
                 index=self.request.path.index(self.node)
                 prev_node=self.request.path[index-1]
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.CREATE_TASKS,request=self.request)
-                print(" final message type fp , receiver", msg.msg_type ,msg.receiver)
+                #print(" final message type fp , receiver", msg.msg_type ,msg.receiver)
                 #index=path.index(self.node.name)
                 #print(path[index+1])
 
@@ -967,7 +973,7 @@ class ReservationProtocol():     #(Protocol):
                 """
                 rules=self.create_rules(self.request.pathnames,self.request)
                 self.load_rules(rules,self.request)
-                print("tasks created at node , prev_node" ,self.node.name ,prev_node.name,self.request.pathnames )
+                #print("tasks created at node , prev_node" ,self.node.name ,prev_node.name,self.request.pathnames )
                 #call task and dependency creation method
                 self.node.message_handler.send_message(prev_node.name,msg)
                 #send classical message to previous node path[index-1]'s Reservation protocol to createtasks 
@@ -985,18 +991,18 @@ class ReservationProtocol():     #(Protocol):
         else :
 
             self.request.status='REJECT'
-            print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
+            #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
             msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.FAIL,request=self.request)
             
             #(RESORCES NOT AVAILABLE)
             #msg_type="FAIL"
             #self.request.status='REJECT'
-            print('inside reservation reject',self.node.name,self.request.id,self.request.initiator,self.request.responder)
+            #print('inside reservation reject',self.node.name,self.request.id,self.request.initiator,self.request.responder)
             #self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
 
             #self.rnode.send_message(path[len(path)-1].name ,msg)
             if self.node.name==self.request.initiator:
-                print("------node at which it is failing---",self.node.name,self.request.responder)
+                #print("------node at which it is failing---",self.node.name,self.request.responder)
                 if self.request.congestion_retransmission!=1:
 
                     self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
@@ -1023,10 +1029,10 @@ class ReservationProtocol():     #(Protocol):
         if msg.msg_type==RRPMsgType.CREATE_TASKS :
             payload=msg.kwargs['request']
             self.request=payload
-            print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
+            #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
             if self.node.name==self.request.initiator:
                 #create tasks
-                print("tasks created at ",self.node.name)
+                #print("tasks created at ",self.node.name)
                 rules=self.create_rules(self.request.pathnames,self.request)
                 self.load_rules(rules,self.request)
                 if self.request.congestion_retransmission==1:
@@ -1043,7 +1049,7 @@ class ReservationProtocol():     #(Protocol):
                 rules=self.create_rules(self.request.pathnames,self.request)
                 self.load_rules(rules,self.request)
                 #call tasks and dependency
-                print("tasks created at ",self.node.name)
+                #print("tasks created at ",self.node.name)
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.CREATE_TASKS,request=self.request)
                 self.node.message_handler.send_message(prev_node.name,msg)
                 
@@ -1063,12 +1069,12 @@ class ReservationProtocol():     #(Protocol):
             #self.request=msg.payload
             self.request=msg.kwargs['request']
             #self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
-            print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
+            #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
             if self.node.name==self.request.initiator:
                 #create tasks
-                print("removed resources at ",self.node.name ,self.request.id)
+                #print("removed resources at ",self.node.name ,self.request.id)
                 #vmemoryarray[index_list[i][1]].reservations.remove(req.reser)
-                print('inside reservation reject received at src',self.node.name,self.request.id,self.request.initiator,self.request.responder)
+                #print('inside reservation reject received at src',self.node.name,self.request.id,self.request.initiator,self.request.responder)
                 #self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
                 for vmemory in self.vmemorylist:
                     if self.request in vmemory.reservations:
@@ -1090,7 +1096,7 @@ class ReservationProtocol():     #(Protocol):
                         vmemory.reservations.remove(self.request)
                 index=self.request.path.index(self.node)
                 prev_node=self.request.path[index-1]
-                print("removed resources at ",self.node.name)
+                #print("removed resources at ",self.node.name)
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.FAIL,request=self.request)
                 self.node.message_handler.send_message(prev_node.name,msg)
 
