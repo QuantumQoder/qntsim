@@ -250,7 +250,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             # #####print('Emit event plus state',EntanglementGenerationA._plus_state)
         else:
             self.own.timeline.quantum_manager.run_circuit(self._flip_circuit, [self._qstate_key])
-            # #####print('flip circuit', EntanglementGenerationA._flip_circuit, self._qstate_key)
+            print('flip circuit', self._qstate_key)
         self.memory.excite(self.middle)
 
     def received_message(self, src: str, msg: Message) -> None:

@@ -182,8 +182,8 @@ class EntanglementSwappingA(EntanglementProtocol):
         log.logger.info(self.own.name + " middle protocol start with ends {}, {}".format(self.left_protocol.own.name,
                                                                                          self.right_protocol.own.name))
 
-        # #print(self.own.name + " SWAPPING middle protocol start with ends {}, {}".format(self.left_protocol.own.name,
-                                                                                        # self.right_protocol.own.name))
+        print(self.own.name + " SWAPPING middle protocol start with ends {}, {}".format(self.left_protocol.own.name,
+                                                                                        self.right_protocol.own.name))
 
         assert self.left_memo.fidelity > 0 and self.right_memo.fidelity > 0
         assert self.left_memo.entangled_memory["node_id"] == self.left_protocol.own.name
@@ -232,8 +232,8 @@ class EntanglementSwappingA(EntanglementProtocol):
 
         self.own.message_handler.send_message(self.left_node, msg_l)
         self.own.message_handler.send_message(self.right_node, msg_r)
-        """if self.left_node=='a' and self.right_node=='c':
-            ####print("Updated to raw after swapping")"""
+        if self.left_node=='a' and self.right_node=='s2':
+            print("Updated to raw after swapping")
         self.update_resource_manager(self.left_memo, "RAW")
         self.update_resource_manager(self.right_memo, "RAW")
         #####print("After updating to RAW")

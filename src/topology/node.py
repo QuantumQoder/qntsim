@@ -196,8 +196,11 @@ class MemoryTimeCard():
         self.reservations = []
     
     def has_virtual_reservation(self):
+        print('len of res', len(self.reservations))
         for res in self.reservations:
+            print('inside has virtual reservation',res.initiator,res.responder)
             if res.isvirtual:
+                print('res.isvirtual',res.isvirtual)
                 return True
         return False
 
@@ -205,7 +208,7 @@ class MemoryTimeCard():
 
 class EndNode(Node):
 
-    def __init__(self, name: str, timeline: "Timeline", memo_size=50):
+    def __init__(self, name: str, timeline: "Timeline", memo_size=10):
         super().__init__(name, timeline)
         self.memory_array = MemoryArray(name + ".MemoryArray", timeline, num_memories=memo_size)
         self.memory_array.owner = self
@@ -233,23 +236,21 @@ class EndNode(Node):
     #--------------------------------------------------------------------------
     def find_virtual_neighbors(self):
         virtual_neighbors = {}
-        virtual_neighbor=[]
+
         #Check the memory of this node for existing entanglements
         for info in self.resource_manager.memory_manager:
             
             if info.state != 'ENTANGLED':
                 continue
             else:
-                ###print((node, info.remote_node))
+                ##print((node, info.remote_node))
                 #This is a virtual neighbor
                 #nx_graph.add_edge(node, str(info.remote_node), color='r')
                 if str(info.remote_node) in virtual_neighbors.keys():
-                    # #print('remotre',info.remote_node,virtual_neighbors)
                     virtual_neighbors[str(info.remote_node)] = virtual_neighbors[str(info.remote_node)] + 1
                 else:
                     virtual_neighbors[str(info.remote_node)] = 1
-            # virtual_neighbor=[info.remote_node,self.name]
-            # #print('findvirtualneighbors',virtual_neighbors,self.name,info.remote_node)
+
         return virtual_neighbors
     #--------------------------------------------------------------------------
     
@@ -273,6 +274,7 @@ class EndNode(Node):
                 for other in end.eg.others:
                     if other != self.name:
                         self.map_to_middle_node[other] = end.name
+        print('self to middel',self.map_to_middle_node)
 
     def get_idle_memory(self, info: "MemoryInfo") -> None:
         """Method for application to receive available memories."""
@@ -283,7 +285,7 @@ class EndNode(Node):
 
 class ServiceNode(Node):
 
-    def __init__(self,name: str, timeline: "Timeline",memo_size= 50):
+    def __init__(self,name: str, timeline: "Timeline",memo_size= 20):
         super().__init__(name, timeline)
         self.memory_array = MemoryArray(name + ".MemoryArray", timeline, num_memories=memo_size)
         self.memory_array.owner = self
@@ -311,6 +313,25 @@ class ServiceNode(Node):
 
     def receive_message(self, src: str, msg: "Message") -> None:
         self.message_handler.push_message(src,msg)
+
+    def find_virtual_neighbors(self):
+        virtual_neighbors = {}
+
+        #Check the memory of this node for existing entanglements
+        for info in self.resource_manager.memory_manager:
+            
+            if info.state != 'ENTANGLED':
+                continue
+            else:
+                ##print((node, info.remote_node))
+                #This is a virtual neighbor
+                #nx_graph.add_edge(node, str(info.remote_node), color='r')
+                if str(info.remote_node) in virtual_neighbors.keys():
+                    virtual_neighbors[str(info.remote_node)] = virtual_neighbors[str(info.remote_node)] + 1
+                else:
+                    virtual_neighbors[str(info.remote_node)] = 1
+
+        return virtual_neighbors
 
     def init(self):
         """Method to initialize quantum router node.

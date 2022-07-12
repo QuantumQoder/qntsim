@@ -185,12 +185,18 @@ class RoutingProtocol():
        
     def nexthop(self,src,dest):
         # This function will give the next hop of the Dijkstra's path.
-
+        
         G=self.node.nx_graph
         path=nx.dijkstra_path(G,src,dest)
+        next_hop = path[1]
         # #print('dijkstas path',path,path[1],path[-1])
-      
-        return path[1]
+        virtual_neighbors = self.node.find_virtual_neighbors()
+        # print('Virtual neighbor', path, virtual_neighbors)
+        for node in path:
+            if node in virtual_neighbors.keys():
+                next_hop = node
+        print('Virtual neighbor', next_hop,path, virtual_neighbors)
+        return next_hop
 
     def next_hop(self):
 
@@ -286,8 +292,8 @@ class MemoryTimeCard():
         self.memory_index = memory_index
         self.reservations = []
     def has_virtual_reservation(self):
-        #print('inside has virtual reservation')
-        for res in self.requests:
+        print('inside has virtual reservation',self.reservations.initiator,self.reservations.responder)
+        for res in self.reservations:
             if res.isvirtual:
                 return True
         return False
@@ -327,16 +333,17 @@ class ReservationProtocol():     #(Protocol):
         memories_indices_free=[]
 
         for card in self.vmemorylist:
-            #print("vmeorylist",self.node.name,reservation.initiator,reservation.responder)
-            #print('111111', reservation in card.reservations)
+            # print("vmeorylist",self.node.name,reservation.initiator,reservation.responder)
+            print('111111', self.node.name, card.reservations,card.memory_index,self.request.initiator, self.request.responder, reservation.initiator,reservation.responder,self.vmemorylist)
             if reservation in card.reservations:
                 memory_indices.append(card.memory_index)
+                print('memory card', self.node.name, card.memory_index,reservation.initiator,reservation.responder,self.request.initiator, self.request.responder)
                 print("To maintain the virtual link indices",card.has_virtual_reservation(), reservation.isvirtual,reservation.initiator,reservation.responder,card.memory_index)
                 if card.has_virtual_reservation() and not reservation.isvirtual:
-                    #print(' inside hasd virt reser')
+                    print(' inside hasd virt reser')
                     virtual_indices.append(card.memory_index)
                     if card.memory_index > last_virtual_index:
-                        print('Last virtual index all conditions satiesfied',self.node.name,virtual_indices)
+                        print('Last virtual index all conditions satiesfied',self.node.name,virtual_indices,card.memory_index)
                         last_virtual_index= card.memory_index
         print('Last virtual index', self.node.name,reservation.initiator,reservation.responder,last_virtual_index)
                 # elif card.has_virtual_reservation() and reservation.isvirtual:
@@ -378,24 +385,25 @@ class ReservationProtocol():     #(Protocol):
                     if memory_info.state == "RAW" and memory_info.index in memory_indices[last_virtual_index + 1 : last_virtual_index + reservation.memory_size + 1]:
                         #Check for node B's memory
                         #print('1st eg rule',reservation.initiator,reservation.responder,memory_info.index)
-                        """##print('self.own.name here is : ', self.own.name)
-                        if self.own.name == 'd':
-                            ##print(f'In rule condition for Entanglement Generation  at node e for d')
-                            ##print('memory_info.index: ', memory_info.index)
-                            ##print('memory_info.state: ', memory_info.state)
-                            ##print('memory_info.remote_node: ', memory_info.remote_node)
-                        """
+                        ##print('self.own.name here is : ', self.own.name)
+                        if self.node.name == 's2':
+                            print(f'In rule condition for Entanglement Generation  at node e for d')
+                            print('memory_info.index: ', memory_info.index)
+                            print('memory_info.state: ', memory_info.state)
+                            print('memory_info.remote_node: ', memory_info.remote_node)
+                        
                         return [memory_info]
                     else:
                         return []
 
                 def eg_rule_action(memories_info: List["MemoryInfo"]):
-                    # #print('Current node in eg_ruleaction for index>0', self.own.name)
+                    
                     memories = [info.memory for info in memories_info]
                     memory = memories[0]
+                    print('Current node in eg_ruleaction for index>0', self.node.name)
                     #print('map tp middle',[path[index - 1]])
                     mid = self.node.map_to_middle_node[path[index - 1]]
-                    #print('---------EntanglementGenerationA----------for pair: ', (self.node.name, path[index - 1]))
+                    print('---------EntanglementGenerationA----------for pair: ', (self.node.name, path[index - 1]))
                     ###print('---------Middle node for this----------', mid)
                     protocol = EntanglementGenerationA(None, "EGA." + memory.name, mid, path[index - 1], memory)
                     return [protocol, [None], [None]]
@@ -469,7 +477,7 @@ class ReservationProtocol():     #(Protocol):
                     ###print('---------Middle node for this---------- ', mid)
                     protocol = EntanglementGenerationA(None, "EGA." + memory.name, mid, path[index + 1], memory)
                     return [protocol, [path[index + 1]], [req_func]]
-                #print('---------EntanglementGenerationA----------for pair: ', (self.node.name, path[index + 1]))
+                print('---------EntanglementGenerationA----------for pair: ', (self.node.name, path[index + 1]))
                 rule = Rule(10, eg_rule_action, eg_rule_condition)
                 rules.append(rule)
         # #print('last_virtual_index', last_virtual_index)
@@ -576,20 +584,21 @@ class ReservationProtocol():     #(Protocol):
             protocol = EntanglementSwappingB(None, "ESB." + memory.name, memory)
             return [protocol, [None], [None]]
 
-        #print('Current node in Swapping', self.node.name)
+        print('Current node in Swapping', self.node.name)
         if index == 0:
             def es_rule_condition(memory_info: "MemoryInfo", manager: "MemoryManager"):
-                #if self.own.name == 'h' and memory_info.state == "ENTANGLED":
-                    ##print('memory_info.index', memory_info.index)
-                    ##print('memory_info.remote_node', memory_info.remote_node)
-                    ##print('path[-1]', path[-1])
-                    ##print('path', path)
+                if self.node.name == 'a' and memory_info.state == "ENTANGLED":
+                    print('amemory_info.index', memory_info.index)
+                    print('memory_info.remote_node', memory_info.remote_node)
+                    print('path[-1]', path[-1])
+                    print('path', path)
 
                 if (memory_info.state == "ENTANGLED"
                         and memory_info.index in memory_indices
                         and memory_info.remote_node != path[-1]
                         #and memory_info.remote_node == path[index+1]
                         and memory_info.fidelity >= reservation.fidelity):
+                    print('Rles added at A',self.node.name)
                     
                     return [memory_info]
                 else:
@@ -600,17 +609,19 @@ class ReservationProtocol():     #(Protocol):
 
         elif index == len(path) - 1:
             def es_rule_condition(memory_info: "MemoryInfo", manager: "MemoryManager"):
-                #if self.own.name == 'h' and memory_info.state == "ENTANGLED":
-                    ##print('memory_info.index', memory_info.index)
-                    ##print('memory_info.remote_node', memory_info.remote_node)
-                    ##print('path[0]', path[0])
-                    ##print('path', path)
+                if self.node.name == 'b' and memory_info.state == "ENTANGLED":
+                    print('At b')
+                    print('memory_info.index', memory_info.index)
+                    print('memory_info.remote_node', memory_info.remote_node)
+                    print('path[0]', path[0])
+                    print('path', path)
 
                 if (memory_info.state == "ENTANGLED"
                         and memory_info.index in memory_indices
                         and memory_info.remote_node != path[0]
                         #and memory_info.remote_node == path[index-1]
                         and memory_info.fidelity >= reservation.fidelity):
+                    print('AT b conditiosn met',self.node.name)
                     return [memory_info]
                 else:
                     return []
@@ -620,7 +631,7 @@ class ReservationProtocol():     #(Protocol):
 
         else:
             _path = path[:]
-            ###print('In middle node for entanglement swapping: ', self.own.name)
+            print('In middle node for entanglement swapping: ', self.node.name)
             while _path.index(self.node.name) % 2 == 0:
                 ###print('Inside new path loop for : ', self.own.name)
                 ###print("Path inside reservation---------",_path)
@@ -638,44 +649,60 @@ class ReservationProtocol():     #(Protocol):
             ###print('(left, right)', (left, right))
 
             def es_rule_conditionA(memory_info: "MemoryInfo", manager: "MemoryManager"):
-                ###print("Node---",)
-                ###print("STATE",memory_info.state)
-                ###print("Index:\tEntangled Node:\tFidelity:\tEntanglement Time:")
+                # print("Node---",)
+                # print("STATE",memory_info.state)
+                # print("Index:\tEntangled Node:\tFidelity:\tEntanglement Time:")
                 #for info in [memory_info]:
                 #    ##print("{:6}\t{:15}\t{:9}\t{}".format(str(info.index), str(info.remote_node),
                 #                         str(info.fidelity), str(info.entangle_time * 1e-12)))
                 ###print("INDEX,REMOTE NODE,FIDELITY, RESERVATION FIDELITY ",memory_info.index,memory_info.remote_node,memory_info.fidelity,reservation.fidelity)
                                 
-                ##print('enter ESA condition check')
-                # #print('Current node in Rule conditionA', self.own.name)
-                # #print('memory_info.remote_node : ', memory_info.remote_node)
-                # #print('memory_info.state : ', memory_info.state)
-                # if memory_info.remote_node == 'v2':
-                #     #print('condition values for v2------')
-                #     #print('memory_info.state == "ENTANGLED" ', memory_info.state == "ENTANGLED")
-                #     #print('memory_info.index in memory_indices ', memory_info.index in memory_indices)
-                #     #print('memory_info.remote_node == left ', memory_info.remote_node == left)
-                #     #print('memory_info.fidelity >= reservation.fidelity ', memory_info.fidelity >= reservation.fidelity)
-                #     #print('Ends------')
+                print('enter ESA condition check')
+                print('Current node in Rule conditionA', self.node.name)
+                print('memory_info.remote_node : ', memory_info.remote_node)
+                print('memory_info.state : ', memory_info.state)
+                print('memory indeces',memory_info.index, memory_indices)
+                if memory_info.remote_node == 's2':
+                    print('condition values for s2------')
+                    print('memory_info.state == "ENTANGLED" ', memory_info.state == "ENTANGLED")
+                    print('memory_info.index in memory_indices ', memory_info.index in memory_indices)
+                    print('memory_info.remote_node == left ', memory_info.remote_node == left)
+                    print('memory_info.fidelity >= reservation.fidelity ', memory_info.fidelity >= reservation.fidelity)
+                    print('Ends------')
 
-                # if memory_info.remote_node == 'v1':
-                #     #print('condition values for v1------')
-                #     #print('memory_info.state == "ENTANGLED" ', memory_info.state == "ENTANGLED")
-                #     #print('memory_info.index in memory_indices ', memory_info.index in memory_indices)
-                #     #print('memory_info.remote_node == right ', memory_info.remote_node == right)
-                #     #print('memory_info.fidelity >= reservation.fidelity ', memory_info.fidelity >= reservation.fidelity)
-                #     #print('Ends------')
-                
+                if memory_info.remote_node == 's1':
+                    print('condition values for s1------')
+                    print('memory_info.state == "ENTANGLED" ', memory_info.state == "ENTANGLED")
+                    print('memory_info.index in memory_indices ', memory_info.index in memory_indices)
+                    print('memory_info.remote_node == right ', memory_info.remote_node == right)
+                    print('memory_info.fidelity >= reservation.fidelity ', memory_info.fidelity >= reservation.fidelity)
+                    print('Ends------')
+
+                if memory_info.remote_node == 'a':
+                    print('condition values for a------')
+                    print('memory_info.state == "ENTANGLED" ', memory_info.state == "ENTANGLED")
+                    print('memory_info.index in memory_indices ', memory_info.index in memory_indices)
+                    print('memory_info.remote_node == right ', memory_info.remote_node == right)
+                    print('memory_info.remote_node == left ', memory_info.remote_node == left)
+                    print('memory_info.fidelity >= reservation.fidelity ', memory_info.fidelity >= reservation.fidelity)
+                    print('Ends------')
+                if memory_info.remote_node == 'b':
+                    print('condition values for b------')
+                    print('memory_info.state == "ENTANGLED" ', memory_info.state == "ENTANGLED")
+                    print('memory_info.index in memory_indices ', memory_info.index in memory_indices)
+                    print('memory_info.remote_node == right ', memory_info.remote_node == right)
+                    print('memory_info.fidelity >= reservation.fidelity ', memory_info.fidelity >= reservation.fidelity)
+                    print('Ends------')
                 # #print('Remote node : ', memory_info.remote_node)
                 #if ((memory_info.state == "ENTANGLED" or memory_info.state == "OCCUPIED")
                 if (memory_info.state == "ENTANGLED"
                         and memory_info.index in memory_indices
                         and memory_info.remote_node == left
                         and memory_info.fidelity >= reservation.fidelity):
-                    # #print('gets in left if')
+                    print('gets in left if')
                     for info in manager:
-                        """##print('info.remote_node: ', info.remote_node)
-                        if info.remote_node == 'e':
+                        print('info.remote_node: ', info.remote_node)
+                        # if info.remote_node == 'e':
                             ##print('condition values for E------')
                             ##print('info.state == "ENTANGLED" ', info.state == "ENTANGLED")
                             ##print()
@@ -690,15 +717,15 @@ class ReservationProtocol():     #(Protocol):
                             ##print()
                             ##print()
                             ##print('Ends------')
-                        """
+                        
                         #if ((info.state == "ENTANGLED" or info.state == "OCCUPIED")
                         if (info.state == "ENTANGLED"
                                 and info.index in memory_indices
                                 and info.remote_node == right
                                 and info.fidelity >= reservation.fidelity):
-                            ###print("ES Condition matched A in IF----",self.own.name)
-                            ###print("(PAIR OF NODES)",(left,right))
-                            # #print('gets in left of right')
+                            print("ES Condition matched A in IF----",self.node.name, info.remote_node)
+                            print("(PAIR OF NODES)",(left,right))
+                            print('gets in left of right')
                             return [memory_info, info]
                     
                 #elif ((memory_info.state == "ENTANGLED" or memory_info.state == "OCCUPIED")
@@ -719,24 +746,24 @@ class ReservationProtocol():     #(Protocol):
                                 and info.index in memory_indices
                                 and info.remote_node == left
                                 and info.fidelity >= reservation.fidelity):
-                            """##print('memory_info.remote_node : ', memory_info.remote_node)
-                            ##print('info.remote_node : ', info.remote_node)
-                            ##print("ES Condition matched A in ELIF----",self.own.name)
-                            ##print("(PAIR OF NODES)",(left,right))
-                            """
+                            ##print('memory_info.remote_node : ', memory_info.remote_node)
+                            print('info.remote_node : ', info.remote_node)
+                            print("ES Condition matched A in ELIF----",self.node.name,info.remote_node)
+                            print("(PAIR OF NODES)",(left,right))
+                            
                             # #print('gets in right of left')
                             return [memory_info, info]
                 """else:
                     for info in manager:
                         ##print("This else")
                         return [memory_info, info]"""
-                # #print("ES Condition in A failed----",self.own.name)
-                # #print("(PAIR OF NODES)",(left,right))
+                print("ES Condition in A failed----",self.node.name)
+                print("(PAIR OF NODES)",(left,right))
                 return []
 
             def es_rule_actionA(memories_info: List["MemoryInfo"]):
                 memories = [info.memory for info in memories_info]
-
+                print('Swapping action', self.node.name)
                 def req_func1(protocols):
                     for protocol in protocols:
                         if (isinstance(protocol, EntanglementSwappingB)
@@ -755,7 +782,7 @@ class ReservationProtocol():     #(Protocol):
                 dsts = [info.remote_node for info in memories_info]
                 req_funcs = [req_func1, req_func2]
                 return protocol, dsts, req_funcs
-            ###print("Node---",self.own.name)
+            print("Node---action",self.node.name)
             ###print("Index A:\tEntangled Node A:\tFidelity A:\tEntanglement Time A:")
             #for info in self.own.resource_manager.memory_manager:
             #    ##print("{:6}\t{:15}\t{:9}\t{}".format(str(info.index), str(info.remote_node),
@@ -764,9 +791,9 @@ class ReservationProtocol():     #(Protocol):
             rules.append(rule)
 
             def es_rule_conditionB(memory_info: "MemoryInfo", manager: "MemoryManager") -> List["MemoryInfo"]:
-                ###print("Node---", self.own.name)
-                ###print("In RULE B")
-                ###print("STATE",memory_info.state)
+                print("Node---", self.node.name)
+                print("In RULE B")
+                print("STATE",memory_info.state)
 
                 
 
@@ -902,7 +929,7 @@ class ReservationProtocol():     #(Protocol):
                     
                     pass 
     
-            if (start>=0 and not isCardVirtual):
+            if (start>=0):
                 
                 index_list.append((start,vmemory.memory_index))
                 demand_count=demand_count-1
@@ -944,7 +971,7 @@ class ReservationProtocol():     #(Protocol):
                 next_node=self.routing.tempnexthop()
                 #msgr=RRMessage(RRPMsgType.RESERVE,next_node,self.request) #msg_type="RESERVE"
                 
-                #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
+                print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.NetworkManager, RRPMsgType.RESERVE,request=self.request)
                 msg.temp_path=self.routing.temp_path
                 msg.marker=self.routing.marker

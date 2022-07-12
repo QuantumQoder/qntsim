@@ -7,7 +7,7 @@ network_config = "/home/aman/QNTSim/QNTSim/example/4node.json"
 
 n,k,lamda=10,6,40
 
-tl = Timeline(4e12,"Qutip")
+tl = Timeline(4e12,"Qiskit")
 network_topo = Topology("network_topo", tl)
 network_topo.load_config(network_config)
 # network_topo.create_random_topology(n,network_config)

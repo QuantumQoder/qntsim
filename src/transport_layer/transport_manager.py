@@ -82,7 +82,7 @@ class TransportManager():
         end_time(int) : end time for the request
         """
         self.tp_id=next(self.id)
-        #print('create request')
+        print('create request')
         transport_protocol_src=TransportProtocol(self.owner, responder,start_time,size,end_time,priority,target_fidelity, timeout) #Create source protocol instance
         self.owner.protocols.append(transport_protocol_src)         #Adding the protocol to the list of protocols
         self.transportprotocolmap[self.tp_id]=transport_protocol_src
