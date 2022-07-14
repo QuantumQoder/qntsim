@@ -680,8 +680,10 @@ class ReservationProtocol():     #(Protocol):
                 print('len(gen_subtask.dependents): ', len(gen_subtask.dependents))
                 if len(gen_subtask.dependents) != 0 and gen_subtask.dependents != None:
                     #Make use of previously mapped purification subtask
+                    print('Make use of previously mapped purification subtask')
                     return gen_subtask.dependents
 
+                print('Not Making use of previously mapped purification subtask')
                 def purify_subtask_action(memarg):
                     #Find another memory that can be used to purify
                     #If memory is available, purify
@@ -711,7 +713,7 @@ class ReservationProtocol():     #(Protocol):
                         print('purify_indices inside req_func: ', purify_indices)
                         print('protocols list: ', [protocol.name for protocol in protocols])
                         for protocol in protocols:
-                            print('protocol name inside req_func: ', protocol.name)
+                            # print('protocol name inside req_func: ', protocol.kept_memo.name, ' protocol: ', protocol, 'protocol.kept_memo.name: ', protocol.kept_memo.name, 'purify_indices: ', [(i.remote_memo, i.memory.name) for i in purify_indices])
                             if not isinstance(protocol, BBPSSW):
                                 continue
 
@@ -721,6 +723,7 @@ class ReservationProtocol():     #(Protocol):
                                 _protocols.insert(1, protocol)
 
                         if len(_protocols) != 2:
+                            print('Pair of protocol instances could not be found to purify')
                             return None
 
                         protocols.remove(_protocols[1])
@@ -774,7 +777,9 @@ class ReservationProtocol():     #(Protocol):
                     
                     if len(purify_indices) == 0:
                         if memarg[0].fidelity >= reservation.fidelity:
+                            print('purification not needed')
                             return True, None, None
+                        print('purification needed but memory not available')
                         return None, None, None
 
                     memories = [info.memory for info in purify_indices]

@@ -43,6 +43,7 @@ class Message():
 
     def __init__(self, receiver_type: Enum, receiver: Enum, msg_type, **kwargs) -> None:
 
+        self.id = None
         self.receiver_type = receiver_type
         self.receiver = receiver
         self.msg_type = msg_type
@@ -291,6 +292,7 @@ class ResourceManager():
             #print('Requested Destination: ', req_dst)
             #print('protocol name: ', protocol.name)
             #print('ResourceManagerMsgType.REQUEST')"""
+        msg.id = 2
 
         self.owner.message_handler.send_message(req_dst, msg)
 

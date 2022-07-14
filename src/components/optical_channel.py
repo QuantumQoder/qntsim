@@ -234,6 +234,7 @@ class ClassicalChannel(OpticalChannel):
         Side Effects:
             Receiver node may receive the qubit (via the `receive_qubit` method).
         """
+        
         if message.msg_type== RRPMsgType.RESERVE:
 
             print("message type",message.msg_type ,source,self.sender)
@@ -244,6 +245,13 @@ class ClassicalChannel(OpticalChannel):
         future_time = round(self.timeline.now() + int(self.delay))
         #process = Process(self.receiver, "receive_message", [source.name, message])
         #event = Event(future_time, process, priority)
+        if hasattr(message, 'id'):
+            if message.id == 1:
+                print('ENT_GEN_SUCCESS_RESPONSE curr_node:', self.sender.name, ' dest: ', self.receiver.name, ' delay: ', self.delay, 'and expected message recv time: ', future_time)
+
+            if message.id == 2:
+                print('TASK_MANAGER_REQ_MESG curr_node:', self.sender.name, ' dest: ', self.receiver.name, ' delay: ', self.delay, 'and expected message recv time: ', future_time)
+
         event = Event(future_time,self.receiver, "receive_message", [source.name, message],priority)
         #self.timeline.schedule(event)
         self.timeline.schedule_counter += 1

@@ -52,7 +52,10 @@ class MessageQueueHandler():
         
         # self.protocol_queue = defaultdict(tuple)
         # self.manager_queue = defaultdict(tuple)
-        # print('push message', src, msg.receiver_type)
+        if hasattr(msg, 'id'):
+            if msg.id == 1 or msg.id == 2:
+                print('push message at ', self.owner.name, ' msg.receiver: ',msg.receiver)
+                
 
         if msg.receiver_type == MsgRecieverType.MANAGER:
             # self.manager_queue[msg.receiver.name]=[[msg],0]
@@ -87,7 +90,7 @@ class MessageQueueHandler():
                 self.protocol_queue[msg.receiver].append([[msg],0])
             else:
                 self.protocol_queue[msg.receiver]=[[msg],0]
-            # print('Pahskdjask',self.protocol_queue[msg.receiver][0])
+            #print('Pahskdjask: ', [ (k,v) for k, v in self.protocol_queue.items()])
             if self.protocol_queue[msg.receiver][1] == 0:
                 for protocol in self.owner.protocols:
                     # print('self protocols', self.owner.name, msg.receiver, protocol.name)

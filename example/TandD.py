@@ -18,8 +18,8 @@ import matplotlib.pyplot as plt
 
 random.seed(0)
 # network_config = "2-node.json"
-network_config = "3-node.json"
-# network_config = "4-node.json"
+# network_config = "3-node.json"
+network_config = "4-node.json"
 
 #network_config = "../example/linear_test_topology.json"
 
@@ -81,7 +81,7 @@ set_parameters(network_topo)
 tl.init()
 
 nm2 = network_topo.nodes['v0'].network_manager
-nm2.create_request('v0','v2', start_time=5e12, end_time=20e12, memory_size=5, target_fidelity=0.94,priority =1, tp_id = 1)
+nm2.create_request('v0','v7', start_time=5e12, end_time=20e12, memory_size=10, target_fidelity=0.9,priority =1, tp_id = 1)
 
 tl.run()
 
@@ -108,7 +108,7 @@ print("Index:\tEntangled Node:\tFidelity:\tEntanglement Time:")
 for info in network_topo.nodes["v2"].resource_manager.memory_manager:
     print("{:6}\t{:15}\t{:9}\t{}\t{}".format(str(info.index), str(info.remote_node),
                                         str(info.fidelity), str(info.entangle_time * 1e-12),str(info.state)))                                
-"""
+
 print("v3 memories")
 print("Index:\tEntangled Node:\tFidelity:\tEntanglement Time:")
 for info in network_topo.nodes["v3"].resource_manager.memory_manager:
@@ -126,7 +126,19 @@ print("Index:\tEntangled Node:\tFidelity:\tEntanglement Time:")
 for info in network_topo.nodes["v5"].resource_manager.memory_manager:
     print("{:6}\t{:15}\t{:9}\t{}\t{}".format(str(info.index), str(info.remote_node),
                                         str(info.fidelity), str(info.entangle_time * 1e-12),str(info.state)))                                
-"""
+
+print("v6 memories")
+print("Index:\tEntangled Node:\tFidelity:\tEntanglement Time:")
+for info in network_topo.nodes["v6"].resource_manager.memory_manager:
+    print("{:6}\t{:15}\t{:9}\t{}\t{}".format(str(info.index), str(info.remote_node),
+                                        str(info.fidelity), str(info.entangle_time * 1e-12),str(info.state)))                                
+
+print("v7 memories")
+print("Index:\tEntangled Node:\tFidelity:\tEntanglement Time:")
+for info in network_topo.nodes["v7"].resource_manager.memory_manager:
+    print("{:6}\t{:15}\t{:9}\t{}\t{}".format(str(info.index), str(info.remote_node),
+                                        str(info.fidelity), str(info.entangle_time * 1e-12),str(info.state)))                                
+
 """
 print("C memories")
 print("Index:\tEntangled Node:\tFidelity:\tEntanglement Time:")

@@ -119,6 +119,7 @@ class BBPSSW(EntanglementProtocol):
         """
         print("Purification is Running")
         log.logger.info(self.own.name + " protocol start with partner {}".format(self.another.own.name))
+        print(self.name + " protocol start with partner {}".format(self.another.name))
 
         assert self.another is not None, "other protocol is not set; please use set_others function to set it."
         kept_memo_ent = self.kept_memo.entangled_memory["node_id"]
@@ -129,7 +130,7 @@ class BBPSSW(EntanglementProtocol):
         dst = self.kept_memo.entangled_memory["node_id"]
 
         # send message to other node to perform BBPSSW protocol 
-        message = Message(MsgRecieverType.PROTOCOL, self.name, BBPSSWMsgType.PURIFICATION_RES, another=self.another.name, F = self.kept_memo.fidelity)
+        message = Message(MsgRecieverType.PROTOCOL, self.another.name, BBPSSWMsgType.PURIFICATION_RES, another=self.another.name, F = self.kept_memo.fidelity)
         self.own.message_handler.send_message(dst, message)
 
     def received_message(self, src: str, msg: Message) -> None:
@@ -141,6 +142,7 @@ class BBPSSW(EntanglementProtocol):
             Will call `update_resource_manager` method.
         """
 
+        print('recv_msg_purification called')
         assert src == self.another.own.name
         self.update_resource_manager(self.meas_memo, "RAW")
 
@@ -148,7 +150,7 @@ class BBPSSW(EntanglementProtocol):
         x_rand = random()
     
         # check if purification succesful or not
-        if x_rand < self.success_probability(msg.F):
+        if x_rand < self.success_probability(msg.kwargs['F']):
             print("purification receive 1")
             # if yes, update the fidelities.
             self.kept_memo.fidelity = self.improved_fidelity(self.kept_memo.fidelity)

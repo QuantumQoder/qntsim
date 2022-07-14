@@ -334,7 +334,7 @@ class EntanglementSwappingB(EntanglementProtocol):
             self.memory.entangled_memory["memo_id"] = remote_memo
             self.memory.update_expire_time(expire_time)
             self.update_resource_manager(self.memory, "ENTANGLED")
-            print(f'Entanglement swap successful between {self.own.name, msg.remote_node}')
+            print(f'Entanglement swap successful between {self.own.name, msg.kwargs["remote_memo"]}')
             self.subtask.on_complete(1)
         else:
             # case if swapping fails

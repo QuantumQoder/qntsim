@@ -54,7 +54,7 @@ class Message():
 
 
     def __init__(self, receiver_type: Enum, receiver: Enum, msg_type, **kwargs) -> None:
-
+        self.id = None
         self.receiver_type = receiver_type
         self.receiver = receiver
         self.msg_type = msg_type
@@ -133,6 +133,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.remote_memo_id = other.memories[0].name
         self.primary = self.own.name > self.other
         # print("primray is set")
+        # print('other protocol name: ', self.other_protocol.name)
 
     def start(self) -> None:
         """Method to start entanglement generation protocol.
@@ -397,7 +398,7 @@ class EntanglementGenerationB(EntanglementProtocol):
             bsm (SingleAtomBSM): bsm object calling method.
             info (Dict[str, any]): information passed from bsm.
         """
-        print('Inside BSM update')
+        # print('Inside BSM update')
         res = info["res"]
         time = info["time"]
         # print("got photon at", time)
@@ -426,10 +427,12 @@ class EntanglementGenerationB(EntanglementProtocol):
         # if only one photon received in the window, entanglement success, send message
         elif time > self.previous_detection_time + self.frequency:
             print("!!!!!!!!!!!!!!!Entanglement SUCESS!!!!!!!!!!!!!!!!!!!")
+            reciever = [self.current_protocol.other_protocol.name, self.current_protocol.name]
             for i, node in enumerate(self.others):
-                # print("sneding accepted indices: ", self.accepted_indices)
-                message = Message(MsgRecieverType.PROTOCOL, self.current_protocol.name, GenerationMsgType.MEAS_RES, protocol = self.current_protocol, res=res, time=time,
+                print("sending messages to: ", node, ' and reciver_protocol is: ', reciever[i])
+                message = Message(MsgRecieverType.PROTOCOL, reciever[i], GenerationMsgType.MEAS_RES, protocol = self.current_protocol, res=res, time=time,
                                                         accepted_index=self.accepted_indices)
+                message.id = 1
                 self.own.message_handler.send_message(node, message)
                 self.first_received = False
 

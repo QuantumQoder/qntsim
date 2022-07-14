@@ -291,6 +291,12 @@ class QuantumRouter(Node):
     def receive_message(self, src: str, msg: "Message") -> None:
         # print('receive msg', msg.receiver,msg.protocol_type)
         #print("Quantum roter receive message")
+        if hasattr(msg, 'id'):
+            if msg.id == 1:
+                print('BSM_MSG_RECV_TIME: ', self.timeline.now(), ' at node: ', self.name)
+            if msg.id == 2:
+                print('REQ_FUNC_RECV_TIME: ', self.timeline.now(), ' at node: ', self.name)
+
         self.message_handler.push_message(src,msg)
 
     def init(self):
