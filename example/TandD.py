@@ -23,7 +23,7 @@ network_config = "4-node.json"
 
 #network_config = "../example/linear_test_topology.json"
 
-tl = Timeline(20e12)
+tl = Timeline(20e12, 'Qiskit')
 network_topo = Topology("network_topo", tl)
 network_topo.load_config(network_config)
 

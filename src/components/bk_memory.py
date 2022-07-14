@@ -1,5 +1,5 @@
-"""Models for simulation of quantum memories.
 
+"""Models for simulation of quantum memories.
 This module defines the Memory class to simulate single atom memories as well as the MemoryArray class to aggregate memories.
 Memories will attempt to send photons through the `send_qubit` interface of nodes.
 Photons should be routed to a BSM device for entanglement generation, or through optical hardware for purification and swapping.
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from ..topology.node import QuantumRouter
 
 from .photon import Photon
-from .circuit import Circuit
+from .circuit import BaseCircuit
 from ..kernel.entity import Entity
 from ..kernel._event import Event
 from ..kernel.process import Process
@@ -30,9 +30,7 @@ from ..utils.quantum_state import QuantumState
 # array of single atom memories
 class MemoryArray(Entity):
     """Aggregator for Memory objects.
-
     The MemoryArray can be accessed as a list to get individual memories.
-
     Attributes:
         name (str): label for memory array instance.
         timeline (Timeline): timeline for simulation.
@@ -42,7 +40,6 @@ class MemoryArray(Entity):
     def __init__(self, name: str, timeline: "Timeline", num_memories=10,
                  fidelity=0.85, frequency=80e6, efficiency=1, coherence_time=-1, wavelength=500):
         """Constructor for the Memory Array class.
-
         Args:
             name (str): name of the memory array instance.
             timeline (Timeline): simulation timeline.
@@ -72,7 +69,6 @@ class MemoryArray(Entity):
 
     def init(self):
         """Implementation of Entity interface (see base class).
-
         Set the owner of memory as the owner of memory array.
         """
 
@@ -82,7 +78,6 @@ class MemoryArray(Entity):
 
     def memory_expire(self, memory: "Memory"):
         """Method to receive expiration events from memories.
-
         Args:
             memory (Memory): expired memory.
         """
@@ -91,7 +86,7 @@ class MemoryArray(Entity):
 
     def update_memory_params(self, arg_name: str, value: Any) -> None:
         # if arg_name == 'coherence_time':
-            # print('Coherence time:', value)
+            # #print('Coherence time:', value)
 
         for memory in self.memories:
             memory.__setattr__(arg_name, value)
@@ -102,10 +97,8 @@ class MemoryArray(Entity):
 
 class Memory(Entity):
     """Individual single-atom memory.
-
     This class models a single-atom memory, where the quantum state is stored as the spin of a single ion.
     This class will replace the older implementation once completed.
-
     Attributes:
         name (str): label for memory instance.
         timeline (Timeline): timeline for simulation.
@@ -118,13 +111,12 @@ class Memory(Entity):
         entangled_memory (Dict[str, Any]): tracks entanglement state of memory.
     """
 
-    _meas_circuit = Circuit(1)
-    _meas_circuit.measure(0)
+    #_meas_circuit = Circuit(1)
+    #_meas_circuit.measure(0)
 
     def __init__(self, name: str, timeline: "Timeline", fidelity: float, frequency: float,
                  efficiency: float, coherence_time: int, wavelength: int):
         """Constructor for the Memory class.
-
         Args:
             name (str): name of the memory instance.
             timeline (Timeline): simulation timeline.
@@ -162,6 +154,11 @@ class Memory(Entity):
         self.excited_photon = None
         self.result={}
         self.next_excite_time = 0
+        Circuit =BaseCircuit.create(self.timeline.type)
+        # #print("memory circuit",BaseCircuit.create(self.timeline.type))
+        self._meas_circuit = Circuit(1)
+        self._meas_circuit.measure(0)
+
 
     def init(self):
         pass
@@ -171,12 +168,9 @@ class Memory(Entity):
 
     def excite(self, dst="") -> None:
         """Method to excite memory and potentially emit a photon.
-
         If it is possible to emit a photon, the photon may be marked as null based on the state of the memory.
-
         Args:
             dst (str): name of destination node for emitted photon (default "").
-
         Side Effects:
             May modify quantum state of memory.
             May schedule photon transmission to destination node.
@@ -187,11 +181,11 @@ class Memory(Entity):
             return
 
         # measure quantum state
-        res = self.timeline.quantum_manager.run_circuit(Memory._meas_circuit, [self.qstate_key])
-        # print(f'previous BSM: {self.previous_bsm}')
-        # print('res: ',res,' ,self.qstate_key: ', self.qstate_key)
+        res = self.timeline.quantum_manager.run_circuit(self._meas_circuit, [self.qstate_key])
+        # #print(f'previous BSM: {self.previous_bsm}')
+        # #print('res: ',res,' ,self.qstate_key: ', self.qstate_key)
         state = res[self.qstate_key]
-        # print('memory state',self.qstate_key,state)
+        # #print('memory state',self.qstate_key,state)
         self.result[self.qstate_key]=state
 
         # create photon and check if null
@@ -213,14 +207,12 @@ class Memory(Entity):
 
     def expire(self) -> None:
         """Method to handle memory expiration.
-
         Is scheduled automatically by the `set_plus` memory operation.
-
         Side Effects:
             Will notify upper entities of expiration via the `pop` interface.
             Will modify the quantum state of the memory.
         """
-        print('******Expire*****')
+        # #print('******Expire*****')
         if self.excited_photon:
             self.excited_photon.is_null = True
 
@@ -230,9 +222,7 @@ class Memory(Entity):
 
     def reset(self) -> None:
         """Method to clear quantum memory.
-
         Will reset quantum state to \|0> and will clear entanglement information.
-
         Side Effects:
             Will modify internal parameters and quantum state.
         """
@@ -248,15 +238,13 @@ class Memory(Entity):
 
     def update_state(self, state: List[complex]) -> None:
         """Method to set the memory state to an arbitrary pure state.
-
         Args:
             state (List[complex]): array of amplitudes for pure state in Z-basis.
-
         Side Effects:
             Will modify internal quantum state and parameters.
             May schedule expiration event.
         """
-        # print('***********Update State***********')
+        # #print('***********Update State***********')
         self.timeline.quantum_manager.set([self.qstate_key], state)
         self.previous_bsm = -1
         self.entangled_memory = {'node_id': None, 'memo_id': None}
@@ -266,17 +254,17 @@ class Memory(Entity):
             self._schedule_expiration()
 
     def _schedule_expiration(self) -> None:
-        # print('**Schedule expiration**')
+        # #print('**Schedule expiration**')
         if self.expiration_event is not None:
             #self.timeline.remove_event(self.expiration_event)
             self.timeline.events.remove(self.expiration_event)
  
         decay_time = self.timeline.now() + int(self.coherence_time * 1e12)
-        # print('Decay time', decay_time)
+        # #print('Decay time', decay_time)
         #process = Process(self, "expire", [])
         #event = Event(decay_time, process)
         event = Event(decay_time,self, "expire", [])
-        # print('*****Event Scheduled*****')
+        # #print('*****Event Scheduled*****')
         #self.timeline.schedule(event)
         self.timeline.schedule_counter += 1
         self.timeline.events.push(event)
@@ -285,9 +273,7 @@ class Memory(Entity):
 
     def update_expire_time(self, time: int):
         """Method to change time of expiration.
-
         Should not normally be called by protocols.
-
         Args:
             time (int): new expiration time.
         """
@@ -318,14 +304,12 @@ class Memory(Entity):
 
 class MemoryWithRandomCoherenceTime(Memory):
     """Individual single-atom memory.
-
     This class inherits Memory class and provides possibility to use stochastic model of
     coherence time. This means that loss of entanglement of the memory with a photon occurs
     at random time given by truncated normal distribution with average value set by
     'coherence_time' input parameter and with standard deviation set by 'coherence_time_stdev'
     input parameter. If coherence_time_stdev <= 0.0 is passed, the class behaves exactly as
     original Memory class.
-
     Attributes:
         name (str): label for memory instance.
         timeline (Timeline): timeline for simulation.
@@ -342,7 +326,6 @@ class MemoryWithRandomCoherenceTime(Memory):
     def __init__(self, name: str, timeline: "Timeline", fidelity: float, frequency: float,
                  efficiency: float, coherence_time: float, coherence_time_stdev: float, wavelength: int):
         """Constructor for the Memory class.
-
         Args:
             name (str): name of the memory instance.
             timeline (Timeline): simulation timeline.
@@ -387,4 +370,3 @@ class MemoryWithRandomCoherenceTime(Memory):
         self.timeline.events.push(event)
 
         self.expiration_event = event
-

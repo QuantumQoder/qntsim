@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 from ..message import Message
 from .entanglement_protocol import EntanglementProtocol
 from ..utils import log
-from ..components.circuit import Circuit
+from ..components.circuit import BaseCircuit
 from ..topology.message_queue_handler import ManagerType, ProtocolType, MsgRecieverType
 
 class SwappingMsgType(Enum):
@@ -76,11 +76,11 @@ class EntanglementSwappingA(EntanglementProtocol):
         degradation (float): degradation factor of memory fidelity after the swapping operation.
     """
 
-    circuit = Circuit(2)
-    circuit.cx(0, 1)
-    circuit.h(0)
-    circuit.measure(0)
-    circuit.measure(1)
+    #circuit = Circuit(2)
+    #circuit.cx(0, 1)
+    #circuit.h(0)
+    #circuit.measure(0)
+    #circuit.measure(1)
 
     def __init__(self, own: "Node", name: str, left_memo: "Memory", right_memo: "Memory", success_prob=1,
                  degradation=0.95):
@@ -115,6 +115,14 @@ class EntanglementSwappingA(EntanglementProtocol):
         self.is_success = False
         self.left_protocol = None
         self.right_protocol = None
+        Circuit =BaseCircuit.create(self.left_memo.timeline.type)
+        #print("swap circuit",BaseCircuit.create(self.left_memo.timeline.type))
+
+        self.circuit = Circuit(2)
+        self.circuit.cx(0, 1)
+        self.circuit.h(0)
+        self.circuit.measure(0)
+        self.circuit.measure(1)
 
     def is_ready(self) -> bool:
         return self.left_protocol is not None and self.right_protocol is not None
@@ -133,7 +141,7 @@ class EntanglementSwappingA(EntanglementProtocol):
             raise Exception("Cannot pair protocol %s with %s" % (self.name, other.name))
 
     def start(self) -> None:
-        # print("swapping between ", self.left_node,  self.right_node)
+        # #print("swapping between ", self.left_node,  self.right_node)
         """Method to start entanglement swapping protocol.
         Will run circuit and send measurement results to other protocols.
         Side Effects:
@@ -145,9 +153,9 @@ class EntanglementSwappingA(EntanglementProtocol):
         assert self.right_memo.entangled_memory["node_id"] == self.right_protocol.own.name
 
         # Loging the qmodes and accepted index data at both ends
-        # print("swapping central node at:", self.own.name)
-        # print("number of qmodes at:", self.left_node, "qmode:", len(self.left_memo.qmodes), "accepted index: ", self.left_memo.accepted_index)
-        # print("number of qmodes at:,", self.right_node, "qmode:", len(self.right_memo.qmodes), "accepted index: ", self.right_memo.accepted_index)
+        # #print("swapping central node at:", self.own.name)
+        # #print("number of qmodes at:", self.left_node, "qmode:", len(self.left_memo.qmodes), "accepted index: ", self.left_memo.accepted_index)
+        # #print("number of qmodes at:,", self.right_node, "qmode:", len(self.right_memo.qmodes), "accepted index: ", self.right_memo.accepted_index)
 
         # Reading out the photons in the memory before the accepted photon at both ends. 
         for i in range(self.left_memo.accepted_index-1):
@@ -156,7 +164,7 @@ class EntanglementSwappingA(EntanglementProtocol):
         for i in range(self.right_memo.accepted_index-1):
             self.right_memo.read()
 
-        # print("topmost quantum modes are:", self.left_memo.qmodes[0].is_null, self.right_memo.qmodes[0].is_null)
+        # #print("topmost quantum modes are:", self.left_memo.qmodes[0].is_null, self.right_memo.qmodes[0].is_null)
 
         # Generate a random no. (<1) to see if swapping is succesful or not
         x_rand = random()
@@ -221,7 +229,7 @@ class EntanglementSwappingA(EntanglementProtocol):
 
     def received_message(self, src: str, msg: "Message") -> None:
         """Method to receive messages (should not be used on A protocol)."""
-
+        self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
         raise Exception("EntanglementSwappingA protocol '{}' should not receive messages.".format(self.name))
 
     def memory_expire(self, memory: "Memory") -> None:
@@ -272,15 +280,15 @@ class EntanglementSwappingB(EntanglementProtocol):
         hold_memory (Memory): quantum memory to be swapped.
     """
 
-    x_cir = Circuit(1)
-    x_cir.x(0)
+    #x_cir = Circuit(1)
+    #x_cir.x(0)
 
-    z_cir = Circuit(1)
-    z_cir.z(0)
+    #z_cir = Circuit(1)
+    #z_cir.z(0)
 
-    x_z_cir = Circuit(1)
-    x_z_cir.x(0)
-    x_z_cir.z(0)
+    #x_z_cir = Circuit(1)
+    #x_z_cir.x(0)
+    #x_z_cir.z(0)
 
     def __init__(self, own: "Node", name: str, hold_memo: "Memory"):
         """Constructor for entanglement swapping B protocol.
@@ -295,6 +303,17 @@ class EntanglementSwappingB(EntanglementProtocol):
         self.memories = [hold_memo]
         self.memory = hold_memo
         self.another = None
+        Circuit =BaseCircuit.create(self.memory.timeline.type)
+        #print("swap circuit",BaseCircuit.create(self.memory.timeline.type))
+        self.x_cir = Circuit(1)
+        self.x_cir.x(0)
+
+        self.z_cir = Circuit(1)
+        self.z_cir.z(0)
+
+        self.x_z_cir = Circuit(1)
+        self.x_z_cir.x(0)
+        self.x_z_cir.z(0)
 
     def is_ready(self) -> bool:
         return self.another is not None
@@ -315,7 +334,7 @@ class EntanglementSwappingB(EntanglementProtocol):
         Side Effects:
             Will invoke `update_resource_manager` method.
         """
-        print('Swapping message kwargs', msg.msg_type, msg.kwargs)
+        #print('Swapping message kwargs', msg.msg_type, msg.kwargs)
         fidelity=msg.kwargs['fidelity']
         expire_time=msg.kwargs['expire_time']
         remote_node=msg.kwargs['remote_node']
@@ -340,6 +359,8 @@ class EntanglementSwappingB(EntanglementProtocol):
             # case if swapping fails
             self.update_resource_manager(self.memory, "RAW")
             self.subtask.on_complete(-1)
+            
+        self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
 
     def start(self) -> None:
         log.logger.info(self.own.name + " end protocol start with partner {}".format(self.another.own.name))

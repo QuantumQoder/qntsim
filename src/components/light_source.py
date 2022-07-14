@@ -249,7 +249,7 @@ class SPDCSource2(LightSource):
 
         # send other photon to local memory
         self.memory.get(photon1)
-        #print("photon added to", self.owner.name, "at index:",len(self.memory.qmodes))
+        # #print("photon added to", self.owner.name, "at index:",len(self.memory.qmodes))
 
         return True
 

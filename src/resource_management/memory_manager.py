@@ -13,7 +13,7 @@ This is done through instances of the MemoryInfo class, which track a single mem
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .resource_manager import ResourceManager
-    from ..components.memory import Memory, MemoryArray
+    from ..components.bk_memory import Memory, MemoryArray
 
 
 class MemoryManager():
@@ -60,7 +60,7 @@ class MemoryManager():
         elif state == "OCCUPIED":
             info.to_occupied()
         elif state == "ENTANGLED":
-            ##print(f'To entangled called for the memory index {info.index} at the node {self.resource_manager.owner.name}')
+            ###print(f'To entangled called for the memory index {info.index} at the node {self.resource_manager.owner.name}')
             info.to_entangled()
         else:
             raise Exception("Unknown state '%s'" % state)
@@ -137,22 +137,22 @@ class MemoryInfo():
         #self.
 
         """if self.memory.memory_array.owner.name == 'd': #and self.remote_node == 'a':
-            #print(f'Reached the to_occupied for d and entanglement to created for memory index: {self.index}')"""
+            ##print(f'Reached the to_occupied for d and entanglement to created for memory index: {self.index}')"""
         self.state = "OCCUPIED"
         self.entangle_time = self.memory.timeline.now() #Remove after testing
 
     def to_entangled(self) -> None:
         """Method to set memory to entangled state."""
-        ##print(f'entanglement link to be created with: {self.memory.entangled_memory["node_id"]}')
+        ###print(f'entanglement link to be created with: {self.memory.entangled_memory["node_id"]}')
         
-        ##print('self.memory.memory_array.owner:   ', self.memory.memory_array.owner)
+        ###print('self.memory.memory_array.owner:   ', self.memory.memory_array.owner)
         """if self.memory.memory_array.owner.name == 'd': #and self.remote_node == 'a':
-            #print(f'Reached the to_entangled for d and entanglement to created for memory index: {self.index}')"""
+            ##print(f'Reached the to_entangled for d and entanglement to created for memory index: {self.index}')"""
         self.state = "ENTANGLED"
         self.remote_node = self.memory.entangled_memory["node_id"]
         self.remote_memo = self.memory.entangled_memory["memo_id"]
         self.fidelity = self.memory.fidelity
-        #print(f'Entanglement generated between: {self.memory.owner.name} and {self.remote_node}')
-        #print(f'Time of entanglement creation: ', self.memory.timeline.now())
-        #print('Number of events run before this Entanglement: ', self.memory.timeline.run_counter)
+        ##print(f'Entanglement generated between: {self.memory.owner.name} and {self.remote_node}')
+        ##print(f'Time of entanglement creation: ', self.memory.timeline.now())
+        ##print('Number of events run before this Entanglement: ', self.memory.timeline.run_counter)
         self.entangle_time = self.memory.timeline.now()

@@ -134,7 +134,7 @@ class BSM(Entity):
         if not any([reference.location == photon.location for reference in self.photons]):
             self.photons.append(photon)
 
-        #print(f'BSM parent get() and photons: {self.photons}')
+        ##print(f'BSM parent get() and photons: {self.photons}')
 
     @abstractmethod
     def trigger(self, detector: Detector, info: Dict[str, Any]):
@@ -193,7 +193,7 @@ class PolarizationBSM(BSM):
             May call get method of one or more attached detector(s).
             May alter the quantum state of photon and any stored photons.
         """
-        #print('PolarizationBSM')
+        ##print('PolarizationBSM')
         super().get(photon)
 
         if len(self.photons) != 2:
@@ -249,7 +249,7 @@ class PolarizationBSM(BSM):
             # Psi+
             elif abs(detector_last - detector_num) == 1:
                 info = {'entity': 'BSM', 'info_type': 'BSM_res', 'res': 0, 'time': time}
-                #print(f'Polarization BSM value: Psi+')
+                ##print(f'Polarization BSM value: Psi+')
                 self.notify(info)
 
         self.last_res = [time, detector_num]

@@ -65,13 +65,13 @@ class Detector(Entity):
         Side Effects:
             May notify upper entities of a detection event.
         """
-        #print('Detector')
+        ##print('Detector')
         self.photon_counter += 1
         now = self.timeline.now()
         time = round(now / self.time_resolution) * self.time_resolution
 
         if (random() < self.efficiency or dark_get) and now > self.next_detection_time:
-            #print(f'Detector : {self.name} and time :{time}')
+            ##print(f'Detector : {self.name} and time :{time}')
             self.notify({'time': time})
             self.next_detection_time = now + (1e12 / self.count_rate)  # period in ps
 
@@ -187,7 +187,7 @@ class QSDetectorPolarization(QSDetector):
         Side Effects:
             Will call `get` method of attached beamsplitter.
         """
-        #print('QSDetectorPolarization')
+        ##print('QSDetectorPolarization')
         self.splitter.get(photon)
 
     def get_photon_times(self):

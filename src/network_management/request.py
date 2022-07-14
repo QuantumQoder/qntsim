@@ -1,4 +1,8 @@
 from typing import List, TYPE_CHECKING
+
+from pyparsing import Path
+
+
 if TYPE_CHECKING:
     from ..topology.node import QuantumRouter,Node
 
@@ -8,9 +12,9 @@ from ..message import Message
 import networkx as nx
 from ..resource_management.rule_manager import Rule
 from ..kernel._event import Event
-from ..entanglement_management.generation import EntanglementGenerationA
-from ..entanglement_management.purification import BBPSSW
-from ..entanglement_management.swapping import EntanglementSwappingA, EntanglementSwappingB
+from ..entanglement_management.bk_generation import EntanglementGenerationA
+from ..entanglement_management.bk_purification import BBPSSW
+from ..entanglement_management.bk_swapping import EntanglementSwappingA, EntanglementSwappingB
 from ..resource_management.memory_manager import MemoryManager, MemoryInfo
 import itertools
 import json
@@ -19,26 +23,38 @@ from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgReciev
 from ..resource_management.task_manager import TaskManager
 from ..resource_management.task_manager import Task
 from ..resource_management.task_manager import SubTask
+#from ..transport_layer.transport_manager import CongestionMsgType
 
 
 class Request():
 
 
     newid=itertools.count()
-    def __init__(self, initiator:str,responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float,priority: int,tp_id: int):
-        
+    
+    def __init__(self, initiator:str,responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float,**kwargs):        
         self.initiator  = initiator
         self.responder  = responder
         self.start_time = start_time
         self.end_time = end_time
         self.memory_size=memory_size
         self.fidelity = target_fidelity
-        self.priority=priority
-        self.tp_id=tp_id
+        # self.priority = priority
+        # self.tp_id = tp_id
+        if "priority" in kwargs:
+            self.priority=kwargs["priority"]
+        if "tp_id" in kwargs:
+            self.tp_id=kwargs["tp_id"]
         self.path=[] #doubly linked list of Nodes (List(Nodes))
         self.pathnames=[]
-        self.isvirtual=False
+        self.status=None
+        # if "isvirtual" in kwargs:
+        self.isvirtual=kwargs.get("isvirtual", False)
         self.id=next(self.newid)
+        self.congestion=0
+        self.congestion_retransmission=kwargs.get("congestion_retransmission",None)
+        # if "congestion_retransmission" in kwargs:
+        #     self.congestion_retransmission=kwargs["congestion_retransmission"]
+        self.remaining_demand_size=0
 
 
 
@@ -47,7 +63,6 @@ class RoutingProtocol():
     
     def __init__(self, node: "Node", initiator:str,responder: str,temp_path:"List(Node)",marker:"Node"):
         """Constructor for routing protocol.
-
         Args:
             own (Node): node protocol is attached to.
             name (str): name of protocol instance.
@@ -76,9 +91,9 @@ class RoutingProtocol():
         nodewise_dest_distance = json.loads(json.dumps(nodewise_dest_distance))
         neighbors = self.node.neighbors
         vneighbors=self.node.virtualneighbors
-        # print('virtual neighbors',vneighbors,self.own.timeline.now()*1e-12)
+        # #print('virtual neighbors',vneighbors,self.own.timeline.now()*1e-12)
         G=self.node.nx_graph
-        # print('nx graph',self.own.nx_graph)
+        # #print('nx graph',self.own.nx_graph)
         """
         The code below is used to populate local_neighbor_table.
         We iterate through the neighbors of node. If that node exist in the nodewise_dest_distance, if it a virtual link we assign distance as 0, else we assign the distance from the nodewise_dest_distance between those nodes.
@@ -98,7 +113,7 @@ class RoutingProtocol():
         
         #Compute the next hop here using our logic
         #Pick the best possible nieghbor according to physical distance
-        # print('--------------self.own.name------------', self.own.name,self.own.neighborhood_list)
+        # #print('--------------self.own.name------------', self.own.name,self.own.neighborhood_list)
         
 
 
@@ -107,19 +122,20 @@ class RoutingProtocol():
         
         G=self.node.nx_graph
         skip=[]
-        print('source ',self.src, self.node.name)
-        if self.node.name == self.src:
+        #print('source ',self.src, self.node.name)
+        if self.node.name == self.src:         
             path=nx.dijkstra_path(G,self.node.name,self.dst) 
+            # print("path", path)
             '''We initially calculate the temporary path using Dijkstra's algorithm.'''
             ''' We append this temporary path to message class temporary path'''
             self.temp_path=path
-               
+            
             '''
                 Marker node: The end node of the the local neighborhood which lies in the temp path.
                 We iterate through the temp path, then through the neighborhood_list, and check if the node in the temp path lies in the neighborhood_list.
                 we add this marker node to the msg.
             '''
-            print("neighbour list of 1st node ",self.node.neighborhood_list)
+            #print("neighbour list of 1st node ",self.node.neighborhood_list)
             for items in self.temp_path:
                 self.marker=items
                 if self.node.neighborhood_list:
@@ -128,61 +144,77 @@ class RoutingProtocol():
 
                             self.marker=nodes
             #self.own.send_message(path[1],msg)
-            print("marker nodes",self.temp_path,self.marker)   
-        print('temp path',self.temp_path,self.node.name)
+            #print("marker nodes",self.temp_path,self.marker)   
+        #print('temp path',self.temp_path,self.node.name)
         indexx=self.temp_path.index(self.node.name)
-        # print('indx',self.own.name,indexx,len(msg.temp_path))
+        # #print('indx',self.own.name,indexx,len(msg.temp_path))
 
         # If the node is the first node in the temp path, we run the next_hop method, which gives us the next node using Djisktr's algorithm
-            
+        #print('It is end node',type(self.src),self.node,type(self.node))
+        if self.node.is_endnode:
+            dst=self.node.service_node
+            #print('end node dst',dst)
+
+        # if not self.node.is_endnode:
+        #     #print('Service node')
+
         if self.node.name == self.temp_path[0]:
             dst=self.nexthop(self.node.name,self.temp_path[-1])
-            print("dst 1",dst)
+            #print("dst 1",dst)
                 
         # If the node is the marker node we do the routing again by calling next_hop method
         elif self.node.name ==self.marker:
-            # print('At marker node',self.own.name,self.own.marker)
+            # #print('At marker node',self.own.name,self.own.marker)
             dst=self.nexthop(self.node.name,self.temp_path[-1])
-            print("dst 2",dst)
+            #print("dst 2",dst)
 
             #If the node is not the source, marker or end node, we skip the routing.
         elif indexx > 0 and indexx < len(self.temp_path)-1:
             dst=self.temp_path[indexx+1]
-            print("dst 3",dst)
-            # print('mddle',self.own.name,dst,indexx)
+            if dst == self.node.end_node:
+                #print('next node is end node',dst, self.node.name)
+                dst=self.node.end_node
+            #print("dst 3",dst)
+            # #print('mddle',self.own.name,dst,indexx)
                 
         #For end node
         elif indexx==len(self.temp_path)-1:
-            # print('last node')
+            # #print('last node')
             dst=self.temp_path[-1]
-            print("dst 4",dst)
+            #print("dst 4",dst)
         return dst
                 
         
        
     def nexthop(self,src,dest):
         # This function will give the next hop of the Dijkstra's path.
-
+        
         G=self.node.nx_graph
         path=nx.dijkstra_path(G,src,dest)
-        # print('dijkstas path',path,path[1],path[-1])
-      
-        return path[1]
+        next_hop = path[1]
+        # #print('dijkstas path',path,path[1],path[-1])
+        virtual_neighbors = self.node.find_virtual_neighbors()
+        # print('Virtual neighbor', path, virtual_neighbors)
+        for node in path:
+            if node in virtual_neighbors.keys():
+                next_hop = node
+        print('Virtual neighbor', next_hop,path, virtual_neighbors)
+        return next_hop
 
     def next_hop(self):
 
         # This function will give the next hop of the Dijkstra's path.
         if (self.node.name==self.dst):
             pass
-        print("node",self.node.name)
+        #print("node",self.node.name)
         G=self.node.nx_graph
         path=nx.dijkstra_path(G,self.src,self.dst)
-        print("path" ,path)
+        #print("path" ,path)
         index=path.index(self.node.name)
-        print(path[index+1])
+        #print(path[index+1])
         return path[index+1]
 
-        # print('dijkstas path',path,path[1],path[-1])
+        # #print('dijkstas path',path,path[1],path[-1])
       
 
 
@@ -218,10 +250,8 @@ class Message():
 
 class RRMessage(Message):
     """Message used by resource reservation protocol.
-
     This message contains all information passed between reservation protocol instances.
     Messages of different types contain different information.
-
     Attributes:
         msg_type (GenerationMsgType): defines the message type.
         receiver (str): name of destination protocol instance.
@@ -239,7 +269,6 @@ class RRMessage(Message):
 
 class NetworkManagerMessage(Message):
     """Message used by the network manager.
-
     Attributes:
         message_type (Enum): message type required by base message type.
         receiver (str): name of destination protocol instance.
@@ -252,7 +281,6 @@ class NetworkManagerMessage(Message):
 
 class MemoryTimeCard():
     """Class for tracking reservations on a specific memory.
-
     Attributes:
         memory_index (int): index of memory being tracked (in memory array).
         reservations (List[Reservation]): list of reservations for the memory.
@@ -260,7 +288,6 @@ class MemoryTimeCard():
 
     def __init__(self, memory_index: int):
         """Constructor for time card class.
-
         Args:
             memory_index (int): index of memory to track.
         """
@@ -268,6 +295,7 @@ class MemoryTimeCard():
         self.memory_index = memory_index
         self.reservations = []
     def has_virtual_reservation(self):
+        print('inside has virtual reservation',self.reservations.initiator,self.reservations.responder)
         for res in self.reservations:
             if res.isvirtual:
                 return True
@@ -296,7 +324,7 @@ class ReservationProtocol():     #(Protocol):
         #self.vmemorylist = [MemoryTimeCard(i) for i in range(len(self.node.memory_array))]
         self.vmemorylist=self.node.vmemory_list
 
-        print(len(self.node.vmemory_list),self.node.name,self.request,"memory available")
+        #print(len(self.node.vmemory_list),self.node.name,self.request,"memory available")
 
         index_list=[]
 
@@ -308,42 +336,55 @@ class ReservationProtocol():     #(Protocol):
 
             demand_count=self.request.memory_size*2
 
-        #print("demand count by request",demand_count,self.request)
-
+        ##print("demand count by request",demand_count,self.request)
+       
         for vmemory in self.vmemorylist:
+            physical_requests=[]
+            
+            isCardVirtual = False
+            #print('requestsss1', self.node.name,self.request.initiator,self.request.responder)
+            for res in vmemory.reservations:
+                if res.isvirtual:#$ or self.reservation.isvirtual
+                    isCardVirtual = True
+                else:
+                    physical_requests.append(res)
+            
+            if isCardVirtual and  self.request.isvirtual:
+                return -1, isCardVirtual
+
 
             start =0
-            end = len(vmemory.reservations)-1
-
+            end = len(physical_requests)-1
             while start<=end :
                 mid=(start+end)//2 
-                if vmemory.reservations[mid].start_time>self.request.end_time :
+                #print('mid',mid,start,end)
+                if physical_requests[mid].start_time>self.request.end_time :
                     
                     end=mid-1
 
-                elif vmemory.reservations[mid].end_time<self.request.start_time :
+                elif physical_requests[mid].end_time<self.request.start_time :
 
                     start=mid+1
 
-                elif max(vmemory.reservations[mid].start_time,self.request.start_time)<min(vmemory.reservations[mid].end_time,self.request.end_time):
+                elif max(physical_requests[mid].start_time,self.request.start_time)<min(physical_requests[mid].end_time,self.request.end_time):
                     start=-1
                     break
         
                 else:
                     
                     pass 
-  
+    
             if (start>=0):
                 
                 index_list.append((start,vmemory.memory_index))
                 demand_count=demand_count-1
             
-            
+            #print('line 902')
             if(demand_count==0):
 
                 for i in range(0,len(index_list)) :
-                    print(index_list,index_list[i],)
-                    #print("memory index",vmemorylist[index_list[i][1]])
+                    #print(index_list,index_list[i],)
+                    # #print("memory index",vmemorylist[index_list[i][1]])
                     #print("list index" ,index_list[i][0] )
                     self.vmemorylist[index_list[i][1]].reservations.insert(index_list[i][0],self.request)
                     if self.request.id not in self.node.resource_manager.reservation_id_to_memory_map:
@@ -353,20 +394,20 @@ class ReservationProtocol():     #(Protocol):
                     else:
                         self.node.resource_manager.reservation_id_to_memory_map[self.request.id].append(index_list[i][1])
                 
-            
+                #print('reservation to memory map',self.node.name,self.node.resource_manager.reservation_id_to_memory_map)
+        
                 return True    
-        print('reservation to memory map',self.node.resource_manager.reservation_id_to_memory_map)
         
         if (demand_count>0):
 
-            print(demand_count,"demand count")
+            #print(demand_count,"demand count")
             index_list.clear()
             return False
         
 
     def start(self):
 
-        #print(self.memories_available(),self.node.name)
+        print("start",self.node.name)
             #if RESOURCES AVAILABLE:
         if self.memories_available() :
 
@@ -375,11 +416,11 @@ class ReservationProtocol():     #(Protocol):
                 next_node=self.routing.tempnexthop()
                 #msgr=RRMessage(RRPMsgType.RESERVE,next_node,self.request) #msg_type="RESERVE"
                 
-                #print("message type , receiver", msgr.msg_type ,msgr.receiver)
+                print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.NetworkManager, RRPMsgType.RESERVE,request=self.request)
                 msg.temp_path=self.routing.temp_path
                 msg.marker=self.routing.marker
-                print("msg.msg_typed",msg.msg_type,msg)
+                #print("msg.msg_typed",msg.msg_type,msg)
                 self.request.path.append(self.node)
                 self.request.pathnames.append(self.node.name)
                 self.node.message_handler.send_message(next_node,msg)
@@ -388,15 +429,16 @@ class ReservationProtocol():     #(Protocol):
              
             if (self.request.responder==self.node.name):
                 
+                #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
                 print ("destination",self.node.name)
                 self.request.path.append(self.node)
                 self.request.pathnames.append(self.node.name)
                 index=self.request.path.index(self.node)
                 prev_node=self.request.path[index-1]
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.CREATE_TASKS,request=self.request)
-                print(" final message type fp , receiver", msg.msg_type ,msg.receiver)
+                #print(" final message type fp , receiver", msg.msg_type ,msg.receiver)
                 #index=path.index(self.node.name)
-                #print(path[index+1])
+                ##print(path[index+1])
 
                 """create tasks and back propagate that msg to create tasks to previous node
                 
@@ -411,23 +453,49 @@ class ReservationProtocol():     #(Protocol):
                 #send classical message to previous node path[index-1]'s Reservation protocol to createtasks 
                 #in receive msg check this condn
                 #send(msg_type)
+                ##print("congestion_retransmission in sucess",self.request.congestion_retransmission)
+                """if self.request.congestion_retransmission==1:
+                    #print("congestion sucess")
+                    msg1=Message(MsgRecieverType.MANAGER, ManagerType.TransportManager,CongestionMsgType.SUCCESS,request=self.request)
+                    self.node.message_handler.send_message(self.request.initiator,msg1)"""
+                #self.node.transport_manager.recv_success_reallocation(self.request.memory_size,self.request)
+                
+
                           
         else :
-            msg=RRMessage(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.FAIL,request=self.request)
+
+            self.request.status='REJECT'
+            #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
+            msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.FAIL,request=self.request)
             
             #(RESORCES NOT AVAILABLE)
             #msg_type="FAIL"
+            #self.request.status='REJECT'
+            #print('inside reservation reject',self.node.name,self.request.id,self.request.initiator,self.request.responder)
+            #self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
 
             #self.rnode.send_message(path[len(path)-1].name ,msg)
             if self.node.name==self.request.initiator:
-                print("------node at which it is failing---",self.node.name)
+                #print("------node at which it is failing---",self.node.name,self.request.responder)
+                if self.request.congestion_retransmission!=1:
+
+                    self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
+                """if self.request.congestion_retransmission==1:
+                    msg1=Message(MsgRecieverType.MANAGER, ManagerType.TransportManager,CongestionMsgType.FAIL,request=self.request)
+                    self.node.message_handler.send_message(src.name,msg1)"""
+                    
                 return
             else :
                 #index=self.request.path.index(self.node)
                 index=len(self.request.path)-1
                 #prev_node=self.request.path[index-1]
                 prev_node=self.request.path[index]
-                self.node.send_message(prev_node.name,msg)
+                self.node.message_handler.send_message(prev_node.name,msg)
+                """if self.request.congestion_retransmission==1:
+                    msg1=Message(MsgRecieverType.MANAGER, ManagerType.TransportManager,CongestionMsgType.FAIL,request=self.request)
+                    self.node.message_handler.send_message(src.name,msg1)"""
+                    
+            self.request.congestion = 1
 
     
     def receive_message(self ,msg :"RRPMsgType"):
@@ -435,7 +503,7 @@ class ReservationProtocol():     #(Protocol):
         if msg.msg_type==RRPMsgType.CREATE_TASKS :
             payload=msg.kwargs['request']
             self.request=payload
-
+            #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
             if self.node.name==self.request.initiator:
                 #create tasks
                 print("tasks created at ",self.node.name)
@@ -443,6 +511,12 @@ class ReservationProtocol():     #(Protocol):
                 # self.load_rules(rules,self.request)
                 self.set_dependencies_subtask(self.request.pathnames,self.request)
                 self.schedule_tasks(self.request)
+                #print("tasks created at ",self.node.name)
+                if self.request.congestion_retransmission==1:
+
+                    #print("congestion_retransmission in sucess",self.request.congestion_retransmission)
+                    remaining_demand_size=self.request.remaining_demand_size-self.request.memory_size
+                    self.node.transport_manager.recv_success_reallocation(self.request.memory_size,self.request,remaining_demand_size)
 
             else:
                 index=self.request.path.index(self.node)
@@ -454,7 +528,7 @@ class ReservationProtocol():     #(Protocol):
                 self.set_dependencies_subtask(self.request.pathnames,self.request)
                 self.schedule_tasks(self.request)
                 #call tasks and dependency
-                print("tasks created at ",self.node.name)
+                #print("tasks created at ",self.node.name)
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.CREATE_TASKS,request=self.request)
                 self.node.message_handler.send_message(prev_node.name,msg)
                 
@@ -471,15 +545,28 @@ class ReservationProtocol():     #(Protocol):
 
         elif msg.msg_type==RRPMsgType.FAIL :
             
-            self.request=msg.payload
-
+            #self.request=msg.payload
+            self.request=msg.kwargs['request']
+            #self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
+            #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
             if self.node.name==self.request.initiator:
                 #create tasks
-                print("removed resources at ",self.node.name)
+                #print("removed resources at ",self.node.name ,self.request.id)
                 #vmemoryarray[index_list[i][1]].reservations.remove(req.reser)
+                #print('inside reservation reject received at src',self.node.name,self.request.id,self.request.initiator,self.request.responder)
+                #self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
                 for vmemory in self.vmemorylist:
                     if self.request in vmemory.reservations:
                         vmemory.reservations.remove(self.request)
+                    """if self.request.congestion_retransmission==1:
+                    msg1=Message(MsgRecieverType.MANAGER, ManagerType.TransportManager,CongestionMsgType.FAIL,request=self.request)
+                    self.node.message_handler.send_message(self.node.name,msg1)"""
+
+                #self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
+                if self.request.congestion_retransmission==1:
+                    self.node.transport_manager.recv_fail_reallocation(self.request.memory_size,self.request,self.request.remaining_demand_size)
+                else:
+                    self.node.network_manager.notify_nm('REJECT',self.request.id,self.request)
                 
 
             else:
@@ -491,6 +578,8 @@ class ReservationProtocol():     #(Protocol):
                 print("removed resources at ",self.node.name)
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.FAIL,"reservation_manager",request=self.request)
                 self.node.send_message(prev_node.name,msg)
+        
+        self.node.message_handler.process_msg(msg.receiver_type,msg.receiver)
 
    
     def schedule_tasks(self, reservation: "Request") -> None:
@@ -1204,18 +1293,3 @@ class ReservationProtocol():     #(Protocol):
             self.own.task_manager.add_task(task_swap_middle, [task_Purify_left, task_Purify_right])
             task_swap_middle.set_reservation(reservation)
         """
-
-
-
-
-
-    
-    
-
-
-
-
-        
-        
-
-       
