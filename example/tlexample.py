@@ -1,8 +1,8 @@
 
 from qntsim.kernel.timeline import Timeline 
 
-Timeline.DLCZ=True
-Timeline.bk=False
+Timeline.DLCZ=False
+Timeline.bk=True
 
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
@@ -18,15 +18,23 @@ network_topo.load_config(network_config)
 
 def set_parameters(topology: Topology):
    
-    MEMO_FREQ = 2e3
+    MEMO_FREQ = 2e4
     MEMO_EXPIRE = 0
     MEMO_EFFICIENCY = 1
     MEMO_FIDELITY = 0.9349367588934053
-    for node in topology.get_nodes_by_type("QuantumRouter"):
+    for node in topology.get_nodes_by_type("EndNode"):
         node.memory_array.update_memory_params("frequency", MEMO_FREQ)
         node.memory_array.update_memory_params("coherence_time", MEMO_EXPIRE)
         node.memory_array.update_memory_params("efficiency", MEMO_EFFICIENCY)
         node.memory_array.update_memory_params("raw_fidelity", MEMO_FIDELITY)
+
+    for node in topology.get_nodes_by_type("ServiceNode"):
+        node.memory_array.update_memory_params("frequency", MEMO_FREQ)
+        node.memory_array.update_memory_params("coherence_time", MEMO_EXPIRE)
+        node.memory_array.update_memory_params("efficiency", MEMO_EFFICIENCY)
+        node.memory_array.update_memory_params("raw_fidelity", MEMO_FIDELITY)
+    
+    
 
   
     DETECTOR_EFFICIENCY = 0.9

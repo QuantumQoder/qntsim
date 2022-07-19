@@ -3,39 +3,51 @@ import itertools
 from random import choices
 import qntsim
 from numpy import random
-from qntsim.components.circuit import Circuit
+#from qntsim.components.circuit import Circuit
 from qntsim.kernel.timeline import Timeline
-from qntsim.kernel.quantum_manager import QuantumManager, QuantumManagerKet
-from qntsim.protocol import Protocol
-from qntsim.topology.node import QuantumRouter
+Timeline.DLCZ=False
+Timeline.bk=True
+from qntsim.components.circuit import BaseCircuit
+
+
+#from qntsim.topology.node import QuantumRouter
 from qntsim.topology.topology import Topology
-from qntsim.network_management.reservation import Reservation
-from qntsim.resource_management.memory_manager import MemoryInfo
-import json
-import sys
-import matplotlib.pyplot as plt
 import numpy as np
 from qiskit import QuantumCircuit,QuantumRegister,ClassicalRegister
 
-network_config = "/home/aman/Sequence/test/Quantum-Networking/example/network_topology.json"
+network_config = "/home/bhanusree/Desktop/QNTv1/QNTSim-Demo/QNTSim/example/3node.json"
 
-tl = Timeline(10e12)
+tl = Timeline(10e12,"Qiskit")
 network_topo = Topology("network_topo", tl)
 network_topo.load_config(network_config)
 
 def set_parameters(topology: Topology):
    
-    MEMO_FREQ = 2e3
+    MEMO_FREQ = 2e4
     MEMO_EXPIRE = 0
     MEMO_EFFICIENCY = 1
-    MEMO_FIDELITY = 0.9349367588934053
+    MEMO_FIDELITY = 0.9549367588934053
+    
+    for node in topology.get_nodes_by_type("EndNode"):
+        node.memory_array.update_memory_params("frequency", MEMO_FREQ)
+        node.memory_array.update_memory_params("coherence_time", MEMO_EXPIRE)
+        node.memory_array.update_memory_params("efficiency", MEMO_EFFICIENCY)
+        node.memory_array.update_memory_params("raw_fidelity", MEMO_FIDELITY)
+    
+    for node in topology.get_nodes_by_type("ServiceNode"):
+        node.memory_array.update_memory_params("frequency", MEMO_FREQ)
+        node.memory_array.update_memory_params("coherence_time", MEMO_EXPIRE)
+        node.memory_array.update_memory_params("efficiency", MEMO_EFFICIENCY)
+        node.memory_array.update_memory_params("raw_fidelity", MEMO_FIDELITY)
+    """
+    
     for node in topology.get_nodes_by_type("QuantumRouter"):
         node.memory_array.update_memory_params("frequency", MEMO_FREQ)
         node.memory_array.update_memory_params("coherence_time", MEMO_EXPIRE)
         node.memory_array.update_memory_params("efficiency", MEMO_EFFICIENCY)
         node.memory_array.update_memory_params("raw_fidelity", MEMO_FIDELITY)
-
-  
+    """
+    
     DETECTOR_EFFICIENCY = 0.9
     DETECTOR_COUNT_RATE = 5e7
     DETECTOR_RESOLUTION = 100
@@ -60,10 +72,10 @@ def set_parameters(topology: Topology):
 
 set_parameters(network_topo)
 
-n=99
+n=500
 
-alice=network_topo.nodes['v0']
-bob = network_topo.nodes['v1']
+alice=network_topo.nodes['a']
+bob = network_topo.nodes['s1']
 
 print("Index:\tEntangled Node:\tFidelity:\tEntanglement Time:\tState:")
 for info in alice.resource_manager.memory_manager:
@@ -72,7 +84,7 @@ for info in alice.resource_manager.memory_manager:
 
 
 def request_entanglements(sender,receiver):
-    sender.transport_manager.request(receiver.owner.name,5e12,n,10e12,0,.7,5e12)
+    sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.7,5e12)
     print()
 
 def roles():
@@ -99,13 +111,15 @@ for info in bob.resource_manager.memory_manager:
                                         str(info.fidelity), str(info.entangle_time * 1e-12),str(info.state)))
 
 def measurement(qm,choice, key):
-    
-    if choice == 1:       #X observable
+    print('choice',choice)
+    if choice == 1: 
+        Circuit=BaseCircuit.create("Qiskit")      #X observable
         circ=Circuit(1)
         circ.h(0)
         circ.measure(0)
         output=qm.run_circuit(circ,[key])
-    if choice == 2:         #W observable
+    if choice == 2:  
+        Circuit=BaseCircuit.create("Qiskit")       #W observable
         circ=Circuit(1)
         circ.s(0)
         # circ.
@@ -114,11 +128,13 @@ def measurement(qm,choice, key):
         circ.h(0)
         circ.measure(0)
         output=qm.run_circuit(circ,[key])
-    if choice == 3:         #Z observable
+    if choice == 3:  
+        Circuit=BaseCircuit.create("Qiskit")       #Z observable
         circ=Circuit(1)
         circ.measure(0)
         output=qm.run_circuit(circ,[key])
-    if choice == 4:         #V observable
+    if choice == 4: 
+        Circuit=BaseCircuit.create("Qiskit")        #V observable
         circ=Circuit(1)
         circ.s(0)
         circ.h(0)
@@ -138,9 +154,9 @@ def alice_measurement():
     for info in alice.resource_manager.memory_manager:
         key=info.memory.qstate_key
         state=qm_alice.get(key)
-        # print('initial state',info.index,info.state,type(state))
+        print('initial state',info.index,info.state,type(state))
         alice_choice=np.random.choice(choice)
-        # print('keys',key)
+        print('keys alice',key)
         # print('alice choice',alice_choice)
         meas_results_alice.append(measurement(qm_alice,alice_choice,key))
         alice_choice_list.append(alice_choice)
@@ -153,10 +169,10 @@ def bob_measurement():
     meas_results_bob=[]
     bob_choice_list=[]
     choice=[2,3,4]
-    for info in alice.resource_manager.memory_manager:
+    for info in bob.resource_manager.memory_manager:
         key=info.memory.qstate_key
         bob_choice=np.random.choice(choice)
-        # print('keys',key)
+        print('keys bob',key)
         # print('bob choice',bob_choice)
         meas_results_bob.append(measurement(qm_bob,bob_choice,key))
         bob_choice_list.append(bob_choice)
@@ -187,7 +203,7 @@ def chsh_correlation(alice_results,bob_results,alice_choice,bob_choice):
     print('reslist',res)
     for i in range(n):
         res2=''.join(map(str,res[i]))
-        # print('aa',res[i],alice_choice[i],bob_choice[i])
+        #print('aa',res[i],res2,alice_choice[i],bob_choice[i])
         if (alice_choice[i]==1 and bob_choice[i]==2):
             for j in range(4):
                 # print('rs and check',res[i],check_list[j])
@@ -208,10 +224,10 @@ def chsh_correlation(alice_results,bob_results,alice_choice,bob_choice):
                 if res2 == check_list[j]:
                     countA3B4[j] +=1
 
-    print('countA1B2', countA1B2)
-    print('countA1B2', countA1B4)
-    print('countA1B2', countA3B2)
-    print('countA1B2', countA3B4)
+    #print('countA1B2', countA1B2)
+    #print('countA1B4', countA1B4)
+    #print('countA3B2', countA3B2)
+    #print('countA3B4', countA3B4)
 
     total12=sum(countA1B2)
     total14=sum(countA1B4)
@@ -233,22 +249,29 @@ def runE91():
     key_mismatch=0
     alice_key,bob_key=[],[]
     alice_results, bob_results =[],[]
-    print('Alice Measurements', alice_meas)
+    print('Alice Measurements',alice_meas)
     print('Bob Measuremenst', bob_meas)
     for i in range(n):
-        alice_results.append(alice_meas[i].get(i)) 
-        bob_results.append(bob_meas[i].get(i))
+        alice_meas_i=list(alice_meas[i].items())
+        bob_meas_i=list(bob_meas[i].items())
+        alice_results.append(alice_meas_i[0][1]) 
+        #print("alice_results",alice_meas_i[0][1])
+        bob_results.append(bob_meas_i[0][1])
+        #print("bob_results",bob_meas_i[0][1])
         if (alice_choice[i]==2 and bob_choice[i]==2) or (alice_choice[i]==3 and bob_choice[i]==3):
-            print('Base match',alice_meas[i].get(i),bob_meas[i].get(i))
-            alice_key.append(alice_meas[i].get(i))
-            bob_key.append(bob_meas[i].get(i))
+            print('Base match',alice_meas[i],bob_meas[i])
+            alice_key.append(alice_meas_i[0][1])
+            bob_key.append(bob_meas_i[0][1])
+    
+    #print('Alice results',alice_results)
+    #print('Bob results',bob_results)
     for j in range(len(alice_key)):
         if alice_key[j] != bob_key[j]:
             key_mismatch += 1
     print('Alice choicec',alice_choice)
     print('Bob choicec',bob_choice)
-    print('Alice results',alice_results)
-    print('Bob results',bob_results)
+    #print('Alice results',alice_results)
+    #print('Bob results',bob_results)
     print('Alice keys', alice_key)
     print('Bob keys', bob_key)
     print('Key length',len(alice_key))
