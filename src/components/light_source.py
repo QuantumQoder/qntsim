@@ -11,7 +11,6 @@ import random as rnd
 from .photon import Photon
 from ..kernel.entity import Entity
 from ..kernel._event import Event
-from ..kernel.process import Process
 from ..utils.encoding import polarization, single_atom
 
 

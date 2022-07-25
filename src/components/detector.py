@@ -21,7 +21,6 @@ from ..components.switch import Switch
 from ..components.interferometer import Interferometer
 from ..kernel.entity import Entity
 from ..kernel._event import Event
-from ..kernel.process import Process
 from ..utils.encoding import time_bin
 
 

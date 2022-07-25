@@ -15,7 +15,6 @@ from .detector import Detector
 from .photon import Photon
 from ..kernel.entity import Entity
 from ..kernel._event import Event
-from ..kernel.process import Process
 from ..kernel.quantum_manager import QuantumManagerKet, QuantumManagerDensity
 from ..utils.encoding import *
 from ..utils.quantum_state import QuantumState

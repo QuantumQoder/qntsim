@@ -24,7 +24,6 @@ elif Timeline.bk:
 from ..message import Message
 from ..protocol import StackProtocol
 from ..kernel._event import Event
-from ..kernel.process import Process
 import itertools
 
 

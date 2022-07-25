@@ -22,7 +22,6 @@ from .photon import Photon
 from .circuit import BaseCircuit
 from ..kernel.entity import Entity
 from ..kernel._event import Event
-from ..kernel.process import Process
 from ..utils.encoding import single_atom
 from ..utils.quantum_state import QuantumState
 

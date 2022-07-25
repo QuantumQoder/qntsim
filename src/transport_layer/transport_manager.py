@@ -1,6 +1,5 @@
 import qntsim
 from qntsim.kernel.timeline import Timeline
-from qntsim.kernel.process import Process
 from qntsim.kernel._event import Event
 from enum import Enum, auto
 from typing import TYPE_CHECKING

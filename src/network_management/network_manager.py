@@ -9,7 +9,6 @@ if TYPE_CHECKING:
     from ..topology.node import QuantumRouter
     from ..protocol import StackProtocol
     from ..kernel._event import Event
-    from ..kernel.process import Process
     from .request import Request
     from .request import RoutingProtocol 
     from .request import ReservationProtocol
