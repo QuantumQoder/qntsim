@@ -147,7 +147,7 @@ class EntanglementSwappingA(EntanglementProtocol):
         self.left_protocol = None
         self.right_protocol = None
         Circuit =BaseCircuit.create(self.left_memo.timeline.type)
-        print("swap circuit",BaseCircuit.create(self.left_memo.timeline.type))
+        # #print("swap circuit",BaseCircuit.create(self.left_memo.timeline.type))
 
         self.circuit = Circuit(2)
         self.circuit.cx(0, 1)
@@ -182,8 +182,8 @@ class EntanglementSwappingA(EntanglementProtocol):
         log.logger.info(self.own.name + " middle protocol start with ends {}, {}".format(self.left_protocol.own.name,
                                                                                          self.right_protocol.own.name))
 
-        print(self.own.name + " SWAPPING middle protocol start with ends {}, {}".format(self.left_protocol.own.name,
-                                                                                        self.right_protocol.own.name))
+        #print(self.own.name + " SWAPPING middle protocol start with ends {}, {}".format(self.left_protocol.own.name,
+                                                                                        #self.right_protocol.own.name))
 
         assert self.left_memo.fidelity > 0 and self.right_memo.fidelity > 0
         assert self.left_memo.entangled_memory["node_id"] == self.left_protocol.own.name
@@ -201,7 +201,7 @@ class EntanglementSwappingA(EntanglementProtocol):
         s = '----Random generated in swap---- '+ str(x_rand)+'\n'
         file1.write(s) 
         file1.close() 
-        ####print('----Random generated in swap----', x_rand)
+        #####print('----Random generated in swap----', x_rand)
         if x_rand < self.success_probability():
 
             fidelity = self.updated_fidelity(self.left_memo.fidelity, self.right_memo.fidelity)
@@ -232,11 +232,11 @@ class EntanglementSwappingA(EntanglementProtocol):
 
         self.own.message_handler.send_message(self.left_node, msg_l)
         self.own.message_handler.send_message(self.right_node, msg_r)
-        """if self.left_node=='a' and self.right_node=='c':
-            ###print("Updated to raw after swapping")"""
+        #if self.left_node=='a' and self.right_node=='s2':
+            #print("Updated to raw after swapping")
         self.update_resource_manager(self.left_memo, "RAW")
         self.update_resource_manager(self.right_memo, "RAW")
-        ####print("After updating to RAW")
+        #####print("After updating to RAW")
 
     def success_probability(self) -> float:
         """A simple model for BSM success probability."""
@@ -332,7 +332,7 @@ class EntanglementSwappingB(EntanglementProtocol):
         self.memory = hold_memo
         self.another = None
         Circuit =BaseCircuit.create(self.memory.timeline.type)
-        print("swap circuit",BaseCircuit.create(self.memory.timeline.type))
+        # #print("swap circuit",BaseCircuit.create(self.memory.timeline.type))
         self.x_cir = Circuit(1)
         self.x_cir.x(0)
 
@@ -382,11 +382,11 @@ class EntanglementSwappingB(EntanglementProtocol):
             self.memory.entangled_memory["memo_id"] = msg.kwargs["remote_memo"]
             self.memory.update_expire_time(msg.kwargs["expire_time"])
             self.update_resource_manager(self.memory, "ENTANGLED")
-            print(f'Entanglement swap successful between {self.own.name, msg.kwargs["remote_node"]}')
-            print(f'Time of Entanglement swap success: {self.own.timeline.now()}')
+            # #print(f'Entanglement swap successful between {self.own.name, msg.kwargs["remote_node"]}')
+            # #print(f'Time of Entanglement swap success: {self.own.timeline.now()}')
         else:
-            print(f'Entanglement swap failed between {self.own.name, msg.kwargs["remote_node"]}')
-            print(f'Time of Entanglement swap failure: {self.own.timeline.now()}')
+            # #print(f'Entanglement swap failed between {self.own.name, msg.kwargs["remote_node"]}')
+            # #print(f'Time of Entanglement swap failure: {self.own.timeline.now()}')
             # self.own.network_manager.notify(status="FAILED")
             self.update_resource_manager(self.memory, "RAW")
             
@@ -394,7 +394,7 @@ class EntanglementSwappingB(EntanglementProtocol):
 
     def start(self) -> None:
         log.logger.info(self.own.name + " end protocol start with partner {}".format(self.another.own.name))
-        # print(self.own.name + " SWAPPING end protocol start with partner {}".format(self.another.own.name))
+        #print(self.own.name + " SWAPPING end protocol start with partner {}".format(self.another.own.name))
 
     def memory_expire(self, memory: "Memory") -> None:
         """Method to deal with expired memories.

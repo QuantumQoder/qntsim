@@ -282,3 +282,11 @@ runE91()
 
 # if (aliceMeasurementChoices[i] == 2 and bobMeasurementChoices[i] == 1) or (aliceMeasurementChoices[i] == 3 and bobMeasurementChoices[i] == 2):
 #         aliceKey.append(aliceResults[i]) # record the i-th result obtained by Alice as the bit of the secret key k
+
+
+
+
+
+
+
+

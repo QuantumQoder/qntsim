@@ -20,11 +20,11 @@ from ..kernel.timeline import Timeline
 if Timeline.DLCZ:
     from ..components.DLCZ_memory import Memory,MemoryArray
     from ..components.DLCZ_bsm import SingleAtomBSM
-    print("DLCZ node")
+    #print("DLCZ node")
 elif Timeline.bk:
     from ..components.bk_memory import Memory, MemoryArray
     from ..components.bk_bsm import SingleAtomBSM
-    print("bk node")
+    #print("bk node")
 
 from ..kernel.entity import Entity
 
@@ -96,15 +96,15 @@ class Node(Entity):
         """
 
         # signal to protocol that we've received a message
-        # print('node msg', msg)
+        # #print('node msg', msg)
         if msg.receiver is not None:
-            print("rrrrrr")
+            #print("rrrrrr")
             for protocol in self.protocols:
-                print('protocol', protocol)
+                #print('protocol', protocol)
                 if protocol.name == msg.receiver and protocol.received_message(src, msg):
                     return
         else:
-            print("rrrrrr")
+            #print("rrrrrr")
             matching = [p for p in self.protocols if type(p) == msg.protocol_type]
             for p in matching:
                 p.received_message(src, msg)
@@ -116,9 +116,9 @@ class Node(Entity):
 
     def send_qubit(self, dst: str, qubit) -> None:
         """Interface for quantum channel `transmit` method."""
-        #print(f'sent qubit from node: {self.name} to node: {dst}')
-        # print((dst), type(qubit))
-        # print("qchannels", self.qchannels)
+        ##print(f'sent qubit from node: {self.name} to node: {dst}')
+        # #print((dst), type(qubit))
+        # #print("qchannels", self.qchannels)
         self.qchannels[dst].transmit(qubit, self)
 
     def receive_qubit(self, src: str, qubit) -> None:
@@ -146,7 +146,7 @@ class BSMNode(Node):
         """
         from ..kernel.timeline import Timeline
         if Timeline.DLCZ:
-            print('DLCZ node egb')
+            #print('DLCZ node egb')
             from ..entanglement_management.DLCZ_generation import EntanglementGenerationB
         elif Timeline.bk:
             from ..entanglement_management.bk_generation import EntanglementGenerationB
@@ -158,7 +158,7 @@ class BSMNode(Node):
         
     def receive_message(self, src: str, msg: "Message") -> None:
         # signal to protocol that we've received a message
-        # print("protocols on bsm: ", self.protocols)
+        # #print("protocols on bsm: ", self.protocols)
         #for protocol in self.protocols:
             #protocol.received_message(src, msg)
             # if type(protocol) == msg.owner_type:
@@ -166,7 +166,7 @@ class BSMNode(Node):
             #         return
 
         # if we reach here, we didn't successfully receive the message in any protocol
-        ##print(src, msg)
+        ###print(src, msg)
         # raise Exception("Unkown protocol")
     
         self.message_handler.push_message(src,msg)
@@ -178,7 +178,7 @@ class BSMNode(Node):
             src (str): name of node where qubit was sent from.
             qubit (any): transmitted qubit.
         """
-        #print(f'optical_channel at node: {self.name}, recv qubit from {src}')
+        ##print(f'optical_channel at node: {self.name}, recv qubit from {src}')
         self.bsm.get(qubit)
 
     def eg_add_others(self, other):
@@ -206,8 +206,11 @@ class MemoryTimeCard():
         self.reservations = []
     
     def has_virtual_reservation(self):
+        #print('len of res', len(self.reservations))
         for res in self.reservations:
+            #print('inside has virtual reservation',res.initiator,res.responder)
             if res.isvirtual:
+                #print('res.isvirtual',res.isvirtual)
                 return True
         return False
 
@@ -215,7 +218,7 @@ class MemoryTimeCard():
 
 class EndNode(Node):
 
-    def __init__(self, name: str, timeline: "Timeline", memo_size=50):
+    def __init__(self, name: str, timeline: "Timeline", memo_size=500):
         super().__init__(name, timeline)
         
         self.memory_array = MemoryArray(name + ".MemoryArray", timeline, num_memories=memo_size)
@@ -244,7 +247,7 @@ class EndNode(Node):
     #--------------------------------------------------------------------------
     def find_virtual_neighbors(self):
         virtual_neighbors = {}
-        virtual_neighbor=[]
+
         #Check the memory of this node for existing entanglements
         for info in self.resource_manager.memory_manager:
             
@@ -255,18 +258,16 @@ class EndNode(Node):
                 #This is a virtual neighbor
                 #nx_graph.add_edge(node, str(info.remote_node), color='r')
                 if str(info.remote_node) in virtual_neighbors.keys():
-                    # print('remotre',info.remote_node,virtual_neighbors)
                     virtual_neighbors[str(info.remote_node)] = virtual_neighbors[str(info.remote_node)] + 1
                 else:
                     virtual_neighbors[str(info.remote_node)] = 1
-            # virtual_neighbor=[info.remote_node,self.name]
-            # print('findvirtualneighbors',virtual_neighbors,self.name,info.remote_node)
+
         return virtual_neighbors
     #--------------------------------------------------------------------------
     
     def receive_message(self, src: str, msg: "Message") -> None:
-        # print('receive msg', msg.receiver,msg.protocol_type)
-        #print("Quantum roter receive message")
+        # #print('receive msg', msg.receiver,msg.protocol_type)
+        ##print("Quantum roter receive message")
         #if msg.receiver_type==MsgRecieverType.MANAGER and msg.msg_type==ResourceManagerMsgType.REQUEST:
             #protocol=msg.kwargs['protocol']
             #print ("msg Quantum Router node receive , protocol",protocol.name)
@@ -284,6 +285,7 @@ class EndNode(Node):
                 for other in end.eg.others:
                     if other != self.name:
                         self.map_to_middle_node[other] = end.name
+        #print('self to middel',self.map_to_middle_node)
 
     def get_idle_memory(self, info: "MemoryInfo") -> None:
         """Method for application to receive available memories."""
@@ -294,7 +296,7 @@ class EndNode(Node):
 
 class ServiceNode(Node):
 
-    def __init__(self,name: str, timeline: "Timeline",memo_size= 50):
+    def __init__(self,name: str, timeline: "Timeline",memo_size=500):
         super().__init__(name, timeline)
         self.memory_array = MemoryArray(name + ".MemoryArray", timeline, num_memories=memo_size)
         self.memory_array.owner = self
@@ -322,6 +324,25 @@ class ServiceNode(Node):
 
     def receive_message(self, src: str, msg: "Message") -> None:
         self.message_handler.push_message(src,msg)
+
+    def find_virtual_neighbors(self):
+        virtual_neighbors = {}
+
+        #Check the memory of this node for existing entanglements
+        for info in self.resource_manager.memory_manager:
+            
+            if info.state != 'ENTANGLED':
+                continue
+            else:
+                ##print((node, info.remote_node))
+                #This is a virtual neighbor
+                #nx_graph.add_edge(node, str(info.remote_node), color='r')
+                if str(info.remote_node) in virtual_neighbors.keys():
+                    virtual_neighbors[str(info.remote_node)] = virtual_neighbors[str(info.remote_node)] + 1
+                else:
+                    virtual_neighbors[str(info.remote_node)] = 1
+
+        return virtual_neighbors
 
     def init(self):
         """Method to initialize quantum router node.
@@ -402,22 +423,22 @@ class ServiceNode(Node):
 #             if info.state != 'ENTANGLED':
 #                 continue
 #             else:
-#                 ##print((node, info.remote_node))
+#                 ###print((node, info.remote_node))
 #                 #This is a virtual neighbor
 #                 #nx_graph.add_edge(node, str(info.remote_node), color='r')
 #                 if str(info.remote_node) in virtual_neighbors.keys():
-#                     # print('remotre',info.remote_node,virtual_neighbors)
+#                     # #print('remotre',info.remote_node,virtual_neighbors)
 #                     virtual_neighbors[str(info.remote_node)] = virtual_neighbors[str(info.remote_node)] + 1
 #                 else:
 #                     virtual_neighbors[str(info.remote_node)] = 1
 #             # virtual_neighbor=[info.remote_node,self.name]
-#             # print('findvirtualneighbors',virtual_neighbors,self.name,info.remote_node)
+#             # #print('findvirtualneighbors',virtual_neighbors,self.name,info.remote_node)
 #         return virtual_neighbors
 #     #--------------------------------------------------------------------------
     
 #     def receive_message(self, src: str, msg: "Message") -> None:
-#         # print('receive msg', msg.receiver,msg.protocol_type)
-#         #print("Quantum roter receive message")
+#         # #print('receive msg', msg.receiver,msg.protocol_type)
+#         ##print("Quantum roter receive message")
 #         self.message_handler.push_message(src,msg)
 
 #     def init(self):

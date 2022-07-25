@@ -138,14 +138,14 @@ class Timeline:
                 break
             """
             if count in [i for i in range(0, 200)]:
-                ##print('Event start time: ', event.time)
-                ##print('event.process.owner.name: ', event.process.owner.name)
+                ###print('Event start time: ', event.time)
+                ###print('event.process.owner.name: ', event.process.owner.name)
                 try:
-                    ##print('type(event.process.act_params[1]).__name__: ', type(event.process.act_params[1]).__name__)
+                    ###print('type(event.process.act_params[1]).__name__: ', type(event.process.act_params[1]).__name__)
                 except:
-                    ##print('Exception: ', event.process.act_params)
+                    ###print('Exception: ', event.process.act_params)
                 #if type(event.process.act_params[1]).__name__ ==  'ResourceManagerMessage':
-                #    ##print('remote protocol: ', event.process.act_params[1].ini_protocol.name)
+                #    ###print('remote protocol: ', event.process.act_params[1].ini_protocol.name)
             """
             count += 1
             assert self.time <= event.time, "invalid event time for process scheduled on " + str(event.process.owner)
@@ -182,7 +182,7 @@ class Timeline:
             	#if type(event.process.owner) not in type_dict:
             	type_set.add(type(event.process.owner))
             	type_name_set.add(event.process.owner.name)
-            	###print('event owner: ', event.process.owner.name)
+            	####print('event owner: ', event.process.owner.name)
             	if event.process.owner.name == 'j':
             		j_counter = j_counter+1
             	
@@ -196,7 +196,7 @@ class Timeline:
                                         event.process.act_params[1].req_condition_func])
             		#d_args_set.append(event.process.act_params)
             		#if type(event.process.act_params[1]).__name__ ==  'ResourceManagerMessage':
-            			##print('d remote protocol: ', event.process.act_params[1].ini_protocol.name)
+            			###print('d remote protocol: ', event.process.act_params[1].ini_protocol.name)
             		d_events_time.append(event.time)
             		
             	if event.process.owner.name == 'i':
@@ -206,7 +206,7 @@ class Timeline:
                     i_process_set.add(event.process.activation)
                     i_args_set.append(type(event.process.act_params[1]).__name__)
                     #if type(event.process.act_params[1]).__name__ ==  'ResourceManagerMessage':
-                        ##print('i remote protocol: ', event.process.act_params[1].ini_protocol.name)
+                        ###print('i remote protocol: ', event.process.act_params[1].ini_protocol.name)
                     i_events_time.append(event.time)
             	
             	if event.process.owner.name == 'g':
@@ -217,7 +217,7 @@ class Timeline:
                     #i_process_set.add(event.process.activation)
                     #i_args_set.append(type(event.process.act_params[1]).__name__)
                     #if type(event.process.act_params[1]).__name__ ==  'ResourceManagerMessage':
-                    #    ##print('i remote protocol: ', event.process.act_params[1].ini_protocol.name)
+                    #    ###print('i remote protocol: ', event.process.act_params[1].ini_protocol.name)
                     #g_events_time.append(event.time)
             	
             	if event.process.owner.name == 'c':
@@ -228,7 +228,7 @@ class Timeline:
                     #i_process_set.add(event.process.activation)
                     #i_args_set.append(type(event.process.act_params[1]).__name__)
                     #if type(event.process.act_params[1]).__name__ ==  'ResourceManagerMessage':
-                    #    ##print('i remote protocol: ', event.process.act_params[1].ini_protocol.name)
+                    #    ###print('i remote protocol: ', event.process.act_params[1].ini_protocol.name)
                     #c_events_time.append(event.time)
             	
             	if event.process.owner.name == 'h':
@@ -236,7 +236,7 @@ class Timeline:
             		h_process_set.add(event.process.activation)
             		h_args_set.append(type(event.process.act_params[1]).__name__)
             		#if type(event.process.act_params[1]).__name__ == 'ResourceManagerMessage':
-            			##print('h remote protocol: ', event.process.act_params[1].ini_protocol.name)
+            			###print('h remote protocol: ', event.process.act_params[1].ini_protocol.name)
             	if event.process.owner.name == 'a':
             		a_counter = a_counter+1
             	if event.process.owner.name == 'b':
@@ -251,7 +251,7 @@ class Timeline:
             # if not event.process.activation in log:
             #     log[event.process.activation] = 0
             # log[event.process.activation]+=1
-            ###print('event execution begins at time= ', self.time)
+            ####print('event execution begins at time= ', self.time)
             #if not (event.time>5e12 and event.time<5.4e12 and event.process.owner.name in ['d','i','g','c']):
             event.process.run()
             """event_ticker_end = time_ns()
@@ -263,53 +263,53 @@ class Timeline:
 
             self.run_counter += 1
 
-        # ##print('number of event', self.event_counter)
-        # ##print('log:',log)
+        # ###print('number of event', self.event_counter)
+        # ###print('log:',log)
 
         self.is_running = False
         elapse = time_ns() - tick
 
-        ##print("Timeline end simulation. Execution Time: %d ns; Scheduled Event: %d; Executed Event: %d" %
+        ###print("Timeline end simulation. Execution Time: %d ns; Scheduled Event: %d; Executed Event: %d" %
         #                (elapse, self.schedule_counter, self.run_counter))
-        ##print('j_counter: ', j_counter)
-        ##print('d_counter: ', d_counter)
-        ##print('i_counter: ', i_counter)
-        ##print('g_counter: ', g_counter)
-        ##print('h_counter: ', h_counter)
-        ##print('a_counter: ', a_counter)
-        ##print('b_counter: ', b_counter)
-        ##print('c_counter: ', c_counter)
-        ##print('k_counter: ', k_counter)
-        ##print('l_counter: ', l_counter)
-        ##print()
-        ##print('d_events_time: ', d_events_time)
-        ##print()
-        ##print()
-        ##print('event_after_d_begin_time: ', event_after_d_begin_time)
-        ##print()
-        ##print()
-        ##print('i_events_time: ', i_events_time)
-        ##print()
-        ##print()
-        ##print('event_after_i_begin_time: ', event_after_i_begin_time)
-        ##print()
-        ##print('type_set: ', type_set)
-        ##print('type_name_set: ', type_name_set)
-        ##print('d_process_set', d_process_set)
-        ##print('i_process_set', i_process_set)
-        ###print('h_process_set', h_process_set)
-        ##print('d_args_set', d_args_set)
-        ###print('h_args_set', h_args_set)
+        ###print('j_counter: ', j_counter)
+        ###print('d_counter: ', d_counter)
+        ###print('i_counter: ', i_counter)
+        ###print('g_counter: ', g_counter)
+        ###print('h_counter: ', h_counter)
+        ###print('a_counter: ', a_counter)
+        ###print('b_counter: ', b_counter)
+        ###print('c_counter: ', c_counter)
+        ###print('k_counter: ', k_counter)
+        ###print('l_counter: ', l_counter)
+        ###print()
+        ###print('d_events_time: ', d_events_time)
+        ###print()
+        ###print()
+        ###print('event_after_d_begin_time: ', event_after_d_begin_time)
+        ###print()
+        ###print()
+        ###print('i_events_time: ', i_events_time)
+        ###print()
+        ###print()
+        ###print('event_after_i_begin_time: ', event_after_i_begin_time)
+        ###print()
+        ###print('type_set: ', type_set)
+        ###print('type_name_set: ', type_name_set)
+        ###print('d_process_set', d_process_set)
+        ###print('i_process_set', i_process_set)
+        ####print('h_process_set', h_process_set)
+        ###print('d_args_set', d_args_set)
+        ####print('h_args_set', h_args_set)
         
-        ##print('d_event_duration', d_event_duration)
-        ##print('i_event_duration', i_event_duration)
-        ##print('g_event_duration', g_event_duration)
-        ##print('c_event_duration', c_event_duration)
-        ##print('d events sum: ', sum(d_event_duration))
-        ##print('i events sum: ', sum(i_event_duration))
-        ##print('g events sum: ', sum(g_event_duration))
-        ##print('c events sum: ', sum(c_event_duration))
-        ##print('d+i+g+c sum: ', (sum(d_event_duration)+sum(i_event_duration)+sum(g_event_duration)+sum(c_event_duration)))
+        ###print('d_event_duration', d_event_duration)
+        ###print('i_event_duration', i_event_duration)
+        ###print('g_event_duration', g_event_duration)
+        ###print('c_event_duration', c_event_duration)
+        ###print('d events sum: ', sum(d_event_duration))
+        ###print('i events sum: ', sum(i_event_duration))
+        ###print('g events sum: ', sum(g_event_duration))
+        ###print('c events sum: ', sum(c_event_duration))
+        ###print('d+i+g+c sum: ', (sum(d_event_duration)+sum(i_event_duration)+sum(g_event_duration)+sum(c_event_duration)))
 
         log.logger.info("Timeline end simulation. Execution Time: %d ns; Scheduled Event: %d; Executed Event: %d" %
                         (elapse, self.schedule_counter, self.run_counter))
@@ -354,7 +354,7 @@ class Timeline:
                 else:
                     stop_time = self.ns_to_human_time(self.stop_time / 1e3)
                 process_bar = f'\rexecution time: {exe_time};     simulation time: {sim_time} / {stop_time}'
-                ###print(f'{process_bar}', end="\r")
+                ####print(f'{process_bar}', end="\r")
                 stdout.flush()
                 sleep(3)
 

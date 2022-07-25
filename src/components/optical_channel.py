@@ -131,8 +131,8 @@ class QuantumChannel(OpticalChannel):
             time = -1
 
             while time < self.timeline.now():
-                # print(len(hq))
-                # print("time", time, len(self.send_bins), self.timeline.now())
+                # #print(len(hq))
+                # #print("time", time, len(self.send_bins), self.timeline.now())
                 time_bin = hq.heappop(self.send_bins)
                 time = int(time_bin * (1e12 / self.frequency))
             assert time == self.timeline.now(), "qc {} transmit method called at invalid time".format(self.name)
@@ -176,7 +176,7 @@ class QuantumChannel(OpticalChannel):
             time_bin = int(time_bin) + 1
         else:
             time_bin = int(time_bin)
-        # print("TIME BIN:", time_bin)
+        # #print("TIME BIN:", time_bin)
         # find earliest available time bin
         while time_bin in self.send_bins:
             time_bin += 1
@@ -234,13 +234,13 @@ class ClassicalChannel(OpticalChannel):
         Side Effects:
             Receiver node may receive the qubit (via the `receive_qubit` method).
         """
-        if message.msg_type== RRPMsgType.RESERVE:
+        # if message.msg_type== RRPMsgType.RESERVE:
 
-            print("message type",message.msg_type ,source,self.sender)
+            # #print("message type",message.msg_type ,source,self.sender)
         assert source == self.sender
-        if message.msg_type== RRPMsgType.RESERVE:
+        # if message.msg_type== RRPMsgType.RESERVE:
 
-            print("message type",message.msg_type,source,self.sender,self.receiver.name)
+        #     #print("message type",message.msg_type,source,self.sender,self.receiver.name)
         future_time = round(self.timeline.now() + int(self.delay))
         #process = Process(self.receiver, "receive_message", [source.name, message])
         #event = Event(future_time, process, priority)

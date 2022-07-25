@@ -119,10 +119,10 @@ class E91():
                     if res2 == check_list[j]:
                         countA3B4[j] +=1
 
-        print('countA1B2', countA1B2)
-        print('countA1B4', countA1B4)
-        print('countA3B2', countA3B2)
-        print('countA3B4', countA3B4)
+        #print('countA1B2', countA1B2)
+        #print('countA1B4', countA1B4)
+        #print('countA3B2', countA3B2)
+        #print('countA3B4', countA3B4)
 
         total12=sum(countA1B2)
         total14=sum(countA1B4)
@@ -144,8 +144,8 @@ class E91():
         key_mismatch=0
         alice_key,bob_key=[],[]
         alice_results, bob_results =[],[]
-        print('Alice Measurements',alice_meas)
-        print('Bob Measuremenst', bob_meas)
+        #print('Alice Measurements',alice_meas)
+        #print('Bob Measuremenst', bob_meas)
         for i in range(n):
             alice_meas_i=list(alice_meas[i].items())
             bob_meas_i=list(bob_meas[i].items())
@@ -153,7 +153,7 @@ class E91():
             bob_results.append(bob_meas_i[0][1])
             #print("bob_results",bob_meas_i[0][1])
             if (alice_choice[i]==2 and bob_choice[i]==2) or (alice_choice[i]==3 and bob_choice[i]==3):
-                print('Base match',alice_meas[i],bob_meas[i])
+                #print('Base match',alice_meas[i],bob_meas[i])
                 alice_key.append(alice_meas_i[0][1])
                 bob_key.append(bob_meas_i[0][1])
         
@@ -161,10 +161,10 @@ class E91():
         for j in range(len(alice_key)):
             if alice_key[j] != bob_key[j]:
                 key_mismatch += 1
-        print('Alice choicec',alice_choice)
-        print('Bob choicec',bob_choice)
-        print('Alice results',alice_results)
-        print('Bob results',bob_results)
+        #print('Alice choicec',alice_choice)
+        #print('Bob choicec',bob_choice)
+        #print('Alice results',alice_results)
+        #print('Bob results',bob_results)
         print('Alice keys', alice_key)
         print('Bob keys', bob_key)
         print('Key length',len(alice_key))

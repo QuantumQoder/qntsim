@@ -86,7 +86,7 @@ class MemoryArray(Entity):
 
     def update_memory_params(self, arg_name: str, value: Any) -> None:
         # if arg_name == 'coherence_time':
-            # print('Coherence time:', value)
+            # #print('Coherence time:', value)
 
         for memory in self.memories:
             memory.__setattr__(arg_name, value)
@@ -155,7 +155,7 @@ class Memory(Entity):
         self.result={}
         self.next_excite_time = 0
         Circuit =BaseCircuit.create(self.timeline.type)
-        #print("memory circuit",BaseCircuit.create(self.timeline.type))
+        # #print("memory circuit",BaseCircuit.create(self.timeline.type))
         self._meas_circuit = Circuit(1)
         self._meas_circuit.measure(0)
 
@@ -182,10 +182,10 @@ class Memory(Entity):
 
         # measure quantum state
         res = self.timeline.quantum_manager.run_circuit(self._meas_circuit, [self.qstate_key])
-        # print(f'previous BSM: {self.previous_bsm}')
-        # print('res: ',res,' ,self.qstate_key: ', self.qstate_key)
+        # #print(f'previous BSM: {self.previous_bsm}')
+        # #print('res: ',res,' ,self.qstate_key: ', self.qstate_key)
         state = res[self.qstate_key]
-        # print('memory state',self.qstate_key,state)
+        # #print('memory state',self.qstate_key,state)
         self.result[self.qstate_key]=state
 
         # create photon and check if null
@@ -212,7 +212,7 @@ class Memory(Entity):
             Will notify upper entities of expiration via the `pop` interface.
             Will modify the quantum state of the memory.
         """
-        # print('******Expire*****')
+        # #print('******Expire*****')
         if self.excited_photon:
             self.excited_photon.is_null = True
 
@@ -244,7 +244,7 @@ class Memory(Entity):
             Will modify internal quantum state and parameters.
             May schedule expiration event.
         """
-        # print('***********Update State***********')
+        # #print('***********Update State***********')
         self.timeline.quantum_manager.set([self.qstate_key], state)
         self.previous_bsm = -1
         self.entangled_memory = {'node_id': None, 'memo_id': None}
@@ -254,17 +254,17 @@ class Memory(Entity):
             self._schedule_expiration()
 
     def _schedule_expiration(self) -> None:
-        # print('**Schedule expiration**')
+        # #print('**Schedule expiration**')
         if self.expiration_event is not None:
             #self.timeline.remove_event(self.expiration_event)
             self.timeline.events.remove(self.expiration_event)
  
         decay_time = self.timeline.now() + int(self.coherence_time * 1e12)
-        # print('Decay time', decay_time)
+        # #print('Decay time', decay_time)
         #process = Process(self, "expire", [])
         #event = Event(decay_time, process)
         event = Event(decay_time,self, "expire", [])
-        # print('*****Event Scheduled*****')
+        # #print('*****Event Scheduled*****')
         #self.timeline.schedule(event)
         self.timeline.schedule_counter += 1
         self.timeline.events.push(event)
