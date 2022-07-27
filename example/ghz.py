@@ -3,20 +3,21 @@ Timeline.DLCZ=False
 Timeline.bk=True
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
-from qntsim.components.circuit import Circuit
+from qntsim.components.circuit import Circuit,QutipCircuit
 from qiskit import *
 from qutip.qip.circuit import QubitCircuit, Gate
 from qutip.qip.operations import gate_sequence_product
 from qiskit.extensions import Initialize
 #from qiskit.ignis.verification import marginal_counts
 from qiskit.quantum_info import random_statevector
+import math
 
 #random.seed(0)
-network_config = "/home/bhanusree/Desktop/QNTv1/QNTSim-Demo/QNTSim/example/3node.json"
+network_config = "/home/aman/QNTSim/QNTSim/example/ghz_topo.json"
 
 n,k,lamda=10,6,40
 
-tl = Timeline(10e12,"Qiskit")
+tl = Timeline(10e12,"Qutip")
 network_topo = Topology("network_topo", tl)
 network_topo.load_config(network_config)
 # network_topo.create_random_topology(n,network_config)
@@ -67,13 +68,27 @@ set_parameters(network_topo)
 
 node1='a'
 node2='b'
+node3='c'
+node4='s1'
+
+# a ==>s1
 tm=network_topo.nodes[node1].transport_manager
-tm.request(node2, start_time=5e12,size=1, end_time=10e12, priority=0 , target_fidelity= 0.5, timeout=2e12) 
+tm.request(node4, start_time=5e12,size=1, end_time=10e12, priority=0 , target_fidelity= 0.5, timeout=2e12) 
+
+# b ==>s1
+tm=network_topo.nodes[node2].transport_manager
+tm.request(node4, start_time=5e12,size=1, end_time=10e12, priority=0 , target_fidelity= 0.5, timeout=2e12) 
+
+# c ==> s1
+tm=network_topo.nodes[node3].transport_manager
+tm.request(node4, start_time=5e12,size=1, end_time=10e12, priority=0 , target_fidelity= 0.5, timeout=2e12) 
+
 
 
 
 tl.init()
 tl.run()
+
 
 
 table=[]
@@ -91,12 +106,24 @@ for info in network_topo.nodes["b"].resource_manager.memory_manager:
 
 print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
 table=[]
+print('c memories')
+for info in network_topo.nodes["c"].resource_manager.memory_manager:
+    if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+        table.append([info.index,'c',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+
+print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+
+table=[]
 print('s1 memories')
 for info in network_topo.nodes["s1"].resource_manager.memory_manager:
     if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
         table.append([info.index,'s1',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
 
 print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+
+
+
+
 
 
 
@@ -118,132 +145,51 @@ def bob_keys():
             state= qm_bob.get(key)
             print("bob keys",key,state)
             return qm_bob,key,state
-            print("bob keys",key,state)
-#alice_keys()
+
+def charlie_keys():
+    qm_charlie = network_topo.nodes[node3].timeline.quantum_manager
+    for mem_info in network_topo.nodes[node3].resource_manager.memory_manager:
+        if mem_info.state == 'ENTANGLED':
+            key=mem_info.memory.qstate_key
+            state= qm_charlie.get(key)
+            print("charlie keys",key,state)
+            return qm_charlie,key,state
+
+def middle_keys():
+    qm_middle = network_topo.nodes[node4].timeline.quantum_manager
+    for mem_info in network_topo.nodes[node4].resource_manager.memory_manager:
+        # print('middle memory info', mem_info)
+        if mem_info.state == 'ENTANGLED':
+            key=mem_info.memory.qstate_key
+            state= qm_middle.get(key)
+            print("middle keys",key,state)
+            return qm_middle,key,state
+
+
+alice_keys()
 bob_keys()
+charlie_keys()
+middle_keys()
 
-def create_random_qubit():
-    qc = QuantumCircuit(1)
-    initial_state = [1,0]
-    qc.initialize(initial_state,0)
-    print('Random state', qc)
-    return qc
+def perform_ghz():
 
+    qm_alice,alice_key,state=alice_keys()
+    print('Alice',qm_alice,alice_key,state)
+    qm_bob,bob_key,state=bob_keys()
+    qm_charlie,charlie_key,state=charlie_keys()
+    qm_middle,middle_key,state=middle_keys()
 
-
-
-
-def alice_measurement(qubit):
-    """
-    psi = random_statevector(2)
-    init_gate = Initialize(psi)
-    init_gate.label = "init"
-    qr = QuantumRegister(3, name="q")
-    crz= ClassicalRegister(1,name="crz")
-    crx= ClassicalRegister(1,name="crx")
-    new_qc=QuantumCircuit(qr,crz,crx)
-    qm_alice,key,alice_state=alice_keys()
-    #q0=qubit
-    #
-    #new_c.barrier()
-    circ=new_qc.compose(alice_state,[1,2])
-    circ.append(init_gate, [0])
-    
-    print(circ)
+    circ = QutipCircuit(3)
+    circ.cx(0,2)
     circ.cx(0,1)
     circ.h(0)
-    print(circ)
-    circ.barrier()
-    t1=circ.measure(0,0)
-    t2=circ.measure(1,1)
-    print("t1,t2",t2)
-    
-    qm_alice.get(key)
-
-    print('size',crz,crx)
-    
-    return init_gate ,circ,crz,crx
-    
-    """
-    #output = qm.run_circuit(circ,[key])
-    # circ.cx(0,1)
-    """
-    psi = random_statevector(2)
-    init_gate = Initialize(psi)
-    init_gate.label = "init"
-    qm_alice,key,alice_state=alice_keys()
-    qc= alice_state
-    #qc.compose(alice_state,[1,2])
-
-    qc.append(init_gate, [0])
-    qc.cx(0,1)
-    qc.h(0)
-    print("t",qc)
-    print("t",key)
-    #qc.barrier()
-    #qc.measure(0,0)
-    #qc.measure(1,1)
-    #print("t1,t2",t1,t2)
-    #qm_alice.run_circuit(qc,[key])
-    #return init_gate ,qc
-    """
-    # psi = random_statevector(2)
-    qm_alice,key,alice_state=alice_keys()
-    key_0=qm_alice.new2()
-    print("alice key new key",key,key_0,qm_alice.get(key_0))
-    circ=Circuit(2)
-    circ.cx(1,2)
-    circ.h(1)
     circ.measure(0)
+    circ.measure(1)
     circ.measure(2)
-    output=qm_alice.run_circuit(circ,[key_0,key])
-    crz=output.get(key_0)
-    crx=output.get(key)
-    # circ.measure(1)
-    #qm_alice,key,alice_state=alice_keys()
-    #alice_state.append()
-    print('output',key_0,key,output,crz,crx)
-    return crz,crx
-
-   
-
-def bob_gates(crz,crx):
-
-    
-    qm_bob, key, state= bob_keys()
-    circ=Circuit(1)
-    if crz == 1:
-        circ.z(0)
-        # circ.measure(0)
-    if crx == 1:
-        circ.x(0)
-        # circ.measure(0)
-
-    output = qm_bob.run_circuit(circ,[key])
-    bob_state = qm_bob.get(key)
-    print("bob output", output,type(circ),type(state))
-    print("\n\n", bob_state)
-    
-    print('Measurement check', bob_state)
-    """circ.z(2).c_if(c1, 1)
-    circ.x(2).c_if(c2, 1)
-    
-    #bob_state.z(1).c_if(c1,1) # Apply gates if the registers 
-    #bob_state.x(1).c_if(c2,1)#
-    print("bob ",circ)
-    inverse_init_gate = init_gate.gates_to_uncompute()
-    circ.append(inverse_init_gate, [2])
-    cr_result = ClassicalRegister(1)
-    circ.add_register(cr_result)
-
-    circ.measure(2,2)
-    print("bob final",circ)"""
+    output = qm_middle.run_circuit(circ,[alice_key,bob_key,charlie_key])
+    print("Output", output)
+    print("\nState\n",  qm_middle.get(middle_key).state)
+    # print("Output", output, qm_middle.get(alice_key))
 
 
-    
-
-qubit=create_random_qubit()
-#qm,key,state = alice_keys()
-
-crz,crx=alice_measurement(qubit)
-bob_gates(crz,crx)
+perform_ghz()

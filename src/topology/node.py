@@ -206,11 +206,11 @@ class MemoryTimeCard():
         self.reservations = []
     
     def has_virtual_reservation(self):
-        #print('len of res', len(self.reservations))
+        # print('len of res', len(self.reservations))
         for res in self.reservations:
-            #print('inside has virtual reservation',res.initiator,res.responder)
+            # print('inside has virtual reservation',res.initiator,res.responder)
             if res.isvirtual:
-                #print('res.isvirtual',res.isvirtual)
+                # print('res.isvirtual',res.isvirtual)
                 return True
         return False
 
@@ -285,7 +285,7 @@ class EndNode(Node):
                 for other in end.eg.others:
                     if other != self.name:
                         self.map_to_middle_node[other] = end.name
-        #print('self to middel',self.map_to_middle_node)
+        # print('self to middel',self.map_to_middle_node)
 
     def get_idle_memory(self, info: "MemoryInfo") -> None:
         """Method for application to receive available memories."""

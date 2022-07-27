@@ -122,6 +122,16 @@ class QuantumManagerKetQiskit(QuantumKernel):
         key = self._least_available
         self._least_available += 1
         self.states[key] = QuantumCircuit(QuantumRegister(1, f"k_{key}"))
+        print('self states', self.states[key])
+        return key
+    def new2(self):
+        key = self._least_available
+        self._least_available += 1
+        initial_state = [1/sqrt(2), 1j/sqrt(2)]
+        circ = QuantumCircuit(QuantumRegister(1, f"k_{key}"))
+        circ.initialize(initial_state, 0)
+        self.states[key] = circ
+        print('new2 circ', circ,self.states[key])
         return key
 
     def _prepare_circuit(self, circuit: "Circuit", keys: List[int]):
@@ -138,6 +148,7 @@ class QuantumManagerKetQiskit(QuantumKernel):
 
         # go through keys and get all unique qstate objects from the required keys
         for key in keys:
+            print('key in keys', key)
             qstate = self.states[key]
 
             # Check if you have added the state corresponding to the key in the circuit
@@ -173,6 +184,7 @@ class QuantumManagerKetQiskit(QuantumKernel):
 
         # Compile the circuit into Qiskit quanutm circuit
         all_keys, circ = self._prepare_circuit(circuit, keys)
+        print("new circuit", all_keys, circ)
 
         # If none of the qubits are measured
         if len(circuit.measured_qubits) == 0:
@@ -185,6 +197,7 @@ class QuantumManagerKetQiskit(QuantumKernel):
 
             # measure state (state reassignment done in _measure method)
             keys = [all_keys[i] for i in circuit.measured_qubits]
+            print('before measure', keys, all_keys,circ )
             return self._measure(circ, keys, all_keys)
 
     def set(self, keys: List[int], amplitudes: List[complex]) -> None:
@@ -206,7 +219,7 @@ class QuantumManagerKetQiskit(QuantumKernel):
         """
 
         # Measure the circuit (qasm_simulator used to get counts of measurement)
-        result = execute(circ, Aer.get_backend('qasm_simulator'), shots = 1).result().get_counts(circ)
+        result = execute(circ, Aer.get_backend('qasm_simulator'), shots = 100).result().get_counts(circ)
 
         # Get the results as a list of digits 
         result_digits = list(map(int, list(result.keys())[0]))
@@ -232,7 +245,7 @@ class QuantumManagerKetQiskit(QuantumKernel):
             # Partially trace out measured qubits. This works because the statevector produced in previous step 
             # already considers the wave function (and ultimately entanglement) collapse due to measurements 
             new_state = quantum_info.partial_trace(statevector, measured_indices).to_statevector().data
-
+            print('new state', new_state)
             for key in keys:
                 all_keys.remove(key)
 
@@ -241,10 +254,12 @@ class QuantumManagerKetQiskit(QuantumKernel):
             
             # Initialize the qubits with their respective state vectors
             qc.initialize(new_state, list(range(len(all_keys))))
-
+            # qc.save_statevector()
+            # print('State vector', qc.get_statevector())
             # Assign quantum circuits to keys.
             for key in all_keys:
                 self.states[key] = qc
+                print('self states', qc)
 
         return dict(zip(keys, result_digits))
 
