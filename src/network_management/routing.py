@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ..topology.node import Node 
     from ..topology.topology import Topology
     from ..kernel._event import Event
-    from ..kernel.process import Process
+    
 
 
 import matplotlib.pyplot as plt
@@ -23,7 +23,7 @@ from .reservation import RSVPMsgType,ResourceReservationMessage
 import json
 import math
 from ..kernel._event import Event
-from ..kernel.process import Process
+
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
 class UpdateRoutingMessageType(Enum):

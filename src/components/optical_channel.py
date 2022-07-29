@@ -19,7 +19,6 @@ if TYPE_CHECKING:
     from ..network_management.request import RRPMsgType
 from ..kernel.entity import Entity
 from ..kernel._event import Event
-from ..kernel.process import Process
 from ..network_management.request import RRPMsgType
 
 
