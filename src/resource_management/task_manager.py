@@ -6,6 +6,7 @@ if TYPE_CHECKING:
     from .memory_manager import MemoryInfo, MemoryManager
     from .resource_manager import ResourceManager
     from ..network_management.reservation import Reservation
+    from ..network_management.request import Request
     from ..topology.node import QuantumRouter
     from ..protocol import Protocol
 
@@ -108,6 +109,10 @@ class Task:
 		self.subtasks = []
 		self.dependencies_subtask_map = {}
 		#self.memory_to_subtask = {} #only used to find generation subtask from memory_info
+		self.other_node = None
+		self.is_vl_final_swap_task= False
+		self.has_already_run = False
+		self.can_run_on_init = False
 
 	def wait(self):
 		self.status = 'waiting'
@@ -126,10 +131,10 @@ class Task:
 			#Pick from the subtask pool and Find an instance of the subtask that is availble and start running it
 		pass
 
-	def set_reservation(self, reservation: "Reservation") -> None:
+	def set_reservation(self, reservation: "Request") -> None:
 		self.reservation = reservation
 	
-	def get_reservation(self) -> "Reservation":
+	def get_reservation(self) -> "Request":
 		return self.reservation
 
 	def on_subtask_success(self, subtask):
@@ -245,7 +250,6 @@ class SubTask:
 			print('reached inside on_complete subtask failure section')
 			self.status = 0
 			self.task.on_subtask_failure(self)
-			pass
 		else:
 			#Success----Call the dependent subtask if any
 			self.status = 1
@@ -345,8 +349,25 @@ class TaskManager:
 			subtask.task = task
 			if subtask.is_eligible_to_run():
 					subtask.run()
+
+		task.has_already_run = True
 	
 	def subtask_success(self, subtask):
+		# If subtask is a final_swap for a virtual link, we remember it
+		print(subtask.task.name, ' Task flag value: ', subtask.task.is_vl_final_swap_task)
+		if subtask.task.is_vl_final_swap_task:
+			responder = subtask.task.get_reservation().responder
+			if responder == self.owner.name:
+				responder = subtask.task.get_reservation().initiator
+			
+			print('responder: ', responder)
+			if responder not in self.owner.virtual_links:
+				self.owner.virtual_links[responder] = [subtask]
+			else:
+				self.owner.virtual_links[responder].append(subtask)
+			
+			print(f'Virtual links at : {self.owner.name} are : {self.owner.virtual_links}')
+		
 		#If subtask has dependents aready mapped, then execute them directly
 		print('In subtask_success')
 		print('subtask.dependents: ',len(subtask.dependents))
@@ -462,7 +483,28 @@ class TaskManager:
 		print("initiate_tasks running for node: ", self.owner.name)
 		for task, task_details in self.task_map.items():
 			if len(task_details['dependencies']) == 0:
+				print('Trying to initiate task: ', task.name ,'and its already run flag is: ', task.has_already_run)
+
+			if task.can_run_on_init:
+				print('Trying to initiate task: ', task.name ,'and its can_run_on_init flag is: ', task.can_run_on_init)
+			
+			if len(task_details['dependencies']) == 0 and not task.has_already_run:
 				self.run_task(task)
+			
+			if task.can_run_on_init:
+				#check if the dependent task can be executed now to instantiate a subtask
+				flag, dependency_subtasks = task.is_eligible()
+				while flag:
+					#dependent_subtask = dependent_task.run()	#Create a subtask by running the dependent task along with passing the dependency subtask objects and memory indices
+					memories_info = []
+					for vals in dependency_subtasks:
+						print('dependency_subtasks name:	', vals.name)
+						memories_info.extend(vals.memories_info)
+					
+					self.run_task(task, memories_info=memories_info, dependency_subtasks=dependency_subtasks)
+					flag, dependency_subtasks = task.is_eligible()
+
+
 			
 	def send_request(self, protocol, req_dst, req_condition_func):
 		return self.owner.resource_manager.send_request(protocol, req_dst, req_condition_func)

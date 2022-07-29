@@ -56,6 +56,7 @@ class Node(Entity):
         self.cchannels = {}  # mapping of destination node names to classical channels
         self.qchannels = {}  # mapping of destination node names to quantum channels
         self.protocols = []
+        self.virtual_links = {} # node: [subtask] for more than one virtual links between a pair of nodes
 
     def init(self) -> None:
         pass

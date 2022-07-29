@@ -65,7 +65,7 @@ set_parameters(network_topo)
 
 
 node1='a'
-node2='s2'
+node2='s4'
 nm=network_topo.nodes[node1].network_manager
 nm.createvirtualrequest(node1, node2, start_time=2e12, end_time=10e12, memory_size=5, target_fidelity=0.5)
 
@@ -102,7 +102,22 @@ for info in network_topo.nodes["s2"].resource_manager.memory_manager:
         table.append([info.index,'s2',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
 # # print('Tbale', table)
 print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+table=[]
+print('s3 memories')
+for info in network_topo.nodes["s3"].resource_manager.memory_manager:
+    if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+        table.append([info.index,'s3',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+# # print('Tbale', table)
+print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+table=[]
+print('s4 memories')
+for info in network_topo.nodes["s4"].resource_manager.memory_manager:
+    if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+        table.append([info.index,'s4',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+# # print('Tbale', table)
+print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
 tl.stop_time=10e12
+
 
 
 
@@ -175,6 +190,21 @@ for info in network_topo.nodes["s2"].resource_manager.memory_manager:
         table.append([info.index,'s2',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
 # # print('Tbale', table)
 print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+table=[]
+print('s3 memories')
+for info in network_topo.nodes["s3"].resource_manager.memory_manager:
+    if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+        table.append([info.index,'s3',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+# # print('Tbale', table)
+print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+table=[]
+print('s4 memories')
+for info in network_topo.nodes["s4"].resource_manager.memory_manager:
+    if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
+        table.append([info.index,'s4',info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+# # print('Tbale', table)
+print(tabulate(table, headers=['Index','Source node' ,'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+
 # table=[]
 # print('s3 memories')
 # for info in network_topo.nodes["s3"].resource_manager.memory_manager:

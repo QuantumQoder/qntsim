@@ -719,13 +719,14 @@ class ReservationProtocol():     #(Protocol):
                 if index == 0:   #Starting node
                     mem_indices = memory_indices
                 else:   #second to second last node
-                    mem_indices = memory_indices[(last_virtual_index+1) + reservation.memory_size:]
+                    # mem_indices = memory_indices[(last_virtual_index+1) + reservation.memory_size:]
+                    mem_indices = memory_indices[reservation.memory_size:]
 
                 #memory_info = []
                 
                 #for mem_index in mem_indices:
                 #    memory_info.append(self.own.resource_manager.memory_manager.__getitem__(mem_index))
-    
+                print('current node, mem_indices, available_memory_indices: ', self.node.name, mem_indices, memory_indices)
                 task_EG_right = Task('TaskEntGen_'+self.node.name+'_'+path[index + 1], [], self.node.timeline.now(), None, self.node.task_manager, mem_indices = mem_indices)
                 self.node.task_manager.add_task(task_EG_right, [])
                 task_EG_right.set_reservation(reservation)
@@ -761,134 +762,137 @@ class ReservationProtocol():     #(Protocol):
                 
         #Task for purification creation
         if index > 0:
+            #To accept virtual links, we skip the purification step when a non physical neighbor is found
+            if path[index - 1] in self.node.neighbors:
+                def ent_purify_action(memories_info: List["MemoryInfo"], **kwargs):
+                    print('inside ent_purify_action1')
+                    print(self.name)
+                    gen_subtask = kwargs['dependency_subtasks'][0]
+                    print('len(gen_subtask.dependents): ', len(gen_subtask.dependents))
+                    if len(gen_subtask.dependents) != 0 and gen_subtask.dependents != None:
+                        #Make use of previously mapped purification subtask
+                        print('Make use of previously mapped purification subtask')
+                        return gen_subtask.dependents
 
-            def ent_purify_action(memories_info: List["MemoryInfo"], **kwargs):
-                print('inside ent_purify_action1')
-                print(self.name)
-                gen_subtask = kwargs['dependency_subtasks'][0]
-                print('len(gen_subtask.dependents): ', len(gen_subtask.dependents))
-                if len(gen_subtask.dependents) != 0 and gen_subtask.dependents != None:
-                    #Make use of previously mapped purification subtask
-                    print('Make use of previously mapped purification subtask')
+                    print('Not Making use of previously mapped purification subtask')
+                    def purify_subtask_action(memarg):
+                        #Find another memory that can be used to purify
+                        #If memory is available, purify
+                        #Otherwise exit without doing anything
+
+                        purify_indices = []
+                        if (memarg[0].state == "ENTANGLED" and memarg[0].fidelity < reservation.fidelity):
+                            for other_mem in self.node.resource_manager.memory_manager:
+                                if other_mem != memarg[0] and other_mem.state == "ENTANGLED" and other_mem.remote_node == memarg[0].remote_node and other_mem.fidelity == memarg[0].fidelity:
+                                    purify_indices.append(memarg[0])
+                                    purify_indices.append(other_mem)
+                                    break
+                        if len(purify_indices) == 0:
+                            #Purification not needed
+                            if memarg[0].fidelity >= reservation.fidelity:
+                                return True, None, None
+
+                            #could not find memory to purify so exit
+                            print('No memory found to purify')
+                            return None, None, None
+                        
+
+                        memories = [info.memory for info in purify_indices]
+                        print('inside ent_purify subtask 1: ', memories[0].name,  memories[1].name)
+                        def req_func(protocols):
+                            _protocols = []
+                            print('purify_indices inside req_func: ', purify_indices)
+                            print('protocols list: ', [protocol.name for protocol in protocols])
+                            for protocol in protocols:
+                                # print('protocol name inside req_func: ', protocol.kept_memo.name, ' protocol: ', protocol, 'protocol.kept_memo.name: ', protocol.kept_memo.name, 'purify_indices: ', [(i.remote_memo, i.memory.name) for i in purify_indices])
+                                if not isinstance(protocol, BBPSSW):
+                                    continue
+
+                                if protocol.kept_memo.name == purify_indices[0].remote_memo:
+                                    _protocols.insert(0, protocol)
+                                if protocol.kept_memo.name == purify_indices[1].remote_memo:
+                                    _protocols.insert(1, protocol)
+
+                            if len(_protocols) != 2:
+                                print('Pair of protocol instances could not be found to purify')
+                                return None
+
+                            protocols.remove(_protocols[1])
+                            #_protocols[1].rule.protocols.remove(_protocols[1])
+                            _protocols[1].subtask.protocols.remove(_protocols[1])
+                            _protocols[1].kept_memo.detach(_protocols[1])
+                            _protocols[0].meas_memo = _protocols[1].kept_memo
+                            _protocols[0].memories = [_protocols[0].kept_memo, _protocols[0].meas_memo]
+                            _protocols[0].name = _protocols[0].name + "." + _protocols[0].meas_memo.name
+                            _protocols[0].meas_memo.attach(_protocols[0])
+                            _protocols[0].t0 = _protocols[0].kept_memo.timeline.now()
+                            print('Inside purification req_func: kept_memo ', _protocols[0].kept_memo.name, ', meas_memo: ', _protocols[0].meas_memo.name)
+
+                            return _protocols[0]
+
+                        name = "EP.%s.%s" % (memories[0].name, memories[1].name)
+                        print('purification_name1:  ', name)
+                        protocol = BBPSSW(None, name, memories[0], memories[1])
+                        dsts = [purify_indices[0].remote_node]
+                        req_funcs = [req_func]
+                        return [protocol], dsts, req_funcs
+                    
+                    ent_purify_subtask_left = SubTask('EP_'+gen_subtask.name, purify_subtask_action, memories_info)
+                    gen_subtask.dependents = [ent_purify_subtask_left]
+                    ent_purify_subtask_left.dependencies = [gen_subtask]
+                    ent_purify_subtask_left.initial_dependency_subtasks = [gen_subtask]
+                    print('newly created purification subtask for the gen subtask: ', gen_subtask.name)
                     return gen_subtask.dependents
 
-                print('Not Making use of previously mapped purification subtask')
-                def purify_subtask_action(memarg):
-                    #Find another memory that can be used to purify
-                    #If memory is available, purify
-                    #Otherwise exit without doing anything
-
-                    purify_indices = []
-                    if (memarg[0].state == "ENTANGLED" and memarg[0].fidelity < reservation.fidelity):
-                        for other_mem in self.node.resource_manager.memory_manager:
-                            if other_mem != memarg[0] and other_mem.state == "ENTANGLED" and other_mem.remote_node == memarg[0].remote_node and other_mem.fidelity == memarg[0].fidelity:
-                                purify_indices.append(memarg[0])
-                                purify_indices.append(other_mem)
-                                break
-                    if len(purify_indices) == 0:
-                        #Purification not needed
-                        if memarg[0].fidelity >= reservation.fidelity:
-                            return True, None, None
-
-                        #could not find memory to purify so exit
-                        print('No memory found to purify')
-                        return None, None, None
-                    
-
-                    memories = [info.memory for info in purify_indices]
-                    print('inside ent_purify subtask 1: ', memories[0].name,  memories[1].name)
-                    def req_func(protocols):
-                        _protocols = []
-                        print('purify_indices inside req_func: ', purify_indices)
-                        print('protocols list: ', [protocol.name for protocol in protocols])
-                        for protocol in protocols:
-                            # print('protocol name inside req_func: ', protocol.kept_memo.name, ' protocol: ', protocol, 'protocol.kept_memo.name: ', protocol.kept_memo.name, 'purify_indices: ', [(i.remote_memo, i.memory.name) for i in purify_indices])
-                            if not isinstance(protocol, BBPSSW):
-                                continue
-
-                            if protocol.kept_memo.name == purify_indices[0].remote_memo:
-                                _protocols.insert(0, protocol)
-                            if protocol.kept_memo.name == purify_indices[1].remote_memo:
-                                _protocols.insert(1, protocol)
-
-                        if len(_protocols) != 2:
-                            print('Pair of protocol instances could not be found to purify')
-                            return None
-
-                        protocols.remove(_protocols[1])
-                        #_protocols[1].rule.protocols.remove(_protocols[1])
-                        _protocols[1].subtask.protocols.remove(_protocols[1])
-                        _protocols[1].kept_memo.detach(_protocols[1])
-                        _protocols[0].meas_memo = _protocols[1].kept_memo
-                        _protocols[0].memories = [_protocols[0].kept_memo, _protocols[0].meas_memo]
-                        _protocols[0].name = _protocols[0].name + "." + _protocols[0].meas_memo.name
-                        _protocols[0].meas_memo.attach(_protocols[0])
-                        _protocols[0].t0 = _protocols[0].kept_memo.timeline.now()
-                        print('Inside purification req_func: kept_memo ', _protocols[0].kept_memo.name, ', meas_memo: ', _protocols[0].meas_memo.name)
-
-                        return _protocols[0]
-
-                    name = "EP.%s.%s" % (memories[0].name, memories[1].name)
-                    print('purification_name1:  ', name)
-                    protocol = BBPSSW(None, name, memories[0], memories[1])
-                    dsts = [purify_indices[0].remote_node]
-                    req_funcs = [req_func]
-                    return [protocol], dsts, req_funcs
-                
-                ent_purify_subtask_left = SubTask('EP_'+gen_subtask.name, purify_subtask_action, memories_info)
-                gen_subtask.dependents = [ent_purify_subtask_left]
-                ent_purify_subtask_left.dependencies = [gen_subtask]
-                ent_purify_subtask_left.initial_dependency_subtasks = [gen_subtask]
-                print('newly created purification subtask for the gen subtask: ', gen_subtask.name)
-                return gen_subtask.dependents
-
-            task_Purify_left = Task('TaskPurifyLeft'+self.node.name+path[index-1], [task_EG_left], self.node.timeline.now(), ent_purify_action, self.node.task_manager)
-            self.node.task_manager.add_task(task_Purify_left, [task_EG_left])
-            task_Purify_left.set_reservation(reservation)
-            last_right_task = task_Purify_left
+                task_Purify_left = Task('TaskPurifyLeft'+self.node.name+path[index-1], [task_EG_left], self.node.timeline.now(), ent_purify_action, self.node.task_manager)
+                self.node.task_manager.add_task(task_Purify_left, [task_EG_left])
+                task_Purify_left.set_reservation(reservation)
+                last_right_task = task_Purify_left
 
         if index < len(path) - 1:
-            def ent_purify_action(memories_info: List["MemoryInfo"], **kwargs):
-                print('inside ent_purify_action2')
-                gen_subtask2 = kwargs['dependency_subtasks'][0]
-                # dependency_subtasks = kwargs.get('dependency_subtasks')
-                # if dependency_subtasks != None:
-                #     gen_subtask = dependency_subtasks[0]
-                if len(gen_subtask2.dependents) != 0 and gen_subtask2.dependents != None:
-                    #Make use of previously mapped purification subtask
-                    print('making use of previously mapped subtask for the gen_subtask: ', gen_subtask2.name)
+            #To accept virtual links, we skip the purification step when a non physical neighbor is found
+            if path[index + 1] in self.node.neighbors:
+                def ent_purify_action(memories_info: List["MemoryInfo"], **kwargs):
+                    print('inside ent_purify_action2')
+                    gen_subtask2 = kwargs['dependency_subtasks'][0]
+                    # dependency_subtasks = kwargs.get('dependency_subtasks')
+                    # if dependency_subtasks != None:
+                    #     gen_subtask = dependency_subtasks[0]
+                    if len(gen_subtask2.dependents) != 0 and gen_subtask2.dependents != None:
+                        #Make use of previously mapped purification subtask
+                        print('making use of previously mapped subtask for the gen_subtask: ', gen_subtask2.name)
+                        return gen_subtask2.dependents
+
+                    def purify_subtask_action(memarg):
+                        purify_indices = []
+                        if (memarg[0].state == "ENTANGLED" and memarg[0].fidelity < reservation.fidelity):
+                            purify_indices.extend(memarg)
+                        
+                        if len(purify_indices) == 0:
+                            if memarg[0].fidelity >= reservation.fidelity:
+                                print('purification not needed')
+                                return True, None, None
+                            print('purification needed but memory not available')
+                            return None, None, None
+
+                        memories = [info.memory for info in purify_indices]
+                        print('inside ent_purify subtask 2: ', memories[0].name)
+                        
+                        name = "EP.%s" % (memories[0].name)
+                        print('purification_name2:  ', name)
+                        protocol = BBPSSW(None, name, memories[0], None)
+                        return [protocol], [None], [None]
+                    
+                    ent_purify_subtask_right = SubTask('EP_'+gen_subtask2.name, purify_subtask_action, memories_info)
+                    gen_subtask2.dependents = [ent_purify_subtask_right]
+                    ent_purify_subtask_right.dependencies = [gen_subtask2]
+                    ent_purify_subtask_right.initial_dependency_subtasks = [gen_subtask2]
                     return gen_subtask2.dependents
-
-                def purify_subtask_action(memarg):
-                    purify_indices = []
-                    if (memarg[0].state == "ENTANGLED" and memarg[0].fidelity < reservation.fidelity):
-                        purify_indices.extend(memarg)
-                    
-                    if len(purify_indices) == 0:
-                        if memarg[0].fidelity >= reservation.fidelity:
-                            print('purification not needed')
-                            return True, None, None
-                        print('purification needed but memory not available')
-                        return None, None, None
-
-                    memories = [info.memory for info in purify_indices]
-                    print('inside ent_purify subtask 2: ', memories[0].name)
-                    
-                    name = "EP.%s" % (memories[0].name)
-                    print('purification_name2:  ', name)
-                    protocol = BBPSSW(None, name, memories[0], None)
-                    return [protocol], [None], [None]
                 
-                ent_purify_subtask_right = SubTask('EP_'+gen_subtask2.name, purify_subtask_action, memories_info)
-                gen_subtask2.dependents = [ent_purify_subtask_right]
-                ent_purify_subtask_right.dependencies = [gen_subtask2]
-                ent_purify_subtask_right.initial_dependency_subtasks = [gen_subtask2]
-                return gen_subtask2.dependents
-            
-            task_Purify_right = Task('TaskPurifyRight'+self.node.name+path[index+1], [task_EG_right], self.node.timeline.now(), ent_purify_action, self.node.task_manager)
-            self.node.task_manager.add_task(task_Purify_right, [task_EG_right])
-            task_Purify_right.set_reservation(reservation)
-            last_left_task = task_Purify_right
+                task_Purify_right = Task('TaskPurifyRight'+self.node.name+path[index+1], [task_EG_right], self.node.timeline.now(), ent_purify_action, self.node.task_manager)
+                self.node.task_manager.add_task(task_Purify_right, [task_EG_right])
+                task_Purify_right.set_reservation(reservation)
+                last_left_task = task_Purify_right
     
         
         """
@@ -917,10 +921,21 @@ class ReservationProtocol():     #(Protocol):
         #curr_task = None
         #task_list = []
         
+        is_final_virtual_swap = False
         for (left, right, mid), val in sorted_schedule:
             
+            if reservation.isvirtual and left == reservation.initiator and right == reservation.responder:
+                is_final_virtual_swap = True
+
             #If current node is left, then instantiate EntSwapLeft instance
             if self.node.name == left:
+                
+                #If the middle node is a virtual neighbor of this node, pick the cached task as a dependency:
+                if mid in self.node.virtual_links.keys():
+                    #Find the cached VL task with this node
+                    subtask_list = self.node.virtual_links[mid]
+                    last_left_task = subtask_list[0].task
+
                 def ent_swap_action(memories_info: List["MemoryInfo"], **kwargs):
                     #purify_subtask_left = kwargs['dependency_subtasks'][0]
                     purify_subtask_right = kwargs['dependency_subtasks'][0]
@@ -952,7 +967,7 @@ class ReservationProtocol():     #(Protocol):
                         protocol = EntanglementSwappingB(None, "ESB." + memory.name, memory)
                         return [protocol], [None], [None]
                     
-                    ent_swap_subtask = SubTask(None, swap_subtask_action, memories_info)
+                    ent_swap_subtask = SubTask('ES-'+purify_subtask_right.name, swap_subtask_action, memories_info)
                     purify_subtask_right.dependents = [ent_swap_subtask]
                     ent_swap_subtask.dependencies = [purify_subtask_right]
                     ent_swap_subtask.initial_dependency_subtasks = purify_subtask_right.initial_dependency_subtasks
@@ -960,10 +975,22 @@ class ReservationProtocol():     #(Protocol):
                 
                 #if path.index(right) - path.index(left) == 2:
                 task_swap_left_end= Task('TaskSwapLeftEnd'+left+right, [last_left_task], self.node.timeline.now(), ent_swap_action, self.node.task_manager)
+                if is_final_virtual_swap:
+                    print('final swap flagged to true')
+                    task_swap_left_end.is_vl_final_swap_task = True
                 self.node.task_manager.add_task(task_swap_left_end, [last_left_task])
                 task_swap_left_end.set_reservation(reservation)
                 last_left_task = task_swap_left_end
                 print('ENT_SWAP_LEFT at: ', self.node.name)
+
+                #If the middle node is a virtual neighbor of this node, pick the cached task as a dependency:
+                if mid in self.node.virtual_links.keys():
+                    #we need to set_dependency_to_subtask
+                    subtask_list = self.node.virtual_links[mid]
+                    for subtask in subtask_list:
+                        task_swap_left_end.set_dependency_to_subtask(subtask)
+                    task_swap_left_end.can_run_on_init = True
+
                 # else:
                 #     task_swap_left_end= Task('TaskSwapLeftEnd'+left+right, [task_list[-1]], self.own.timeline.now(), ent_swap_action, self.own.task_manager)
                 #     self.own.task_manager.add_task(task_swap_left_end, [task_list[-1]])
@@ -971,6 +998,13 @@ class ReservationProtocol():     #(Protocol):
                 #     curr_task = task_swap_left_end
             
             elif right == self.node.name:
+                
+                #If the middle node is a virtual neighbor of this node, pick the cached task as a dependency:
+                if mid in self.node.virtual_links.keys():
+                    #Find the cached VL task with this node
+                    subtask_list = self.node.virtual_links[mid]
+                    last_right_task = subtask_list[0].task
+
                 def ent_swap_action(memories_info: List["MemoryInfo"], **kwargs):
                     purify_subtask_left = kwargs['dependency_subtasks'][0]
                     #purify_subtask_right = kwargs['dependency_subtasks'][0]
@@ -1002,7 +1036,7 @@ class ReservationProtocol():     #(Protocol):
                         protocol = EntanglementSwappingB(None, "ESB." + memory.name, memory)
                         return [protocol], [None], [None]
                     
-                    ent_swap_subtask = SubTask(None, swap_subtask_action, memories_info)
+                    ent_swap_subtask = SubTask('ES-'+purify_subtask_left.name, swap_subtask_action, memories_info)
                     purify_subtask_left.dependents = [ent_swap_subtask]
                     ent_swap_subtask.dependencies = [purify_subtask_left]
                     ent_swap_subtask.initial_dependency_subtasks = purify_subtask_left.initial_dependency_subtasks
@@ -1010,10 +1044,22 @@ class ReservationProtocol():     #(Protocol):
                 
                 #if path.index(right) - path.index(left) == 2:
                 task_swap_right_end= Task('TaskSwapRightEnd'+right+left, [last_right_task], self.node.timeline.now(), ent_swap_action, self.node.task_manager)
+                if is_final_virtual_swap:
+                    print('final swap flagged to true')
+                    task_swap_right_end.is_vl_final_swap_task = True
                 self.node.task_manager.add_task(task_swap_right_end, [last_right_task])
                 task_swap_right_end.set_reservation(reservation)
                 last_right_task = task_swap_right_end
                 print('ENT_SWAP_RIGHT at: ', self.node.name)
+
+                #If the middle node is a virtual neighbor of this node, pick the cached task as a dependency:
+                if mid in self.node.virtual_links.keys():
+                    #we need to set_dependency_to_subtask
+                    subtask_list = self.node.virtual_links[mid]
+                    for subtask in subtask_list:
+                        task_swap_right_end.set_dependency_to_subtask(subtask)
+                    task_swap_right_end.can_run_on_init = True
+
                 # else:
                 #     task_swap_right_end= Task('TaskSwapRightEnd'+right+left, [task_list[-1]], self.own.timeline.now(), ent_swap_action, self.own.task_manager)
                 #     self.own.task_manager.add_task(task_swap_right_end, [task_list[-1]])
@@ -1024,6 +1070,22 @@ class ReservationProtocol():     #(Protocol):
                 left_m = left
                 right_m = right
                 print(f'while setting task action: left :{left} right: {right} and mid: {mid} and self.own.name: {self.node.name}')
+
+                #If the left node is a virtual neighbor of this node, pick the cached task as a dependency:
+                if left in self.node.virtual_links.keys():
+                    #Find the cached VL task with this node
+                    print('at mid of swap node: ', self.node.name, 'self.node.virtual_links: ',self.node.virtual_links)
+                    subtask_list = self.node.virtual_links[left]
+                    last_right_task = subtask_list[0].task
+                    print('right task from VL:', last_left_task.name)
+
+                #If the right node is a virtual neighbor of this node, pick the cached task as a dependency:
+                if right in self.node.virtual_links.keys():
+                    #Find the cached VL task with this node
+                    subtask_list = self.node.virtual_links[right]
+                    last_left_task = subtask_list[0].task
+                    print('left task from VL:', last_right_task.name)
+
                 def ent_swap_action_middle(memories_info: List["MemoryInfo"], **kwargs):
                     print(f'inside task actin: left :{left} right: {right} and mid: {mid} and self.own.name: {self.node.name}')
                     print(f'inside task actin: left_m :{left_m} right_m: {right_m} and mid: {mid} and self.own.name: {self.node.name}')
@@ -1118,11 +1180,31 @@ class ReservationProtocol():     #(Protocol):
                     return purify_subtask_left.dependents
                 
                 task_swap_middle= Task('TaskSwapMiddle'+right+left, [last_left_task, last_right_task], self.node.timeline.now(), ent_swap_action_middle, self.node.task_manager)
+                # if is_final_virtual_swap:
+                #     task_swap_middle.is_vl_final_swap_task = True
                 self.node.task_manager.add_task(task_swap_middle, [last_left_task, last_right_task])
                 task_swap_middle.set_reservation(reservation)
                 print('ENT_SWAP_MIDDLE at: ', self.node.name)
                 print('last_left_task   : ', last_left_task.name)
                 print('last_right_task   : ', last_right_task.name)
+
+                #If the left node is a virtual neighbor of this node, pick the cached task as a dependency:
+                if left in self.node.virtual_links.keys():
+                    #we need to set_dependency_to_subtask
+                    subtask_list = self.node.virtual_links[left]
+                    for subtask in subtask_list:
+                        task_swap_middle.set_dependency_to_subtask(subtask)
+                
+                #If the right node is a virtual neighbor of this node, pick the cached task as a dependency:
+                if right in self.node.virtual_links.keys():
+                    #we need to set_dependency_to_subtask
+                    subtask_list = self.node.virtual_links[right]
+                    for subtask in subtask_list:
+                        task_swap_middle.set_dependency_to_subtask(subtask)
+
+                #If both sides are pre-shared VLs then we don't need to wait
+                if left in self.node.virtual_links.keys() and right in self.node.virtual_links.keys():
+                    task_swap_middle.can_run_on_init = True
                 
             #task_list.append(curr_task)
         
