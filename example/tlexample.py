@@ -1,30 +1,39 @@
 
-from qntsim.kernel.timeline import Timeline
+from qntsim.kernel.timeline import Timeline 
+
+Timeline.DLCZ=False
+Timeline.bk=True
+
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
 #random.seed(0)
 network_config = "4node.json"
 
-n,k,lamda=10,6,40
 
 tl = Timeline(4e12,"Qiskit")
 network_topo = Topology("network_topo", tl)
 network_topo.load_config(network_config)
-# network_topo.create_random_topology(n,network_config)
-
 
 
 def set_parameters(topology: Topology):
    
-    MEMO_FREQ = 2e3
+    MEMO_FREQ = 2e4
     MEMO_EXPIRE = 0
     MEMO_EFFICIENCY = 1
     MEMO_FIDELITY = 0.9349367588934053
-    for node in topology.get_nodes_by_type("QuantumRouter"):
+    for node in topology.get_nodes_by_type("EndNode"):
         node.memory_array.update_memory_params("frequency", MEMO_FREQ)
         node.memory_array.update_memory_params("coherence_time", MEMO_EXPIRE)
         node.memory_array.update_memory_params("efficiency", MEMO_EFFICIENCY)
         node.memory_array.update_memory_params("raw_fidelity", MEMO_FIDELITY)
+
+    for node in topology.get_nodes_by_type("ServiceNode"):
+        node.memory_array.update_memory_params("frequency", MEMO_FREQ)
+        node.memory_array.update_memory_params("coherence_time", MEMO_EXPIRE)
+        node.memory_array.update_memory_params("efficiency", MEMO_EFFICIENCY)
+        node.memory_array.update_memory_params("raw_fidelity", MEMO_FIDELITY)
+    
+    
 
   
     DETECTOR_EFFICIENCY = 0.9
@@ -122,39 +131,9 @@ tl.stop_time=10e12
 
 
 node1='a'
-node2='b'
+node2='s1'
 tm=network_topo.nodes[node1].transport_manager
-tm.request(node2, start_time=5e12,size=5, end_time=10e12, priority=0 , target_fidelity= 0.5, timeout=2e12) 
-
-# node1='a'
-# node2='b'
-# tm=network_topo.nodes[node1].transport_manager
-# tm.request(node2, start_time=5e12,size=5, end_time=10e12, priority=0 , target_fidelity= 0.6, timeout=2e12) 
-
-# node1='v2'
-# node2='v3'
-# tm=network_topo.nodes[node1].transport_manager
-# tm.request(node2, start_time=6e12,size=5, end_time=10e12, priority=0 , target_fidelity= 0.7, timeout=2e12) 
-
-
-
-# node1='v0'
-# node2='v2'
-# tm=network_topo.nodes[node1].transport_manager
-# tm.request(node2, start_time=5e12,size=5, end_time=10e12, priority=0 , target_fidelity= 0.7, timeout=2e12)
-
-
-
-
-
-
-# tm.request(node2,3e12,5,10e12,1,.7,2e12) 
-# tm.request(node2,5e12,5,10e12,0,.7,5e9)
-
-
-# virt_graph=network_topo.get_virtual_graph()
-# network_topo.plot_graph(virt_graph)
-
+tm.request(node2, start_time=5e12,size=3, end_time=10e12, priority=0 , target_fidelity= 0.5, timeout=2e12) 
 
 
 

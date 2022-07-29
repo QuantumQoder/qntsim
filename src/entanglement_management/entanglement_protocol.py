@@ -5,7 +5,12 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..topology.node import Node
-    from ..components.memory import Memory
+
+from ..kernel.timeline import Timeline
+if Timeline.DLCZ:
+    from ..components.DLCZ_memory import Memory
+elif Timeline.bk:
+    from ..components.bk_memory import Memory
 
 from ..protocol import Protocol
 

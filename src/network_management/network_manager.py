@@ -102,7 +102,9 @@ class NetworkManager():
         #self.networkmap[ReqId]=[self.tp_id,status]
         if not ResObj.isvirtual:
             self.networkmap[ReqId]=[ResObj.tp_id,status]
-        #print('netwrok map',self.networkmap)
+        else:
+            print('notify nm network map appending or not',ResObj.isvirtual,ReqId)
+        print('netwrok map',self.networkmap)
         # for ReqId,ResObj in self.requests.items():
         #     #print('REqId',ReqId,self.tp_id,status,ResObj.isvirtual)
            

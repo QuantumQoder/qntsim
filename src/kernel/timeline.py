@@ -11,6 +11,7 @@ from time import time_ns, sleep
 from typing import TYPE_CHECKING
 
 from numpy import random
+from sympy import false
 
 if TYPE_CHECKING:
     from ._event import Event
@@ -21,8 +22,30 @@ from .quantum_kernel import QuantumKernel
 from .quantum_manager import QuantumManagerDensity
 
 
+"""
+ch=input("Enter 0 for DLCZ ,1 for barettkok")
+if ch=='0':
+    DLCZ=True
+    bk=False
+    print("DLCZ input value",DLCZ)
+else:
+    DLCZ=False
+    bk=True
+    print("DLCZ input value",DLCZ)
+"""
+#DLCZ=False
+#bk=False 
+#if not DLCZ:
+    #bk=True
+#else:
+    #bk=False
+
+
 class Timeline:
-    # declare protocol
+    DLCZ=False
+    bk=False
+
+
     def __init__(self, stop_time=inf,backend=str, formalism='ket_vector'):
         
         self.events = EventList()

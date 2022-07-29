@@ -12,9 +12,15 @@ from ..message import Message
 import networkx as nx
 from ..resource_management.rule_manager import Rule
 from ..kernel._event import Event
-from ..entanglement_management.bk_generation import EntanglementGenerationA
-from ..entanglement_management.bk_purification import BBPSSW
-from ..entanglement_management.bk_swapping import EntanglementSwappingA, EntanglementSwappingB
+from ..kernel.timeline import Timeline
+if Timeline.DLCZ:
+    from ..entanglement_management.DLCZ_generation import EntanglementGenerationA
+    from ..entanglement_management.DLCZ_purification import BBPSSW
+    from ..entanglement_management.DLCZ_swapping import EntanglementSwappingA, EntanglementSwappingB
+elif Timeline.bk:
+    from ..entanglement_management.bk_generation import EntanglementGenerationA
+    from ..entanglement_management.bk_purification import BBPSSW
+    from ..entanglement_management.bk_swapping import EntanglementSwappingA, EntanglementSwappingB
 from ..resource_management.memory_manager import MemoryManager, MemoryInfo
 import itertools
 import json
@@ -416,7 +422,7 @@ class ReservationProtocol():     #(Protocol):
                 next_node=self.routing.tempnexthop()
                 #msgr=RRMessage(RRPMsgType.RESERVE,next_node,self.request) #msg_type="RESERVE"
                 
-                print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
+                #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.NetworkManager, RRPMsgType.RESERVE,request=self.request)
                 msg.temp_path=self.routing.temp_path
                 msg.marker=self.routing.marker
@@ -430,7 +436,7 @@ class ReservationProtocol():     #(Protocol):
             if (self.request.responder==self.node.name):
                 
                 #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
-                print ("destination",self.node.name)
+                #print ("destination",self.node.name)
                 self.request.path.append(self.node)
                 self.request.pathnames.append(self.node.name)
                 index=self.request.path.index(self.node)
@@ -575,10 +581,10 @@ class ReservationProtocol():     #(Protocol):
                         vmemory.reservations.remove(self.request)
                 index=self.request.path.index(self.node)
                 prev_node=self.request.path[index-1]
-                print("removed resources at ",self.node.name)
-                msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.FAIL,"reservation_manager",request=self.request)
-                self.node.send_message(prev_node.name,msg)
-        
+                #print("removed resources at ",self.node.name)
+                msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.FAIL,request=self.request)
+                self.node.message_handler.send_message(prev_node.name,msg)
+
         self.node.message_handler.process_msg(msg.receiver_type,msg.receiver)
 
    

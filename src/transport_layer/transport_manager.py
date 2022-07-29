@@ -6,7 +6,11 @@ from enum import Enum, auto
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..topology.node import QuantumRouter,Node
-    from ..components.memory import Memory
+from ..kernel.timeline import Timeline
+if Timeline.DLCZ:
+    from ..components.DLCZ_memory import Memory
+elif Timeline.bk:
+    from ..components.bk_memory import Memory
 from ..message import Message
 import itertools
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType

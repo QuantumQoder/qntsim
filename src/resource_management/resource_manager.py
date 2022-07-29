@@ -7,9 +7,13 @@ This module also defines the message type used by the resource manager.
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Callable, List
 if TYPE_CHECKING:
-    from ..components.bk_memory import Memory
     from ..topology.node import QuantumRouter
     from .rule_manager import Rule
+from ..kernel.timeline import Timeline
+if Timeline.DLCZ:
+    from ..components.DLCZ_memory import Memory
+elif Timeline.bk:
+    from ..components.bk_memory import Memory
 
 from ..entanglement_management.entanglement_protocol import EntanglementProtocol
 from ..message import Message
@@ -198,13 +202,13 @@ class ResourceManager():
                 ##print('Resss',memo_info.index, memlist, currentreqid)"""
         ##print("resource manager current req id",currentreqid1)
         for req in self.owner.vmemory_list[memo_info.index].reservations:
-              
+            #print("resource manager current req id",self.owner.name,memo_info.index,req.id)  
             time_now = self.owner.timeline.now()
             if req.start_time<= time_now and req.end_time>=time_now:
 
                 currentreqid=req.id 
                 #print("check current req id ",currentreqid ,self.owner.name,req.initiator)
-                break
+                #break
 
         #print("check current req id ",currentreqid,self.owner.name,req.initiator)
 
@@ -232,7 +236,7 @@ class ResourceManager():
             for ReqId,ResObj in self.owner.network_manager.requests.items():
                 if ReqId == currentreqid:
                     ResObj.status='APPROVED' 
-                    # #print("ResObj.tp_id",self.owner.network_manager.requests,ResObj.tp_id) 
+                    #print("ResObj.tp_id",self.owner.network_manager.requests,ResObj.tp_id) 
                     # if ResObj.isvirtual:
                     self.owner.network_manager.notify_nm('APPROVED',ReqId,ResObj)
                     # #print('Res status',ResObj.initiator,ResObj.responder)
@@ -265,7 +269,7 @@ class ResourceManager():
                             ##print("ResObj.tp_id",self.owner.network_manager.requests,ResObj.tp_id) 
                             # if ResObj.isvirtual:
                             self.owner.network_manager.notify_nm('PARTIALCOMPLETE',ReqId,ResObj)
-                # if t==0:
+                #if t==0:
                     #print(" resource manager not satisfy")
 
         """
@@ -335,8 +339,8 @@ class ResourceManager():
             
             ini_protocol=msg.kwargs['protocol']
             #print('ini_protocol',ini_protocol)
-            ##print("Resourcemanager request receive",ini_protocol.name,self.owner.name)
-            ###print(protocol)
+            #print("Resourcemanager request receive",ini_protocol.name,self.owner.name)
+            ##print(protocol)
             if protocol is not None:
                
                 protocol.set_others(ini_protocol)
