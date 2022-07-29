@@ -3,20 +3,21 @@ Timeline.DLCZ=False
 Timeline.bk=True
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
-from qntsim.components.circuit import Circuit
+from qntsim.components.circuit import Circuit,QutipCircuit
 from qiskit import *
 from qutip.qip.circuit import QubitCircuit, Gate
 from qutip.qip.operations import gate_sequence_product
 from qiskit.extensions import Initialize
 #from qiskit.ignis.verification import marginal_counts
 from qiskit.quantum_info import random_statevector
+import math
 
 #random.seed(0)
-network_config = "/home/bhanusree/Desktop/QNTv1/QNTSim-Demo/QNTSim/example/3node.json"
+network_config = "/home/aman/QNTSim/QNTSim/example/3node.json"
 
 n,k,lamda=10,6,40
 
-tl = Timeline(10e12,"Qiskit")
+tl = Timeline(10e12,"Qutip")
 network_topo = Topology("network_topo", tl)
 network_topo.load_config(network_config)
 # network_topo.create_random_topology(n,network_config)
@@ -107,7 +108,8 @@ def alice_keys():
         if mem_info.state == 'ENTANGLED':
             key=mem_info.memory.qstate_key
             state= qm_alice.get(key)
-            print("alice keys",key, state)
+            print("\n\nEntangled State\n\n",state.state)
+
             return qm_alice,key,state
 
 def bob_keys():
@@ -116,134 +118,65 @@ def bob_keys():
         if mem_info.state == 'ENTANGLED':
             key=mem_info.memory.qstate_key
             state= qm_bob.get(key)
-            print("bob keys",key,state)
+            # print("bob keys",key,state)
             return qm_bob,key,state
             print("bob keys",key,state)
 #alice_keys()
-bob_keys()
-
-def create_random_qubit():
-    qc = QuantumCircuit(1)
-    initial_state = [1,0]
-    qc.initialize(initial_state,0)
-    print('Random state', qc)
-    return qc
+       
+# bob_keys()
 
 
 
+def alice_measurement():
 
-
-def alice_measurement(qubit):
-    """
-    psi = random_statevector(2)
-    init_gate = Initialize(psi)
-    init_gate.label = "init"
-    qr = QuantumRegister(3, name="q")
-    crz= ClassicalRegister(1,name="crz")
-    crx= ClassicalRegister(1,name="crx")
-    new_qc=QuantumCircuit(qr,crz,crx)
     qm_alice,key,alice_state=alice_keys()
-    #q0=qubit
-    #
-    #new_c.barrier()
-    circ=new_qc.compose(alice_state,[1,2])
-    circ.append(init_gate, [0])
-    
-    print(circ)
+    key_0=qm_alice.new([complex(-1/math.sqrt(2)), complex(1/math.sqrt(2))])
+    # key_0 = qm_alice.new([0,1])
+    print("\n\nRandom State\n\n",qm_alice.get(key_0).state)
+    circ=QutipCircuit(2)
     circ.cx(0,1)
     circ.h(0)
-    print(circ)
-    circ.barrier()
-    t1=circ.measure(0,0)
-    t2=circ.measure(1,1)
-    print("t1,t2",t2)
-    
-    qm_alice.get(key)
-
-    print('size',crz,crx)
-    
-    return init_gate ,circ,crz,crx
-    
-    """
-    #output = qm.run_circuit(circ,[key])
-    # circ.cx(0,1)
-    """
-    psi = random_statevector(2)
-    init_gate = Initialize(psi)
-    init_gate.label = "init"
-    qm_alice,key,alice_state=alice_keys()
-    qc= alice_state
-    #qc.compose(alice_state,[1,2])
-
-    qc.append(init_gate, [0])
-    qc.cx(0,1)
-    qc.h(0)
-    print("t",qc)
-    print("t",key)
-    #qc.barrier()
-    #qc.measure(0,0)
-    #qc.measure(1,1)
-    #print("t1,t2",t1,t2)
-    #qm_alice.run_circuit(qc,[key])
-    #return init_gate ,qc
-    """
-    # psi = random_statevector(2)
-    qm_alice,key,alice_state=alice_keys()
-    key_0=qm_alice.new2()
-    print("alice key new key",key,key_0,qm_alice.get(key_0))
-    circ=Circuit(2)
-    circ.cx(1,2)
-    circ.h(1)
     circ.measure(0)
-    circ.measure(2)
+    circ.measure(1)
     output=qm_alice.run_circuit(circ,[key_0,key])
     crz=output.get(key_0)
     crx=output.get(key)
     # circ.measure(1)
     #qm_alice,key,alice_state=alice_keys()
     #alice_state.append()
-    print('output',key_0,key,output,crz,crx)
-    return crz,crx
+    print('\n\nMeasurement Output\n\n', output)
+    return crz,crx,qm_alice.get(key_0)
 
    
 
 def bob_gates(crz,crx):
 
-    
-    qm_bob, key, state= bob_keys()
-    circ=Circuit(1)
-    if crz == 1:
+    qm_bob,key,state=bob_keys()
+    print('\n\nBefore corrective measure\n',state.state)
+    circ=QutipCircuit(1)
+    print("\n\nCorrective measures at Bob's end")
+    if crz==1:
+        print('Applied Z Gate')
         circ.z(0)
-        # circ.measure(0)
-    if crx == 1:
+        #circ.measure(0)
+    if crx==1:
+        print('Applied X Gate')
+        # print('crz x')
         circ.x(0)
-        # circ.measure(0)
-
-    output = qm_bob.run_circuit(circ,[key])
-    bob_state = qm_bob.get(key)
-    print("bob output", output,type(circ),type(state))
-    print("\n\n", bob_state)
     
-    print('Measurement check', bob_state)
-    """circ.z(2).c_if(c1, 1)
-    circ.x(2).c_if(c2, 1)
+    #circ.measure(0)
     
-    #bob_state.z(1).c_if(c1,1) # Apply gates if the registers 
-    #bob_state.x(1).c_if(c2,1)#
-    print("bob ",circ)
-    inverse_init_gate = init_gate.gates_to_uncompute()
-    circ.append(inverse_init_gate, [2])
-    cr_result = ClassicalRegister(1)
-    circ.add_register(cr_result)
-
-    circ.measure(2,2)
-    print("bob final",circ)"""
+    output=qm_bob.run_circuit(circ,[key])
+    print("\n\nOutput state at Bob's end\n",qm_bob.get(key).state)
+    return qm_bob.get(key)
 
 
-    
 
-qubit=create_random_qubit()
-#qm,key,state = alice_keys()
+crz,crx,random=alice_measurement()
+bob_state= bob_gates(crz,crx)
+# print('type ', type(bob_state), type(random))
 
-crz,crx=alice_measurement(qubit)
-bob_gates(crz,crx)
+# if (bob_state.state == random.state).all():
+#     print("Success")
+# else:
+#     print("fialure")

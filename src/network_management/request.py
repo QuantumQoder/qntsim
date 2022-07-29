@@ -204,7 +204,7 @@ class RoutingProtocol():
         for node in path:
             if node in virtual_neighbors.keys():
                 next_hop = node
-        #print('Virtual neighbor', next_hop,path, virtual_neighbors)
+        # print('Virtual neighbor', next_hop,path, virtual_neighbors)
         return next_hop
 
     def next_hop(self):
@@ -301,7 +301,7 @@ class MemoryTimeCard():
         self.memory_index = memory_index
         self.reservations = []
     def has_virtual_reservation(self):
-        #print('inside has virtual reservation',self.reservations.initiator,self.reservations.responder)
+        # print('inside has virtual reservation',self.reservations.initiator,self.reservations.responder)
         for res in self.reservations:
             if res.isvirtual:
                 return True
@@ -413,7 +413,7 @@ class ReservationProtocol():     #(Protocol):
 
     def start(self):
 
-        #print("start",self.node.name)
+        # print("start",self.node.name)
             #if RESOURCES AVAILABLE:
         if self.memories_available() :
 
@@ -422,7 +422,7 @@ class ReservationProtocol():     #(Protocol):
                 next_node=self.routing.tempnexthop()
                 #msgr=RRMessage(RRPMsgType.RESERVE,next_node,self.request) #msg_type="RESERVE"
                 
-                #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
+                # print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.NetworkManager, RRPMsgType.RESERVE,request=self.request)
                 msg.temp_path=self.routing.temp_path
                 msg.marker=self.routing.marker
@@ -436,7 +436,7 @@ class ReservationProtocol():     #(Protocol):
             if (self.request.responder==self.node.name):
                 
                 #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
-                #print ("destination",self.node.name)
+                # print ("destination",self.node.name)
                 self.request.path.append(self.node)
                 self.request.pathnames.append(self.node.name)
                 index=self.request.path.index(self.node)

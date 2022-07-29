@@ -182,7 +182,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         """
 
         log.logger.info(self.own.name + " protocol start with partner {}".format(self.other))
-        #print(self.own.name + " Generation protocol start with partner {}".format(self.other),self.name, self.middle)
+        # print(self.own.name + " Generation protocol start with partner {}".format(self.other),self.name, self.middle)
         ####print('start protocol',self.other_protocol.name,self.name)
         # to avoid start after remove protocol
         if self not in self.own.protocols:
@@ -256,7 +256,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             # #####print('Emit event plus state',EntanglementGenerationA._plus_state)
         else:
             self.own.timeline.quantum_manager.run_circuit(self._flip_circuit, [self._qstate_key])
-            #print('flip circuit', self._qstate_key)
+            # print('flip circuit', self._qstate_key)
         self.memory.excite(self.middle)
 
     def received_message(self, src: str, msg: Message) -> None:
