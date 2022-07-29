@@ -131,9 +131,9 @@ tl.stop_time=10e12
 
 
 node1='a'
-node2='s1'
+node2='b'
 tm=network_topo.nodes[node1].transport_manager
-tm.request(node2, start_time=5e12,size=3, end_time=10e12, priority=0 , target_fidelity= 0.5, timeout=2e12) 
+tm.request(node2, start_time=5e12,size=5, end_time=10e12, priority=0 , target_fidelity= 0.5, timeout=2e12) 
 
 
 

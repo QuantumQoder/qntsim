@@ -20,11 +20,11 @@ from ..kernel.timeline import Timeline
 if Timeline.DLCZ:
     from ..components.DLCZ_memory import Memory,MemoryArray
     from ..components.DLCZ_bsm import SingleAtomBSM
-    print("DLCZ node")
+    #print("DLCZ node")
 elif Timeline.bk:
     from ..components.bk_memory import Memory, MemoryArray
     from ..components.bk_bsm import SingleAtomBSM
-    print("bk node")
+    #print("bk node")
 
 from ..kernel.entity import Entity
 
@@ -148,7 +148,7 @@ class BSMNode(Node):
         """
         from ..kernel.timeline import Timeline
         if Timeline.DLCZ:
-            print('DLCZ node egb')
+            #print('DLCZ node egb')
             from ..entanglement_management.DLCZ_generation import EntanglementGenerationB
         elif Timeline.bk:
             from ..entanglement_management.bk_generation import EntanglementGenerationB
@@ -208,11 +208,11 @@ class MemoryTimeCard():
         self.reservations = []
     
     def has_virtual_reservation(self):
-        print('len of res', len(self.reservations))
+        #print('len of res', len(self.reservations))
         for res in self.reservations:
-            print('inside has virtual reservation',res.initiator,res.responder)
+            #print('inside has virtual reservation',res.initiator,res.responder)
             if res.isvirtual:
-                print('res.isvirtual',res.isvirtual)
+                #print('res.isvirtual',res.isvirtual)
                 return True
         return False
 
@@ -220,7 +220,7 @@ class MemoryTimeCard():
 
 class EndNode(Node):
 
-    def __init__(self, name: str, timeline: "Timeline", memo_size=10):
+    def __init__(self, name: str, timeline: "Timeline", memo_size=500):
         super().__init__(name, timeline)
         
         self.memory_array = MemoryArray(name + ".MemoryArray", timeline, num_memories=memo_size)
@@ -291,7 +291,7 @@ class EndNode(Node):
                 for other in end.eg.others:
                     if other != self.name:
                         self.map_to_middle_node[other] = end.name
-        print('self to middel',self.map_to_middle_node)
+        #print('self to middel',self.map_to_middle_node)
 
     def get_idle_memory(self, info: "MemoryInfo") -> None:
         """Method for application to receive available memories."""
@@ -302,7 +302,7 @@ class EndNode(Node):
 
 class ServiceNode(Node):
 
-    def __init__(self,name: str, timeline: "Timeline",memo_size= 20):
+    def __init__(self,name: str, timeline: "Timeline",memo_size=500):
         super().__init__(name, timeline)
         self.memory_array = MemoryArray(name + ".MemoryArray", timeline, num_memories=memo_size)
         self.memory_array.owner = self

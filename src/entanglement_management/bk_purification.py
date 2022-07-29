@@ -93,7 +93,7 @@ class BBPSSW(EntanglementProtocol):
         if self.meas_memo is None:
             self.memories.pop()
         Circuit =BaseCircuit.create(self.kept_memo.timeline.type)
-        print("pur circuit",BaseCircuit.create(self.kept_memo.timeline.type))
+        #print("pur circuit",BaseCircuit.create(self.kept_memo.timeline.type))
         self.circuit = Circuit(2)
         self.circuit.cx(0, 1)
         self.circuit.measure(1)

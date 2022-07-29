@@ -18,8 +18,8 @@ if TYPE_CHECKING:
 
 from .entanglement_protocol import EntanglementProtocol
 from ..message import Message
-from ..kernel.event import Event
-from ..kernel.process import Process
+from ..kernel._event import Event
+#from ..kernel.process import Process
 from ..components.circuit import BaseCircuit
 from ..utils import log
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
@@ -182,7 +182,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         """
 
         log.logger.info(self.own.name + " protocol start with partner {}".format(self.other))
-        print(self.own.name + " Generation protocol start with partner {}".format(self.other),self.name, self.middle)
+        #print(self.own.name + " Generation protocol start with partner {}".format(self.other),self.name, self.middle)
         ####print('start protocol',self.other_protocol.name,self.name)
         # to avoid start after remove protocol
         if self not in self.own.protocols:
@@ -234,7 +234,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             
         else:
             # entanglement failed
-            print('Entanglement failed called from end()')
+            #print('Entanglement failed called from end()')
             self._entanglement_fail()
 
     def next_round(self) -> None:
@@ -256,7 +256,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             # #####print('Emit event plus state',EntanglementGenerationA._plus_state)
         else:
             self.own.timeline.quantum_manager.run_circuit(self._flip_circuit, [self._qstate_key])
-            print('flip circuit', self._qstate_key)
+            #print('flip circuit', self._qstate_key)
         self.memory.excite(self.middle)
 
     def received_message(self, src: str, msg: Message) -> None:
@@ -379,7 +379,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             end_time = self.expected_times[1] + self.own.cchannels[self.middle].delay + 10
             # process = Process(self, "end", [])
             
-            print("end time and offset",msg_emit_time_1+int(1e12 /total),end_time)
+            #print("end time and offset",msg_emit_time_1+int(1e12 /total),end_time)
             event = Event(msg_emit_time_1+int(1e12 /total), self, "release_bsm", [])
             self.own.timeline.events.push(event)
             # self.own.timeline.schedule(event)
@@ -430,10 +430,10 @@ class EntanglementGenerationA(EntanglementProtocol):
                     if self.bsm_res[i] == -1:
                         ###print(f'Setting up the value: {res} at i={i}',self.bsm_res)
                         self.bsm_res[i] = res
-                        if self.primary:
-                            print(f' primary After Setting up the value: {res} at i={i}',self.name,self.own.timeline.now()*1e-12,self.own.name,self.bsm_res)
-                        else:
-                            print(f' secondary After Setting up the value: {res} at i={i}',self.name,self.own.timeline.now()*1e-12,self.own.name,self.bsm_res)
+                        #if self.primary:
+                            #print(f' primary After Setting up the value: {res} at i={i}',self.name,self.own.timeline.now()*1e-12,self.own.name,self.bsm_res)
+                        #else:
+                            #print(f' secondary After Setting up the value: {res} at i={i}',self.name,self.own.timeline.now()*1e-12,self.own.name,self.bsm_res)
                         #self._entanglement_succeed()
                     else:
                         # entanglement failed
@@ -463,7 +463,7 @@ class EntanglementGenerationA(EntanglementProtocol):
 
     def _entanglement_succeed(self):
         log.logger.info(self.own.name + " successful entanglement of memory {}".format(self.memory))
-        print(self.own.name + " successful entanglement of memory with the node: ",self.other," {} ".format(self.memory))
+        #print(self.own.name + " successful entanglement of memory with the node: ",self.other," {} ".format(self.memory))
         self.memory.entangled_memory["node_id"] = self.other
         self.memory.entangled_memory["memo_id"] = self.remote_memo_id
         self.memory.fidelity = self.memory.raw_fidelity
@@ -479,7 +479,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         for event in self.scheduled_events:
             # ###print('Nemtamgle fieldb ent')
             self.own.timeline.events.remove(event)
-        print(self.own.name + " entanglement fail  ",self.other, self.name, self.other_protocol.name)
+        #print(self.own.name + " entanglement fail  ",self.other, self.name, self.other_protocol.name)
         log.logger.info(self.own.name + " failed entanglement of memory {}".format(self.memory))
         
         # #print(self.own.name + " failed entanglement of memory with the node: ",self.other," {} ".format(self.memory.name))
@@ -558,25 +558,25 @@ class EntanglementGenerationB(EntanglementProtocol):
             other_protocol=msg.kwargs['other_protocol']
             if len(self.reservations) == 0:
                 message = Message(MsgRecieverType.PROTOCOL, protocol.name, GenerationMsgType.BSM_ALLOCATE, protocol = protocol)
-                print('BSM allocate', protocol.name, self.name)
+                #print('BSM allocate', protocol.name, self.name)
                 self.own.message_handler.send_message(protocol.own.name, message)
                 self.current_protocol = protocol
                 self.current_primary = protocol.own.name
                 self.secondary_protocol=other_protocol
-                print("MESAGE SENT TO NODE")
-            else:
-                for res in self.reservations:
-                    print("res protocol deatails name ",protocol,protocol.name)
+                #print("MESAGE SENT TO NODE")
+            #else:
+                #for res in self.reservations:
+                    #print("res protocol deatails name ",protocol,protocol.name)
             self.reservations.append(protocol)
 
-            print("protocol appended: ", protocol.name)
+            #print("protocol appended: ", protocol.name)
 
         # Once attempt to entanglement generation is complete, the BSM is released. Check if other process exist
         # in reservations queue. If yes, start one on top. Else, return 
         elif msg_type is GenerationMsgType.RELEASE_BSM:
             protocol=msg.kwargs['protocol']
             other_protocol=msg.kwargs['other_protocol']
-            print("protocol removed:", protocol,self.reservations)
+            #print("protocol removed:", protocol,self.reservations)
             self.reservations.remove(protocol)
             self.accepted_indices = 0
             self.previous_detection_time = None

@@ -1,7 +1,7 @@
 import qntsim
 from qntsim.kernel.timeline import Timeline
 from qntsim.kernel.process import Process
-from qntsim.kernel.event import Event
+from qntsim.kernel._event import Event
 from enum import Enum, auto
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -86,7 +86,7 @@ class TransportManager():
         end_time(int) : end time for the request
         """
         self.tp_id=next(self.id)
-        print('create request')
+        #print('create request')
         transport_protocol_src=TransportProtocol(self.owner, responder,start_time,size,end_time,priority,target_fidelity, timeout) #Create source protocol instance
         self.owner.protocols.append(transport_protocol_src)         #Adding the protocol to the list of protocols
         self.transportprotocolmap[self.tp_id]=transport_protocol_src

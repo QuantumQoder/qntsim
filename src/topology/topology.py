@@ -669,8 +669,8 @@ class Topology():
                     #print('Swap succesful')"""
 
 
-"""
-    def plot_graph(self, nx_graph):
+
+"""def plot_graph(self, nx_graph):
         colors = nx.get_edge_attributes(nx_graph,'color').values()
         ###print("Colors",colors)
         weights = nx.get_edge_attributes(nx_graph,'weight').values()

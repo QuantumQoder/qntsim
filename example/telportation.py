@@ -1,17 +1,20 @@
 
 from qntsim.kernel.timeline import Timeline
+Timeline.DLCZ=False
+Timeline.bk=True
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
 from qntsim.components.circuit import Circuit
 from qiskit import *
 from qutip.qip.circuit import QubitCircuit, Gate
 from qutip.qip.operations import gate_sequence_product
+
 #random.seed(0)
-network_config = "/home/aman/QNTSim/QNTSim/example/3node.json"
+network_config = "/home/bhanusree/Desktop/QNTv1/QNTSim-Demo/QNTSim/example/3node.json"
 
 n,k,lamda=10,6,40
 
-tl = Timeline(4e12,"Qiskit")
+tl = Timeline(10e12,"Qiskit")
 network_topo = Topology("network_topo", tl)
 network_topo.load_config(network_config)
 # network_topo.create_random_topology(n,network_config)
@@ -20,17 +23,21 @@ network_topo.load_config(network_config)
 
 def set_parameters(topology: Topology):
    
-    MEMO_FREQ = 2e3
+    MEMO_FREQ = 2e4
     MEMO_EXPIRE = 0
     MEMO_EFFICIENCY = 1
     MEMO_FIDELITY = 0.9349367588934053
-    for node in topology.get_nodes_by_type("QuantumRouter"):
+    for node in topology.get_nodes_by_type("EndNode"):
         node.memory_array.update_memory_params("frequency", MEMO_FREQ)
         node.memory_array.update_memory_params("coherence_time", MEMO_EXPIRE)
         node.memory_array.update_memory_params("efficiency", MEMO_EFFICIENCY)
         node.memory_array.update_memory_params("raw_fidelity", MEMO_FIDELITY)
-
-  
+    
+    for node in topology.get_nodes_by_type("ServiceNode"):
+        node.memory_array.update_memory_params("frequency", MEMO_FREQ)
+        node.memory_array.update_memory_params("coherence_time", MEMO_EXPIRE)
+        node.memory_array.update_memory_params("efficiency", MEMO_EFFICIENCY)
+        node.memory_array.update_memory_params("raw_fidelity", MEMO_FIDELITY)
     DETECTOR_EFFICIENCY = 0.9
     DETECTOR_COUNT_RATE = 5e7
     DETECTOR_RESOLUTION = 100
@@ -97,15 +104,16 @@ def alice_keys():
     for mem_info in network_topo.nodes[node1].resource_manager.memory_manager:
         key=mem_info.memory.qstate_key
         state= qm_alice.get(key)
-        if len(state.keys) > 1:
-            print("alice keys",type(state.keys))
-            return qm_alice,state.keys[1],state
+        print("alice keys",state)
+        return qm_alice,key,state
 
 def bob_keys():
     qm_bob = network_topo.nodes[node2].timeline.quantum_manager
     for mem_info in network_topo.nodes[node2].resource_manager.memory_manager:
         key=mem_info.memory.qstate_key
         state= qm_bob.get(key)
+        print("bob keys",state)
+        return qm_bob,key,state
         print("bob keys",key,state)
 alice_keys()
 bob_keys()
@@ -121,24 +129,59 @@ def create_random_qubit():
 
 
 
-def alice_measurement(qm,key,state,qubit):
-    print('inputs',state,key)
-    # state.h(0)
+def alice_measurement(qubit):
+    qr = QuantumRegister(3, name="q")
+    crz= ClassicalRegister(1,name="crz")
+    crx= ClassicalRegister(1,name="crx")
+    new_qc=QuantumCircuit(qr,crz,crx)
+    qm_alice,key,alice_state=alice_keys()
+    q0=qubit
+    new_c = new_qc.compose(q0,[0])
+    new_c.barrier()
+    circ=new_c.compose(alice_state,[1,2])
     
-    circ= QuantumCircuit(1)
+    print(circ)
+    circ.cx(0,1)
     circ.h(0)
-    circ.measure(0)
-    print('size', circ.size)
-    output = qm.run_circuit(circ,[key])
+    print(circ)
+    circ.barrier()
+    t1=circ.measure(0,0)
+    t2=circ.measure(1,1)
+    print("t1,t2",t2)
+    
+    qm_alice.get(key)
+
+    print('size',crz,crx)
+    
+    #return circ,crz,crx
+    #output = qm.run_circuit(circ,[key])
     # circ.cx(0,1)
     
+
+    circ=Circuit(2)
+    circ.cx(0,1)
+    circ.h(0,1)
     
     
     # circ.measure(1)
     
-    print('output',output)
+#print('output',output)
+
+def bob_gates(circ,c1,c2):
+    # Here we use c_if to control our gates with a classical
+    # bit instead of a qubit
+    
+    
+    circ.z(2).c_if(c1, 1)
+    circ.x(2).c_if(c2, 1)
+    
+    #bob_state.z(1).c_if(c1,1) # Apply gates if the registers 
+    #bob_state.x(1).c_if(c2,1)#
+
+    print("bob final",circ)
 
 qubit=create_random_qubit()
-qm,key,state = alice_keys()
+#qm,key,state = alice_keys()
 
-alice_measurement(qm,key,state,qubit)
+circ,c1,c2=alice_measurement(qubit)
+bob_gates(circ,c1,c2)

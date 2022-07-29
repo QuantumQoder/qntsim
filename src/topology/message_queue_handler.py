@@ -8,7 +8,7 @@ from aenum import Enum
 class MsgRecieverType(Enum):
 
     PROTOCOL = auto()
-    MANAGER = auto
+    MANAGER = auto()
 
 class GenerationMsgType(Enum):
     """Defines possible message types for entanglement generation."""

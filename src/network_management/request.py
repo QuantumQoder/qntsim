@@ -204,7 +204,7 @@ class RoutingProtocol():
         for node in path:
             if node in virtual_neighbors.keys():
                 next_hop = node
-        print('Virtual neighbor', next_hop,path, virtual_neighbors)
+        #print('Virtual neighbor', next_hop,path, virtual_neighbors)
         return next_hop
 
     def next_hop(self):
@@ -301,7 +301,7 @@ class MemoryTimeCard():
         self.memory_index = memory_index
         self.reservations = []
     def has_virtual_reservation(self):
-        print('inside has virtual reservation',self.reservations.initiator,self.reservations.responder)
+        #print('inside has virtual reservation',self.reservations.initiator,self.reservations.responder)
         for res in self.reservations:
             if res.isvirtual:
                 return True
@@ -413,7 +413,7 @@ class ReservationProtocol():     #(Protocol):
 
     def start(self):
 
-        print("start",self.node.name)
+        #print("start",self.node.name)
             #if RESOURCES AVAILABLE:
         if self.memories_available() :
 

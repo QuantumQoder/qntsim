@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 from .entanglement_protocol import EntanglementProtocol
 from ..message import Message
-from ..kernel.event import Event
+from ..kernel._event import Event
 from ..kernel.process import Process
 from ..components.circuit import BaseCircuit
 from ..utils import log
@@ -271,8 +271,7 @@ class EntanglementGenerationA(EntanglementProtocol):
 
             return
         
-        print("bug check",msg_type is GenerationMsgType.MEAS_RES,self.state)
-        
+        #print("bug check",msg_type is GenerationMsgType.MEAS_RES,self.state)
         if self.state==0 and msg_type is GenerationMsgType.BSM_ALLOCATE:
             self.qc_delay = self.own.qchannels[self.middle].delay
             frequency = self.memory.frequency

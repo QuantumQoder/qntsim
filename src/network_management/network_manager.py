@@ -20,7 +20,6 @@ from .reservation import ResourceReservationProtocol, RSVPMsgType, Reservation
 from ..transport_layer.transport_manager import TransportProtocol
 from ..resource_management.resource_manager import ResourceManagerMsgType
 from ..kernel._event import Event
-from ..kernel.process import Process
 from .request import Request ,RoutingProtocol,ReservationProtocol,RRPMsgType
 
 
@@ -102,9 +101,7 @@ class NetworkManager():
         #self.networkmap[ReqId]=[self.tp_id,status]
         if not ResObj.isvirtual:
             self.networkmap[ReqId]=[ResObj.tp_id,status]
-        else:
-            print('notify nm network map appending or not',ResObj.isvirtual,ReqId)
-        print('netwrok map',self.networkmap)
+        #print('netwrok map',self.networkmap)
         # for ReqId,ResObj in self.requests.items():
         #     #print('REqId',ReqId,self.tp_id,status,ResObj.isvirtual)
            
@@ -166,7 +163,7 @@ class NetworkManager():
         self.requests.update({user_request.id:user_request})
         
         
-        print("user request id ,tp_id ,src,path,des,size ",user_request.id,user_request.tp_id, user_request.initiator,user_request.path,user_request.responder,user_request.memory_size,memory_size)
+        #print("user request id ,tp_id ,src,path,des,size ",user_request.id,user_request.tp_id, user_request.initiator,user_request.path,user_request.responder,user_request.memory_size,memory_size)
 
         routing_protocol=RoutingProtocol(self.owner,initiator,responder,[],self.owner.name)
 
