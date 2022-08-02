@@ -3,12 +3,16 @@ Timeline.DLCZ=False
 Timeline.bk=True
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
-from e91 import E91
-
+from application.e91 import E91
+from application.teleportation import Teleportation
+from application.ping_pong import PingPong
+from application.ghz import GHZ
+from application.qsdc1 import QSDC1
+from application.ip1 import IP1
 
 def load_topo(path,backend):
 
-   tl = Timeline(50e12,backend)
+   tl = Timeline(20e12,backend)
    network_topo = Topology("network_topo", tl)
    network_topo.load_config(path)
    return tl,network_topo
@@ -76,7 +80,7 @@ def input_e91(e91_state):
 
 
    print("\n ----E91 QKD--- ")   
-   print("\nEnter command for help page $:--help")
+   print("\nEnter command for help page $:help")
    print("\nEnter command to Load topology $: load_topology <path_to_json_file>")
    print("\nEnter command to run E91 $:run_e91 <sender> <receiver> <keylength>")
    print("\nEnter command to exit Simulation $:exit\n")
@@ -122,7 +126,7 @@ def input_e91(e91_state):
       elif command=='exit':
          break
 
-      elif command=='--help':
+      elif command=='help':
          print("\nCommand to Load topology $: load_topology <path_to_json_file>")
          print("$:load_topology config.json")
          print("\nCommand to run E91 $:run_e91 <sender> <receiver> <keylength>")
@@ -132,17 +136,196 @@ def input_e91(e91_state):
       else:
          print("Enter correct command")
 
+def ping_pong(ping_pong_state):
+
+   print("\nEnter command for help page $:help")
+   print("\nEnter command to Load topology $: load_topology <path_to_json_file>")
+   print("\nEnter command to run ping pong protocol $:run_pp <sender> <receiver> <sequence_length> <message>")
+   print("\nEnter command to exit Simulation $:exit\n")
+   while True:
+
+      user_input = input('>>>')
+      tokens = user_input.split()
+      command = tokens[0]
+      args=tokens[1:]
+
+      if command=='load_topology'and (ping_pong_state==0 or ping_pong_state==1) :
+         if len(args)==1:
+            print('\nLoaded topology\n')
+            path=args[0]
+            tl,network_topo=load_topo(path,"Qutip")
+            network_topo.get_virtual_graph()
+            #print("To get keys between end nodes run_e91")
+            ping_pong_state=1
+         else:
+            print("Path to config file is not given\n")
+      
+      elif command=='run_pp':
+         
+         if ping_pong_state==1:
+            if len(args)==4:
+               sender=args[0]
+               receiver=args[1]
+               sequence_length=int(args[2])
+               message=args[3]
+               n=int(sequence_length*len(message))
+               alice=network_topo.nodes[sender]
+               bob = network_topo.nodes[receiver]
+               pp=PingPong()
+               alice,bob=pp.roles(alice,bob,n)
+               tl.init()
+               tl.run() 
+               print("print bug") 
+               pp.create_key_lists(alice,bob)
+               print("a ,b, s",pp.alice_key_list,pp.bob_key_list,pp.state_key_list)
+               pp.run_ping_pong(alice,bob,sequence_length,message)
+            else:
+               print("incorrect sender or receiver or sequencelength or message") 
+         else:
+            print("Topology is not yet loaded ,enter command to Load topology")
+
+      elif command=='exit':
+         break
+
+      elif command=='help':
+         print("\nCommand to Load topology $: load_topology <path_to_json_file>")
+         print("$:load_topology config.json")
+         print("\nEnter command to run ping pong protocol $:run_pp <sender> <receiver> <sequence_length> <message>")
+         print("$:run_pp endnode1 endnode2 4 010101")
+         print("\ncommand to exit Simulation $:exit\n")
+
+      else:
+         print("Enter correct command")
 
 
+def qsdc1(qsdc1_state):
+
+   print("\nEnter command for help page $:help")
+   print("\nEnter command to Load topology $: load_topology <path_to_json_file>")
+   print("\nEnter command to run first qsdc protocol $:run_qsdc1 <sender> <receiver> <sequence_length> <key>")
+   print("\nEnter command to exit Simulation $:exit\n")
+   while True:
+
+      user_input = input('>>>')
+      tokens = user_input.split()
+      command = tokens[0]
+      args=tokens[1:]
+
+      if command=='load_topology'and (qsdc1_state==0 or qsdc1_state==1) :
+         if len(args)==1:
+            print('\nLoaded topology\n')
+            path=args[0]
+            tl,network_topo=load_topo(path,"Qutip")
+            network_topo.get_virtual_graph()
+            #print("To get keys between end nodes run_e91")
+            qsdc1_state=1
+         else:
+            print("Path to config file is not given\n")
+      
+      elif command=='run_qsdc1':
+         
+         if qsdc1_state==1:
+            if len(args)==4:
+               sender=args[0]
+               receiver=args[1]
+               sequence_length=int(args[2])
+               message=args[3]
+               if (len(message)%2==0):
+                  
+                  n=int(sequence_length*len(message))
+                  alice=network_topo.nodes[sender]
+                  bob = network_topo.nodes[receiver]
+                  qsdc1=QSDC1()
+                  alice,bob=qsdc1.roles(alice,bob,n)
+                  tl.init()
+                  tl.run()  
+                  qsdc1.run_first_QSDC(alice,bob,sequence_length,message)
+               else:
+                  print("Enter message of even length")
+            else:
+               print("incorrect sender or receiver or sequencelength or message") 
+         else:
+            print("Topology is not yet loaded ,enter command to Load topology")
+
+      elif command=='exit':
+         break
+
+      elif command=='help':
+         print("\nCommand to Load topology $: load_topology <path_to_json_file>")
+         print("$:load_topology config.json")
+         print("\nEnter command to run  first qsdc protocol $:run_qsdc1 <sender> <receiver> <sequence_length> <key>")
+         print("$:run_qsdc1 endnode1 endnode2 4 010101")
+         print("\ncommand to exit Simulation $:exit\n")
+
+      else:
+         print("Enter correct command")
+
+def ip1(ip1_state):
+
+   print("\nEnter command for help page $:help")
+   print("\nEnter command to Load topology $: load_topology <path_to_json_file>")
+   print("\nEnter command to run ip_protocol 1 $:run_ip1 <sender> <receiver> <message>")
+   print("\nEnter command to exit Simulation $:exit\n")
+   while True:
+
+      user_input = input('>>>')
+      tokens = user_input.split()
+      command = tokens[0]
+      args=tokens[1:]
+
+      if command=='load_topology'and (ip1_state==0 or ip1_state==1) :
+         if len(args)==1:
+            print('\nLoaded topology\n')
+            path=args[0]
+            tl,network_topo=load_topo(path,"Qutip")
+            network_topo.get_virtual_graph()
+            #print("To get keys between end nodes run_e91")
+            ip1_state=1
+         else:
+            print("Path to config file is not given\n")
+      
+      elif command=='run_ip1':
+         
+         if ip1_state==1:
+            if len(args)==3:
+               sender=args[0]
+               receiver=args[1]
+               message=args[2]
+               
+               alice=network_topo.nodes[sender]
+               bob = network_topo.nodes[receiver]
+               ip1=IP1()
+               alice,bob=ip1.roles(alice,bob,n=50)
+               tl.init()
+               tl.run()  
+               ip1.run_ip_protocol(alice,bob,message)
+              
+            else:
+               print("incorrect sender or receiver or message") 
+         else:
+            print("Topology is not yet loaded ,enter command to Load topology")
+
+      elif command=='exit':
+         break
+
+      elif command=='help':
+         print("\nCommand to Load topology $: load_topology <path_to_json_file>")
+         print("$:load_topology config.json")
+         print("\nEnter command to run ip protocol 1 $:run_ip1 <sender> <receiver> <message>")
+         print("$:run_qsdc1 endnode1 endnode2 010101")
+         print("\ncommand to exit Simulation $:exit\n")
+
+      else:
+         print("Enter correct command")
 
 def input_entanglements(e2e_state):
 
    print("\n ----E2E entanglements--- ")  
-   print("\nEnter command for help page $:--help")
+   print("\nEnter command for help page $:help")
    print("\nEnter command for backend $:backend Qiskit/Qutip")
    print("\nEnter command to Load topology $: load_topology <path_to_json_file>")
    print("\nEnter command requesting entanglements $:")
-   print("ent_req  <src node-name> <dst node-name> <start_time> <size> <end_time> <priority> <target_fidelity> <timeout>")
+   print("ent_req  <src node-namping_pong_statee> <dst node-name> <start_time> <size>  <priority> <target_fidelity> <timeout>")
    print("\nEnter command to run simulation $: run_sim ")    
    print("\nEnter command to get results $: get_res ")
    print("\nEnter command to exit Simulation $:exit")
@@ -186,7 +369,7 @@ def input_entanglements(e2e_state):
                network_topo.get_virtual_graph()
                
                print("Enter command requesting entanglements $:")
-               print(" ent_req  <src node-name> <dst node-name> <start_time> <size> <end_time> <priority> <target_fidelity> <timeout>")
+               print(" ent_req  <src node-name> <dst node-name> <start_time> <size>  <priority> <target_fidelity> <timeout>")
             else:
                print("Path to config file is not given")
          elif(e2e_state==0):
@@ -196,21 +379,25 @@ def input_entanglements(e2e_state):
 
       elif command == 'ent_req':
          if (e2e_state==2 or e2e_state==3):
-            if len(args)==8:
+            if len(args)==7:
                node1=args[0]
                node2=args[1]
                start_time=(int(args[2]))*1e12
-               size=args[3]
-               end_time=(int(args[4]))*1e12
-               priority=args[5]
-               target_fidelity=args[6]
-               timeout=(int(args[7]))*1e12
-               req_pairs.append((node1,node2))
-               tm=network_topo.nodes[node1].transport_manager
-               tm.request(node2, float(start_time),int(size), float(end_time), int(priority) ,float(target_fidelity), float(timeout) )
-               print("Enter command to run simulation  OR ")  
-               print("Enter command to request more entanglements")
-               e2e_state=3  
+               if start_time>20 and start_time<0:
+                  print("start time should be less than 20")
+               else:   
+                  size=args[3]
+                  #end_time=(int(args[4]))*1e12
+                  priority=args[4]
+                  target_fidelity=args[5]
+                  timeout=(int(args[6]))*1e12
+                  tm=network_topo.nodes[node1].transport_manager
+                  #end time of req is simulation end time
+                  tm.request(node2, float(start_time),int(size), 20e12 , int(priority) ,float(target_fidelity), float(timeout) )
+                  req_pairs.append((node1,node2))
+                  print("Enter command to run simulation  OR ")  
+                  print("Enter command to request more entanglements")
+                  e2e_state=3  
             else:
                print("Incorrect request parameters")
          elif (e2e_state==0):
@@ -262,14 +449,14 @@ def input_entanglements(e2e_state):
       elif command == 'exit':
          break
 
-      elif command=='--help':
+      elif command=='help':
          print("\ncommand for backend $:backend <Qiskit/Qutip>")
          print("$:backend Qiskit")
          print("\ncommand to Load topology $: load_topology <path_to_json_file>")
          print("$:load_topology config.json")
          print("\ncommand to request entanglements ")
-         print("$:ent_req  <src node-name> <dst node-name> <start_time> <size> <end_time> <priority> <target_fidelity> <timeout>")
-         print("$:ent_req endnode1 endnode2 5 10 20 0 0.5 2 ")
+         print("$:ent_req  <src node-name> <dst node-name> <start_time> <size> <priority> <target_fidelity> <timeout>")
+         print("$:ent_req endnode1 endnode2 5 10 0 0.5 2 ")
          print("\ncommand to run simulation $: run_sim ")    
          print("\ncommand to get results $: get_res ")
          print("\ncommand to exit Simulation $:exit\n")
@@ -278,6 +465,125 @@ def input_entanglements(e2e_state):
       else:
          print('Enter correct command')
 
+def telportation(tel_state):
+
+   print("\n ----Teleportation----")   
+   print("\nEnter command for help page $:help")
+   print("\nEnter command to Load topology $: load_topology <path_to_json_file>")
+   print("\nEnter command to run tel $:run_tel <sender> <receiver> <random_qubit_amplitud|0> > <random_qubit_amplitude|1> >")
+   print("\nEnter command to exit Simulation $:exit\n")
+
+
+   while True:
+      user_input = input('>>>')
+      tokens = user_input.split()
+      command = tokens[0]
+      args=tokens[1:]
+
+      if command=='load_topology'and (tel_state==0 or tel_state==1) :
+         if len(args)==1:
+            print('\nLoaded topology\n')
+            path=args[0]
+            tl,network_topo=load_topo(path,"Qutip")
+            network_topo.get_virtual_graph()
+            #print("To get keys between end nodes run_e91")
+            tel_state=1
+         else:
+            print("Path to config file is not given\n")
+      
+      elif command=='run_tel':
+         
+         if tel_state==1:
+            if len(args)==4:
+               sender=args[0]
+               receiver=args[1]
+               A_0=complex(args[2])
+               A_1=complex(args[3])
+               alice=network_topo.nodes[sender]
+               bob = network_topo.nodes[receiver]
+               tel= Teleportation()
+               alice,bob=tel.roles(alice,bob)
+               tl.init()
+               tl.run()  
+               tel.runtel(alice,bob,A_0,A_1)
+            else:
+               print("incorrect sender or receiver or random qubit amplitudes") 
+         else:
+            print("Topology is not yet loaded ,enter command to Load topology")
+
+      elif command=='exit':
+         break
+
+      elif command=='help':
+         print("\nCommand to Load topology $: load_topology <path_to_json_file>")
+         print("$:load_topology config.json")
+         print("\nCommand to run tel $:run_e91 <sender> <receiver> <random_qubit_amplitud|0> > <random_qubit_amplitude|1>")
+         print("$:run_e91 endnode1 endnode2 112")
+         print("\ncommand to exit Simulation $:exit\n")
+
+      else:
+         print("Enter correct command")
+
+def ghz(ghz_state):
+
+   print("\n ----GHZ----")   
+   print("\nEnter command for help page $:help")
+   print("\nEnter command to Load topology $: load_topology <path_to_json_file>")
+   print("\nEnter command to run tel $:run_ghz <endnode1> <endnode2> <endnode3> <middlenode>")
+   print("\nEnter command to exit Simulation $:exit\n")
+
+
+   while True:
+      user_input = input('>>>')
+      tokens = user_input.split()
+      command = tokens[0]
+      args=tokens[1:]
+
+      if command=='load_topology'and (ghz_state==0 or ghz_state==1) :
+         if len(args)==1:
+            print('\nLoaded topology\n')
+            path=args[0]
+            tl,network_topo=load_topo(path,"Qutip")
+            network_topo.get_virtual_graph()
+            #print("To get keys between end nodes run_e91")
+            ghz_state=1
+         else:
+            print("Path to config file is not given\n")
+      
+      elif command=='run_ghz':
+         
+         if ghz_state==1:
+            if len(args)==4:
+               endnode1=args[0]
+               endnode2=args[1]
+               endnode3=args[2]
+               middlenode=args[3]
+               alice=network_topo.nodes[endnode1]
+               bob = network_topo.nodes[endnode2]
+               charlie=network_topo.nodes[endnode3]
+               middlenode=network_topo.nodes[middlenode]
+               ghz= GHZ()
+               alice,bob,charlie,middlenode=ghz.roles(alice,bob,charlie,middlenode)
+               tl.init()
+               tl.run()  
+               ghz.perform_ghz(alice,bob,charlie,middlenode)
+            else:
+               print("incorrect endnode1 or endnode2 or endnode3 or middlenode") 
+         else:
+            print("Topology is not yet loaded ,enter command to Load topology")
+
+      elif command=='exit':
+         break
+
+      elif command=='help':
+         print("\nCommand to Load topology $: load_topology <path_to_json_file>")
+         print("$:load_topology config.json")
+         print("\nCommand to run ghz $:run_ghz <endnode1> <endnode2> <endnode3> <middlenode>")
+         print("$:run_e91 endnode1 endnode2 endnode3 middlenode")
+         print("\ncommand to exit Simulation $:exit\n")
+
+      else:
+         print("Enter correct command")
 
 
 
@@ -291,6 +597,11 @@ def main():
 
       print("\nEnter e91 for e91 to get keys")
       print("Enter e2e for two party end-to-end Entanglements between remote Nodes")
+      print("Enter tel for telportation between remote Nodes")
+      print("Enter ghz for to get GHZ state at middle node")
+      print("Enter ping_pong to ping_pong protocol")
+      print("Enter first_qsdc for first_qsdc protocol")
+      print("Enter ip1  for ip protocol 1")
       print("Enter Quit to Quit\n")
 
       user_input = input('>>>')
@@ -303,7 +614,28 @@ def main():
       
       elif command=='e2e':
          e2e_state=0
-         input_entanglements(e2e_state)  
+         input_entanglements(e2e_state)
+
+      elif command=='tel':
+         tel_state=0
+         telportation(tel_state)  
+
+      elif command=='ghz':
+         ghz_state=0
+         ghz(ghz_state)
+
+      elif command=='ping_pong':
+         ping_pong_state=0
+         ping_pong(ping_pong_state)
+
+      elif command=='first_qsdc':
+         qsdc1_state=0
+         qsdc1(qsdc1_state)
+
+      elif command=='ip1':
+         ip1_state=0
+         ip1(ip1_state)
+
 
       elif command=='Quit':         
          break
@@ -312,156 +644,3 @@ def main():
          print("Enter correct command")
         
 main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
-def input_e91():
-
-   print("\n ----E91 QKD--- ")   
-   print("\nEnter command to Load topology $: load_topology <path_to_json_file>")
-
-   user_input = input('>>>')
-   tokens = user_input.split()
-   command = tokens[0]
-   args = tokens[1]
-   if command == 'load_topology':
-      print('Load_topo')
-      tl,network_topo=load_topo(args,"Qiskit")
-   else:
-      print("Enter correct command")
-
-   set_parameters(network_topo)
-
-   
-   print("\nEnter command to run E91")
-   user_input = input('>>>')
-   tokens = user_input.split()
-   command = tokens[0]
-   sender = tokens[1]
-   receiver = tokens[2]
-   if command == 'run_e91':
-      print('run_e91')
-      n=100
-      alice=network_topo.nodes[sender]
-      bob = network_topo.nodes[receiver]
-      e91=E91()
-      alice,bob=e91.roles(alice,bob,n)
-      
-      tl.init()
-      tl.run()  
-      e91.runE91(alice,bob,n)
-   else:
-      print("Enter correct command")
-
-"""
-
-"""
-def input_entanglements():
-   while True:
-      print("\nChoose Backend for Simulator")
-      print("Enter Qiskit for Qiskit backend ,Qutip for Qutip backend")
-      user_input = input('>>>')
-      tokens = user_input.split()
-      command = tokens[0]
-      if command=='Qiskit':
-         backend="Qiskit"
-         print("Qiskit was selected")
-      elif command=='Qutip':
-         backend="Qutip"
-         print("Qutip was selected")
-      else :
-         print("Enter correct command")
-
-
-
-      print("\nEnter command to Load topology $: load_topo <path_to_json_file>")
-      user_input = input('>>>')
-      tokens = user_input.split()
-      command = tokens[0]
-      args = tokens[1]
-      if command == 'load_topo':
-         print('Load_topo')
-         tl,network_topo=load_topo(args,backend)
-      else:
-         print("Enter correct command")
-      set_parameters(network_topo)
-
-      req=True
-      req_pairs=[]
-      #dst=[]
-      while req:
-         
-         print("\nEnter command to Load topology $: create_req  <src node-name> <dst node-name> <start_time> <size> <end_time> <priority> <target_fidelity> <timeout>")
-         user_input = input('>>>')
-         tokens = user_input.split()
-         command = tokens[0]
-         node1=tokens[1]
-         node2=tokens[2]
-         start_time=tokens[3]
-         size=tokens[4]
-         end_time=tokens[5]
-         priority=tokens[6]
-         target_fidelity=tokens[7]
-         timeout=tokens[8]
-         if command == 'create_req':
-            print('create_req')
-            #load_topo(args)
-            req_pairs.append((node1,node2))
-            tm=network_topo.nodes[node1].transport_manager
-            tm.request(node2, float(start_time),int(size), float(end_time), int(priority) ,float(target_fidelity), float(timeout) )
-         else:
-            print("Enter correct command")
-         print("\n Enter Y to continue to give more requests")
-         user_input = input('>>>')
-         tokens = user_input.split()
-         command = tokens[0]
-         if command != 'Y':
-            req=False
-         
-
-      print("\nEnter command to start simulation")
-      print("Enter command to run simulation $: run_sim \n")
-      user_input = input('>>>')
-      tokens = user_input.split()
-      command = tokens[0]
-      args = tokens[1:]
-      if command == 'run_sim':
-         print('run_sim')
-         #load_topo(args)
-         tl.init()
-         tl.run()
-
-
-      print("\nEnter command to Get Result")
-      print("Enter command to Load topology $: get_res \n")
-      user_input = input('>>>')
-      tokens = user_input.split()
-      command = tokens[0]
-      if command == 'get_res':
-         print('get_res')
-         get_res(network_topo,req_pairs)
-
-      print("Enter Quit to exit Simulation")
-      user_input = input('>>>')
-      tokens = user_input.split()
-      command = tokens[0]
-      if command == 'Quit':
-         break
-
-"""
-"""
-virt_graph=network_topo.get_virtual_graph()
-network_topo.plot_graph(virt_graph)
-"""
