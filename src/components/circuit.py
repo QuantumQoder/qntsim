@@ -49,9 +49,11 @@ def t_gate():
 
 def validator(func):
     def wrapper(self, *args, **kwargs):
+        rot_gates =['rx','ry','rz']
         for q in args:
-            assert q < self.size, 'qubit index out of range'
-            assert q not in self.measured_qubits, 'qubit has been measured'
+            if func.__name__ not in rot_gates:
+                assert q < self.size, 'qubit index out of range'
+                assert q not in self.measured_qubits, 'qubit has been measured'
         if func.__name__ != 'measure':
             self._cache = None
         return func(self, *args, **kwargs)
@@ -283,11 +285,29 @@ class QutipCircuit(BaseCircuit):
                     qc.add_gate('T', indices[0])
                 elif name == 's':
                     qc.add_gate('S', indices[0])
+                elif name == 'ry':
+                    qc.add_gate('RY', indices[0],arg_value=indices[1])
+                elif name == 'rx':
+                    qc.add_gate('RX', indices[0],arg_value=indices[1])
+                elif name == 'rz':
+                    qc.add_gate('RZ', indices[0],arg_value=indices[1])
                 else:
                     raise NotImplementedError
             self._cache = gate_sequence_product(qc.propagators()).full()
             return self._cache
         return self._cache
+
+    @validator
+    def ry(self, qubit, arg_value):
+        self.gates.append(['ry',[qubit,arg_value]])
+
+    @validator
+    def rx(self,qubit, arg_value):
+        self.gates.append(['rx',[qubit,arg_value]])
+
+    @validator
+    def rz(self,qubit, arg_value):
+        self.gates.append(['rz',[qubit,arg_value]])
 
     @validator
     def h(self, qubit: int):

@@ -222,7 +222,7 @@ class EndNode(Node):
 
     def __init__(self, name: str, timeline: "Timeline", memo_size=500):
         super().__init__(name, timeline)
-        
+        self.memo_size = memo_size
         self.memory_array = MemoryArray(name + ".MemoryArray", timeline, num_memories=memo_size)
         self.memory_array.owner = self
         self.message_handler = MessageQueueHandler(self)
