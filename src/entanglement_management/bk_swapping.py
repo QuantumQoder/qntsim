@@ -257,7 +257,10 @@ class EntanglementSwappingA(EntanglementProtocol):
             float: fidelity of swapped entanglement.
         """
 
-        return f1 * f2 * self.degradation
+        # return f1 * f2 * self.degradation
+        return 1/4+3/4*((4*f1-1)/3) * ((4*f2-1)/3) * self.degradation
+        # return 1/4+3/4((p1*p2*(4*((ita)^2)-1)/3)*((4*f1-1)/3)((4*f2-1)/3))
+        # return 1/4+3/4*((4*f1-1)/3) * ((4*f2-1)/3)
 
     def received_message(self, src: str, msg: "Message") -> None:
         """Method to receive messages (should not be used on A protocol)."""
