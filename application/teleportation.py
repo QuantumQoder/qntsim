@@ -244,6 +244,6 @@ class Teleportation():
 
     def runtel(self,alice,bob,A_0,A_1):
         crz,crx,case=self.alice_measurement(A_0,A_1,alice)
-        print("crz",crz)
-        print("crx",crx)
+        print("Measurement result of random qubit crz",crz)
+        print("Measurement result of alice qubit crx",crx)
         self.bob_gates(crz,crx,case,bob)

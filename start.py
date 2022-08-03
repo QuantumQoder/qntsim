@@ -110,14 +110,17 @@ def input_e91(e91_state):
                sender=args[0]
                receiver=args[1]
                keys=int(args[2])
-               n=int((9*keys)/2)
-               alice=network_topo.nodes[sender]
-               bob = network_topo.nodes[receiver]
-               e91=E91()
-               alice,bob=e91.roles(alice,bob,n)
-               tl.init()
-               tl.run()  
-               e91.runE91(alice,bob,n)
+               if keys<50 and keys>0:
+                  n=int((9*keys)/2)
+                  alice=network_topo.nodes[sender]
+                  bob = network_topo.nodes[receiver]
+                  e91=E91()
+                  alice,bob=e91.roles(alice,bob,n)
+                  tl.init()
+                  tl.run()  
+                  e91.runE91(alice,bob,n)
+               else:
+                  print("key length should be less than 50")
             else:
                print("incorrect sender or receiver or keylength") 
          else:
@@ -130,7 +133,7 @@ def input_e91(e91_state):
          print("\nCommand to Load topology $: load_topology <path_to_json_file>")
          print("$:load_topology config.json")
          print("\nCommand to run E91 $:run_e91 <sender> <receiver> <keylength>")
-         print("$:run_e91 endnode1 endnode2 112")
+         print("$:run_e91 endnode1 endnode2 20")
          print("\ncommand to exit Simulation $:exit\n")
 
       else:
@@ -168,17 +171,18 @@ def ping_pong(ping_pong_state):
                receiver=args[1]
                sequence_length=int(args[2])
                message=args[3]
-               n=int(sequence_length*len(message))
-               alice=network_topo.nodes[sender]
-               bob = network_topo.nodes[receiver]
-               pp=PingPong()
-               alice,bob=pp.roles(alice,bob,n)
-               tl.init()
-               tl.run() 
-               print("print bug") 
-               pp.create_key_lists(alice,bob)
-               print("a ,b, s",pp.alice_key_list,pp.bob_key_list,pp.state_key_list)
-               pp.run_ping_pong(alice,bob,sequence_length,message)
+               if len(message)<=9:
+                  n=int(sequence_length*len(message))
+                  alice=network_topo.nodes[sender]
+                  bob = network_topo.nodes[receiver]
+                  pp=PingPong()
+                  alice,bob=pp.roles(alice,bob,n)
+                  tl.init()
+                  tl.run() 
+                  pp.create_key_lists(alice,bob)
+                  pp.run_ping_pong(sequence_length,message)
+               else:
+                  print("message length should be less than 9")
             else:
                print("incorrect sender or receiver or sequencelength or message") 
          else:
