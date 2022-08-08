@@ -26,7 +26,7 @@ class QSDC1():
         sender=alice
         receiver=bob
         print('sender, receiver',sender.owner.name,receiver.owner.name)
-        return self.request_entanglements(sender,receiver,n=100)
+        return self.request_entanglements(sender,receiver,n)
 
 
     def check_phi_plus(self,state):
@@ -159,8 +159,8 @@ class QSDC1():
         #print(list(output.values()))
         return output
 
-    def run_first_QSDC(self,alice,bob,message):
-        message = "110011001001010101010100"
+    def run_first_QSDC(self,alice,bob,sequence_length,message):
+        #message = "110011001001010101010100"
         assert len(message)%2 == 0
         entangled_keys,alice_bob_keys_dict  = self.create_entanglement(alice,bob)
         qm_alice = alice.timeline.quantum_manager

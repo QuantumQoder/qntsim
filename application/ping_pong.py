@@ -21,6 +21,8 @@ class PingPong():
     alice_key_list, bob_key_list = [], []
     state_key_list=[]
     alice_bob_keys_dict={}
+    alice=None
+    bob=None
     
     def request_entanglements(self,sender,receiver,n):
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.5,5e12)
@@ -30,19 +32,20 @@ class PingPong():
         sender=alice
         receiver=bob
         print('sender, receiver',sender.owner.name,receiver.owner.name)
-        return self.request_entanglements(sender,receiver,n)
+        return self.request_entanglements(sender,receiver,200)
     
     def create_key_lists(self,alice,bob):
-
+        self.alice=alice
+        self.bob=bob
         for info in alice.resource_manager.memory_manager:
             alice_key=info.memory.qstate_key
             self.alice_key_list.append(alice_key)
-        print('Alice keys',self.alice_key_list)
+        #print('Alice keys',self.alice_key_list)
         
         for info in bob.resource_manager.memory_manager:
             bob_key=info.memory.qstate_key
             self.bob_key_list.append(bob_key)
-        print('Bob keys',self.bob_key_list)
+        #print('Bob keys',self.bob_key_list)
 
     def z_measurement(self,qm, key):
         circ=QutipCircuit(1)       #Z Basis measurement
@@ -58,11 +61,11 @@ class PingPong():
             return True
         else : return False
 
-    def create_psi_plus_entanglement(self,alice,bob):
+    def create_psi_plus_entanglement(self):
         entangled_keys = []
-        qm_alice=alice.timeline.quantum_manager
+        qm_alice=self.alice.timeline.quantum_manager
 
-        for info in bob.resource_manager.memory_manager:
+        for info in self.bob.resource_manager.memory_manager:
 
             key=info.memory.qstate_key
             state=qm_alice.get(key)
@@ -73,9 +76,9 @@ class PingPong():
             #Filtering out phi_minus, created randomly, from phi_plus
             if(not self.check_phi_plus(state.state)):continue
 
-            print(state)
+            #print(state)
             self.state_key_list.append(state.keys)
-            print('state key list', self.state_key_list)
+            #print('state key list', self.state_key_list)
             self.alice_bob_keys_dict[state.keys[0]] = state.keys[1]
             self.alice_bob_keys_dict[state.keys[1]] = state.keys[0]
             self.to_psi_plus(qm_alice, state.keys)
@@ -97,14 +100,14 @@ class PingPong():
         circ.h(0) 
         circ.cx(0,1)
         qm.run_circuit(circ, keys)
-        print('to psi plus',keys)
+        #print('to psi plus',keys)
         #return is_psi_plus
 
-    def protocol_c(self,alice,bob,entangled_keys):
+    def protocol_c(self,entangled_keys):
         meas_results_alice, meas_results_bob = [] , [] 
 
-        qm_alice=alice.timeline.quantum_manager
-        for info in alice.resource_manager.memory_manager:
+        qm_alice=self.alice.timeline.quantum_manager
+        for info in self.alice.resource_manager.memory_manager:
 
             alice_key=info.memory.qstate_key
             state=qm_alice.get(alice_key)
@@ -112,8 +115,8 @@ class PingPong():
             if alice_key not in entangled_keys: continue
             meas_results_alice.append(self.z_measurement(qm_alice, alice_key))
             
-        qm_bob=bob.timeline.quantum_manager
-        for info in bob.resource_manager.memory_manager:
+        qm_bob=self.bob.timeline.quantum_manager
+        for info in self.bob.resource_manager.memory_manager:
 
             bob_key=info.memory.qstate_key
             state=qm_bob.get(bob_key)
@@ -136,16 +139,16 @@ class PingPong():
         print(output)
         return output
 
-    def protocol_m(self,alice,bob,x_n, current_keys):
+    def protocol_m(self,x_n, current_keys):
 
         meas_results_bob = []
-        qm_bob=bob.timeline.quantum_manager
-        print('protocl m',x_n, current_keys)
-        for i,info in enumerate(bob.resource_manager.memory_manager):
+        qm_bob=self.bob.timeline.quantum_manager
+        #print('protocl m',x_n, current_keys)
+        for i,info in enumerate(self.bob.resource_manager.memory_manager):
             bob_key=info.memory.qstate_key
             if bob_key in current_keys:
                 if bob_key in self.alice_bob_keys_dict.keys() or bob_key in self.alice_bob_keys_dict.values():
-                    print('new keylist',bob_key,self.alice_bob_keys_dict[bob_key])
+                    #print('new keylist',bob_key,self.alice_bob_keys_dict[bob_key])
                     meas_results_bob.append(self.encode_and_bell_measure(x_n, qm_bob, [bob_key,self.alice_bob_keys_dict[bob_key]]))
         return meas_results_bob
 
@@ -178,7 +181,7 @@ class PingPong():
             return '0'
         else : return '#'
 
-    def one_bit_ping_pong(self,alice,bob,x_n, c, sequence_length, entangled_keys, round_num):
+    def one_bit_ping_pong(self,x_n, c, sequence_length, entangled_keys, round_num):
         #print("round_num ", round_num)
         memory_size = 10
 
@@ -186,12 +189,12 @@ class PingPong():
 
         draw = random.uniform(0, 1)
         while (draw < c):
-            print("Switching to protocol c ")
-            meas_results_alice, meas_results_bob = self.protocol_c(alice,bob,current_keys)
+            #print("Switching to protocol c ")
+            meas_results_alice, meas_results_bob = self.protocol_c(current_keys)
 
             for i in range(len(meas_results_alice)):
                 if not (list(meas_results_alice[i].values())[0] == 1 - list(meas_results_bob[i].values())[0]):
-                    print("Alice and Bob get same states -> Stop Protocol!")
+                    #print("Alice and Bob get same states -> Stop Protocol!")
                     return -1
 
             print("Protocol c passes through without trouble! No Eve detected yet")
@@ -202,9 +205,9 @@ class PingPong():
             current_keys = entangled_keys[round_num*sequence_length : (round_num + 1)*sequence_length]
 
         if (draw > c) : 
-            bell_results = self.protocol_m(alice,bob,x_n, current_keys)
+            bell_results = self.protocol_m(x_n, current_keys)
             round_num = round_num + 1
-            print("HERE", bell_results)
+            #print("HERE", bell_results)
             accuracy = self.get_percentage_accurate(bell_results, x_n)
             print(accuracy)
             if accuracy == 1 :
@@ -215,13 +218,13 @@ class PingPong():
                 return -1
 
 
-    def run_ping_pong(self,alice,bob,sequence_length,message):
+    def run_ping_pong(self,sequence_length,message):
         n = 0
         c = 0.2
         #sequence_length = 4
         
         bob_message = ""
-        entangled_keys = self.create_psi_plus_entanglement(alice,bob)
+        entangled_keys = self.create_psi_plus_entanglement()
         print("entangled_keys",entangled_keys)
         round_num = 0
         
@@ -229,8 +232,9 @@ class PingPong():
 
         while(n < len(message)):
             n = n+1
+            print(" whil n",n,len(message))
 
-            result, round_num = self.one_bit_ping_pong(alice,bob,message[n-1], c, sequence_length, entangled_keys, round_num)
+            result, round_num = self.one_bit_ping_pong(message[n-1], c, sequence_length, entangled_keys, round_num)
 
             if(result == -1): 
                 print("Protocol doesn't run because of the aforesaid mistakes!")
