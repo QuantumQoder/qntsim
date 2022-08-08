@@ -62,17 +62,13 @@ class Topology():
 
     def create_random_topology(self, n, config):  
         labels={}
-        G=nx.barabasi_albert_graph(n,2)
+        G=nx.barabasi_albert_graph(n,1)
         config = json5.load(open(config))
         for node in G.nodes:
             labels[node]="s"+str(node)
             for keys in config["end_node"]:
                 labels[node]=keys
-        # #print('ba graph',G.nodes)
-        #self.draw_graph(G)
-        #nx.draw(G, labels=labels, with_labels=True)
-        #plt.show()
-        
+    
          # create nodes
         for node_name in G.nodes:
             node = ServiceNode("s"+str(node_name), self.timeline)          
@@ -147,34 +143,108 @@ class Topology():
             # #print('check', node.name, key, value)
             self.nodes[key].service_node = value
     
-        #     if type(node) == EndNode:
-        #         #print('Add service node',config['end_node'])
-        #         for key, value in config['end_node'].items():
-        #             #print('end node key value',node.name, key, value )
-        #             if node.name == key:
-        #                 #print('check', node.name, key, value)
-        #                 node.service_node = value
-        #                 break
-        #     if type(node) ==  ServiceNode:
-        #         for key, value in config['end_node'].items():
-        #             if node.name == value:
-        #                 node.end_node =key
-        #                 break
-        #         #print('service noce end node',node.end_node)
+       
+    def create_linear_topology(self, n):  
+        labels={}
+        G=nx.path_graph(n,create_using=None)
+        #print("G node",G.nodes)
+        for node in G.nodes:
+            labels[node]="s"+str(node)
+        
+        # create nodes
+        for node_name in G.nodes:
+            #print("bug",node_name,type(node_name))
+            if node_name==0 or node_name==n-1:
+                #print("node mane",node_name)
+                node = EndNode("s"+str(node_name), self.timeline)          
+                self.add_node(node)
+            else:
+                node = ServiceNode("s"+str(node_name), self.timeline)          
+                self.add_node(node)
 
+        
+        #adding cchannels
+        for i in G.nodes:
+            if i!=n-1:
+                cchannel_params = {"delay": 1e9, "distance": 1e3}
+                self.add_classical_channel("s"+str(i) , "s"+str(i+1), **cchannel_params)
+        
+        k = range(n)[::-1]
+        for i in k:
+            if i!=0:
+                cchannel_params = {"delay": 1e9, "distance": 1e3}
+                self.add_classical_channel("s"+str(i) , "s"+str(i-1), **cchannel_params)
+                               
+        #create qconnections (two way quantum channel)
+        for (src,dst) in G.edges:   
+            qconnection_params = {"attenuation": 1e-5, "distance": 70}     
+            self.add_quantum_connection("s"+str(src), "s"+str(dst), **qconnection_params)
 
-        # for node in self.get_nodes_by_type("QuantumRouter"):
-        #     # #print('tplgy',node)
-        #     node.nx_graph=self.nx_graph
-        #     #-----------------------------------------------
-        #     node.all_pair_shortest_dist = all_pair_dist
-        #     node.neighbors = list(G.neighbors(node.name))
-            #-----------------------------------------------
-            # table = self.generate_forwarding_table(node.name)
-            # for dst, next_node in table.items():
-            #     node.network_manager.protocol_stack[0].add_forwarding_rule(dst, next_node)
+        all_pair_dist, G = self.all_pair_shortest_dist()
+        self.nx_graph=G
+        self.all_pair_shortest_distance=all_pair_dist
+        for node in self.nodes.values():
+            if type(node) != BSMNode:
+                node.all_pair_shortest_dist = all_pair_dist
+                node.nx_graph=self.nx_graph
+                node.delay_graph=self.cc_delay_graph
+                node.neighbors = list(G.neighbors(node.name))
+        if n>1:
+            self.nodes["s"+str(0)].service_node = "s"+str(1)
+            self.nodes["s"+str(n-1)].service_node = "s"+str(n-2)
+    
+    def create_star_topology(self, n):  
+        labels={}
+        G=nx.star_graph(n,create_using=None)
+        #print("Gstar node",G.nodes)
+        for node in G.nodes:
+            labels[node]="s"+str(node)
+        
+        # create nodes
+        for node_name in G.nodes:
+            #print("bug",node_name,type(node_name))
+            if node_name==0 :
+                #print("node mane",node_name)
+                node = ServiceNode("s"+str(node_name), self.timeline)          
+                self.add_node(node)
+            else:
+                node = EndNode("s"+str(node_name), self.timeline)          
+                self.add_node(node)
 
+        
+        #adding cchannels
+        for i in G.nodes:
+            if i!=0:
+                cchannel_params = {"delay": 1e9, "distance": 1e3}
+                self.add_classical_channel("s"+str(0) , "s"+str(i), **cchannel_params)
+        
+        
+        for i in G.nodes:
+            if i!=0:
+                cchannel_params = {"delay": 1e9, "distance": 1e3}
+                self.add_classical_channel("s"+str(i) , "s"+str(0), **cchannel_params)
+                               
+        #create qconnections (two way quantum channel)
+        for (src,dst) in G.edges:   
+            qconnection_params = {"attenuation": 1e-5, "distance": 70}     
+            self.add_quantum_connection("s"+str(src), "s"+str(dst), **qconnection_params)
 
+        all_pair_dist, G = self.all_pair_shortest_dist()
+        self.nx_graph=G
+        self.all_pair_shortest_distance=all_pair_dist
+        for node in self.nodes.values():
+            if type(node) != BSMNode:
+                node.all_pair_shortest_dist = all_pair_dist
+                node.nx_graph=self.nx_graph
+                node.delay_graph=self.cc_delay_graph
+                node.neighbors = list(G.neighbors(node.name))
+        for i in range(n+1):
+            if i!=0:
+                self.nodes["s"+str(i)].service_node = "s"+str(0)
+    
+
+       
+   
 
 
     def load_config(self, config_file: str) -> None:
@@ -428,7 +498,7 @@ class Topology():
         cchannel = ClassicalChannel(name, self.timeline, **kwargs)
         cchannel.set_ends(self.nodes[node1], self.nodes[node2])
         self.cchannels.append(cchannel)
-
+        #print(" add cc channel",cchannel ,cchannel.delay)
         # edit graph
         # #print('add classical channel',node1,node2)
         self._cc_graph[node1][node2] = cchannel.delay 

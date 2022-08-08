@@ -460,8 +460,13 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.memory.accepted_index = accepted_index
 
         self.update_resource_manager(self.memory, 'ENTANGLED')
-        print('_entanglement_succeed:  len(self.subtask.protocols): ', len(self.subtask.protocols))
+        #print('_entanglement_succeed:  len(self.subtask.protocols): ', len(self.subtask.protocols))
         self.subtask.on_complete(1)
+        dst=self.subtask.task.get_reservation().responder
+        src=self.subtask.task.get_reservation().initiator
+        if (self.own.name==src and self.other==dst) or (self.own.name==dst and self.other==src) :
+            print(f'Entanglement sucessful between {src,dst}')
+
 
     def _entanglement_fail(self):
         #print("Entanglement fail",self.own.name,self.other)

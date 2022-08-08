@@ -225,13 +225,13 @@ class EntanglementSwappingA(EntanglementProtocol):
                                                 remote_memo=self.left_memo.entangled_memory["memo_id"],
                                                 expire_time=expire_time,
                                                 meas_res=[]) 
-            print('Entanglement Swapping successful')
+            #print('Entanglement Swapping successful')
             self.subtask.on_complete(1)
         else:
             expire_time = min(self.left_memo.get_expire_time(), self.right_memo.get_expire_time())
             msg_l = Message(MsgRecieverType.PROTOCOL, self.left_protocol.name ,SwappingMsgType.SWAP_RES, left_protocol=self.left_protocol.name, fidelity=0,expire_time=expire_time)
             msg_r = Message(MsgRecieverType.PROTOCOL, self.right_protocol.name,SwappingMsgType.SWAP_RES, right_protocol=self.right_protocol.name, fidelity=0,expire_time=expire_time)
-            print('Entanglement Swapping failed')
+            #print('Entanglement Swapping failed')
             self.subtask.on_complete(-1)
 
         self.own.message_handler.send_message(self.left_node, msg_l)
@@ -391,8 +391,13 @@ class EntanglementSwappingB(EntanglementProtocol):
             self.update_resource_manager(self.memory, "ENTANGLED")
             # #print(f'Entanglement swap successful between {self.own.name, msg.kwargs["remote_node"]}')
             # #print(f'Time of Entanglement swap success: {self.own.timeline.now()}')
-            print(f'Entanglement swap successful between {self.own.name, msg.kwargs["remote_memo"]}')
+            #print(f'Entanglement swap successful between {self.own.name, msg.kwargs["remote_memo"]}')
             self.subtask.on_complete(1)
+            dst=self.subtask.task.get_reservation().responder
+            src=self.subtask.task.get_reservation().initiator
+            if (self.own.name==src and msg.kwargs["remote_node"]==dst) or (self.own.name==dst and msg.kwargs["remote_node"]==src) :
+                print(f'Entanglement sucessful between {src,dst}')
+
         else:
             # #print(f'Entanglement swap failed between {self.own.name, msg.kwargs["remote_node"]}')
             # #print(f'Time of Entanglement swap failure: {self.own.timeline.now()}')

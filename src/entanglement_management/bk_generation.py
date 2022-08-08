@@ -471,8 +471,13 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.update_resource_manager(self.memory, 'ENTANGLED')
         # #print(self.own.name + " entanglement success ",self.other, self.name, self.other_protocol.name)
         self.update_resource_manager(self.memory, 'ENTANGLED')
-        print('_entanglement_succeed:  len(self.subtask.protocols): ', len(self.subtask.protocols))
+        #print('_entanglement_succeed:  len(self.subtask.protocols): ', len(self.subtask.protocols))
         self.subtask.on_complete(1)
+        dst=self.subtask.task.get_reservation().responder
+        src=self.subtask.task.get_reservation().initiator
+        if (self.own.name==src and self.other==dst) or (self.own.name==dst and self.other==src) :
+            print(f'Entanglement sucessful between {src,dst}')
+
 
 
     def _entanglement_fail(self):
@@ -485,7 +490,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         # #print(self.own.name + " failed entanglement of memory with the node: ",self.other," {} ".format(self.memory.name))
         # ####print(f'Time of entanglement failure: {self.own.timeline.now()}')
         self.update_resource_manager(self.memory, 'RAW')
-        print('_entanglement_fail:  len(self.subtask.protocols): ', len(self.subtask.protocols))
+        #print('_entanglement_fail:  len(self.subtask.protocols): ', len(self.subtask.protocols))
         self.subtask.on_complete(-1)
 
 

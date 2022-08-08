@@ -54,16 +54,16 @@ class MessageQueueHandler():
 
         if priority == inf:
             priority = self.owner.timeline.schedule_counter
-        # print('send message', dst, self.owner.cchannels)
+        #print('send message', dst, self.owner.cchannels,self.owner.name)
         self.owner.cchannels[dst].transmit(msg, self.owner, priority)
    
     def push_message(self, src, msg):
         
         # self.protocol_queue = defaultdict(tuple)
         # self.manager_queue = defaultdict(tuple)
-        if hasattr(msg, 'id'):
-            if msg.id == 1 or msg.id == 2:
-                print('push message at ', self.owner.name, ' msg.receiver: ',msg.receiver)
+        #if hasattr(msg, 'id'):
+            #if msg.id == 1 or msg.id == 2:
+                #print('push message at ', self.owner.name, ' msg.receiver: ',msg.receiver)
                 
 
         if msg.receiver_type == MsgRecieverType.MANAGER:

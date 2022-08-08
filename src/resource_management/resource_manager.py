@@ -391,7 +391,7 @@ class ResourceManager():
                     ##print("receive message queue elif loop 2",self.owner.message_handler.manager_queue,self.owner.name )
                     protocol.start()
             else:
-                print('#######Protocol Not called##########')
+                #print('#######Protocol Not called##########')
                 ##print('Protocol Name: ', protocol.name)
                 #protocol.rule.protocols.remove(protocol)
                 protocol.subtask.protocols.remove(protocol)

@@ -93,8 +93,8 @@ class Task:
 		self.status = 'created'
 		self.dependencies = dependencies
 		self.action = action
-		print(f'type(self.action) : {type(action)}')
-		print(f'action:   {self.action}')
+		#print(f'type(self.action) : {type(action)}')
+		#print(f'action:   {self.action}')
 		self.creation_time = timestamp
 		self.updation_time = ''   #start execution time
 		self.completion_time = ''
@@ -139,19 +139,19 @@ class Task:
 
 	def on_subtask_success(self, subtask):
 		#Convey this info to the task manager and store the args in task manager
-		print('########Subtask Succeeded############## subtask.protocol name', subtask.name)
+		#print('########Subtask Succeeded############## subtask.protocol name', subtask.name)
 		self.task_manager.subtask_success(subtask)
 	
 	def on_subtask_failure(self, subtask):
 		#Convey this info to the task manager and store the args in task manager
-		print(f'########Subtask Failed############## : {subtask.name}')
+		#print(f'########Subtask Failed############## : {subtask.name}')
 		self.task_manager.subtask_failure(subtask)
 
 	def init_dependency_subtask_map(self):
 		for dependency in self.dependencies:
 			self.dependencies_subtask_map[dependency]	= []
-		print('Initialized the dependencies_subtask_map')
-		print('current status:	', self.dependencies_subtask_map)
+		#print('Initialized the dependencies_subtask_map')
+		#print('current status:	', self.dependencies_subtask_map)
 	
 	def set_action(self, action: Callable[
                      [List["MemoryInfo"]], Tuple["Protocol", List["str"], List[Callable[["Protocol"], bool]]]]):
@@ -165,17 +165,17 @@ class Task:
 		#	subtask_list = []
 		subtask_list.append(subtask)
 		self.dependencies_subtask_map[subtask.task] = subtask_list
-		print('Task name:	', self.name)
-		print('added a subtask to dependency  and map status is:	', [(d.name, [subt_.name for subt_ in sd]) for d, sd in self.dependencies_subtask_map.items()])
+		#print('Task name:	', self.name)
+		#print('added a subtask to dependency  and map status is:	', [(d.name, [subt_.name for subt_ in sd]) for d, sd in self.dependencies_subtask_map.items()])
 
 	def is_eligible(self):
 		#Loop over the dependencies_subtask_map and find if a subtask of all dependencies are available
-		print('checking eligibility of:	', self.name)
+		#print('checking eligibility of:	', self.name)
 		subtasks_available = []	
 		subtasks_available_list = [] #append the lists
 		for dependency, subtask_list in self.dependencies_subtask_map.items():
 			if len(subtask_list) == 0:
-				print(f'Not eligible yet because {dependency.name} does not have an instance to allocate')
+				#print(f'Not eligible yet because {dependency.name} does not have an instance to allocate')
 				return False, []
 			subtasks_available_list.append(subtask_list)
 			#subtask_list.remove(subtask_list[0])
@@ -183,7 +183,7 @@ class Task:
 		for subtask_list in subtasks_available_list:
 			subtasks_available.append(subtask_list[0])
 			subtask_list.remove(subtask_list[0])
-		print('subtasks_available:	', [st.name for st in subtasks_available])
+		#print('subtasks_available:	', [st.name for st in subtasks_available])
 		return True, subtasks_available
 			
 
@@ -215,15 +215,15 @@ class SubTask:
 		
 		protocol, req_dsts, req_condition_funcs = self.action(self.memories_info)
 		if protocol == True:
-			print('Purification not needed')
+			#print('Purification not needed')
 			self.on_complete(1)
 			return
 		
 		if protocol == None:
-			print('Could not create protocol instance: ')
+			#print('Could not create protocol instance: ')
 			return 
 
-		print(f'task.name: {self.task.name}  for node: {self.task.task_manager.owner.name} and memory returned for this: {self.memories_info[0].index}')
+		#print(f'task.name: {self.task.name}  for node: {self.task.task_manager.owner.name} and memory returned for this: {self.memories_info[0].index}')
 		self.protocols.extend(protocol)
 		protocol[0].subtask = self
 		self.name = protocol[0].name	#Do something about this
@@ -234,7 +234,7 @@ class SubTask:
 		
 		for dst, req_func in zip(req_dsts, req_condition_funcs):
 			self.task.task_manager.send_request(protocol[0], dst, req_func)
-			print('dst, req_func:	', dst, req_func)
+			#print('dst, req_func:	', dst, req_func)
 
 	"""
 		notify the parent task in case of success
@@ -247,7 +247,7 @@ class SubTask:
 			#Failure----We need to go back through the chain of all dependencies that lead to this point and need to retry them again
 			#This has to be handled through the task manager
 			#self.run()
-			print('reached inside on_complete subtask failure section')
+			#print('reached inside on_complete subtask failure section')
 			self.status = 0
 			self.task.on_subtask_failure(self)
 		else:
@@ -266,12 +266,12 @@ class SubTask:
 
 
 	def is_eligible_to_run(self):
-		print('subtask:	self.dependencies in is_eligible_to_run', [d.name for d in self.dependencies])
+		#print('subtask:	self.dependencies in is_eligible_to_run', [d.name for d in self.dependencies])
 		for dependency in self.dependencies:
 			if dependency.status != 1:
-				print('False')
+				#print('False')
 				return False
-		print('True')
+		#print('True')
 		return True
 
 #Each node has their separate Task Manager
@@ -309,7 +309,7 @@ class TaskManager:
 		#Remove none vals
 		dependencies = [i for i in dependencies if i != None]
 		
-		print('depedencies for task:  ', task.name ,'  are  ', [i.name for i in dependencies if i != None])
+		#print('depedencies for task:  ', task.name ,'  are  ', [i.name for i in dependencies if i != None])
 
 		entry = {}
 		entry['dependencies'] = dependencies
@@ -344,7 +344,7 @@ class TaskManager:
 
 		task.wakeup(self.owner.timeline.now())
 		subtasks = task.action(task.memories_info, dependency_subtasks=dependency_subtasks)
-		print('len(subtasks):	', len(subtasks))
+		#print('len(subtasks):	', len(subtasks))
 		for subtask in subtasks:
 			subtask.task = task
 			if subtask.is_eligible_to_run():
@@ -354,23 +354,23 @@ class TaskManager:
 	
 	def subtask_success(self, subtask):
 		# If subtask is a final_swap for a virtual link, we remember it
-		print(subtask.task.name, ' Task flag value: ', subtask.task.is_vl_final_swap_task)
+		#print(subtask.task.name, ' Task flag value: ', subtask.task.is_vl_final_swap_task)
 		if subtask.task.is_vl_final_swap_task:
 			responder = subtask.task.get_reservation().responder
 			if responder == self.owner.name:
 				responder = subtask.task.get_reservation().initiator
 			
-			print('responder: ', responder)
+			#print('responder: ', responder)
 			if responder not in self.owner.virtual_links:
 				self.owner.virtual_links[responder] = [subtask]
 			else:
 				self.owner.virtual_links[responder].append(subtask)
 			
-			print(f'Virtual links at : {self.owner.name} are : {self.owner.virtual_links}')
+			#print(f'Virtual links at : {self.owner.name} are : {self.owner.virtual_links}')
 		
 		#If subtask has dependents aready mapped, then execute them directly
-		print('In subtask_success')
-		print('subtask.dependents: ',len(subtask.dependents))
+		#print('In subtask_success')
+		#print('subtask.dependents: ',len(subtask.dependents))
 		if len(subtask.dependents) != 0:
 			for dependent_subtask in subtask.dependents:
 				if dependent_subtask.is_eligible_to_run():
@@ -379,7 +379,7 @@ class TaskManager:
 
 		#Get the parent task from this subtask and obtain its dependents
 		dependent_tasks = self.task_map[subtask.task]['is_dependecy_of']
-		print('dependent_tasks for this: ', len(dependent_tasks))
+		#print('dependent_tasks for this: ', len(dependent_tasks))
 
 		#Call the dependent task's dependency_subtask_map and append to it
 		for dependent_task in dependent_tasks:
@@ -391,7 +391,7 @@ class TaskManager:
 				#dependent_subtask = dependent_task.run()	#Create a subtask by running the dependent task along with passing the dependency subtask objects and memory indices
 				memories_info = []
 				for vals in dependency_subtasks:
-					print('dependency_subtasks name:	', vals.name)
+					#print('dependency_subtasks name:	', vals.name)
 					memories_info.extend(vals.memories_info)
 				
 				self.run_task(dependent_task, memories_info=memories_info, dependency_subtasks=dependency_subtasks)
@@ -399,8 +399,8 @@ class TaskManager:
 
 	def subtask_failure(self, subtask):
 		#Since subtask has failed we check if it was dependent on any other subtask and we keep on doing this till we reach the first subtask in the chain
-		print('subtask failed:	', subtask.name)
-		print('initial dependencies for this subtask:	', [i.name for i in subtask.initial_dependency_subtasks])
+		#print('subtask failed:	', subtask.name)
+		#print('initial dependencies for this subtask:	', [i.name for i in subtask.initial_dependency_subtasks])
 		for init_dep_subtask in subtask.initial_dependency_subtasks:
 			init_dep_subtask.run()
 		
@@ -480,13 +480,13 @@ class TaskManager:
 
 	def initiate_tasks(self):
 		#Loop over all the tasks and find the ones that don't have any dependencies associated
-		print("initiate_tasks running for node: ", self.owner.name)
+		#print("initiate_tasks running for node: ", self.owner.name)
 		for task, task_details in self.task_map.items():
-			if len(task_details['dependencies']) == 0:
-				print('Trying to initiate task: ', task.name ,'and its already run flag is: ', task.has_already_run)
+			#if len(task_details['dependencies']) == 0:
+				#print('Trying to initiate task: ', task.name ,'and its already run flag is: ', task.has_already_run)
 
-			if task.can_run_on_init:
-				print('Trying to initiate task: ', task.name ,'and its can_run_on_init flag is: ', task.can_run_on_init)
+			#if task.can_run_on_init:
+				#print('Trying to initiate task: ', task.name ,'and its can_run_on_init flag is: ', task.can_run_on_init)
 			
 			if len(task_details['dependencies']) == 0 and not task.has_already_run:
 				self.run_task(task)
@@ -498,7 +498,7 @@ class TaskManager:
 					#dependent_subtask = dependent_task.run()	#Create a subtask by running the dependent task along with passing the dependency subtask objects and memory indices
 					memories_info = []
 					for vals in dependency_subtasks:
-						print('dependency_subtasks name:	', vals.name)
+						#print('dependency_subtasks name:	', vals.name)
 						memories_info.extend(vals.memories_info)
 					
 					self.run_task(task, memories_info=memories_info, dependency_subtasks=dependency_subtasks)
