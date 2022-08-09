@@ -129,10 +129,14 @@ class E91():
         total32=sum(countA3B2)
         total34=sum(countA3B4)
 
-        expect12 = (countA1B2[0]-countA1B2[1]-countA1B2[2]+countA1B2[3])/total12
-        expect14 = (countA1B4[0]-countA1B4[1]-countA1B4[2]+countA1B4[3])/total14
-        expect32 = (countA3B2[0]-countA3B2[1]-countA3B2[2]+countA3B2[3])/total32
-        expect34 = (countA3B4[0]-countA3B4[1]-countA3B4[2]+countA3B4[3])/total34
+        try:
+            expect12 = (countA1B2[0]-countA1B2[1]-countA1B2[2]+countA1B2[3])/total12
+            expect14 = (countA1B4[0]-countA1B4[1]-countA1B4[2]+countA1B4[3])/total14
+            expect32 = (countA3B2[0]-countA3B2[1]-countA3B2[2]+countA3B2[3])/total32
+            expect34 = (countA3B4[0]-countA3B4[1]-countA3B4[2]+countA3B4[3])/total34
+        except ZeroDivisionError:
+            print(f'Error occured,Retry e91 again')
+
 
         corr=expect12-expect14+expect32+expect34
 
@@ -170,4 +174,4 @@ class E91():
         print('Key length',len(alice_key))
         print('Mismatched keys', key_mismatch)
         chsh_value=self.chsh_correlation(alice_results,bob_results,alice_choice,bob_choice,n)
-        #print('Correlation value', str(round(chsh_value,3)))
+        print('Correlation value', str(round(chsh_value,3)))

@@ -161,16 +161,19 @@ class PingPong():
             for result in bell_results:
                 if list(result.values()) == [0, 1]:
                     count+=1
-
-            return count/len(bell_results)
-
+            try:
+                return count/len(bell_results)
+            except ZeroDivisionError:
+                print(f'Error occured , Retry ping_pong again')
 
         elif x_n == '1':
             for result in bell_results:
                 if list(result.values()) == [1, 1]:
                     count+=1
-
-            return count/len(bell_results)
+            try:
+                return count/len(bell_results)
+            except ZeroDivisionError:
+                print(f'Error occured , Retry ping_pong again')
 
 
     def decode_bell(self,bell_results):

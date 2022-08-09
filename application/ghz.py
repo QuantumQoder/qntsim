@@ -33,7 +33,7 @@ class GHZ():
             if mem_info.state == 'ENTANGLED':
                 key=mem_info.memory.qstate_key
                 state= qm_alice.get(key)
-                print("alice keys",key, state.state)
+                print("alice state ",key, state.state)
                 return qm_alice,key,state
 
     def bob_keys(self,bob):
@@ -51,7 +51,7 @@ class GHZ():
             if mem_info.state == 'ENTANGLED':
                 key=mem_info.memory.qstate_key
                 state= qm_charlie.get(key)
-                print("charlie keys",key,state.state)
+                print("charlie state",key,state.state)
                 return qm_charlie,key,state
 
     def middle_keys(self,middlenode):
@@ -61,7 +61,7 @@ class GHZ():
             if mem_info.state == 'ENTANGLED':
                 key=mem_info.memory.qstate_key
                 state= qm_middle.get(key)
-                print("middle keys",key,state.state)
+                print("middlenode state",key,state.state)
                 return qm_middle,key,state
 
 
