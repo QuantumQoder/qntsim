@@ -1,10 +1,10 @@
 from topology.simulator.constants import *
+from qntsim.kernel.timeline import Timeline
+Timeline.DLCZ=False
+Timeline.bk=True
 from qntsim.topology.topology import Topology
-from qntsim.kernel.timeline import Timeline 
 
 def load_topology(network_config):
-    Timeline.DLCZ=False
-    Timeline.bk=True
     print("Loading Topology: " + network_config)
     
     tl = Timeline(4e12,"Qiskit")

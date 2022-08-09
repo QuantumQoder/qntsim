@@ -9,14 +9,18 @@ function loadTopology(topology_file) {
     console.log(topology_file);
     $.ajax({
         type: "GET",
-        url: "graph",
+        url: "makeGraph",
         data: {
             topology: topology_file,
         },
         dataType: "json",
         success: function (response) {
-            console.log(response);
-            $("#response").append(JSON.stringify(response));
+            if(response.success){
+                console.log("Graph of the topology is ready");
+                window.location.href='graph';
+            }else{
+                alert("Could not graph the topology");
+            }
         }
     });
 }

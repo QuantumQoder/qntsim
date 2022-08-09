@@ -1,2 +1,6 @@
 build/
 example/logger.txt
+**/__pycache/**
+*.pyc
+web/drawgraph.html
+web/topology/templates/graph.html

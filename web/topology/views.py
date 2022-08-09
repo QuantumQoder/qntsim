@@ -9,11 +9,18 @@ def index(request):
 	}
 	return render(request, 'load_topology.html', context)
 
-def graph(request):
-	topDir = r'D:\Qulabz-Code\QNTSIM\front\QNTSIM\topology\simulator'
-	topFile = topDir + '\\' + request.GET['topology']
+def makeGraph(request):
+
+	topFile = 'topology/simulator/' + request.GET['topology']
 	topoObj = graph_topology(topFile)
+
 	if topoObj:
-		return JsonResponse({'success':'true'})
+		return JsonResponse({'success':'true'}) 
 	else:
 		return JsonResponse({'success':'false'}) 
+
+def graph(request):
+	context = {
+		"title": "Topology Graph"
+	}
+	return render(request, 'graph.html', context)
