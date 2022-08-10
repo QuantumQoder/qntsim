@@ -9,3 +9,4 @@ SWAP_SUCC_PROB = 0.9
 SWAP_DEGRADATION = 0.99
 ATTENUATION = 1e-5
 QC_FREQ = 1e11
+MEMORY_COLS = ['Index','Source node', 'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'] 

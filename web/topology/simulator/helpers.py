@@ -12,7 +12,7 @@ def load_topology(network_config):
     network_topo = Topology("network_topo", tl)
     network_topo.load_config(network_config)
     
-    return network_topo
+    return tl,network_topo
 
 def set_parameters(topology: Topology):
     
