@@ -97,6 +97,7 @@ class GHZ():
 
 ####################################################################################
 
+# path (Type : String) -Path to config Json file
 #endnode1, endnode2 , endnode3 , middlenode (Type :string)- nodes in topology 
 #backend (Type :String) is Qutip (since state vectors are returned in output)
 #Todo Support on Qiskit

@@ -345,6 +345,8 @@ class IP1():
     #run_ip_protocol(message = "010010")
 
 #########################################################################################################################
+
+# path (Type : String) -Path to config Json file
 # sender and receiver (Type :string)-nodes in network 
 # backend (Type :string) Qutip (Since entanglements are filtered out based on EPR state)
 # message (Type: String)--a bit string

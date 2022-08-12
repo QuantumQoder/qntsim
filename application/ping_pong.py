@@ -270,6 +270,7 @@ class PingPong():
 
 #########################################################################################
 
+# path (Type : String) -Path to config Json file
 # sender and receiver (Type :string)-nodes in network 
 # backend (Type :string) Qutip (Since entanglements are filtered out based on EPR state)
 # Todo support on Qiskit
