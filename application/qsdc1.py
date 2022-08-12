@@ -198,11 +198,12 @@ class QSDC1():
 
 ##############################################################################################################
 
-# sender and receiver (input type :string)-nodes in network 
-# backend (input type :string) Qutip (Since entanglements are filtered out based on EPR state)
+# sender and receiver (Type :string)-nodes in network 
+# backend (Type :string) Qutip (Since entanglements are filtered out based on EPR state)
 # Todo Support on Qiskit
-# message length should be even
-# sequence length should be less than 5
+# message (Type: String)--a bit string
+# message length  should be even
+# sequence length (Type : Integer) should be less than 5
 """
 def run(path,sender,receiver,sequence_length,message):
 

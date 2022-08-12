@@ -11,6 +11,8 @@ from qiskit.quantum_info import random_statevector
 import math
 
 class GHZ():
+
+    #Requesting transport manager for entanglements
     def request_entanglements(self,endnode1,endnode2,endnode3,middlenode):
         endnode1.transport_manager.request(middlenode.owner.name, 5e12,1, 20e12, 0 , 0.5,2e12) 
         endnode2.transport_manager.request(middlenode.owner.name, 5e12,1, 20e12, 0 , 0.5,2e12) 
@@ -19,6 +21,7 @@ class GHZ():
         
         return endnode1,endnode2,endnode3,middlenode
 
+    # set's alice , bob ,charlie and middlenode 
     def roles(self,alice,bob,charlie,middlenode):
         endnode1=alice
         endnode2=bob
@@ -26,7 +29,7 @@ class GHZ():
         print('endnode1,endnode2,endnode3,middle',endnode1.owner.name,endnode2.owner.name,endnode3.owner.name,middlenode.owner.name)
         return self.request_entanglements(endnode1,endnode2,endnode3,middlenode)
 
-
+    # Gets alice's entangled memory state
     def alice_keys(self,alice):
         qm_alice = alice.timeline.quantum_manager
         for mem_info in alice.resource_manager.memory_manager:
@@ -35,7 +38,7 @@ class GHZ():
                 state= qm_alice.get(key)
                 print("alice state ",key, state.state)
                 return qm_alice,key,state
-
+    # Gets bob's entangled memory state
     def bob_keys(self,bob):
         qm_bob = bob.timeline.quantum_manager
         for mem_info in bob.resource_manager.memory_manager:
@@ -45,6 +48,7 @@ class GHZ():
                 print("bob state",key,state.state)
                 return qm_bob,key,state
 
+    # Gets charlie's entangled memory state
     def charlie_keys(self,charlie):
         qm_charlie = charlie.timeline.quantum_manager
         for mem_info in charlie.resource_manager.memory_manager:
@@ -53,7 +57,8 @@ class GHZ():
                 state= qm_charlie.get(key)
                 print("charlie state",key,state.state)
                 return qm_charlie,key,state
-
+    
+    #Gets middlenode's entangled memory state
     def middle_keys(self,middlenode):
         qm_middle = middlenode.timeline.quantum_manager
         for mem_info in middlenode.resource_manager.memory_manager:
@@ -77,12 +82,23 @@ class GHZ():
         qm_bob,bob_key,state=self.bob_keys(bob)
         qm_charlie,charlie_key,state=self.charlie_keys(charlie)
         qm_middle,middle_key,state=self.middle_keys(middlenode)
+
         circ = QutipCircuit(3)
+        circ.cx(0,2)
+        circ.cx(0,1)
+        circ.h(0)
+        circ.measure(0)
+        circ.measure(1)
+        circ.measure(2)
+        output = qm_middle.run_circuit(circ,[alice_key,bob_key,charlie_key])
+        print("Output", output)
+        print("\nGHZ State\n",  qm_middle.get(middle_key).state)
+        # print("Output", output, qm_middle.get(alice_key))
 
 ####################################################################################
 
-#endnode1,endnode2,endnode3,middlenode (input type :string)-nodes in network 
-#backend is Qutip (since state vectors are returned in output)
+#endnode1, endnode2 , endnode3 , middlenode (Type :string)- nodes in topology 
+#backend (Type :String) is Qutip (since state vectors are returned in output)
 #Todo Support on Qiskit
 
 """

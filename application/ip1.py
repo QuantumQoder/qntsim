@@ -344,10 +344,10 @@ class IP1():
     # I don't know
     #run_ip_protocol(message = "010010")
 
-
 #########################################################################################################################
-# sender and receiver (input type :string)-nodes in network 
-# backend (input type :string) Qutip (Since entanglements are filtered out based on EPR state)
+# sender and receiver (Type :string)-nodes in network 
+# backend (Type :string) Qutip (Since entanglements are filtered out based on EPR state)
+# message (Type: String)--a bit string
 # Todo Support on qiskit
 # no.of entanglements=50
 """

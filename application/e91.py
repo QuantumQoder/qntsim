@@ -5,17 +5,19 @@ from qntsim.components.circuit import BaseCircuit
 
 class E91():
 
+    # Request transport manager  for entanglements
     def request_entanglements(self,sender,receiver,n):
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.7,5e12)
         return sender,receiver
-
+    
+    # Sets the sender and receiver as alice and bob respectively, and request entanglements 
     def roles(self,alice,bob,n):
         sender=alice
         receiver=bob
         print('sender, receiver',sender.owner.name,receiver.owner.name)
         return self.request_entanglements(sender,receiver,n)
 
-
+    # circuit measurements
     def measurement(self,qm,choice, key):
         #print('choice',choice)
         if choice == 1: 
@@ -51,7 +53,7 @@ class E91():
         #print('output',output)
         return output
 
-
+    # measurements on alice side
     def alice_measurement(self,alice):
         choice=[1,2,3]
         qm_alice=alice.timeline.quantum_manager
@@ -68,7 +70,7 @@ class E91():
         # print('Alice measuremnt reuslts',meas_results_alice)
         return alice_choice_list,meas_results_alice
     
-
+    #measurements on bob side
     def bob_measurement(self,bob):
         qm_bob=bob.timeline.quantum_manager
         meas_results_bob=[]
@@ -176,12 +178,14 @@ class E91():
         chsh_value=self.chsh_correlation(alice_results,bob_results,alice_choice,bob_choice,n)
         print('Correlation value', str(round(chsh_value,3)))
 
+
 ###############################################################################################
 
-# sender and receiver (input type :string)-nodes in network 
-# backend (input type :string) -Qiskit
+# sender and receiver (Type : String)-nodes in network 
+# backend (Type : String) -Qiskit
+# path (Type : String) -Path to config Json file
 # To-do support on Qutip 
-# key_length should be <50 and >0
+# key_length(Type : Integer ) should be <50 and >0
 
 """
 def e91(backend,path,sender,receiver,key_length):
@@ -204,3 +208,6 @@ def e91(backend,path,sender,receiver,key_length):
         tl.run()  
         e91.run_e91(alice,bob,n)
 """   
+
+
+

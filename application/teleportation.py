@@ -250,10 +250,13 @@ class Teleportation():
 
 #################################################################################################
 
-# sender and receiver (input type :string)-nodes in network 
-# backend is Qutip (since state vectors are returned in output)
+# path (Type : String) -Path to config Json file
+# sender and receiver (Type :string)-nodes in network 
+# backend (Type : String)is Qutip (since state vectors are returned in output)
 # Todo support on Qiskit
-# A_0 amplitude of |0> and A_1 amplitude of |1> (input type :Complex)
+# A_0 (Type : Complex)
+# A_1 (Type : Complex)
+# A_0 amplitude of |0> and A_1 amplitude of |1> 
 # (abs(A_0)**2 + abs(A_1)**2 ==1) sum of absoulte values of amplitude's squares should be 1
 
 """
