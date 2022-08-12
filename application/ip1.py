@@ -347,3 +347,28 @@ class IP1():
 
 
     # key = qm_alice.new([amp1, amp2])
+
+# network_config : String : File path for json configuration file
+# sender : String : Sender node name
+# receiver : String : Receiver node name
+# message : String : Message to send
+def ip1(network_config, sender,receiver,message):
+    from qntsim.kernel.timeline import Timeline
+    Timeline.DLCZ=False
+    Timeline.bk=True
+    from qntsim.topology.topology import Topology
+
+    tl = Timeline(4e12,"Qiskit")
+
+    network_topo = Topology("network_topo", tl)
+    network_topo.load_config(network_config)
+
+    alice=network_topo.nodes[sender]
+    bob = network_topo.nodes[receiver]
+    ip1=IP1()
+    alice,bob=ip1.roles(alice,bob,n=50)
+    tl.init()
+    tl.run()  
+    ip1.run_ip_protocol(alice,bob,message)
+
+ip1("../example/4node.json", "a", "b", "test_message")
