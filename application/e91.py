@@ -142,7 +142,7 @@ class E91():
 
         return corr
 
-    def runE91(self,alice,bob,n):
+    def run(self,alice,bob,n):
         alice_choice,alice_meas=self.alice_measurement(alice)
         bob_choice,bob_meas=self.bob_measurement(bob)
         key_mismatch=0
@@ -175,3 +175,32 @@ class E91():
         print('Mismatched keys', key_mismatch)
         chsh_value=self.chsh_correlation(alice_results,bob_results,alice_choice,bob_choice,n)
         print('Correlation value', str(round(chsh_value,3)))
+
+###############################################################################################
+
+# sender and receiver (input type :string)-nodes in network 
+# backend (input type :string) -Qiskit
+# To-do support on Qutip 
+# key_length should be <50 and >0
+
+"""
+def e91(backend,path,sender,receiver,key_length):
+
+    from qntsim.kernel.timeline import Timeline 
+    Timeline.DLCZ=False
+    Timeline.bk=True
+    from qntsim.topology.topology import Topology
+
+    tl = Timeline(20e12,backend)
+    network_topo = Topology("network_topo", tl)
+    network_topo.load_config(path)
+    if key_length<50 and key_length>0:
+        n=int((9*key_length)/2)
+        alice=network_topo.nodes[sender]
+        bob = network_topo.nodes[receiver]
+        e91=E91()
+        alice,bob=e91.roles(alice,bob,n)
+        tl.init()
+        tl.run()  
+        e91.run_e91(alice,bob,n)
+"""   

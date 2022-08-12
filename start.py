@@ -118,7 +118,7 @@ def input_e91(e91_state):
                   alice,bob=e91.roles(alice,bob,n)
                   tl.init()
                   tl.run()  
-                  e91.runE91(alice,bob,n)
+                  e91.run(alice,bob,n)
                else:
                   print("key length should be less than 50")
             else:
@@ -180,7 +180,7 @@ def ping_pong(ping_pong_state):
                   tl.init()
                   tl.run() 
                   pp.create_key_lists(alice,bob)
-                  pp.run_ping_pong(sequence_length,message)
+                  pp.run(sequence_length,message)
                else:
                   print("message length should be less than 9")
             else:
@@ -243,7 +243,7 @@ def qsdc1(qsdc1_state):
                   alice,bob=qsdc1.roles(alice,bob,n)
                   tl.init()
                   tl.run()  
-                  qsdc1.run_first_QSDC(alice,bob,sequence_length,message)
+                  qsdc1.run(alice,bob,sequence_length,message)
                else:
                   print("Enter message of even length")
             else:
@@ -302,7 +302,7 @@ def ip1(ip1_state):
                alice,bob=ip1.roles(alice,bob,n=50)
                tl.init()
                tl.run()  
-               ip1.run_ip_protocol(alice,bob,message)
+               ip1.run(alice,bob,message)
               
             else:
                print("incorrect sender or receiver or message") 
@@ -509,7 +509,7 @@ def telportation(tel_state):
                alice,bob=tel.roles(alice,bob)
                tl.init()
                tl.run()  
-               tel.runtel(alice,bob,A_0,A_1)
+               tel.run(alice,bob,A_0,A_1)
             else:
                print("incorrect sender or receiver or random qubit amplitudes") 
          else:
@@ -570,7 +570,7 @@ def ghz(ghz_state):
                alice,bob,charlie,middlenode=ghz.roles(alice,bob,charlie,middlenode)
                tl.init()
                tl.run()  
-               ghz.perform_ghz(alice,bob,charlie,middlenode)
+               ghz.run(alice,bob,charlie,middlenode)
             else:
                print("incorrect endnode1 or endnode2 or endnode3 or middlenode") 
          else:

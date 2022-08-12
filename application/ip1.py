@@ -322,7 +322,7 @@ class IP1():
 
 
 
-    def run_ip_protocol(self,alice,bob,message ):
+    def run(self,alice,bob,message ):
         qm_alice=alice.timeline.quantum_manager
         qm_bob=bob.timeline.quantum_manager
         IdA, IdB = self.get_IDs()
@@ -345,5 +345,27 @@ class IP1():
     #run_ip_protocol(message = "010010")
 
 
-
-    # key = qm_alice.new([amp1, amp2])
+#########################################################################################################################
+# sender and receiver (input type :string)-nodes in network 
+# backend (input type :string) Qutip (Since entanglements are filtered out based on EPR state)
+# Todo Support on qiskit
+# no.of entanglements=50
+"""
+def ip1(path,sender,receiver,message):
+    from qntsim.kernel.timeline import Timeline 
+    Timeline.DLCZ=False
+    Timeline.bk=True
+    from qntsim.topology.topology import Topology
+    
+    tl = Timeline(20e12,"Qutip")
+    network_topo = Topology("network_topo", tl)
+    network_topo.load_config(path)
+    
+    alice=network_topo.nodes[sender]
+    bob = network_topo.nodes[receiver]
+    ip1=IP1()
+    alice,bob=ip1.roles(alice,bob,n=50)
+    tl.init()
+    tl.run()  
+    ip1.run_ip_protocol(alice,bob,message)
+"""

@@ -221,7 +221,7 @@ class PingPong():
                 return -1
 
 
-    def run_ping_pong(self,sequence_length,message):
+    def run(self,sequence_length,message):
         n = 0
         c = 0.2
         #sequence_length = 4
@@ -266,3 +266,35 @@ class PingPong():
 
     ## Initilize new state as required, and you get key corresponding to these states
     # key = qm_alice.new([amp1, amp2])
+
+
+#########################################################################################
+
+# sender and receiver (input type :string)-nodes in network 
+# backend (input type :string) Qutip (Since entanglements are filtered out based on EPR state)
+# Todo support on Qiskit
+# message length should be less than 9
+# sequence length should be less than 5
+
+"""
+def run(path,sender,receiver,sequence_length,message):
+
+    from qntsim.kernel.timeline import Timeline 
+    Timeline.DLCZ=False
+    Timeline.bk=True
+    from qntsim.topology.topology import Topology
+    
+    tl = Timeline(20e12,"Qutip")
+    network_topo = Topology("network_topo", tl)
+    network_topo.load_config(path)
+    if len(message)<=9:
+        n=int(sequence_length*len(message))
+        alice=network_topo.nodes[sender]
+        bob = network_topo.nodes[receiver]
+        pp=PingPong()
+        alice,bob=pp.roles(alice,bob,n)
+        tl.init()
+        tl.run() 
+        pp.create_key_lists(alice,bob)
+        pp.run_ping_pong(sequence_length,message)
+"""

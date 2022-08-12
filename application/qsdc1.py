@@ -159,7 +159,7 @@ class QSDC1():
         #print(list(output.values()))
         return output
 
-    def run_first_QSDC(self,alice,bob,sequence_length,message):
+    def run(self,alice,bob,sequence_length,message):
         #message = "110011001001010101010100"
         assert len(message)%2 == 0
         entangled_keys,alice_bob_keys_dict  = self.create_entanglement(alice,bob)
@@ -193,3 +193,35 @@ class QSDC1():
 
 # if (aliceMeasurementChoices[i] == 2 and bobMeasurementChoices[i] == 1) or (aliceMeasurementChoices[i] == 3 and bobMeasurementChoices[i] == 2):
 #         aliceKey.append(aliceResults[i]) # record the i-th result obtained by Alice as the bit of the secret key k
+
+
+
+##############################################################################################################
+
+# sender and receiver (input type :string)-nodes in network 
+# backend (input type :string) Qutip (Since entanglements are filtered out based on EPR state)
+# Todo Support on Qiskit
+# message length should be even
+# sequence length should be less than 5
+"""
+def run(path,sender,receiver,sequence_length,message):
+
+    from qntsim.kernel.timeline import Timeline 
+    Timeline.DLCZ=False
+    Timeline.bk=True
+    from qntsim.topology.topology import Topology
+    
+    tl = Timeline(20e12,"Qutip")
+    network_topo = Topology("network_topo", tl)
+    network_topo.load_config(path)
+    if (len(message)%2==0):
+        
+        n=int(sequence_length*len(message))
+        alice=network_topo.nodes[sender]
+        bob = network_topo.nodes[receiver]
+        qsdc1=QSDC1()
+        alice,bob=qsdc1.roles(alice,bob,n)
+        tl.init()
+        tl.run()  
+        qsdc1.run_first_QSDC(alice,bob,sequence_length,message)
+"""
