@@ -182,27 +182,28 @@ class E91():
 # sender : String : Sender node name
 # receiver : String : Receiver node name
 # keylength : Integer : Length of the key : 0 < keylength < 50
-def e91(framework,network_config, sender, receiver, keylength):
-    from qntsim.kernel.timeline import Timeline
-    Timeline.DLCZ=False
-    Timeline.bk=True
-    from qntsim.topology.topology import Topology
 
-    tl = Timeline(4e12,framework)
+# def e91(framework,network_config, sender, receiver, keylength):
+#     from qntsim.kernel.timeline import Timeline
+#     Timeline.DLCZ=False
+#     Timeline.bk=True
+#     from qntsim.topology.topology import Topology
 
-    network_topo = Topology("network_topo", tl)
-    network_topo.load_config(network_config)
+#     tl = Timeline(4e12,framework)
 
-    if keylength<50 and keylength>0:
-        n=int((9*keylength)/2)
-        alice=network_topo.nodes[sender]
-        bob = network_topo.nodes[receiver]
-        e91=E91()
-        alice,bob=e91.roles(alice,bob,n)
-        tl.init()
-        tl.run()
-        e91.runE91(alice,bob,n)
-    else:
-        print("key length should be between 0 and 50")
+#     network_topo = Topology("network_topo", tl)
+#     network_topo.load_config(network_config)
 
-e91("Qiskit","../example/3node.json", "a", "b", 20)
+#     if keylength<50 and keylength>0:
+#         n=int((9*keylength)/2)
+#         alice=network_topo.nodes[sender]
+#         bob = network_topo.nodes[receiver]
+#         e91=E91()
+#         alice,bob=e91.roles(alice,bob,n)
+#         tl.init()
+#         tl.run()
+#         e91.runE91(alice,bob,n)
+#     else:
+#         print("key length should be between 0 and 50")
+
+# e91("Qiskit","../example/3node.json", "a", "b", 20)

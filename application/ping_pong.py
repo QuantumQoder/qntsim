@@ -271,28 +271,29 @@ class PingPong():
 # sender : String : Sender node name
 # sequence_length : Integer : Length of the sequence : 0 < sequence_length < 9
 # message : String : Message to send
-def ping_pong(network_config, sender,receiver,sequence_length,message):
-	from qntsim.kernel.timeline import Timeline
-	Timeline.DLCZ=False
-	Timeline.bk=True
-	from qntsim.topology.topology import Topology
 
-	tl = Timeline(4e12,"Qiskit")
+# def ping_pong(network_config, sender,receiver,sequence_length,message):
+# 	from qntsim.kernel.timeline import Timeline
+# 	Timeline.DLCZ=False
+# 	Timeline.bk=True
+# 	from qntsim.topology.topology import Topology
 
-	network_topo = Topology("network_topo", tl)
-	network_topo.load_config(network_config)
+# 	tl = Timeline(4e12,"Qiskit")
 
-	if len(message)<=9:
-		n=int(sequence_length*len(message))
-		alice=network_topo.nodes[sender]
-		bob = network_topo.nodes[receiver]
-		pp=PingPong()
-		alice,bob=pp.roles(alice,bob,n)
-		tl.init()
-		tl.run() 
-		pp.create_key_lists(alice,bob)
-		pp.run_ping_pong(sequence_length,message)
-	else:
-		print("message length should be less than 9")
+# 	network_topo = Topology("network_topo", tl)
+# 	network_topo.load_config(network_config)
 
-ping_pong("../example/4node.json", "a", "b", 2, "test_message")
+# 	if len(message)<=9:
+# 		n=int(sequence_length*len(message))
+# 		alice=network_topo.nodes[sender]
+# 		bob = network_topo.nodes[receiver]
+# 		pp=PingPong()
+# 		alice,bob=pp.roles(alice,bob,n)
+# 		tl.init()
+# 		tl.run() 
+# 		pp.create_key_lists(alice,bob)
+# 		pp.run_ping_pong(sequence_length,message)
+# 	else:
+# 		print("message length should be less than 9")
+
+# ping_pong("../example/4node.json", "a", "b", 2, "test_message")

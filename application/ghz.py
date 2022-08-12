@@ -98,25 +98,26 @@ class GHZ():
 # endnode2 : String : GHZ end node 2 name
 # endnode3 : String : GHZ end node 3 name
 # middlenode : String : GHZ middlenode name
-def ghz(network_config, endnode1,endnode2,endnode3,middlenode):
-    from qntsim.kernel.timeline import Timeline
-    Timeline.DLCZ=False
-    Timeline.bk=True
-    from qntsim.topology.topology import Topology
 
-    tl = Timeline(4e12,"Qiskit")
+# def ghz(network_config, endnode1,endnode2,endnode3,middlenode):
+#     from qntsim.kernel.timeline import Timeline
+#     Timeline.DLCZ=False
+#     Timeline.bk=True
+#     from qntsim.topology.topology import Topology
 
-    network_topo = Topology("network_topo", tl)
-    network_topo.load_config(network_config)
+#     tl = Timeline(4e12,"Qiskit")
 
-    alice=network_topo.nodes[endnode1]
-    bob = network_topo.nodes[endnode2]
-    charlie=network_topo.nodes[endnode3]
-    middlenode=network_topo.nodes[middlenode]
-    ghz= GHZ()
-    alice,bob,charlie,middlenode=ghz.roles(alice,bob,charlie,middlenode)
-    tl.init()
-    tl.run()  
-    ghz.perform_ghz(alice,bob,charlie,middlenode)
+#     network_topo = Topology("network_topo", tl)
+#     network_topo.load_config(network_config)
 
-ghz("../example/4node.json", "a", "b", "s1", "s2")
+#     alice=network_topo.nodes[endnode1]
+#     bob = network_topo.nodes[endnode2]
+#     charlie=network_topo.nodes[endnode3]
+#     middlenode=network_topo.nodes[middlenode]
+#     ghz= GHZ()
+#     alice,bob,charlie,middlenode=ghz.roles(alice,bob,charlie,middlenode)
+#     tl.init()
+#     tl.run()  
+#     ghz.perform_ghz(alice,bob,charlie,middlenode)
+
+# ghz("../example/4node.json", "a", "b", "s1", "s2")
