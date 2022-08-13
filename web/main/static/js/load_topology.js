@@ -14,6 +14,7 @@ function loadTopology(topology_file) {
             topology: topology_file,
         },
         dataType: "json",
+        async: false,
         success: function (response) {
             if(response.success){
                 console.log("Graph of the topology is ready");

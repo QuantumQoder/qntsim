@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{ title }}</title>
+
+	{% load static %}
+	<link rel="stylesheet" href="{% static '/css/table.css' %}">
+	<link rel="stylesheet" href="{% static '/css/iframe.css' %}">
+	<link rel="stylesheet" href="{% static '/css/form.css' %}">
+	<script src="{% static '/js/jquery.min.js' %}"></script>
+	<!-- <script src="{% static '/js/form.js' %}"></script> -->
+	<script src="{% static '/js/app.js' %}"></script>
+	
+
+</head>
+<body>
+	<h1>Quantum Network Simulation</h1>
+
+	<form id="qntsimForm" action="">
+		<!-- <div class="tab">
+			<h3>Choose Base Framework</h3>
+			<select name="base" id="base">
+				<option value="Qiskit">Qiskit</option>
+				<option value="Qutip">QuTip</option>
+			</select>
+		</div> -->
+		<div class="tab">
+			<h3>Define Nodes</h3>
+
+			<table id="nodes">
+				<thead>
+					<th>Name</th>
+					<th>Type</th>
+					<th>No of Memories</th>
+					<th>Memory Frequency</th>
+					<th>Memory Expiry Time</th>
+					<th>Memory Efficiency</th>
+					<th>Memory Fidelity</th>
+					<th>Actions</th>
+				</thead>
+				<tbody></tbody>
+			</table>
+
+			<button type="button" class="addRow">Add Node</button>
+
+		</div>
+		<div class="tab">
+			<h3>Create Quantum Connections</h3>
+
+			<table id="qc">
+				<thead>
+					<th>Node 1</th>
+					<th>Node 2</th>
+					<th>Attenuation</th>
+					<th>Distance</th>
+					<th>Actions</th>
+				</thead>
+				<tbody></tbody>
+			</table>
+
+			<button type="button" class="addRow">Add QC</button>
+
+		</div>
+		<div class="tab">
+			<h3>Create Virtual Connections</h3>
+
+			<table id="vc">
+				<thead>
+					<th>Node 1</th>
+					<th>Node 2</th>
+					<th>Demand Size</th>
+					<th>Actions</th>
+				</thead>
+				<tbody></tbody>
+			</table>
+
+			<button type="button" class="addRow">Add Node</button>
+
+		</div>
+		<div class="tab">
+			<h3>Create Classical Connections</h3>
+
+			<table id="cc">
+			</table>
+
+			<button type="button" class="addRow">Add CC</button>
+
+		</div>
+		<div class="tab">
+			<h3>Visualise Topology</h3>
+
+			<div id="topoGraph">
+				<iframe id="topoGraphFrame" src="graph" title="Topology Graph"></iframe>
+			</div>
+		</div>
+
+		<div class="tab">
+			<h3>Select Application</h3>
+			<select name="app" id="app">
+				<option value="e91">e91</option>
+				<option value="ghz">ghz</option>
+				<option value="ip1">ip1</option>
+				<option value="ping_pong">Ping Pong</option>
+				<option value="qsdc1">qsdc1</option>
+				<option value="teleportation">Teleportation</option>
+			</select>
+		</div>
+
+		<div class="tab" id="appConf">
+			
+			<h3>Application Parameters</h3>
+
+			<label for="sender">Select Sender: </label>
+			<select name="sender" id="sender"></select>
+			<label for="receiver">Select Receiver: </label>
+			<select name="receiver" id="receiver"></select>
+			<label for="keyLength">Select Key Length: </label>
+			<input type="text" name="keyLength" id="keyLength">
+		</div>
+
+		<div class="tab">
+			<h3>Application Logs</h3>
+
+			<div id="appLogs"></div>
+		</div>
+
+		<div class="tab" id="results">
+			<h3>Results</h3>
+		</div>
+		
+		<div id="error"></div>
+
+		<div style="overflow:auto;">
+			<div style="float:right;">
+				<button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
+				<button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
+			</div>
+		</div>
+		<!-- Circles which indicates the steps of the form: -->
+		<div style="text-align:center;margin-top:40px;">
+			<!-- <span class="step"></span> -->
+			<span class="step"></span>
+			<span class="step"></span>
+			<span class="step"></span>
+			<span class="step"></span>
+			<span class="step"></span>
+			<span class="step"></span>
+			<span class="step"></span>
+			<span class="step"></span>
+			<span class="step"></span>
+		</div>
+	</form>
+</body>
+</html>

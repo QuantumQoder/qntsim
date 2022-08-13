@@ -1,4 +1,4 @@
-from topology.simulator.constants import *
+from main.simulator.constants import *
 from qntsim.kernel.timeline import Timeline
 Timeline.DLCZ=False
 Timeline.bk=True

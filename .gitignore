@@ -4,3 +4,6 @@ example/logger.txt
 *.pyc
 web/drawgraph.html
 web/topology/templates/graph.html
+drawgraph.html
+.gitignore
+logger.txt

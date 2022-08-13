@@ -6,4 +6,5 @@ urlpatterns = [
     path('makeGraph', views.makeGraph, name='makeGraph'),
     path('graph', views.graph, name='graph'),
     path('example', views.example, name='example'),
+    path('appLog', views.appLog, name='appLog'),
 ]
