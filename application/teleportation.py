@@ -242,8 +242,40 @@ class Teleportation():
         print('bob final state after corrective measures',qm_bob.get(key).state)
 
 
-    def runtel(self,alice,bob,A_0,A_1):
+    def run(self,alice,bob,A_0,A_1):
         crz,crx,case=self.alice_measurement(A_0,A_1,alice)
         print("Measurement result of random qubit crz",crz)
         print("Measurement result of alice qubit crx",crx)
         self.bob_gates(crz,crx,case,bob)
+
+#################################################################################################
+
+# path (Type : String) -Path to config Json file
+# sender and receiver (Type :string)-nodes in network 
+# backend (Type : String)is Qutip (since state vectors are returned in output)
+# Todo support on Qiskit
+# A_0 (Type : Complex)
+# A_1 (Type : Complex)
+# A_0 amplitude of |0> and A_1 amplitude of |1> 
+# (abs(A_0)**2 + abs(A_1)**2 ==1) sum of absoulte values of amplitude's squares should be 1
+
+"""
+def run(path,sender,receiver,A_0,A_1):
+
+    from qntsim.kernel.timeline import Timeline 
+    Timeline.DLCZ=False
+    Timeline.bk=True
+    from qntsim.topology.topology import Topology
+    
+    tl = Timeline(20e12,"Qutip")
+    network_topo = Topology("network_topo", tl)
+    network_topo.load_config(path)
+    
+    alice=network_topo.nodes[sender]
+    bob = network_topo.nodes[receiver]
+    tel= Teleportation()
+    alice,bob=tel.roles(alice,bob)
+    tl.init()
+    tl.run()  
+    tel.run_teleportation(alice,bob,A_0,A_1)
+"""

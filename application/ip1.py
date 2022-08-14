@@ -322,7 +322,7 @@ class IP1():
 
 
 
-    def run_ip_protocol(self,alice,bob,message ):
+    def run(self,alice,bob,message ):
         qm_alice=alice.timeline.quantum_manager
         qm_bob=bob.timeline.quantum_manager
         IdA, IdB = self.get_IDs()
@@ -344,32 +344,30 @@ class IP1():
     # I don't know
     #run_ip_protocol(message = "010010")
 
+#########################################################################################################################
 
-
-    # key = qm_alice.new([amp1, amp2])
-
-# network_config : String : File path for json configuration file
-# sender : String : Sender node name
-# receiver : String : Receiver node name
-# message : String : Message to send
-
-# def ip1(network_config, sender,receiver,message):
-#     from qntsim.kernel.timeline import Timeline
-#     Timeline.DLCZ=False
-#     Timeline.bk=True
-#     from qntsim.topology.topology import Topology
-
-#     tl = Timeline(4e12,"Qiskit")
-
-#     network_topo = Topology("network_topo", tl)
-#     network_topo.load_config(network_config)
-
-#     alice=network_topo.nodes[sender]
-#     bob = network_topo.nodes[receiver]
-#     ip1=IP1()
-#     alice,bob=ip1.roles(alice,bob,n=50)
-#     tl.init()
-#     tl.run()  
-#     ip1.run_ip_protocol(alice,bob,message)
-
-# ip1("../example/4node.json", "a", "b", "test_message")
+# path (Type : String) -Path to config Json file
+# sender and receiver (Type :string)-nodes in network 
+# backend (Type :string) Qutip (Since entanglements are filtered out based on EPR state)
+# message (Type: String)--a bit string
+# Todo Support on qiskit
+# no.of entanglements=50
+"""
+def ip1(path,sender,receiver,message):
+    from qntsim.kernel.timeline import Timeline 
+    Timeline.DLCZ=False
+    Timeline.bk=True
+    from qntsim.topology.topology import Topology
+    
+    tl = Timeline(20e12,"Qutip")
+    network_topo = Topology("network_topo", tl)
+    network_topo.load_config(path)
+    
+    alice=network_topo.nodes[sender]
+    bob = network_topo.nodes[receiver]
+    ip1=IP1()
+    alice,bob=ip1.roles(alice,bob,n=50)
+    tl.init()
+    tl.run()  
+    ip1.run_ip_protocol(alice,bob,message)
+"""

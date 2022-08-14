@@ -5,7 +5,7 @@ from qntsim.components.circuit import BaseCircuit
 
 class E91():
 
-    # Request transport manager  
+    # Request transport manager  for entanglements
     def request_entanglements(self,sender,receiver,n):
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.7,5e12)
         return sender,receiver
@@ -17,7 +17,7 @@ class E91():
         print('sender, receiver',sender.owner.name,receiver.owner.name)
         return self.request_entanglements(sender,receiver,n)
 
-
+    # circuit measurements
     def measurement(self,qm,choice, key):
         #print('choice',choice)
         if choice == 1: 
@@ -53,7 +53,7 @@ class E91():
         #print('output',output)
         return output
 
-
+    # measurements on alice side
     def alice_measurement(self,alice):
         choice=[1,2,3]
         qm_alice=alice.timeline.quantum_manager
@@ -70,7 +70,7 @@ class E91():
         # print('Alice measuremnt reuslts',meas_results_alice)
         return alice_choice_list,meas_results_alice
     
-
+    #measurements on bob side
     def bob_measurement(self,bob):
         qm_bob=bob.timeline.quantum_manager
         meas_results_bob=[]
@@ -144,7 +144,7 @@ class E91():
 
         return corr
 
-    def runE91(self,alice,bob,n):
+    def run(self,alice,bob,n):
         alice_choice,alice_meas=self.alice_measurement(alice)
         bob_choice,bob_meas=self.bob_measurement(bob)
         key_mismatch=0
@@ -177,33 +177,37 @@ class E91():
         print('Mismatched keys', key_mismatch)
         chsh_value=self.chsh_correlation(alice_results,bob_results,alice_choice,bob_choice,n)
         print('Correlation value', str(round(chsh_value,3)))
-# showFuncs : String : ["Qiskit", "Qutip"]
-# network_config : String : File path for json configuration file
-# sender : String : Sender node name
-# receiver : String : Receiver node name
-# keylength : Integer : Length of the key : 0 < keylength < 50
 
-# def e91(framework,network_config, sender, receiver, keylength):
-#     from qntsim.kernel.timeline import Timeline
-#     Timeline.DLCZ=False
-#     Timeline.bk=True
-#     from qntsim.topology.topology import Topology
 
-#     tl = Timeline(4e12,framework)
+###############################################################################################
 
-#     network_topo = Topology("network_topo", tl)
-#     network_topo.load_config(network_config)
+# sender and receiver (Type : String)-nodes in network 
+# backend (Type : String) -Qiskit
+# path (Type : String) -Path to config Json file
+# To-do support on Qutip 
+# key_length(Type : Integer ) should be <50 and >0
 
-#     if keylength<50 and keylength>0:
-#         n=int((9*keylength)/2)
-#         alice=network_topo.nodes[sender]
-#         bob = network_topo.nodes[receiver]
-#         e91=E91()
-#         alice,bob=e91.roles(alice,bob,n)
-#         tl.init()
-#         tl.run()
-#         e91.runE91(alice,bob,n)
-#     else:
-#         print("key length should be between 0 and 50")
+"""
+def e91(backend,path,sender,receiver,key_length):
 
-# e91("Qiskit","../example/3node.json", "a", "b", 20)
+    from qntsim.kernel.timeline import Timeline 
+    Timeline.DLCZ=False
+    Timeline.bk=True
+    from qntsim.topology.topology import Topology
+
+    tl = Timeline(20e12,backend)
+    network_topo = Topology("network_topo", tl)
+    network_topo.load_config(path)
+    if key_length<50 and key_length>0:
+        n=int((9*key_length)/2)
+        alice=network_topo.nodes[sender]
+        bob = network_topo.nodes[receiver]
+        e91=E91()
+        alice,bob=e91.roles(alice,bob,n)
+        tl.init()
+        tl.run()  
+        e91.run_e91(alice,bob,n)
+"""   
+
+
+
