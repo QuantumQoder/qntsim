@@ -3,8 +3,8 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('makeGraph', views.makeGraph, name='makeGraph'),
     path('graph', views.graph, name='graph'),
+    path('fetchAppOptions', views.fetchAppOptions, name='fetchAppOptions'),
     path('example', views.example, name='example'),
     path('appLog', views.appLog, name='appLog'),
 ]

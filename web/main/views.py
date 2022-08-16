@@ -1,9 +1,9 @@
 import time
+import json
 from django.shortcuts import render
 from django.http import HttpResponse,JsonResponse
 from django.template import loader
 from main.simulator.topology_funcs import *
-from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import condition
 
 def index(request):
@@ -12,27 +12,20 @@ def index(request):
 	}
 	return render(request, 'app.html', context)
 
-def makeGraph(request):
+def fetchAppOptions(request):
+	app = request.GET.get('app')
+	context = {
+		"nodes": json.loads(request.GET.get('nodes')),
+	}
+	print(type(context))
+	return render(request, f'appOpts/{app}.html', context)
 
-	topFile = 'main/simulator/' + request.GET['topology']
-	topoObj = graph_topology(topFile)
-
-	if topoObj:
-		return JsonResponse({'success':'true'}) 
-	else:
-		return JsonResponse({'success':'false'}) 
-
-@xframe_options_exempt
 def graph(request):
 	topology = request.GET.get('topology')
 	if topology is not None:
-		topFile = 'main/simulator/' + request.GET['topology']
-		topoObj = graph_topology(topFile)
-	
-	context = {
-		"title": "Topology Graph"
-	}
-	return render(request, 'graph.html', context)
+		topoObj = graph_topology(topology)
+		
+		return topoObj
 
 @condition(etag_func=None)
 def appLog(request):

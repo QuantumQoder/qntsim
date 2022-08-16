@@ -23,7 +23,7 @@ function deleteRow(row) {
 }
 
 function addRow(tableID) {
-	console.log(`Adding row to table: ${tableID}`);
+	// console.log(`Adding row to table: ${tableID}`);
 	// console.log(nodes);
 	// var noOfCols = $(`#${tableID}`).find("th").length;
 	var HTML = `<tr>`;
@@ -62,123 +62,96 @@ function addRow(tableID) {
 
 function fetchTopologyGraph(){
 	console.log("Fetching topology graph");
-	var serviceNodes = [];
-	var endNodes = [];
-
-	console.log(`Visualising Topology`);
-	// Selecting the iframe element
-	// var frame = document.getElementById("topoGraphFrame");
-          
-	// // Adjusting the iframe height onload event
-	// frame.onload = function()
-	// // function execute while load the iframe
-	// {
-	//   // set the height of the iframe as 
-	//   // the height of the iframe content
-	//   frame.style.height = 
-	//   frame.contentWindow.document.body.scrollHeight + 'px';
-	   
-
-	//  // set the width of the iframe as the 
-	//  // width of the iframe content
-	//  frame.style.width  = 
-	//   frame.contentWindow.document.body.scrollWidth+'px';
-		  
-	// }
-	// $("#topoGraph").load("graph");
-
-	// $.ajax({
-	// 	type: "GET",
-	// 	url: "graph",
-	// 	data: {
-	// 		topology: "3node.json",
-	// 	},
-	// 	async: false,
-	// 	success: function (response) {
-	// 		$("#topoGraph").load(main/graph);
-	// 	}
-	// });
-
-	// $(this.parentElement).children("table")[0]
-	// console.log($(`#nodes select[name="nodeType"]`));
-	// $(`#nodes select[name="nodeType"]`).each(function() {
-	// 	if($(this).val() == "service"){
-	// 		console.log($(this.parentElement.parentElement));
-	// 		// serviceNodes.append();
-	// 	} else if($(this).val() == "end"){
-	// 		console.log($(this.parentElement));
-	// 	} else {
-	// 		console.log(`Error - Wrong type passed: ${$(this).val()}`);
-	// 		$("#error").text(`Wrong type passed: ${$(this).val()}`);
-	// 	}
-	// });
-	// var topologyConfig = {
-	// 	"service_node": ,
-	// 	"end_node":{"a":"s1",
-	// 			"b":"s2"},
-		
-	// 	"qconnections": [
-			
-	// 		{
-	// 			"node1": "a",
-	// 			"node2": "s1",
-	// 			"attenuation": 1e-5,
-	// 			"distance": 70
-	// 		},
-	// 		{
-	// 			"node1": "s1",
-	// 			"node2": "s2",
-	// 			"attenuation": 1e-5,
-	// 			"distance": 70
-	// 		},
-	// 		{
-	// 			"node1": "s2",
-	// 			"node2": "b",
-	// 			"attenuation": 1e-5,
-	// 			"distance": 70
-	// 		}             
-	// 	],
-	// 	"cchannels_table": {
-	// 		"type": "RT",
-	// 		"labels": ["a", "s1", "s2","b"],
-	// 		"table": [[0,   1e9, 1e9,1e9],
-	// 				  [1e9, 0,   1e9,1e9],
-	// 				  [1e9, 1e9, 0,1e9],
-	// 				  [1e9, 1e9, 1e9, 0]
-	// 				  ]          
-	// 	}
-	// };
+	var nodeArray = [];
+	$('#nodes > tbody  > tr').each(function() {
+		nodeArray.push({
+			"Name": $(this).find('[name=nodeName]')[0].value,
+			"Type": $(this).find('[name=nodeType]')[0].value,
+			"noOfMemory": $(this).find('[name=nodeNoMemories]')[0].value,
+			"memory": {
+				"frequency": $(this).find('[name=nodeMemoFreq]')[0].value,
+				"expiry": $(this).find('[name=nodeMemoFreq]')[0].value,
+				"efficiency": $(this).find('[name=nodeMemoExpiry]')[0].value,
+				"fidelity": $(this).find('[name=nodeMemoFidelity]')[0].value,
+			},
+		});
+	});
+	console.log(nodeArray);
+	var qc = [];
+	$('#qc > tbody  > tr').each(function() {
+		qc.push({
+			"Nodes": [$(this).find('[name=qcNode1]')[0].value, $(this).find('[name=qcNode2]')[0].value],
+			"Attenuation": $(this).find('[name=qcAttenuation]')[0].value,
+			"Distance": $(this).find('[name=qcDistance]')[0].value,
+		});
+	});
+	console.log(qc);
+	var cc = [];
+	$('#cc tbody input').each(function() {
+		var nodes = $(this).data('nodes');
+		if(nodes){
+			cc.push({
+				"Nodes": nodes,
+				"Delay": $(this).value,
+				"Distance": 1e3,
+			});
+		}
+	});
+	console.log(cc);
+	
+	var topology = {
+		"nodes": nodes,
+		"quantum_connections": qc,
+		"classical_connections": cc,
+	};
+	console.log(`Visualising Topology : ${JSON.stringify(topology)}`);
+	$.ajax({
+		type: "GET",
+		url: "graph",
+		data: {
+			"topology": topology,
+		},
+		success: function (response) {
+			$("#topoGraph").load(response);
+		}
+	});
 }
 
 function createCCTable() {
 	$(`#cc`).empty();
 	console.log("Create Classical Connections Table");
-	var HTML = `<tr><td></td>`;
+	var HTML = `<thead><th></th>`;
 	nodes.forEach(node => {
-		HTML += `<td>${node}</td>`;
+		HTML += `<th>${node}</th>`;
 	});
-	HTML += `</tr>`;
+	HTML += `</thead><tbody>`;
 	nodes.forEach(node => {
 		HTML += `<tr><td>${node}</td>`;
 		nodes.forEach(node2 => {
 			if(node == node2){
-				HTML += `<td>0</td>`;
+				HTML += `<td><input type="text" name="ccDelay" value="0" data-nodes=["${node}","${node2}"] disabled></td>`;
 			} else {
-				HTML += `<td><input type="text" name="ccDelay" value="0.5"></td>`;
+				HTML += `<td><input type="text" name="ccDelay" value="0.5" data-nodes=["${node}","${node2}"]></td>`;
 			}
 		});
-		HTML += `</tr>`;
+		HTML += `</tr></tbody>`;
 	});
 	$(`#cc`).html(HTML);
 }
 
 function fetchAppOptions() {
-	var HTML = ``;
-	nodes.forEach(node => {
-		HTML += `<option value="${node}">${node}</option>`;
+	console.log(`Fetching options for ${$("#app").val()}`);
+	$.ajax({
+		type: "GET",
+		url: "fetchAppOptions",
+		data: {
+			"nodes": JSON.stringify(nodes),
+			"app": $("#app").val(),
+		},
+		success: function (response) {
+			$("#appConf").html(response);
+		}
 	});
-	$("#sender").html(HTML);
-	$("#receiver").html(HTML);
 }
 
 function fetchLogs(){
@@ -204,13 +177,17 @@ function fetchLogs(){
 	})
 	.done(function(data)
 	{
-		console.log('Complete response = ' + data);
+		// console.log('Complete response = ' + data);
 	})
 	.fail(function(data)
 	{
-		console.log('Error: ', data);
+		// console.log('Error: ', data);
 	});
 	console.log('Request Sent');
+}
+
+function getResults(){
+
 }
 
 function showTab(n) {
@@ -222,7 +199,7 @@ function showTab(n) {
 			break;
 		case 1:
 			nodes = $(`#nodes input[name=nodeName]`).map(function() {
-				console.log($(this).val());
+				// console.log($(this).val());
 				return $(this).val();
 			}).get();
 			break;
@@ -235,13 +212,15 @@ function showTab(n) {
 			fetchTopologyGraph();
 			break;
 		case 5:
-			fetchAppOptions();
 			break;
 		case 6:
-			fetchLogs();
+			fetchAppOptions();
 			break;
 		case 7:
-			
+			fetchLogs();
+			break;
+		case 8:
+			getResults();
 			break;
 	}
 }
@@ -300,7 +279,7 @@ function nextPrev(n) {
 		// Hide previous tab and show next one
 		$(`div.tab:nth-child(${currentTab+1})`).hide();
 		currentTab = currentTab + n;
-		console.log("New Tab: " + currentTab);
+		// console.log("New Tab: " + currentTab);
 		showTab(currentTab);
 
 		// ... and run a function that displays the correct step indicator:
@@ -314,7 +293,7 @@ function nextPrev(n) {
 }
  
 function fixStepIndicator(n) {
-	console.log(`Fixing Step Indicator: ${n}`);
+	// console.log(`Fixing Step Indicator: ${n}`);
 
 	  // This function removes the "active" class of all steps...
 	  var i, x = document.getElementsByClassName("step");
@@ -328,7 +307,7 @@ function fixStepIndicator(n) {
 }
 
 function fixButtons(n){
-	console.log(`Fixing Buttons ${n}`);
+	// console.log(`Fixing Buttons ${n}`);
 	//Set the Buttons
 	if (n == 0) {
 		$("#prevBtn").hide();

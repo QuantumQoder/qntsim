@@ -1,0 +1,20 @@
+<h3>Teleportation Application Parameters</h3>
+
+<label for="sender">Select Sender: </label>
+<select name="sender" id="sender">
+    {% for node in nodes %}
+    <option value="{{node}}">{{node}}</option>
+    {% endfor %}
+</select>
+
+<label for="receiver">Select Receiver: </label>
+<select name="receiver" id="receiver">
+    {% for node in nodes %}
+    <option value="{{node}}">{{node}}</option>
+    {% endfor %}
+</select>
+
+<label for="amplitude1">Select random qubit amplitude 1: </label>
+<input type="text" name="amplitude1" id="amplitude1">
+<label for="amplitude2">Select random qubit amplitude 2: </label>
+<input type="text" name="amplitude2" id="amplitude2">

@@ -1,0 +1,18 @@
+<h3>E91 Application Parameters</h3>
+
+<label for="sender">Select Sender: </label>
+<select name="sender" id="sender">
+    {% for node in nodes %}
+    <option value="{{node}}">{{node}}</option>
+    {% endfor %}
+</select>
+
+<label for="receiver">Select Receiver: </label>
+<select name="receiver" id="receiver">
+    {% for node in nodes %}
+    <option value="{{node}}">{{node}}</option>
+    {% endfor %}
+</select>
+
+<label for="keyLength">Select Key Length: </label>
+<input type="text" name="keyLength" id="keyLength">

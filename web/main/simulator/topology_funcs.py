@@ -178,8 +178,8 @@ class E91():
         chsh_value=self.chsh_correlation(alice_results,bob_results,alice_choice,bob_choice,n)
         print('Correlation value', str(round(chsh_value,3)))
 
-def graph_topology(network_config):
-    tl,network_topo = load_topology(network_config)
+def graph_topology(network_config_json):
+    tl,network_topo = load_config_json(network_config_json)
     graph = network_topo.get_virtual_graph()
     
     return graph

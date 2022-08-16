@@ -1,0 +1,20 @@
+<h3>Ping Pong Application Parameters</h3>
+
+<label for="sender">Select Sender: </label>
+<select name="sender" id="sender">
+    {% for node in nodes %}
+    <option value="{{node}}">{{node}}</option>
+    {% endfor %}
+</select>
+
+<label for="receiver">Select Receiver: </label>
+<select name="receiver" id="receiver">
+    {% for node in nodes %}
+    <option value="{{node}}">{{node}}</option>
+    {% endfor %}
+</select>
+
+<label for="sequenceLength">Set sequence length: </label>
+<input type="text" name="sequenceLength" id="sequenceLength">
+<label for="message">Message: </label>
+<input type="text" name="message" id="message">
