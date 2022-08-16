@@ -521,8 +521,8 @@ def telportation(tel_state):
       elif command=='help':
          print("\nCommand to Load topology $: load_topology <path_to_json_file>")
          print("$:load_topology config.json")
-         print("\nCommand to run tel $:run_e91 <sender> <receiver> <random_qubit_amplitud|0> > <random_qubit_amplitude|1>")
-         print("$:run_e91 endnode1 endnode2 112")
+         print("\nCommand to run tel $:run_tel <sender> <receiver> <random_qubit_amplitud|0> > <random_qubit_amplitude|1>")
+         print("$:run_tel endnode1 endnode2 0.70710678118+0j 0-0.70710678118j")
          print("\ncommand to exit Simulation $:exit\n")
 
       else:

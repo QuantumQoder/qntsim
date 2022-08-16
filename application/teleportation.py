@@ -250,7 +250,7 @@ class Teleportation():
 
 #################################################################################################
 
-# path (Type : String) -Path to config Json file
+
 # sender and receiver (Type :string)-nodes in network 
 # backend (Type : String)is Qutip (since state vectors are returned in output)
 # Todo support on Qiskit
@@ -259,8 +259,9 @@ class Teleportation():
 # A_0 amplitude of |0> and A_1 amplitude of |1> 
 # (abs(A_0)**2 + abs(A_1)**2 ==1) sum of absoulte values of amplitude's squares should be 1
 
+# path (Type : String) -Path to config Json file
 """
-def run(path,sender,receiver,A_0,A_1):
+def tel(path,sender,receiver,A_0,A_1):
 
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
@@ -277,5 +278,56 @@ def run(path,sender,receiver,A_0,A_1):
     alice,bob=tel.roles(alice,bob)
     tl.init()
     tl.run()  
-    tel.run_teleportation(alice,bob,A_0,A_1)
+    tel.run(alice,bob,A_0,A_1)
+"""
+
+# jsonConfig (Type : Json) -Json Configuration of network 
+
+"""
+def tel(jsonConfig,sender,receiver,A_0,A_1):
+
+    from qntsim.kernel.timeline import Timeline 
+    Timeline.DLCZ=False
+    Timeline.bk=True
+    from qntsim.topology.topology import Topology
+    
+    tl = Timeline(20e12,"Qutip")
+    network_topo = Topology("network_topo", tl)
+    network_topo.load_config_json(jsonConfig)
+    
+    alice=network_topo.nodes[sender]
+    bob = network_topo.nodes[receiver]
+    tel= Teleportation()
+    alice,bob=tel.roles(alice,bob)
+    tl.init()
+    tl.run()  
+    tel.run(alice,bob,A_0,A_1)
+
+
+conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
+
+memo = {"frequency": 2e3, "expiry": 0, "efficiency": 1, "fidelity": 1}
+node1 = {"Name": "N1", "Type": "end", "noOfMemory": 50, "memory":memo}
+node2 = {"Name": "N2", "Type": "end", "noOfMemory": 50, "memory":memo}
+node3 = {"Name": "N3", "Type": "service", "noOfMemory": 50, "memory":memo}
+conf["nodes"].append(node1)
+conf["nodes"].append(node2)
+conf["nodes"].append(node3)
+
+qc1 = {"Nodes": ["N1", "N2"], "Attenuation": 1e-5, "Distance": 70}
+qc2 = {"Nodes": ["N2", "N3"], "Attenuation": 1e-5, "Distance": 70}
+conf["quantum_connections"].append(qc1)
+conf["quantum_connections"].append(qc2)
+
+cc1 = {"Nodes": ["N1", "N1"], "Delay": 0, "Distance": 0}
+cc1 = {"Nodes": ["N2", "N2"], "Delay": 0, "Distance": 0}
+cc1 = {"Nodes": ["N3", "N3"], "Delay": 0, "Distance": 0}
+cc12 = {"Nodes": ["N1", "N2"], "Delay": 1e9, "Distance": 1e3}
+cc13 = {"Nodes": ["N1", "N3"], "Delay": 1e9, "Distance": 1e3}
+cc23 = {"Nodes": ["N2", "N3"], "Delay": 1e9, "Distance": 1e3}
+conf["classical_connections"].append(cc12)
+conf["classical_connections"].append(cc13)
+conf["classical_connections"].append(cc23)
+
+tel( conf, "N1", "N2", complex(0.70710678118+0j), complex(0-0.70710678118j))
 """
