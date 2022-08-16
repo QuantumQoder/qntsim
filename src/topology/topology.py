@@ -241,12 +241,105 @@ class Topology():
         for i in range(n+1):
             if i!=0:
                 self.nodes["s"+str(i)].service_node = "s"+str(0)
-    
 
-       
-   
-
-
+    def load_config_json(self, config) -> None:
+        """Method to load a network configuration file.
+        Network should be specified in json format.
+        Will populate nodes, qchannels, cchannels, and graph fields.
+        Will also generate and install forwarding tables for quantum router nodes.
+        Args:
+            config (dictionary): json network configuration
+            {
+                "nodes": [{
+                    "Name": "Name of node",
+                    "Type": ["service", "end"],
+                    "noOfMemory": 50, # No of Memories
+                    "memory":{
+                        "frequency": 2e4, # Memory Frequency
+                        "expiry": 0, # Memory Expiry Time
+                        "efficiency": 2e4, # Memory Efficiency
+                        "fidelity": 2e4, # Memory Fidelity
+                    },
+                }],
+                "quantum_connections": [{
+                    "Nodes": ["N1", "N2"] # Name of connected nodes
+                    "Attenuation": 1e-5,
+                    "Distance": 70,
+                }],
+                "classical_connections": [{
+                    "Nodes": ["N1", "N2"] # Name of connected nodes
+                    "Delay": 1e-5,
+                    "Distance": 1e3,
+                }],
+            }
+        Side Effects:
+            Will modify graph, graph_no_middle, qchannels, and cchannels attributes.
+        """
+        for node in config["nodes"]:
+            nodeObj = None
+            if node["Type"] is "service":
+                nodeObj = ServiceNode(node["Name"],self.timeline, node["noOfMemory"])
+            elif node["Type"] is "end":
+                nodeObj = EndNode(node["Name"],self.timeline, node["noOfMemory"])
+            
+            if nodeObj is None:
+                return f"Wrong type {node['Type']}"
+            else:
+                nodeObj.memory_array.update_memory_params("frequency", node["memory"]["frequency"])
+                nodeObj.memory_array.update_memory_params("coherence_time", node["memory"]["expiry"])
+                nodeObj.memory_array.update_memory_params("efficiency", node["memory"]["efficiency"])
+                nodeObj.memory_array.update_memory_params("raw_fidelity", node["memory"]["fidelity"])
+                self.add_node(nodeObj)
+        
+        for qc in config["quantum_connections"]:
+            qchannel_params = {
+                "attenuation": qc["Attenuation"],
+                "distance": qc["Distance"]
+            }
+            self.add_quantum_connection(qc["Nodes"][0], qc["Nodes"][1], **qchannel_params)
+            #TODO: Add mapping in add_quantum connection for node.service_node and node.end_node
+            
+        for cc in config["classical_connections"]:
+            cchannel_params = {
+                "delay": cc["Delay"]/2,  # divide RT time by 2
+                "distance": cc["Distance"]
+            }
+            if cc["Nodes"][0] is cc["Nodes"][1]:
+                continue
+            else:
+                self.add_classical_channel(cc["Nodes"][0], cc["Nodes"][1], **cchannel_params)
+        
+        # generate forwarding tables
+        #-------------------------------
+        # all_pair_dist, G = self.all_pair_shortest_dist()
+        # #print('all pair distance', all_pair_dist, G)
+        # self.nx_graph=G
+        # #print('self.nx_graph',self.nx_graph,self.name)
+        
+        #-------------------------------
+        
+        # for node in self.nodes.values():
+        #     # #print('nodes',type(node))
+        #     if type(node) != BSMNode:
+        #         node.all_pair_shortest_dist = all_pair_dist
+        #         node.nx_graph=self.nx_graph
+        #         node.delay_graph=self.cc_delay_graph
+        #         # #print('delay graph',node.name)
+        #         node.neighbors = list(G.neighbors(node.name))
+        #     if type(node) == EndNode:
+        #         # #print('Add service node',config['end_node'])
+        #         for key, value in config['end_node'].items():
+        #             # #print('end node key value',node.name, key, value )
+        #             if node.name == key:
+        #                 # #print('check', node.name, key, value)
+        #                 node.service_node = value
+        #                 break
+        #     if type(node) ==  ServiceNode:
+        #         for key, value in config['end_node'].items():
+        #             if node.name == value:
+        #                 node.end_node =key
+        #                 break
+        
     def load_config(self, config_file: str) -> None:
         """Method to load a network configuration file.
         Network should be specified in json format.

@@ -344,7 +344,7 @@ class Timeline:
         Progress bar will display the execution time of simulation, as well as the current simulation time.
         """
 
-        def #print_time():
+        def print_time():
             start_time = time_ns()
             while self.is_running:
                 exe_time = self.ns_to_human_time(time_ns() - start_time)

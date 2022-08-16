@@ -186,7 +186,7 @@ class E91():
 # path (Type : String) -Path to config Json file
 # To-do support on Qutip 
 # key_length(Type : Integer ) should be <50 and >0
-
+# virtual liks : [{"sender": a, "reveiver": b, "demand": 50}]
 """
 def e91(backend,path,sender,receiver,key_length):
 
@@ -207,7 +207,49 @@ def e91(backend,path,sender,receiver,key_length):
         tl.init()
         tl.run()  
         e91.run_e91(alice,bob,n)
-"""   
 
+def e91(backend,jsonConfig,sender,receiver,key_length):
 
+    from qntsim.kernel.timeline import Timeline 
+    Timeline.DLCZ=False
+    Timeline.bk=True
+    from qntsim.topology.topology import Topology
 
+    tl = Timeline(20e12,backend)
+    network_topo = Topology("network_topo", tl)
+    network_topo.load_config_json(jsonConfig)
+    if key_length<50 and key_length>0:
+        n=int((9*key_length)/2)
+        alice=network_topo.nodes[sender]
+        bob = network_topo.nodes[receiver]
+        e91=E91()
+        alice,bob=e91.roles(alice,bob,n)
+        tl.init()
+        tl.run()  
+        e91.run_e91(alice,bob,n)
+
+conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
+
+memo = {"frequency": 2e4, "expiry": 0, "efficiency": 2e4, "fidelity": 2e4}
+node1 = {"Name": "N1", "Type": "end", "noOfMemory": 50, "memory":memo}
+node2 = {"Name": "N2", "Type": "end", "noOfMemory": 50, "memory":memo}
+node3 = {"Name": "N3", "Type": "service", "noOfMemory": 50, "memory":memo}
+conf["nodes"].append(node1)
+conf["nodes"].append(node2)
+conf["nodes"].append(node3)
+
+qc1 = {"Nodes": ["N1", "N2"], "Attenuation": 1e-5, "Distance": 70}
+qc2 = {"Nodes": ["N2", "N3"], "Attenuation": 1e-5, "Distance": 70}
+conf["quantum_connections"].append(qc1)
+conf["quantum_connections"].append(qc2)
+
+cc1 = {"Nodes": ["N1", "N1"], "Delay": 0, "Distance": 0}
+cc1 = {"Nodes": ["N2", "N2"], "Delay": 0, "Distance": 0}
+cc1 = {"Nodes": ["N3", "N3"], "Delay": 0, "Distance": 0}
+cc1 = {"Nodes": ["N1", "N2"], "Delay": 1e-5, "Distance": 1e3}
+cc2 = {"Nodes": ["N2", "N3"], "Delay": 1e-5, "Distance": 1e3}
+conf["classical_connections"].append(cc1)
+conf["classical_connections"].append(cc2)
+
+e91("Qutip", conf, "N1", "N2", 5)
+"""
