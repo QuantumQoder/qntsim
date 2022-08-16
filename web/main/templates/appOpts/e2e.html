@@ -1,0 +1,26 @@
+<h3>E2E Application Parameters</h3>
+
+<label for="sender">Select Sender: </label>
+<select name="sender" id="sender">
+    {% for node in nodes %}
+    <option value="{{node}}">{{node}}</option>
+    {% endfor %}
+</select>
+
+<label for="receiver">Select Receiver: </label>
+<select name="receiver" id="receiver">
+    {% for node in nodes %}
+    <option value="{{node}}">{{node}}</option>
+    {% endfor %}
+</select>
+
+<label for="startTime">Start Time: </label>
+<input type="text" name="startTime" id="startTime" value="1e12">
+<label for="size">Size: </label>
+<input type="text" name="size" id="size">
+<label for="priority">Priority: </label>
+<input type="text" name="priority" id="priority">
+<label for="targetFidelity">Target Fidelity: </label>
+<input type="text" name="targetFidelity" id="targetFidelity">
+<label for="timeout">Timeout: </label>
+<input type="text" name="timeout" id="timeout">
