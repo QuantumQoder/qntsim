@@ -162,7 +162,7 @@ class Topology():
                 node = ServiceNode("s"+str(node_name), self.timeline)          
                 self.add_node(node)
 
-        
+        #TODO:add ccchanels for all possible node pairs
         #adding cchannels
         for i in G.nodes:
             if i!=n-1:
@@ -308,37 +308,39 @@ class Topology():
                 continue
             else:
                 self.add_classical_channel(cc["Nodes"][0], cc["Nodes"][1], **cchannel_params)
+                self.add_classical_channel(cc["Nodes"][1], cc["Nodes"][0], **cchannel_params)
         
-        # generate forwarding tables
+         # generate forwarding tables
         #-------------------------------
-        # all_pair_dist, G = self.all_pair_shortest_dist()
+        all_pair_dist, G = self.all_pair_shortest_dist()
         # #print('all pair distance', all_pair_dist, G)
-        # self.nx_graph=G
+        self.nx_graph=G
         # #print('self.nx_graph',self.nx_graph,self.name)
         
         #-------------------------------
         
-        # for node in self.nodes.values():
-        #     # #print('nodes',type(node))
-        #     if type(node) != BSMNode:
-        #         node.all_pair_shortest_dist = all_pair_dist
-        #         node.nx_graph=self.nx_graph
-        #         node.delay_graph=self.cc_delay_graph
-        #         # #print('delay graph',node.name)
-        #         node.neighbors = list(G.neighbors(node.name))
-        #     if type(node) == EndNode:
-        #         # #print('Add service node',config['end_node'])
-        #         for key, value in config['end_node'].items():
-        #             # #print('end node key value',node.name, key, value )
-        #             if node.name == key:
-        #                 # #print('check', node.name, key, value)
-        #                 node.service_node = value
-        #                 break
-        #     if type(node) ==  ServiceNode:
-        #         for key, value in config['end_node'].items():
-        #             if node.name == value:
-        #                 node.end_node =key
-        #                 break
+        for node in self.nodes.values():
+            # #print('nodes',type(node))
+            if type(node) != BSMNode:
+                node.all_pair_shortest_dist = all_pair_dist
+                node.nx_graph=self.nx_graph
+                node.delay_graph=self.cc_delay_graph
+                # #print('delay graph',node.name)
+                node.neighbors = list(G.neighbors(node.name))
+            if type(node) == EndNode:
+                # #print('Add service node',config['end_node'])
+                for qc in config["quantum_connections"]:
+                    if node.name == qc["Nodes"][0]:
+                        node.service_node = qc["Nodes"][1]
+                        break
+            
+            """
+            if type(node) ==  ServiceNode:
+                for key, value in config['end_node'].items():
+                    if node.name == value:
+                        node.end_node =key
+                        break
+            """
         
     def load_config(self, config_file: str) -> None:
         """Method to load a network configuration file.
@@ -365,7 +367,7 @@ class Topology():
         # for node_params in config["nodes"]:
         #     name = node_params.pop("name")
         #     node_type = node_params.pop("type")
-
+        
         #     if node_type == "EndNode":
         #         node = EndNode(name, self.timeline, **node_params)
         #     elif node_type == "ServiceNode":
@@ -484,7 +486,7 @@ class Topology():
             # table = self.generate_forwarding_table(node.name)
             # for dst, next_node in table.items():
             #     node.network_manager.protocol_stack[0].add_forwarding_rule(dst, next_node)
-
+               
     def add_node(self, node: "Node") -> None:
         """Method to add a node to the network.
         Args:

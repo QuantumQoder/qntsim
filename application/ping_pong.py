@@ -269,8 +269,6 @@ class PingPong():
 
 
 #########################################################################################
-
-# path (Type : String) -Path to config Json file
 # sender and receiver (Type :string)-nodes in network 
 # backend (Type :string) Qutip (Since entanglements are filtered out based on EPR state)
 # Todo support on Qiskit
@@ -278,8 +276,10 @@ class PingPong():
 # message length should be less than 9
 # sequence length (Type:Integr) should be less than 5
 
+
+# path (Type : String) -Path to config Json file
 """
-def run(path,sender,receiver,sequence_length,message):
+def ping_pong(path,sender,receiver,sequence_length,message):
 
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
@@ -298,5 +298,55 @@ def run(path,sender,receiver,sequence_length,message):
         tl.init()
         tl.run() 
         pp.create_key_lists(alice,bob)
-        pp.run_ping_pong(sequence_length,message)
+        pp.run(sequence_length,message)
+"""
+# jsonConfig (Type : Json) -Json Configuration of network 
+"""
+def ping_pong(jsonConfig,sender,receiver,sequence_length,message):
+
+    from qntsim.kernel.timeline import Timeline 
+    Timeline.DLCZ=False
+    Timeline.bk=True
+    from qntsim.topology.topology import Topology
+    
+    tl = Timeline(20e12,"Qutip")
+    network_topo = Topology("network_topo", tl)
+    network_topo.load_config_json(jsonConfig)
+    if len(message)<=9:
+        n=int(sequence_length*len(message))
+        alice=network_topo.nodes[sender]
+        bob = network_topo.nodes[receiver]
+        pp=PingPong()
+        alice,bob=pp.roles(alice,bob,n)
+        tl.init()
+        tl.run() 
+        pp.create_key_lists(alice,bob)
+        pp.run(sequence_length,message)
+
+conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
+
+memo = {"frequency": 2e3, "expiry": 0, "efficiency": 1, "fidelity": 1}
+node1 = {"Name": "N1", "Type": "end", "noOfMemory": 50, "memory":memo}
+node2 = {"Name": "N2", "Type": "end", "noOfMemory": 50, "memory":memo}
+node3 = {"Name": "N3", "Type": "service", "noOfMemory": 50, "memory":memo}
+conf["nodes"].append(node1)
+conf["nodes"].append(node2)
+conf["nodes"].append(node3)
+
+qc1 = {"Nodes": ["N1", "N3"], "Attenuation": 1e-5, "Distance": 70}
+qc2 = {"Nodes": ["N2", "N3"], "Attenuation": 1e-5, "Distance": 70}
+conf["quantum_connections"].append(qc1)
+conf["quantum_connections"].append(qc2)
+
+cc1 = {"Nodes": ["N1", "N1"], "Delay": 0, "Distance": 0}
+cc1 = {"Nodes": ["N2", "N2"], "Delay": 0, "Distance": 0}
+cc1 = {"Nodes": ["N3", "N3"], "Delay": 0, "Distance": 0}
+cc12 = {"Nodes": ["N1", "N2"], "Delay": 1e9, "Distance": 1e3}
+cc13 = {"Nodes": ["N1", "N3"], "Delay": 1e9, "Distance": 1e3}
+cc23 = {"Nodes": ["N2", "N3"], "Delay": 1e9, "Distance": 1e3}
+conf["classical_connections"].append(cc12)
+conf["classical_connections"].append(cc13)
+conf["classical_connections"].append(cc23)
+
+ping_pong( conf, "N1", "N2", 4 ,"01001010")
 """

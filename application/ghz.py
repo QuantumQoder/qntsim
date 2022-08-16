@@ -97,11 +97,11 @@ class GHZ():
 
 ####################################################################################
 
-# path (Type : String) -Path to config Json file
 #endnode1, endnode2 , endnode3 , middlenode (Type :string)- nodes in topology 
 #backend (Type :String) is Qutip (since state vectors are returned in output)
-#Todo Support on Qiskit
+#TODO: Support on Qiskit
 
+# path (Type : String) -Path to config Json file
 """
 def ghz(path,endnode1,endnode2,endnode3,middlenode):
     from qntsim.kernel.timeline import Timeline 
@@ -122,4 +122,68 @@ def ghz(path,endnode1,endnode2,endnode3,middlenode):
     tl.run()  
     ghz.run_ghz(alice,bob,charlie,middlenode)
 
+"""
+
+# jsonConfig (Type : Json) -Json Configuration of network 
+"""
+def ghz(jsonConfig,endnode1,endnode2,endnode3,middlenode):
+    from qntsim.kernel.timeline import Timeline 
+    Timeline.DLCZ=False
+    Timeline.bk=True
+    from qntsim.topology.topology import Topology
+    
+    tl = Timeline(20e12,"Qutip")
+    network_topo = Topology("network_topo", tl)
+    network_topo.load_config_json(jsonConfig)
+    alice=network_topo.nodes[endnode1]
+    bob = network_topo.nodes[endnode2]
+    charlie=network_topo.nodes[endnode3]
+    middlenode=network_topo.nodes[middlenode]
+    ghz= GHZ()
+    alice,bob,charlie,middlenode=ghz.roles(alice,bob,charlie,middlenode)
+    tl.init()
+    tl.run()  
+    ghz.run_ghz(alice,bob,charlie,middlenode)
+
+
+conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
+
+memo = {"frequency": 2e3, "expiry": 0, "efficiency": 1, "fidelity": 1}
+node1 = {"Name": "N1", "Type": "end", "noOfMemory": 50, "memory":memo}
+node2 = {"Name": "N2", "Type": "end", "noOfMemory": 50, "memory":memo}
+node3 = {"Name": "N3", "Type": "end", "noOfMemory": 50, "memory":memo}
+node4 = {"Name": "N4", "Type": "service", "noOfMemory": 50, "memory":memo}
+
+conf["nodes"].append(node1)
+conf["nodes"].append(node2)
+conf["nodes"].append(node3)
+conf["nodes"].append(node4)
+
+qc1 = {"Nodes": ["N1", "N4"], "Attenuation": 1e-5, "Distance": 70}
+qc2 = {"Nodes": ["N2", "N4"], "Attenuation": 1e-5, "Distance": 70}
+qc3 = {"Nodes": ["N3", "N4"], "Attenuation": 1e-5, "Distance": 70}
+conf["quantum_connections"].append(qc1)
+conf["quantum_connections"].append(qc2)
+conf["quantum_connections"].append(qc3)
+
+cc1 = {"Nodes": ["N1", "N1"], "Delay": 0, "Distance": 0}
+cc1 = {"Nodes": ["N2", "N2"], "Delay": 0, "Distance": 0}
+cc1 = {"Nodes": ["N3", "N3"], "Delay": 0, "Distance": 0}
+cc1 = {"Nodes": ["N4", "N4"], "Delay": 0, "Distance": 0}
+
+cc12 = {"Nodes": ["N1", "N2"], "Delay": 1e9, "Distance": 1e3}
+cc13 = {"Nodes": ["N1", "N3"], "Delay": 1e9, "Distance": 1e3}
+cc14 = {"Nodes": ["N1", "N4"], "Delay": 1e9, "Distance": 1e3}
+cc23 = {"Nodes": ["N2", "N3"], "Delay": 1e9, "Distance": 1e3}
+cc24 = {"Nodes": ["N2", "N4"], "Delay": 1e9, "Distance": 1e3}
+cc34 = {"Nodes": ["N3", "N4"], "Delay": 1e9, "Distance": 1e3}
+conf["classical_connections"].append(cc12)
+conf["classical_connections"].append(cc13)
+conf["classical_connections"].append(cc14)
+conf["classical_connections"].append(cc23)
+conf["classical_connections"].append(cc24)
+conf["classical_connections"].append(cc34)
+
+
+ghz(conf,"N1","N2","N3","N4")
 """
