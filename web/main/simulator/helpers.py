@@ -1,16 +1,17 @@
+import string
 from main.simulator.constants import *
 from qntsim.kernel.timeline import Timeline
 Timeline.DLCZ=False
 Timeline.bk=True
 from qntsim.topology.topology import Topology
 
-def load_topology(network_config):
-    print("Loading Topology: " + network_config)
+def load_topology(network_config_json):
+    print(f'Loading Topology: {network_config_json}')
     
     tl = Timeline(4e12,"Qiskit")
 
     network_topo = Topology("network_topo", tl)
-    network_topo.load_config(network_config)
+    network_topo.load_config_json(network_config_json)
     
     return tl,network_topo
 

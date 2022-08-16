@@ -36,8 +36,8 @@ function addRow(tableID) {
 		case "nodes":
 			HTML += `<td><input type="text" name="nodeName"></td>
 					<td><select name="nodeType"><option value="service" default>Service</option><option value="end">End</option></select></td>
-					<td><input type="text" name="nodeNoMemories" value="50"></td>
-					<td><input type="text" name="nodeMemoFreq" value="2e4"></td>
+					<td><input type="text" name="nodeNoMemories" value="500"></td>
+					<td><input type="text" name="nodeMemoFreq" value="2e3"></td>
 					<td><input type="text" name="nodeMemoExpiry" value="0"></td>
 					<td><input type="text" name="nodeMemoEfficiency" value="1"></td>
 					<td><input type="text" name="nodeMemoFidelity" value="0.93"></td>`;
@@ -67,12 +67,12 @@ function fetchTopologyGraph(){
 		nodeArray.push({
 			"Name": $(this).find('[name=nodeName]')[0].value,
 			"Type": $(this).find('[name=nodeType]')[0].value,
-			"noOfMemory": $(this).find('[name=nodeNoMemories]')[0].value,
+			"noOfMemory": Number($(this).find('[name=nodeNoMemories]')[0].value),
 			"memory": {
-				"frequency": $(this).find('[name=nodeMemoFreq]')[0].value,
-				"expiry": $(this).find('[name=nodeMemoFreq]')[0].value,
-				"efficiency": $(this).find('[name=nodeMemoExpiry]')[0].value,
-				"fidelity": $(this).find('[name=nodeMemoFidelity]')[0].value,
+				"frequency": Number($(this).find('[name=nodeMemoFreq]')[0].value),
+				"expiry": Number($(this).find('[name=nodeMemoFreq]')[0].value),
+				"efficiency": Number($(this).find('[name=nodeMemoExpiry]')[0].value),
+				"fidelity": Number($(this).find('[name=nodeMemoFidelity]')[0].value),
 			},
 		});
 	});
@@ -81,8 +81,8 @@ function fetchTopologyGraph(){
 	$('#qc > tbody  > tr').each(function() {
 		qc.push({
 			"Nodes": [$(this).find('[name=qcNode1]')[0].value, $(this).find('[name=qcNode2]')[0].value],
-			"Attenuation": $(this).find('[name=qcAttenuation]')[0].value,
-			"Distance": $(this).find('[name=qcDistance]')[0].value,
+			"Attenuation": Number($(this).find('[name=qcAttenuation]')[0].value),
+			"Distance": Number($(this).find('[name=qcDistance]')[0].value),
 		});
 	});
 	console.log(qc);
@@ -92,7 +92,7 @@ function fetchTopologyGraph(){
 		if(nodes){
 			cc.push({
 				"Nodes": nodes,
-				"Delay": $(this).value,
+				"Delay": Number($(this).val()),
 				"Distance": 1e3,
 			});
 		}
@@ -100,19 +100,20 @@ function fetchTopologyGraph(){
 	console.log(cc);
 	
 	var topology = {
-		"nodes": nodes,
+		"nodes": nodeArray,
 		"quantum_connections": qc,
 		"classical_connections": cc,
 	};
 	console.log(`Visualising Topology : ${JSON.stringify(topology)}`);
 	$.ajax({
-		type: "GET",
+		type: "POST",
 		url: "graph",
 		data: {
-			"topology": topology,
+			"topology": JSON.stringify(topology),
 		},
 		success: function (response) {
-			$("#topoGraph").load(response);
+			console.log(response)
+			$("#topoGraph").html(response);
 		}
 	});
 }
@@ -131,7 +132,7 @@ function createCCTable() {
 			if(node == node2){
 				HTML += `<td><input type="text" name="ccDelay" value="0" data-nodes=["${node}","${node2}"] disabled></td>`;
 			} else {
-				HTML += `<td><input type="text" name="ccDelay" value="0.5" data-nodes=["${node}","${node2}"]></td>`;
+				HTML += `<td><input type="text" name="ccDelay" value="1e9" data-nodes=["${node}","${node2}"]></td>`;
 			}
 		});
 		HTML += `</tr></tbody>`;

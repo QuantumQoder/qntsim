@@ -1,3 +1,4 @@
+from pyvis.network import Network
 from tokenize import String
 from main.simulator.helpers import *
 from qntsim.topology.topology import Topology
@@ -179,7 +180,9 @@ class E91():
         print('Correlation value', str(round(chsh_value,3)))
 
 def graph_topology(network_config_json):
-    tl,network_topo = load_config_json(network_config_json)
+    
+    tl,network_topo = load_topology(network_config_json)
+    print(f'Making graph')
     graph = network_topo.get_virtual_graph()
     
     return graph
