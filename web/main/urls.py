@@ -7,4 +7,5 @@ urlpatterns = [
     path('fetchAppOptions', views.fetchAppOptions, name='fetchAppOptions'),
     path('example', views.example, name='example'),
     path('appLog', views.appLog, name='appLog'),
+    path('run', views.run, name='run'),
 ]

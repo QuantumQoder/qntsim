@@ -1,5 +1,5 @@
 var currentTab;
-var pages = 9;
+var pages = 8;
 var nodes = [];
 
 $(document).ready(function () {
@@ -17,6 +17,15 @@ $(document).ready(function () {
 	//     loadTopology(top_file);
 	// });
 });
+
+function convertFormToJSON(form) {
+	const array = $(form).serializeArray(); // Encodes the set of form elements as an array of names and values.
+	const json = {};
+	$.each(array, function () {
+	  json[this.name] = this.value || "";
+	});
+	return json;
+}
 
 function deleteRow(row) {
 	$(row.parentElement.parentElement).remove();
@@ -60,8 +69,9 @@ function addRow(tableID) {
 	$(`#${tableID}`).append(HTML);
 }
 
-function fetchTopologyGraph(){
-	console.log("Fetching topology graph");
+function fetchTopology(){
+	console.log("Fetching topology");
+
 	var nodeArray = [];
 	$('#nodes > tbody  > tr').each(function() {
 		nodeArray.push({
@@ -76,7 +86,6 @@ function fetchTopologyGraph(){
 			},
 		});
 	});
-	console.log(nodeArray);
 	var qc = [];
 	$('#qc > tbody  > tr').each(function() {
 		qc.push({
@@ -85,7 +94,6 @@ function fetchTopologyGraph(){
 			"Distance": Number($(this).find('[name=qcDistance]')[0].value),
 		});
 	});
-	console.log(qc);
 	var cc = [];
 	$('#cc tbody input').each(function() {
 		var nodes = $(this).data('nodes');
@@ -97,13 +105,27 @@ function fetchTopologyGraph(){
 			});
 		}
 	});
-	console.log(cc);
-	
 	var topology = {
 		"nodes": nodeArray,
 		"quantum_connections": qc,
 		"classical_connections": cc,
 	};
+	console.log(JSON.stringify(topology));
+	return topology;
+}
+
+function fetchApp(){
+	return $("#app").val();
+}
+
+function fetchAppSettings(){
+	const formData = convertFormToJSON($("#appConf form"));
+	return formData;
+}
+
+function fetchTopologyGraph(){
+	console.log("Fetching topology graph");
+	var topology = fetchTopology();
 	console.log(`Visualising Topology : ${JSON.stringify(topology)}`);
 	$.ajax({
 		type: "POST",
@@ -140,14 +162,14 @@ function createCCTable() {
 	$(`#cc`).html(HTML);
 }
 
-function fetchAppOptions() {
+function setAppOptions() {
 	console.log(`Fetching options for ${$("#app").val()}`);
 	$.ajax({
 		type: "GET",
 		url: "fetchAppOptions",
 		data: {
 			"nodes": JSON.stringify(nodes),
-			"app": $("#app").val(),
+			"app": fetchApp(),
 		},
 		success: function (response) {
 			$("#appConf").html(response);
@@ -188,7 +210,20 @@ function fetchLogs(){
 }
 
 function getResults(){
-
+	var appConf = {
+		"application": fetchApp(),
+		"topology": JSON.stringify(fetchTopology()),
+		"appSettings": JSON.stringify(fetchAppSettings())
+	}
+	console.log(appConf);
+	$.ajax({
+		type: "POST",
+		url: "run",
+		data: appConf,
+		success: function (response) {
+			$("#results").html(response);
+		}
+	});
 }
 
 function showTab(n) {
@@ -215,12 +250,9 @@ function showTab(n) {
 		case 5:
 			break;
 		case 6:
-			fetchAppOptions();
+			setAppOptions();
 			break;
 		case 7:
-			fetchLogs();
-			break;
-		case 8:
 			getResults();
 			break;
 	}

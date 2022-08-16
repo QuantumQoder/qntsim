@@ -3,6 +3,7 @@ Timeline.DLCZ=False
 Timeline.bk=True
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
+import pandas as pd
 
 def load_topo(path,backend):
 
@@ -12,7 +13,8 @@ def load_topo(path,backend):
    return tl,network_topo
 
 def get_res(network_topo,req_pairs):
-
+      cols = ['Index','Source node', 'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State']
+      memoryDict = {}
       #table=[]
       for pair in req_pairs:
          print('src ',pair[0])
@@ -21,15 +23,20 @@ def get_res(network_topo,req_pairs):
          for info in network_topo.nodes[src].resource_manager.memory_manager:
             if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
                table.append([info.index,src,info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
-         print(tabulate(table, headers=['Index','Source node', 'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
+         print(tabulate(table, headers=cols, tablefmt='grid'))
+         memoryDict["sender"] = pd.DataFrame(table, columns=cols)
+         
          table=[]
          print('dst ',pair[1])
          dst=pair[1]
          for info in network_topo.nodes[dst].resource_manager.memory_manager:
             if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
                table.append([info.index,dst,info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
-         print(tabulate(table, headers=['Index','Source node', 'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State'], tablefmt='grid'))
-      
+         print(tabulate(table, headers=cols, tablefmt='grid'))
+         memoryDict["reciver"] = pd.DataFrame(table, columns=cols)
+
+         return memoryDict
+         
 def set_parameters(topology:Topology):
    
    MEMO_FREQ = 2e4

@@ -176,7 +176,18 @@ class E91():
         print('Key length',len(alice_key))
         print('Mismatched keys', key_mismatch)
         chsh_value=self.chsh_correlation(alice_results,bob_results,alice_choice,bob_choice,n)
-        print('Correlation value', str(round(chsh_value,3)))
+        print('Correlation value', round(chsh_value,3))
+        
+        res = {
+            "sender_keys": alice_key,
+            "receiver_keys": bob_key,
+            "keyLength": len(alice_key),
+            'mismatch': key_mismatch,
+            'correlation': str(round(chsh_value,3))
+        }
+        
+        return res
+        
 
 
 ###############################################################################################
