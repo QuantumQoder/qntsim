@@ -28,7 +28,6 @@
 		</div> -->
 		<div class="tab">
 			<h3>Define Nodes</h3>
-
 			<table id="nodes">
 				<thead>
 					<th>Name</th>
@@ -42,8 +41,14 @@
 				</thead>
 				<tbody></tbody>
 			</table>
-
 			<button type="button" class="addRow">Add Node</button>
+
+			<h4>Quantum memorys's Parameters at a Each Node:</h4>
+			<h4>Memory's Frequency  (Units:Hz)</h4>
+			<h4>Memory's Expiry Time(Units:seconds ,precision:picoseconds)</h4>
+			<h4>Memory's Efficiency (Efficiency &lt;1) </h4>
+            <h4>Memory's Fidelity(Fidelity &lt;1)</h4>
+
 
 		</div>
 		<div class="tab">
@@ -59,8 +64,13 @@
 				</thead>
 				<tbody></tbody>
 			</table>
-
 			<button type="button" class="addRow">Add QC</button>
+
+			<h4>Quantum Channel Connection (between Node 1 and Node 2):</h4>
+			<h4>Node 1: A node in the Network</h4>
+			<h4>Node 2: A node in the Network</h4>
+			<h4>Attenuation: Attenuation of channel</h4>
+            <h4>Distance:length of channel(Units:km)</h4>
 
 		</div>
 		<div class="tab">
@@ -75,8 +85,13 @@
 				</thead>
 				<tbody></tbody>
 			</table>
-
+			<!---TODO: Virtual Links Documention hyperlink-->
 			<button type="button" class="addRow">Add Node</button>
+			<p>Virtual links creations between Node 1 and Node 2</p>
+			<h4>Virtual link : Pre-established entanglements in network</h4>
+			<h4>Node 1: A node in the Network</h4>
+			<h4>Node 2: A node in the Network</h4>
+			<h4>Demand Size:No.of entanglements of the virtual link </h4>
 
 		</div>
 		<div class="tab">
@@ -84,13 +99,14 @@
 
 			<table id="cc">
 			</table>
-
+            
 		</div>
 		<div class="tab">
 			<h3>Visualise Topology</h3>
 
 			<div id="topoGraph">
 			</div>
+			<p>Network Topology </p>
 		</div>
 
 		<div class="tab">
@@ -104,6 +120,14 @@
 				<option value="qsdc1">qsdc1</option>
 				<option value="teleportation">Teleportation</option>
 			</select>
+			<h3>Applications:</h3>
+			<h3>1)e91 : E91 QKD Protocol </h3>
+			<h3>2)e2e : End to End entanglement generation </h3>
+			<h3>3)ghz : Greenberger–Horne–Zeilinger state (GHZ state) </h3>
+			<h3>4)ip1 : Quantum Secure Direct Communication with Mutual Authentication via Rotation of an arbitrary basis</h3>
+			<h3>5)PingPong : Quantum Secure Direct Communication based on Ping-pong Protocol </h3>
+			<h3>6)qsdc1 : **first QSDC Protocol </h3>
+			<h3>7)Teleportation : Quantum Teleportation </h3>
 		</div>
 
 		<div class="tab">
