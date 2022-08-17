@@ -99,19 +99,6 @@ def tlexample(network_config: String, node1: String, node2: String):
 
     return memoryDict
 
-
-
-def fetchE91Config(network_config):
-    json_data = open(network_config)   
-    data1 = json.load(json_data) # deserialises it
-
-    responseData = {
-        "sender": data1["service_node"] +["a", "b"],
-        "receiver": data1["service_node"] +["a", "b"],
-    }
-    
-    return responseData
-
 def e91(network_config, sender, receiver, keyLength):
     tl,network_topo = load_topology(network_config)
     if keyLength<50 and keyLength>0:
@@ -127,7 +114,7 @@ def e91(network_config, sender, receiver, keyLength):
     else:
         print("key length should be between 0 and 50")
         return None
-
+    
 def e2e(network_config, sender, receiver, startTime, size, priority, targetFidelity, timeout):
     req_pairs=[]
     
@@ -140,4 +127,74 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     tl.run()
     
     results = get_res(network_topo,req_pairs)
+    return results
+
+def ghz(network_config, endnode1, endnode2, endnode3, middlenode):
+    tl,network_topo = load_topology(network_config)
+    alice=network_topo.nodes[endnode1]
+    bob = network_topo.nodes[endnode2]
+    charlie=network_topo.nodes[endnode3]
+    middlenode=network_topo.nodes[middlenode]
+    ghz= GHZ()
+    alice,bob,charlie,middlenode=ghz.roles(alice,bob,charlie,middlenode)
+    tl.init()
+    tl.run()  
+    results = ghz.run(alice,bob,charlie,middlenode)
+    return results
+
+def ip1(network_config, sender, receiver, message):
+    tl,network_topo = load_topology(network_config)
+    alice=network_topo.nodes[sender]
+    bob = network_topo.nodes[receiver]
+    ip1=IP1()
+    alice,bob=ip1.roles(alice,bob,n=50)
+    tl.init()
+    tl.run()  
+    results = ip1.run(alice,bob,message)
+    return results
+    
+def ping_pong(network_config, sender, receiver, sequenceLength, message):
+    tl,network_topo = load_topology(network_config)
+    if len(message)<=9:
+        n=int(sequenceLength*len(message))
+        alice=network_topo.nodes[sender]
+        bob = network_topo.nodes[receiver]
+        pp=PingPong()
+        alice,bob=pp.roles(alice,bob,n)
+        tl.init()
+        tl.run() 
+        pp.create_key_lists(alice,bob)
+        results = pp.run(sequenceLength,message)
+        return results
+    else:
+        print("message should be less than or equal to 9")
+        return None
+    
+def qsdc1(network_config, sender, receiver, sequenceLength, key):
+    tl,network_topo = load_topology(network_config)
+    if (len(key)%2==0):
+        
+        n=int(sequenceLength*len(key))
+        alice=network_topo.nodes[sender]
+        bob = network_topo.nodes[receiver]
+        qsdc1=QSDC1()
+        alice,bob=qsdc1.roles(alice,bob,n)
+        tl.init()
+        tl.run()  
+        results = qsdc1.run(alice,bob,sequenceLength,key)
+        return results
+    else:
+        print("key should have even no of digits")
+        return None
+    
+def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
+    tl,network_topo = load_topology(network_config)
+    
+    alice=network_topo.nodes[sender]
+    bob = network_topo.nodes[receiver]
+    tel= Teleportation()
+    alice,bob=tel.roles(alice,bob)
+    tl.init()
+    tl.run()  
+    results = tel.run(alice,bob,amplitude1,amplitude2)
     return results
