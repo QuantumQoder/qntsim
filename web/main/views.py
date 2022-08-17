@@ -2,6 +2,9 @@ from re import S
 import time
 import json
 import base64
+import io
+import networkx as nx
+import matplotlib.pyplot as plt
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
@@ -36,15 +39,22 @@ def run(request):
         results = e91(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["keyLength"]))
     elif application == "e2e":
         results = e2e(topology, appSettings["sender"], appSettings["receiver"], appSettings["startTime"], appSettings["size"], appSettings["priority"], appSettings["targetFidelity"], appSettings["timeout"] )
+    elif application == "ghz":
+        results = ghz(topology, appSettings["endnode1"], appSettings["endnode2"], appSettings["endnode3"], appSettings["middlenode"] )
+    elif application == "ip1":
+        results = ip1(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"] )
+    elif application == "ping_pong":
+        results = ping_pong(topology, appSettings["sender"], appSettings["receiver"], appSettings["sequenceLength"], appSettings["message"] )
+    elif application == "qsdc1":
+        results = qsdc1(topology, appSettings["sender"], appSettings["receiver"], appSettings["sequenceLength"], appSettings["key"] )
+    elif application == "teleportation":
+        results = teleportation(topology, appSettings["sender"], appSettings["receiver"], appSettings["amplitude1"], appSettings["amplitude2"] )
 
     print(results)
     return render(request, f'apps/{application}/results.html', results)
 
 @csrf_exempt
 def graph(request):
-    import io
-    import networkx as nx
-    import matplotlib.pyplot as plt
     topology = json.loads(request.POST['topology'])
     print(f"Request received to make topology graph: {str(topology)}")
     if topology is not None:
@@ -52,12 +62,13 @@ def graph(request):
         graph = graph_topology(topology)
         nx.draw(graph, with_labels=True)
         plt.savefig(buffer, dpi=300, bbox_inches='tight', format="png")
-        plt.show()
         buffer.seek(0)
         figdata_png = base64.b64encode(buffer.getvalue())
+        buffer.truncate(0)
         context = {
             "b64String": figdata_png.decode('utf8'),
         }
+        plt.clf()
         return render(request, f'topologyGraph.html', context)
 
 

@@ -8,7 +8,7 @@ from qntsim.topology.topology import Topology
 def load_topology(network_config_json):
     print(f'Loading Topology: {network_config_json}')
     
-    tl = Timeline(4e12,"Qiskit")
+    tl = Timeline(20e12,"Qutip")
 
     network_topo = Topology("network_topo", tl)
     network_topo.load_config_json(network_config_json)

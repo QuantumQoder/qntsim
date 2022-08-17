@@ -182,6 +182,12 @@ class QSDC1():
         print(f"key transmitted : {message}")
         print(f"key shared received : {message_received}")
 
+        res = {
+            "key_transmitted": message,
+            "key_shared_received": message_received
+        }
+        return res
+
 # In the request if the runtime is till the simulation, then memory will be sequentially allotted 
 # For quantum router , you can directly change memory size
 
@@ -205,8 +211,8 @@ class QSDC1():
 # message (Type: String)--a bit string
 # message length  should be even
 # sequence length (Type : Integer) should be less than 5
-"""
-def qsdc1(path,sender,receiver,sequence_length,message):
+'''
+def qsdc1(path, sender,receiver,sequence_length,message):
 
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
@@ -225,13 +231,13 @@ def qsdc1(path,sender,receiver,sequence_length,message):
         alice,bob=qsdc1.roles(alice,bob,n)
         tl.init()
         tl.run()  
-        qsdc1.run(alice,bob,sequence_length,message)
-"""
+        res = qsdc1.run(alice,bob,sequence_length,message)
+        print(res)
 
 
 
 # jsonConfig (Type : Json) -Json Configuration of network 
-"""
+
 def qsdc1(jsonConfig,sender,receiver,sequence_length,message):
 
     from qntsim.kernel.timeline import Timeline 
@@ -251,8 +257,8 @@ def qsdc1(jsonConfig,sender,receiver,sequence_length,message):
         alice,bob=qsdc1.roles(alice,bob,n)
         tl.init()
         tl.run()  
-        qsdc1.run(alice,bob,sequence_length,message)
-
+        res = qsdc1.run(alice,bob,sequence_length,message)
+        print(res)
 
 
 conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
@@ -279,6 +285,5 @@ cc23 = {"Nodes": ["N2", "N3"], "Delay": 1e9, "Distance": 1e3}
 conf["classical_connections"].append(cc12)
 conf["classical_connections"].append(cc13)
 conf["classical_connections"].append(cc23)
-
-qsdc1( conf, "N1", "N2",1,"110011001001010101010100")
-"""
+'''
+# qsdc1("a", "b",3,"110011001001010101010100")

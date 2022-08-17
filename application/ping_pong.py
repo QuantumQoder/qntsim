@@ -247,6 +247,13 @@ class PingPong():
         print(f"Message transmitted : {message}")
         print(f"Message recieved : {bob_message}")
 
+
+        res = {
+            "message_transmitted": message,
+            "message_received": bob_message
+        }
+
+        return res
     #start = time.time()
     #run_ping_pong(alice,bob,sequence_length,message = "010110100")
     #end = time.time()
@@ -298,10 +305,12 @@ def ping_pong(path,sender,receiver,sequence_length,message):
         tl.init()
         tl.run() 
         pp.create_key_lists(alice,bob)
-        pp.run(sequence_length,message)
-"""
+        res = pp.run(sequence_length,message)
+        print(res)
+
+
 # jsonConfig (Type : Json) -Json Configuration of network 
-"""
+
 def ping_pong(jsonConfig,sender,receiver,sequence_length,message):
 
     from qntsim.kernel.timeline import Timeline 
@@ -321,7 +330,8 @@ def ping_pong(jsonConfig,sender,receiver,sequence_length,message):
         tl.init()
         tl.run() 
         pp.create_key_lists(alice,bob)
-        pp.run(sequence_length,message)
+        res = pp.run(sequence_length,message)
+        print(res)
 
 conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
 
@@ -349,4 +359,5 @@ conf["classical_connections"].append(cc13)
 conf["classical_connections"].append(cc23)
 
 ping_pong( conf, "N1", "N2", 4 ,"01001010")
+
 """

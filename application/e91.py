@@ -136,13 +136,13 @@ class E91():
             expect14 = (countA1B4[0]-countA1B4[1]-countA1B4[2]+countA1B4[3])/total14
             expect32 = (countA3B2[0]-countA3B2[1]-countA3B2[2]+countA3B2[3])/total32
             expect34 = (countA3B4[0]-countA3B4[1]-countA3B4[2]+countA3B4[3])/total34
+            corr=expect12-expect14+expect32+expect34
+
+            return corr
         except ZeroDivisionError:
             print(f'Error occured,Retry e91 again')
+            return 0
 
-
-        corr=expect12-expect14+expect32+expect34
-
-        return corr
 
     def run(self,alice,bob,n):
         alice_choice,alice_meas=self.alice_measurement(alice)
@@ -188,8 +188,6 @@ class E91():
         
         return res
         
-
-
 ###############################################################################################
 
 # sender and receiver (Type : String)-nodes in network 

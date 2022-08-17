@@ -339,6 +339,13 @@ class IP1():
         print(f"input message : {message}")
         print(f"Bob_message : {Bob_message}")
 
+
+        res ={
+            "input_message": message,
+            "bob_message" : Bob_message
+        }
+
+        return res
     # One question - technically all of this is happening on Alice's nodes. How do 
     # I send everything to Bob's nodes
     # I don't know
@@ -371,12 +378,13 @@ def ip1(path,sender,receiver,message):
     alice,bob=ip1.roles(alice,bob,n=50)
     tl.init()
     tl.run()  
-    ip1.run(alice,bob,message)
-"""
+    res = ip1.run(alice,bob,message)
+    print(res)
+
 
 
 # jsonConfig (Type : Json) -Json Configuration of network 
-"""
+
 def ip1(jsonConfig,sender,receiver,message):
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
