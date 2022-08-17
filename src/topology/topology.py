@@ -297,7 +297,6 @@ class Topology():
                 "distance": qc["Distance"]
             }
             self.add_quantum_connection(qc["Nodes"][0], qc["Nodes"][1], **qchannel_params)
-            #TODO: Add mapping in add_quantum connection for node.service_node and node.end_node
             
         for cc in config["classical_connections"]:
             cchannel_params = {
@@ -313,34 +312,40 @@ class Topology():
          # generate forwarding tables
         #-------------------------------
         all_pair_dist, G = self.all_pair_shortest_dist()
-        # #print('all pair distance', all_pair_dist, G)
+        print('all pair distance', all_pair_dist, G)
         self.nx_graph=G
-        # #print('self.nx_graph',self.nx_graph,self.name)
+        print('self.nx_graph',self.nx_graph,self.name)
         
         #-------------------------------
         
-        for node in self.nodes.values():
-            # #print('nodes',type(node))
-            if type(node) != BSMNode:
-                node.all_pair_shortest_dist = all_pair_dist
-                node.nx_graph=self.nx_graph
-                node.delay_graph=self.cc_delay_graph
-                # #print('delay graph',node.name)
-                node.neighbors = list(G.neighbors(node.name))
-            if type(node) == EndNode:
-                # #print('Add service node',config['end_node'])
-                for qc in config["quantum_connections"]:
-                    if node.name == qc["Nodes"][0]:
-                        node.service_node = qc["Nodes"][1]
-                        break
+        for qc in config["quantum_connections"]:
+            qcnode0 = next(filter(lambda node: node.name == qc["Nodes"][0], self.nodes.values()), None)
+            qcnode1 = next(filter(lambda node: node.name == qc["Nodes"][1], self.nodes.values()), None)
             
-            """
-            if type(node) ==  ServiceNode:
-                for key, value in config['end_node'].items():
-                    if node.name == value:
-                        node.end_node =key
-                        break
-            """
+            qcnode0.all_pair_shortest_dist = all_pair_dist
+            qcnode0.nx_graph=self.nx_graph
+            qcnode0.delay_graph=self.cc_delay_graph
+            qcnode0.neighbors = list(G.neighbors(qcnode0.name))
+            
+            qcnode1.all_pair_shortest_dist = all_pair_dist
+            qcnode1.nx_graph=self.nx_graph
+            qcnode1.delay_graph=self.cc_delay_graph
+            qcnode1.neighbors = list(G.neighbors(qcnode0.name))
+            
+            if type(qcnode0) == EndNode:
+                if type(qcnode1) == EndNode:
+                    qcnode0.end_node = qc["Nodes"][1]
+                    qcnode1.end_node = qc["Nodes"][0]
+                else:
+                    qcnode0.service_node = qc["Nodes"][1]
+                    qcnode1.end_node = qc["Nodes"][0]
+            else:
+                if type(qcnode1) == EndNode:
+                    qcnode0.end_node = qc["Nodes"][1]
+                    qcnode1.service_node = qc["Nodes"][0]
+                else:
+                    qcnode0.service_node = qc["Nodes"][1]
+                    qcnode1.service_node = qc["Nodes"][0]
         
     def load_config(self, config_file: str) -> None:
         """Method to load a network configuration file.
