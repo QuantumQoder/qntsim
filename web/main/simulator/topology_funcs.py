@@ -17,7 +17,7 @@ from main.simulator.app.teleportation import *
 
 def graph_topology(network_config_json):
     
-    tl,network_topo = load_topology(network_config_json)
+    tl,network_topo = load_topology(network_config_json, "Qiskit")
     print(f'Making graph')
     graph = network_topo.get_virtual_graph()
     
@@ -100,7 +100,7 @@ def tlexample(network_config: String, node1: String, node2: String):
     return memoryDict
 
 def e91(network_config, sender, receiver, keyLength):
-    tl,network_topo = load_topology(network_config)
+    tl,network_topo = load_topology(network_config, "Qiskit")
     if keyLength<50 and keyLength>0:
         n=int((9*keyLength)/2)
         alice=network_topo.nodes[sender]
@@ -118,7 +118,7 @@ def e91(network_config, sender, receiver, keyLength):
 def e2e(network_config, sender, receiver, startTime, size, priority, targetFidelity, timeout):
     req_pairs=[]
     
-    tl,network_topo = load_topology(network_config)
+    tl,network_topo = load_topology(network_config, "Qiskit")
     tm=network_topo.nodes[sender].transport_manager
     tm.request(receiver, float(startTime),int(size), 20e12 , int(priority) ,float(targetFidelity), float(timeout) )
     req_pairs.append((sender,receiver))
@@ -130,7 +130,7 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     return results
 
 def ghz(network_config, endnode1, endnode2, endnode3, middlenode):
-    tl,network_topo = load_topology(network_config)
+    tl,network_topo = load_topology(network_config, "Qutip")
     alice=network_topo.nodes[endnode1]
     bob = network_topo.nodes[endnode2]
     charlie=network_topo.nodes[endnode3]
@@ -143,7 +143,7 @@ def ghz(network_config, endnode1, endnode2, endnode3, middlenode):
     return results
 
 def ip1(network_config, sender, receiver, message):
-    tl,network_topo = load_topology(network_config)
+    tl,network_topo = load_topology(network_config, "Qutip")
     alice=network_topo.nodes[sender]
     bob = network_topo.nodes[receiver]
     ip1=IP1()
@@ -154,7 +154,7 @@ def ip1(network_config, sender, receiver, message):
     return results
     
 def ping_pong(network_config, sender, receiver, sequenceLength, message):
-    tl,network_topo = load_topology(network_config)
+    tl,network_topo = load_topology(network_config, "Qutip")
     if len(message)<=9:
         n=int(sequenceLength*len(message))
         alice=network_topo.nodes[sender]
@@ -171,7 +171,7 @@ def ping_pong(network_config, sender, receiver, sequenceLength, message):
         return None
     
 def qsdc1(network_config, sender, receiver, sequenceLength, key):
-    tl,network_topo = load_topology(network_config)
+    tl,network_topo = load_topology(network_config, "Qutip")
     if (len(key)%2==0):
         
         n=int(sequenceLength*len(key))
@@ -188,13 +188,13 @@ def qsdc1(network_config, sender, receiver, sequenceLength, key):
         return None
     
 def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
-    tl,network_topo = load_topology(network_config)
+    tl,network_topo = load_topology(network_config, "Qutip")
     
     alice=network_topo.nodes[sender]
     bob = network_topo.nodes[receiver]
     tel= Teleportation()
     alice,bob=tel.roles(alice,bob)
     tl.init()
-    tl.run()  
+    tl.run()
     results = tel.run(alice,bob,amplitude1,amplitude2)
     return results

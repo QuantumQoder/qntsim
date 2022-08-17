@@ -5,10 +5,10 @@ Timeline.DLCZ=False
 Timeline.bk=True
 from qntsim.topology.topology import Topology
 
-def load_topology(network_config_json):
+def load_topology(network_config_json, backend):
     print(f'Loading Topology: {network_config_json}')
     
-    tl = Timeline(20e12,"Qutip")
+    tl = Timeline(20e12,backend)
 
     network_topo = Topology("network_topo", tl)
     network_topo.load_config_json(network_config_json)
