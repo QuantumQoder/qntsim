@@ -291,7 +291,7 @@ def tel(path,sender,receiver,A_0,A_1):
 
 # jsonConfig (Type : Json) -Json Configuration of network 
 
-
+"""
 def tel(jsonConfig,sender,receiver,A_0,A_1):
 
     from qntsim.kernel.timeline import Timeline 
@@ -338,3 +338,4 @@ conf["classical_connections"].append(cc13)
 conf["classical_connections"].append(cc23)
 
 tel( conf, "N1", "N2", complex(0.70710678118+0j), complex(0-0.70710678118j))
+"""

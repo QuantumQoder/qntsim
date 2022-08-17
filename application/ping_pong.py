@@ -285,7 +285,7 @@ class PingPong():
 
 
 # path (Type : String) -Path to config Json file
-
+"""
 def ping_pong(path,sender,receiver,sequence_length,message):
 
     from qntsim.kernel.timeline import Timeline 
@@ -310,7 +310,7 @@ def ping_pong(path,sender,receiver,sequence_length,message):
 
 
 # jsonConfig (Type : Json) -Json Configuration of network 
-'''
+
 def ping_pong(jsonConfig,sender,receiver,sequence_length,message):
 
     from qntsim.kernel.timeline import Timeline 
@@ -360,4 +360,4 @@ conf["classical_connections"].append(cc23)
 
 ping_pong( conf, "N1", "N2", 4 ,"01001010")
 
-'''
+"""

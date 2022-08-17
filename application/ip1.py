@@ -343,7 +343,6 @@ class IP1():
         res ={
             "input_message": message,
             "bob_message" : Bob_message
-
         }
 
         return res
@@ -362,7 +361,7 @@ class IP1():
 # no.of entanglements=50
 
 # path (Type : String) -Path to config Json file
-
+"""
 def ip1(path,sender,receiver,message):
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
@@ -385,7 +384,7 @@ def ip1(path,sender,receiver,message):
 
 
 # jsonConfig (Type : Json) -Json Configuration of network 
-"""
+
 def ip1(jsonConfig,sender,receiver,message):
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
