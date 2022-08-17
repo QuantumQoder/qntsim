@@ -58,6 +58,10 @@ def graph(request):
         context = {
             "b64String": figdata_png.decode('utf8'),
         }
+        buffer.truncate(0)
+        buffer.seek(0)
+        # print(buffer.getvalue())
+        # print(context)
         return render(request, f'topologyGraph.html', context)
 
 

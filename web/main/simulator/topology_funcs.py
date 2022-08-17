@@ -135,7 +135,7 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     tm=network_topo.nodes[sender].transport_manager
     tm.request(receiver, float(startTime),int(size), 20e12 , int(priority) ,float(targetFidelity), float(timeout) )
     req_pairs.append((sender,receiver))
-    tl.stop_time=10e12
+    # tl.stop_time=30e12
     tl.init()
     tl.run()
     
