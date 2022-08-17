@@ -183,7 +183,7 @@ class QSDC1():
         print(f"key shared received : {message_received}")
 
         res = {
-            "key_trasnmitted": message,
+            "key_transmitted": message,
             "key_shared_received": message_received
         }
         return res
@@ -211,7 +211,7 @@ class QSDC1():
 # message (Type: String)--a bit string
 # message length  should be even
 # sequence length (Type : Integer) should be less than 5
-
+'''
 def qsdc1(path, sender,receiver,sequence_length,message):
 
     from qntsim.kernel.timeline import Timeline 
@@ -237,7 +237,7 @@ def qsdc1(path, sender,receiver,sequence_length,message):
 
 
 # jsonConfig (Type : Json) -Json Configuration of network 
-'''
+
 def qsdc1(jsonConfig,sender,receiver,sequence_length,message):
 
     from qntsim.kernel.timeline import Timeline 
