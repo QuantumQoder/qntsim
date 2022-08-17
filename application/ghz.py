@@ -143,7 +143,7 @@ def ghz(jsonConfig,endnode1,endnode2,endnode3,middlenode):
     alice,bob,charlie,middlenode=ghz.roles(alice,bob,charlie,middlenode)
     tl.init()
     tl.run()  
-    ghz.run_ghz(alice,bob,charlie,middlenode)
+    ghz.run(alice,bob,charlie,middlenode)
 
 
 conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
