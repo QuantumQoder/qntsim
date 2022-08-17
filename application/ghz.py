@@ -92,7 +92,15 @@ class GHZ():
         circ.measure(2)
         output = qm_middle.run_circuit(circ,[alice_key,bob_key,charlie_key])
         print("Output", output)
+        ghz_state = qm_middle.get(middle_key).state
         print("\nGHZ State\n",  qm_middle.get(middle_key).state)
+
+        res = {
+            "output": output,
+            "ghz_state" : ghz_state
+        }
+
+        return res
         # print("Output", output, qm_middle.get(alice_key))
 
 ####################################################################################
@@ -102,7 +110,7 @@ class GHZ():
 #TODO: Support on Qiskit
 
 # path (Type : String) -Path to config Json file
-"""
+
 def ghz(path,endnode1,endnode2,endnode3,middlenode):
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
@@ -120,9 +128,10 @@ def ghz(path,endnode1,endnode2,endnode3,middlenode):
     alice,bob,charlie,middlenode=ghz.roles(alice,bob,charlie,middlenode)
     tl.init()
     tl.run()  
-    ghz.run_ghz(alice,bob,charlie,middlenode)
+    res = ghz.run(alice,bob,charlie,middlenode)
+    print(res)
 
-"""
+
 
 # jsonConfig (Type : Json) -Json Configuration of network 
 """

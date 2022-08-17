@@ -83,7 +83,7 @@ class Teleportation():
                 print("-01+10") 
             
         print("random qubit alice sending",qm_alice.get(key_0).state)
-
+        random_qubit = qm_alice.get(key_0).state
         circ=QutipCircuit(2)
         circ.cx(0,1)
         circ.h(0)
@@ -96,7 +96,7 @@ class Teleportation():
         #qm_alice,key,alice_state=alice_keys()
         #alice_state.append()
         #print('output',key_0,key,output,crz,crx)
-        return crz,crx,case
+        return crz,crx,case, random_qubit
         
 
     def bob_gates(self,crz,crx,case,bob):
@@ -240,13 +240,21 @@ class Teleportation():
         output=qm_bob.run_circuit(circ,[key])
         print("Bob's state before corrective measures",state.state)
         print('bob final state after corrective measures',qm_bob.get(key).state)
-
+        return state.state, qm_bob.get(key).state
 
     def run(self,alice,bob,A_0,A_1):
-        crz,crx,case=self.alice_measurement(A_0,A_1,alice)
+        crz,crx,case, random_qubit=self.alice_measurement(A_0,A_1,alice)
         print("Measurement result of random qubit crz",crz)
         print("Measurement result of alice qubit crx",crx)
-        self.bob_gates(crz,crx,case,bob)
+        bob_initial_state, bob_final_state = self.bob_gates(crz,crx,case,bob)
+
+        res = {
+            "random_qubit" : random_qubit,
+            "bob_initial_state" : bob_initial_state,
+            "bob_final_state" : bob_final_state
+        }
+
+        return res
 
 #################################################################################################
 
@@ -283,7 +291,7 @@ def tel(path,sender,receiver,A_0,A_1):
 
 # jsonConfig (Type : Json) -Json Configuration of network 
 
-"""
+
 def tel(jsonConfig,sender,receiver,A_0,A_1):
 
     from qntsim.kernel.timeline import Timeline 
@@ -301,8 +309,8 @@ def tel(jsonConfig,sender,receiver,A_0,A_1):
     alice,bob=tel.roles(alice,bob)
     tl.init()
     tl.run()  
-    tel.run(alice,bob,A_0,A_1)
-
+    res = tel.run(alice,bob,A_0,A_1)
+    print(res)
 
 conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
 
@@ -330,4 +338,3 @@ conf["classical_connections"].append(cc13)
 conf["classical_connections"].append(cc23)
 
 tel( conf, "N1", "N2", complex(0.70710678118+0j), complex(0-0.70710678118j))
-"""
