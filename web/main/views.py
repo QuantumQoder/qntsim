@@ -15,12 +15,26 @@ from django.views.decorators.csrf import csrf_exempt
 
 matplotlib.use('agg')
 
-def index(request):
+def home(request):
     context = {
         "title": "QNT Simulator"
     }
-    return render(request, 'app.html', context)
+    return render(request, 'home.html', context)
 
+def apps(request):
+    app = request.GET.get('app')
+    if app:
+        context = {
+            "title": app,
+            "app": app
+        }
+        return render(request, f'apps/{app}/index.html', context)
+    else:
+        context = {
+            "title": "QNT Simulator"
+        }
+        
+        return render(request, 'apps.html', context)
 
 def fetchAppOptions(request):
     app = request.GET.get('app')
@@ -64,7 +78,6 @@ def graph(request):
         graph = graph_topology(topology)
         print(graph)
         nx.draw(graph, with_labels=True)
-        print('after nx_draw')
         plt.savefig(buffer, dpi=300, bbox_inches='tight', format="png")
         buffer.seek(0)
         figdata_png = base64.b64encode(buffer.getvalue())

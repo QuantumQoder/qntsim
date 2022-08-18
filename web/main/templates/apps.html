@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{ title }}</title>
+
+	{% load static %}
+	<link rel="stylesheet" href="{% static '/css/nav.css' %}">
+	<link rel="stylesheet" href="{% static '/css/table.css' %}">
+	<link rel="stylesheet" href="{% static '/css/form.css' %}">
+	<link rel="stylesheet" href="{% static '/css/image.css' %}">
+	<script src="{% static '/js/jquery.min.js' %}"></script>
+	<script src="{% static '/js/app.js' %}"></script>
+	
+
+</head>
+<body>
+	<div class="nav">
+        <ul>
+            <li><a href="">Home</a></li>
+            <li><a href="/apps">Applications</a></li>
+        </ul>
+    </div>
+
+	<br>
+	<h1>Quantum Network Simulation Applications</h1>
+
+	<div class="section">
+		<h2>E91</h2>
+		<h3>E91 QKD Protocol</h3>
+		<a href="/apps?app=e91">Run E91 Application</a>
+	</div>
+	<div class="section">
+		<h2>E2E</h2>
+		<h3>End to End entanglement generation</h3>
+		<a href="/apps?app=e2e">Run E2E Application</a>
+	</div>
+	<div class="section">
+		<h2>GHZ</h2>
+		<h3>Greenberger–Horne–Zeilinger state (GHZ state)</h3>
+		<a href="/apps?app=ghz">Run GHZ Application</a>
+	</div>
+	<div class="section">
+		<h2>IP1</h2>
+		<h3>Quantum Secure Direct Communication with Mutual Authentication via Rotation of an arbitrary basis</h3>
+		<a href="/apps?app=ip1">Run IP1 Application</a>
+	</div>
+	<div class="section">
+		<h2>Ping Pong</h2>
+		<h3>Quantum Secure Direct Communication based on Ping-pong Protocol</h3>
+		<a href="/apps?app=pingpong">Run Ping Pong Application</a>
+	</div>
+	<div class="section">
+		<h2>QSDC1</h2>
+		<h3>First QSDC Protocol</h3>
+		<a href="/apps?app=qsdc1">Run QSDC Application</a>
+	</div>
+	<div class="section">
+		<h2>Teleportation</h2>
+		<h3>Quantum Teleportation</h3>
+		<a href="/apps?app=teleportation">Run Teleportation Application</a>
+	</div>
+
+</body>
+</html>
