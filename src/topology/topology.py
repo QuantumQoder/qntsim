@@ -290,14 +290,6 @@ class Topology():
                 nodeObj.memory_array.update_memory_params("efficiency", node["memory"]["efficiency"])
                 nodeObj.memory_array.update_memory_params("raw_fidelity", node["memory"]["fidelity"])
                 self.add_node(nodeObj)
-        
-        for qc in config["quantum_connections"]:
-            qchannel_params = {
-                "attenuation": qc["Attenuation"],
-                "distance": qc["Distance"]
-            }
-            self.add_quantum_connection(qc["Nodes"][0], qc["Nodes"][1], **qchannel_params)
-            #TODO: Add mapping in add_quantum connection for node.service_node and node.end_node
             
         for cc in config["classical_connections"]:
             cchannel_params = {
@@ -310,37 +302,49 @@ class Topology():
                 self.add_classical_channel(cc["Nodes"][0], cc["Nodes"][1], **cchannel_params)
                 self.add_classical_channel(cc["Nodes"][1], cc["Nodes"][0], **cchannel_params)
         
+        for qc in config["quantum_connections"]:
+            qchannel_params = {
+                "attenuation": qc["Attenuation"],
+                "distance": qc["Distance"]
+            }
+            self.add_quantum_connection(qc["Nodes"][0], qc["Nodes"][1], **qchannel_params)
+        
          # generate forwarding tables
         #-------------------------------
         all_pair_dist, G = self.all_pair_shortest_dist()
-        # #print('all pair distance', all_pair_dist, G)
+        # print('all pair distance', all_pair_dist, G)
         self.nx_graph=G
-        # #print('self.nx_graph',self.nx_graph,self.name)
+        # print('self.nx_graph',self.nx_graph,self.name)
         
         #-------------------------------
-        
         for node in self.nodes.values():
-            # #print('nodes',type(node))
             if type(node) != BSMNode:
                 node.all_pair_shortest_dist = all_pair_dist
                 node.nx_graph=self.nx_graph
                 node.delay_graph=self.cc_delay_graph
-                # #print('delay graph',node.name)
                 node.neighbors = list(G.neighbors(node.name))
-            if type(node) == EndNode:
-                # #print('Add service node',config['end_node'])
-                for qc in config["quantum_connections"]:
-                    if node.name == qc["Nodes"][0]:
-                        node.service_node = qc["Nodes"][1]
-                        break
+        
+        for qc in config["quantum_connections"]:
+            qcnode0 = next(filter(lambda node: node.name == qc["Nodes"][0], self.nodes.values()), None)
+            qcnode1 = next(filter(lambda node: node.name == qc["Nodes"][1], self.nodes.values()), None)
             
-            """
-            if type(node) ==  ServiceNode:
-                for key, value in config['end_node'].items():
-                    if node.name == value:
-                        node.end_node =key
-                        break
-            """
+            if type(qcnode0) == EndNode:
+                if type(qcnode1) == EndNode:
+                    qcnode0.end_node = qc["Nodes"][1]
+                    qcnode1.end_node = qc["Nodes"][0]
+                else:
+                    qcnode0.service_node = qc["Nodes"][1]
+                    qcnode1.end_node = qc["Nodes"][0]
+            else:
+                if type(qcnode1) == EndNode:
+                    qcnode0.end_node = qc["Nodes"][1]
+                    qcnode1.service_node = qc["Nodes"][0]
+                else:
+                    qcnode0.service_node = qc["Nodes"][1]
+                    qcnode1.service_node = qc["Nodes"][0]
+                    
+            self.nodes[qc["Nodes"][0]] = qcnode0
+            self.nodes[qc["Nodes"][1]] = qcnode1
         
     def load_config(self, config_file: str) -> None:
         """Method to load a network configuration file.
@@ -507,7 +511,7 @@ class Topology():
             node1 (str): first node in pair to connect.
             node2 (str): second node in pair to connect.
         """
-        # #print('add quantum connection', node1, node2)
+        # print('add quantum connection', node1, node2)
         assert node1 in self.nodes, node1 + " not a valid node"
         assert node2 in self.nodes, node2 + " not a valid node"
 
@@ -535,11 +539,11 @@ class Topology():
             # update params
             del kwargs["attenuation"]
             if node1 in self._cc_graph and node2 in self._cc_graph[node1]:
-                # #print('node1 node2', node1, node2, self._cc_graph[node1][node2])
+                # print('node1 node2', node1, node2, self._cc_graph[node1][node2])
                 temp1=self._cc_graph[node1][node2] 
                 temp2= self._cc_graph[node2][node1]
                 kwargs["delay"] = (temp1 + temp2) / 4
-                # #print('kwargs delay', kwargs["delay"])
+                # print('kwargs delay', kwargs["delay"])
 
             # add classical channels (for middle node connectivity)
             for node in [node1, node2]:
@@ -702,7 +706,9 @@ class Topology():
                     #This is a virtual neighbor
                     ###print("Node, remote node-------",(node, info.remote_node))
                     nx_graph.add_edge(node, str(info.remote_node), color='red')
+        print('before draw')
         self.draw_graph(nx_graph)
+        print('after draw')
         return nx_graph
 
 

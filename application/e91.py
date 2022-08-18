@@ -220,10 +220,9 @@ def e91(backend,path,sender,receiver,key_length):
         tl.run()  
         e91.run(alice,bob,n)
 
+e91("Qiskit", "../example/3node.json", "a", "b", 8)
 """
-
 # jsonConfig (Type : Json) -Json Configuration of network 
-"""
 def e91(backend,jsonConfig,sender,receiver,key_length):
 
     from qntsim.kernel.timeline import Timeline 
@@ -234,7 +233,7 @@ def e91(backend,jsonConfig,sender,receiver,key_length):
     tl = Timeline(20e12,backend)
     network_topo = Topology("network_topo", tl)
     network_topo.load_config_json(jsonConfig)
-    network_topo.get_virtual_graph()
+    print(network_topo.get_virtual_graph())
     if key_length<50 and key_length>0:
         n=int((9*key_length)/2)
         alice=network_topo.nodes[sender]
@@ -242,7 +241,7 @@ def e91(backend,jsonConfig,sender,receiver,key_length):
         e91=E91()
         alice,bob=e91.roles(alice,bob,n)
         tl.init()
-        tl.run()  
+        tl.run()
         e91.run(alice,bob,n)
 
 conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
@@ -260,15 +259,39 @@ qc2 = {"Nodes": ["N2", "N3"], "Attenuation": 1e-5, "Distance": 70}
 conf["quantum_connections"].append(qc1)
 conf["quantum_connections"].append(qc2)
 
-cc1 = {"Nodes": ["N1", "N1"], "Delay": 0, "Distance": 0}
-cc1 = {"Nodes": ["N2", "N2"], "Delay": 0, "Distance": 0}
-cc1 = {"Nodes": ["N3", "N3"], "Delay": 0, "Distance": 0}
+cc11 = {"Nodes": ["N1", "N1"], "Delay": 0, "Distance": 0}
+cc22 = {"Nodes": ["N2", "N2"], "Delay": 0, "Distance": 0}
+cc33 = {"Nodes": ["N3", "N3"], "Delay": 0, "Distance": 0}
 cc12 = {"Nodes": ["N1", "N2"], "Delay": 1e9, "Distance": 1e3}
 cc13 = {"Nodes": ["N1", "N3"], "Delay": 1e9, "Distance": 1e3}
 cc23 = {"Nodes": ["N2", "N3"], "Delay": 1e9, "Distance": 1e3}
+cc21 = {"Nodes": ["N1", "N2"], "Delay": 1e9, "Distance": 1e3}
+cc23 = {"Nodes": ["N1", "N3"], "Delay": 1e9, "Distance": 1e3}
+cc32 = {"Nodes": ["N2", "N3"], "Delay": 1e9, "Distance": 1e3}
+conf["classical_connections"].append(cc11)
+conf["classical_connections"].append(cc22)
+conf["classical_connections"].append(cc33)
 conf["classical_connections"].append(cc12)
 conf["classical_connections"].append(cc13)
 conf["classical_connections"].append(cc23)
+conf["classical_connections"].append(cc21)
+conf["classical_connections"].append(cc31)
+conf["classical_connections"].append(cc32)
 
-e91("Qiskit", conf, "N1", "N2", 5)
-"""
+e91("Qiskit", conf, "N1", "N2", 8)
+
+# from qntsim.kernel.timeline import Timeline 
+# Timeline.DLCZ=False
+# Timeline.bk=True
+# from qntsim.topology.topology import Topology
+
+# tl1 = Timeline(20e12,"Qiskit")
+# network_topo = Topology("network_topo", tl1)
+# network_topo.load_config("test.json")
+# print('network_topo ', network_topo.__dict__["_cc_graph"])
+
+# print("========================================================")
+# tl2 = Timeline(20e12,"Qiskit")
+# network_topo_json = Topology("network_topo_json", tl2)
+# network_topo_json.load_config_json(conf)
+# print('network_topo_json ',network_topo_json.__dict__["_cc_graph"])

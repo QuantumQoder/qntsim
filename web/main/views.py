@@ -14,6 +14,7 @@ from main.simulator.topology_funcs import *
 from django.views.decorators.http import condition
 from django.views.decorators.csrf import csrf_exempt
 
+matplotlib.use('agg')
 
 def index(request):
     context = {
@@ -62,7 +63,9 @@ def graph(request):
     if topology is not None:
         buffer = io.BytesIO()
         graph = graph_topology(topology)
+        print(graph)
         nx.draw(graph, with_labels=True)
+        print('after nx_draw')
         plt.savefig(buffer, dpi=300, bbox_inches='tight', format="png")
         buffer.seek(0)
         figdata_png = base64.b64encode(buffer.getvalue())
@@ -90,15 +93,3 @@ def stream_response_generator():
         time.sleep(0.5)
 
 
-def example(request):
-
-    # topFile = 'topology/simulator/' + request.GET['topology']
-    # topoObj = tlexample(topFile, request.GET['node1'], request.GET['node2'])
-    # columns = [{'field': f, 'title': f} for f in MEMORY_COLS]
-    memoryData = tlexample('main/simulator/4node.json', 'a', 'b')
-    print(memoryData)
-    context = {
-        "data": memoryData,
-        # "columns": columns
-    }
-    return render(request, 'example.html', context)
