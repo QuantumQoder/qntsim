@@ -395,9 +395,51 @@ class EntanglementSwappingB(EntanglementProtocol):
             self.subtask.on_complete(1)
             dst=self.subtask.task.get_reservation().responder
             src=self.subtask.task.get_reservation().initiator
-            if (self.own.name==src and msg.kwargs["remote_node"]==dst) or (self.own.name==dst and msg.kwargs["remote_node"]==src) :
+            #if (self.own.name==src and msg.kwargs["remote_node"]==dst) or (self.own.name==dst and msg.kwargs["remote_node"]==src) :
+                #print(f'Entanglement sucessful between {src,dst}')
+            
+            if (self.own.name==src and msg.kwargs["remote_node"]==dst) :
                 print(f'Entanglement sucessful between {src,dst}')
+                #Index | Source node   | Entangled Node   |   Fidelity |   Entanglement Time |   Expire Time | State 
+                for info in self.own.resource_manager.memory_manager:
+                    if info.memory==self.memory:
+                        break
 
+                dict={"reservation":self.subtask.task.get_reservation(),
+                      "request_id":self.subtask.task.get_reservation().tp_id,
+                      "Index":self.memory.entangled_memory["memo_id"],
+                      "Source node":src,
+                      "Entangled node":info.remote_node,
+                      "Fidelity":self.memory.fidelity,
+                      "Entanglement Time":info.entangle_time * 1e-12,
+                      "Expire Time":info.entangle_time * 1e-12+info.memory.coherence_time,
+                      "State":info.state
+                      }
+                self.own.snapshots.append(dict)
+                #print("dict1",dict)
+                print("node\n ",self.own.name, self.own.snapshots)
+
+           
+            elif (self.own.name==dst and msg.kwargs["remote_node"]==src) :
+                print(f'Entanglement sucessful between {src,dst}')
+                #Index | Source node   | Entangled Node   |   Fidelity |   Entanglement Time |   Expire Time | State 
+                for info in self.own.resource_manager.memory_manager:
+                    if info.memory==self.memory:
+                        break
+                dict={"reservation":self.subtask.task.get_reservation(),
+                      "request_id":self.subtask.task.get_reservation().tp_id,
+                      "Index":info.index,
+                      "Source node":dst,
+                      "Entangled node":info.remote_node,
+                      "Fidelity":self.memory.fidelity,
+                      "Entanglement Time":info.entangle_time * 1e-12,
+                      "Expire Time":info.entangle_time * 1e-12+info.memory.coherence_time,
+                      "State":info.state
+                      }
+                self.own.snapshots.append(dict)
+                #print("dict",dict)
+                print("node\n",self.own.name,self.own.snapshots)
+                
         else:
             # #print(f'Entanglement swap failed between {self.own.name, msg.kwargs["remote_node"]}')
             # #print(f'Time of Entanglement swap failure: {self.own.timeline.now()}')

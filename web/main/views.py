@@ -4,6 +4,8 @@ import json
 import base64
 import io
 import networkx as nx
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse

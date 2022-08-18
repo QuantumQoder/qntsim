@@ -63,7 +63,7 @@ class Node(Entity):
         self.qchannels = {}  # mapping of destination node names to quantum channels
         self.protocols = []
         self.virtual_links = {} # node: [subtask] for more than one virtual links between a pair of nodes
-
+        self.snapshots = []##TODO:Enhance way to store snapshots
     def init(self) -> None:
         pass
 
@@ -246,7 +246,6 @@ class EndNode(Node):
         self.vmemory_list=[MemoryTimeCard(i) for i in range(len(self.memory_array))]
         self.map_to_middle_node = {}
         self.lightsource = SPDCSource2(self, name, timeline)
-
     #--------------------------------------------------------------------------
     def find_virtual_neighbors(self):
         virtual_neighbors = {}
@@ -328,7 +327,7 @@ class ServiceNode(Node):
         self.vmemory_list=[MemoryTimeCard(i) for i in range(len(self.memory_array))]
         self.map_to_middle_node = {}
         self.lightsource = SPDCSource2(self, name, timeline)
-
+        
     def receive_message(self, src: str, msg: "Message") -> None:
         self.message_handler.push_message(src,msg)
 
