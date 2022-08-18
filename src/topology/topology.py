@@ -342,12 +342,10 @@ class Topology():
                 else:
                     qcnode0.service_node = qc["Nodes"][1]
                     qcnode1.service_node = qc["Nodes"][0]
-
-            # print('self.nodes', self.nodes)
+                    
             self.nodes[qc["Nodes"][0]] = qcnode0
             self.nodes[qc["Nodes"][1]] = qcnode1
-            # print('self.nodes', self.nodes)
-
+        
     def load_config(self, config_file: str) -> None:
         """Method to load a network configuration file.
         Network should be specified in json format.
@@ -708,7 +706,9 @@ class Topology():
                     #This is a virtual neighbor
                     ###print("Node, remote node-------",(node, info.remote_node))
                     nx_graph.add_edge(node, str(info.remote_node), color='red')
+        print('before draw')
         self.draw_graph(nx_graph)
+        print('after draw')
         return nx_graph
 
 

@@ -4,6 +4,7 @@ import json
 import base64
 import io
 import networkx as nx
+import matplotlib
 import matplotlib.pyplot as plt
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
@@ -12,6 +13,7 @@ from main.simulator.topology_funcs import *
 from django.views.decorators.http import condition
 from django.views.decorators.csrf import csrf_exempt
 
+matplotlib.use('agg')
 
 def index(request):
     context = {
@@ -62,6 +64,7 @@ def graph(request):
         graph = graph_topology(topology)
         print(graph)
         nx.draw(graph, with_labels=True)
+        print('after nx_draw')
         plt.savefig(buffer, dpi=300, bbox_inches='tight', format="png")
         buffer.seek(0)
         figdata_png = base64.b64encode(buffer.getvalue())
