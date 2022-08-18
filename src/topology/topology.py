@@ -346,6 +346,9 @@ class Topology():
                 else:
                     qcnode0.service_node = qc["Nodes"][1]
                     qcnode1.service_node = qc["Nodes"][0]
+                    
+            self.nodes[qc["Nodes"][0]] = qcnode0
+            self.nodes[qc["Nodes"][1]] = qcnode1
         
     def load_config(self, config_file: str) -> None:
         """Method to load a network configuration file.
