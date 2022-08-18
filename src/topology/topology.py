@@ -707,7 +707,9 @@ class Topology():
                     #This is a virtual neighbor
                     ###print("Node, remote node-------",(node, info.remote_node))
                     nx_graph.add_edge(node, str(info.remote_node), color='red')
+        print('before draw')
         self.draw_graph(nx_graph)
+        print('after draw')
         return nx_graph
 
 
