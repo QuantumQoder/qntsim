@@ -223,7 +223,7 @@ def e91(backend,path,sender,receiver,key_length):
 e91("Qiskit", "../example/3node.json", "a", "b", 8)
 """
 # jsonConfig (Type : Json) -Json Configuration of network 
-
+"""
 def e91(backend,jsonConfig,sender,receiver,key_length):
 
     from qntsim.kernel.timeline import Timeline 
@@ -244,6 +244,7 @@ def e91(backend,jsonConfig,sender,receiver,key_length):
         tl.init()
         tl.run()
         e91.run(alice,bob,n)
+"""
 """
 conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
 
