@@ -1,5 +1,5 @@
 var currentTab;
-var pages = 7;
+var pages = 6;
 var nodes = [];
 
 $(document).ready(function () {
@@ -7,15 +7,10 @@ $(document).ready(function () {
 	showTab(currentTab); // Display the current tab
 	fixButtons(currentTab);
 	fixStepIndicator(currentTab);
-	// $("#prevBtn").hide();
 	$(".addRow").click(function (e) { 
 		e.preventDefault();
 		addRow($(this.parentElement).children("table")[0].id);
 	});
-	// $("#submit").click(function () {
-	//     var top_file = $('#topology').val();
-	//     loadTopology(top_file);
-	// });
 });
 
 function convertFormToJSON(form) {
@@ -67,6 +62,19 @@ function addRow(tableID) {
 	HTML += `<td><button type="button" class="deleteRow" onclick="deleteRow(this)">Delete Node</button></td></tr>`;
 
 	$(`#${tableID}`).append(HTML);
+}
+
+function setSenderReceiver() {
+	$("#sender").empty();
+	$("#receiver").empty();
+
+	var nodeOpts = ``;
+	nodes.forEach(node => {
+		nodeOpts += `<option name="${node}" value="${node}">${node}</option>`;
+	});
+
+	$("#sender").append(nodeOpts);
+	$("#receiver").append(nodeOpts);
 }
 
 function fetchTopology(){
@@ -180,6 +188,7 @@ function getResults(){
 }
 
 function showTab(n) {
+	// console.log(`Showing tab: ${n+1}`);
 	$(`div.tab:nth-child(${n+1})`).show();
 	
 	switch(n) {
@@ -193,16 +202,15 @@ function showTab(n) {
 			}).get();
 			break;
 		case 2:
-			break;
-		case 3:
 			createCCTable();
 			break;
-		case 4:
+		case 3:
 			fetchTopologyGraph();
 			break;
-		case 5:
+		case 4:
+			setSenderReceiver();
 			break;
-		case 6:
+		case 5:
 			getResults();
 			break;
 	}

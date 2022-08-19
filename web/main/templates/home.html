@@ -7,13 +7,25 @@
 	<title>{{ title }}</title>
 
 	{% load static %}
+	<link href="{% static '/assets/purpleBuzz/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static '/assets/purpleBuzz/css/boxicon.min.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static '/assets/purpleBuzz/css/templatemo.css' %}">
+    <link rel="stylesheet" href="{% static '/assets/purpleBuzz/css/custom.css' %}">
+	<link rel="stylesheet" href="{% static '/css/all.css' %}">
+	<link rel="stylesheet" href="{% static '/css/headings.css' %}">
+	<link rel="stylesheet" href="{% static '/css/table.css' %}">
+	<link rel="stylesheet" href="{% static '/css/form.css' %}">
 	<link rel="stylesheet" href="{% static '/css/nav.css' %}">
-	<script src="{% static '/js/jquery.min.js' %}"></script>	
+	<link rel="stylesheet" href="{% static '/css/image.css' %}">
+	<script src="{% static '/js/jquery.min.js' %}"></script>
+	<script src="{% static '/js/app.js' %}"></script>
 
 </head>
 <body>
 	<div class="nav">
         <ul>
+			<li><a href="https://www.qulabs.ai/"><img id="logo" src="{% static '/assets/images/QNTSim.png' %}"></img></a></li>
             <li><a href="/">Home</a></li>
             <li><a href="/apps">Applications</a></li>
         </ul> 

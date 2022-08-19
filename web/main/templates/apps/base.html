@@ -7,6 +7,13 @@
 	<title>{% block title %}{% endblock %}</title>
 
 	{% load static %}
+	<link href="{% static '/assets/purpleBuzz/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static '/assets/purpleBuzz/css/boxicon.min.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static '/assets/purpleBuzz/css/templatemo.css' %}">
+    <link rel="stylesheet" href="{% static '/assets/purpleBuzz/css/custom.css' %}">
+	<link rel="stylesheet" href="{% static '/css/all.css' %}">
+	<link rel="stylesheet" href="{% static '/css/headings.css' %}">
 	<link rel="stylesheet" href="{% static '/css/table.css' %}">
 	<link rel="stylesheet" href="{% static '/css/form.css' %}">
 	<link rel="stylesheet" href="{% static '/css/nav.css' %}">
@@ -19,15 +26,19 @@
 <body>
 	<div class="nav">
         <ul>
+            <li><a href="https://www.qulabs.ai/"><img id="logo" src="{% static '/assets/images/QNTSim.png' %}"></img></a></li>
             <li><a href="/">Home</a></li>
             <li><a href="/apps">Applications</a></li>
         </ul> 
     </div>
     <br>
+    <br>
+    <br>
 
 	<h1>Quantum Network Simulation</h1>
 
 	<div id="qntsimForm">
+
 		<div class="tab">
 			<h3>Define Nodes</h3>
 			<table id="nodes">
@@ -35,8 +46,8 @@
 					<th>Name</th>
 					<th>Type</th>
 					<th>No of Memories</th>
-					<th>Memory Frequency</th>
-					<th>Memory Expiry Time</th>
+					<th>Memory Frequency (Hz)</th>
+					<th>Memory Expiry Time (ps)</th>
 					<th>Memory Efficiency</th>
 					<th>Memory Fidelity</th>
 					<th>Actions</th>
@@ -45,13 +56,14 @@
 			</table>
 			<button type="button" class="addRow">Add Node</button>
 
-			<h4>Quantum memorys's Parameters at a Each Node:</h4>
+			{% comment %} <h4>Quantum memorys's Parameters at a Each Node:</h4>
 			<h4>Memory's Frequency  (Units:Hz)</h4>
 			<h4>Memory's Expiry Time(Units:seconds ,precision:picoseconds)</h4>
 			<h4>Memory's Efficiency (Efficiency &lt;1) </h4>
-            <h4>Memory's Fidelity(Fidelity &lt;1)</h4>
-
-
+            <h4>Memory's Fidelity(Fidelity &lt;1)</h4> {% endcomment %}
+			<div class="description">
+				TODO: Add description
+			</div>
 		</div>
 		<div class="tab">
 			<h3>Create Quantum Connections</h3>
@@ -75,7 +87,7 @@
             <h4>Distance:length of channel(Units:km)</h4>
 
 		</div>
-		<div class="tab">
+		{% comment %} <div class="tab">
 			<h3>Create Virtual Connections</h3>
 
 			<table id="vc">
@@ -95,7 +107,7 @@
 			<h4>Node 2: A node in the Network</h4>
 			<h4>Demand Size:No.of entanglements of the virtual link </h4>
 
-		</div>
+		</div> {% endcomment %}
 		<div class="tab">
 			<h3>Create Classical Connections</h3>
 
@@ -131,16 +143,16 @@
 				<button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
 			</div>
 		</div>
-		<!-- Circles which indicates the steps of the form: -->
-		<div style="text-align:center;margin-top:40px;">
+
+		<div class="steps" style="text-align:center;margin-top:40px;">
 			<!-- <span class="step"></span> -->
-			<span class="step"></span>
-			<span class="step"></span>
-			<span class="step"></span>
-			<span class="step"></span>
-			<span class="step"></span>
-			<span class="step"></span>
-			<span class="step"></span>
+			<span class="step">Nodes</span>
+			<span class="step">Quantum Connections</span>
+			{% comment %} <span class="step">Create Virtual Connections</span> {% endcomment %}
+			<span class="step">Classical Connections</span>
+			<span class="step">Visualise</span>
+			<span class="step">Parameters</span>
+			<span class="step">Results</span>
 		</div>
 	</div>
 </body>

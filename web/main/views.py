@@ -47,9 +47,13 @@ def fetchAppOptions(request):
 
 @csrf_exempt
 def run(request):
+    
     topology = json.loads(request.POST['topology'])
     application = request.POST['application']
     appSettings = json.loads(request.POST['appSettings'])
+    
+    print(f"Running applications: {application}")
+    
     results = {}
 
     if application == "e91":
