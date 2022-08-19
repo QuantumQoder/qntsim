@@ -223,6 +223,7 @@ def e91(backend,path,sender,receiver,key_length):
 e91("Qiskit", "../example/3node.json", "a", "b", 8)
 """
 # jsonConfig (Type : Json) -Json Configuration of network 
+
 def e91(backend,jsonConfig,sender,receiver,key_length):
 
     from qntsim.kernel.timeline import Timeline 
@@ -243,7 +244,7 @@ def e91(backend,jsonConfig,sender,receiver,key_length):
         tl.init()
         tl.run()
         e91.run(alice,bob,n)
-
+"""
 conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
 
 memo = {"frequency": 2e3, "expiry": 0, "efficiency": 1, "fidelity": 1}
@@ -295,3 +296,7 @@ e91("Qiskit", conf, "N1", "N2", 8)
 # network_topo_json = Topology("network_topo_json", tl2)
 # network_topo_json.load_config_json(conf)
 # print('network_topo_json ',network_topo_json.__dict__["_cc_graph"])
+"""
+
+#conf={'nodes': [{'Name': 'n1', 'Type': 'end', 'noOfMemory': 500, 'memory': {'frequency': 2000, 'expiry': 2000, 'efficiency': 0, 'fidelity': 0.93}}, {'Name': 'n2', 'Type': 'service', 'noOfMemory': 500, 'memory': {'frequency': 2000, 'expiry': 2000, 'efficiency': 0, 'fidelity': 0.93}}], 'quantum_connections': [{'Nodes': ['n1', 'n2'], 'Attenuation': 1e-05, 'Distance': 70}], 'classical_connections': [{'Nodes': ['n1', 'n1'], 'Delay': 0, 'Distance': 1000}, {'Nodes': ['n1', 'n2'], 'Delay': 1000000000, 'Distance': 1000}, {'Nodes': ['n2', 'n1'], 'Delay': 1000000000, 'Distance': 1000}, {'Nodes': ['n2', 'n2'], 'Delay': 0, 'Distance': 1000}]}
+#e91("Qiskit", conf, "n1", "n2", 8)

@@ -43,7 +43,7 @@ else:
 
 class Timeline:
     DLCZ=False
-    bk=False
+    bk=True
 
 
     def __init__(self, stop_time=inf,backend=str, formalism='ket_vector'):

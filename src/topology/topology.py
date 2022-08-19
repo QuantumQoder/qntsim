@@ -243,6 +243,8 @@ class Topology():
                 self.nodes["s"+str(i)].service_node = "s"+str(0)
 
     def load_config_json(self, config) -> None:
+        #print("lcj_start",config)
+        #print()
         """Method to load a network configuration file.
         Network should be specified in json format.
         Will populate nodes, qchannels, cchannels, and graph fields.
@@ -276,22 +278,29 @@ class Topology():
             Will modify graph, graph_no_middle, qchannels, and cchannels attributes.
         """
         for node in config["nodes"]:
+            #print("test check lcj nodes",node,node["Type"],type(node["Type"]))
             nodeObj = None
-            if node["Type"] is "service":
-                nodeObj = ServiceNode(node["Name"],self.timeline, node["noOfMemory"])
-            elif node["Type"] is "end":
-                nodeObj = EndNode(node["Name"],self.timeline, node["noOfMemory"])
+            if node["Type"] == "service":
+                nodeObj = ServiceNode(node["Name"],self.timeline,node["noOfMemory"])
+                #self.add_node(nodeObj)
+            elif node["Type"] == "end":
+                #print("check Type",node["Name"])
+                nodeObj = EndNode(node["Name"],self.timeline,node["noOfMemory"])
+                #self.add_node(nodeObj)
+            
             
             if nodeObj is None:
                 return f"Wrong type {node['Type']}"
             else:
-                nodeObj.memory_array.update_memory_params("frequency", node["memory"]["frequency"])
-                nodeObj.memory_array.update_memory_params("coherence_time", node["memory"]["expiry"])
-                nodeObj.memory_array.update_memory_params("efficiency", node["memory"]["efficiency"])
-                nodeObj.memory_array.update_memory_params("raw_fidelity", node["memory"]["fidelity"])
+                #nodeObj.memory_array.update_memory_params("frequency", node["memory"]["frequency"])
+                #nodeObj.memory_array.update_memory_params("coherence_time", node["memory"]["expiry"])
+                #nodeObj.memory_array.update_memory_params("efficiency", node["memory"]["efficiency"])
+                #nodeObj.memory_array.update_memory_params("raw_fidelity", node["memory"]["fidelity"])
                 self.add_node(nodeObj)
             
+            
         for cc in config["classical_connections"]:
+           
             cchannel_params = {
                 "delay": cc["Delay"]/2,  # divide RT time by 2
                 "distance": cc["Distance"]
@@ -303,18 +312,20 @@ class Topology():
                 self.add_classical_channel(cc["Nodes"][1], cc["Nodes"][0], **cchannel_params)
         
         for qc in config["quantum_connections"]:
+            
             qchannel_params = {
                 "attenuation": qc["Attenuation"],
                 "distance": qc["Distance"]
             }
             self.add_quantum_connection(qc["Nodes"][0], qc["Nodes"][1], **qchannel_params)
         
-         # generate forwarding tables
+          
+        # generate forwarding tables
         #-------------------------------
         all_pair_dist, G = self.all_pair_shortest_dist()
         # print('all pair distance', all_pair_dist, G)
         self.nx_graph=G
-        # print('self.nx_graph',self.nx_graph,self.name)
+        #print('self.nx_graph',self.nx_graph,self.name)
         
         #-------------------------------
         for node in self.nodes.values():
@@ -324,10 +335,12 @@ class Topology():
                 node.delay_graph=self.cc_delay_graph
                 node.neighbors = list(G.neighbors(node.name))
         
+        
+        
         for qc in config["quantum_connections"]:
             qcnode0 = next(filter(lambda node: node.name == qc["Nodes"][0], self.nodes.values()), None)
             qcnode1 = next(filter(lambda node: node.name == qc["Nodes"][1], self.nodes.values()), None)
-            
+            #print(qcnode0,qcnode0.name,qcnode1,qcnode1.name)
             if type(qcnode0) == EndNode:
                 if type(qcnode1) == EndNode:
                     qcnode0.end_node = qc["Nodes"][1]
@@ -343,8 +356,9 @@ class Topology():
                     qcnode0.service_node = qc["Nodes"][1]
                     qcnode1.service_node = qc["Nodes"][0]
                     
-            self.nodes[qc["Nodes"][0]] = qcnode0
-            self.nodes[qc["Nodes"][1]] = qcnode1
+            #self.nodes[qc["Nodes"][0]] = qcnode0
+            #self.nodes[qc["Nodes"][1]] = qcnode1
+        
         
     def load_config(self, config_file: str) -> None:
         """Method to load a network configuration file.
@@ -657,7 +671,7 @@ class Topology():
     #-----------------------------------------------
     def generate_nx_graph(self):
         G = nx.Graph()
-        # #print('gengph',G, G.nodes)
+        #print('gengph',G, G.nodes)
         for node in self.nodes.keys():
 
             if type(self.nodes[node]) == BSMNode:
@@ -665,12 +679,13 @@ class Topology():
 
             for neighbor in self.graph_no_middle[node]:    
                 distance = self.graph_no_middle[node][neighbor]
-                ###print('------------node-------------', type(node))
-                # #print('------------neighbor-------------', self,node,neighbor)
+                #print('------------node-------------', type(node))
+                #print('------------neighbor-------------', self,node,neighbor)
                 # self.owner.all_neighbor[node]=neighbor
                 ###print('------------distance-------------', type(distance))
                 G.add_node(node)                
-                G.add_edge(node, neighbor, color='blue', weight=distance)      
+                G.add_edge(node, neighbor, color='blue', weight=distance)  
+        print("G",G)    
         return G
 
 
@@ -688,8 +703,8 @@ class Topology():
     def get_virtual_graph(self):
         #Plotting virtual graph
         nx_graph = self.generate_nx_graph()
-        for node in self.nodes.keys():
-            
+        #print(self.nodes.keys())
+        for node in self.nodes.keys(): 
             #Check if this is middle node then skip it
             if type(self.nodes[node]) == BSMNode:
                 ###print("In if-------",node)
@@ -704,7 +719,7 @@ class Topology():
                 else:
                     # #print('xxxx', (node, info.remote_node))
                     #This is a virtual neighbor
-                    ###print("Node, remote node-------",(node, info.remote_node))
+                    #print("Node, remote node-------",(node, info.remote_node))
                     nx_graph.add_edge(node, str(info.remote_node), color='red')
         print('before draw')
         self.draw_graph(nx_graph)

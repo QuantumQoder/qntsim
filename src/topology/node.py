@@ -20,11 +20,11 @@ from ..kernel.timeline import Timeline
 if Timeline.DLCZ:
     from ..components.DLCZ_memory import Memory,MemoryArray
     from ..components.DLCZ_bsm import SingleAtomBSM
-    #print("DLCZ node")
+    print("DLCZ node")
 elif Timeline.bk:
     from ..components.bk_memory import Memory, MemoryArray
     from ..components.bk_bsm import SingleAtomBSM
-    #print("bk node")
+    print("bk node")
 
 from ..kernel.entity import Entity
 
@@ -39,7 +39,19 @@ from .message_queue_handler import MessageQueueHandler
 from ..resource_management.task_manager import TaskManager
 from ..resource_management.resource_manager import MsgRecieverType ,ResourceManagerMsgType
 
+"""
+def force_import(backend):
+
+    if backend=="DLCZ":
+        from ..components.DLCZ_memory import Memory,MemoryArray
+        from ..components.DLCZ_bsm import SingleAtomBSM
+        #print("DLCZ node")
+    elif backend=="bk" :
+        from ..components.bk_memory import Memory, MemoryArray
+        from ..components.bk_bsm import SingleAtomBSM
+"""
 class Node(Entity):
+
     """Base node type.
     
     Provides default interfaces for network.

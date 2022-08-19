@@ -417,7 +417,7 @@ class EntanglementSwappingB(EntanglementProtocol):
                       }
                 self.own.snapshots.append(dict)
                 #print("dict1",dict)
-                print("node\n ",self.own.name, self.own.snapshots)
+                #print("node\n ",self.own.name, self.own.snapshots)
 
            
             elif (self.own.name==dst and msg.kwargs["remote_node"]==src) :
@@ -438,7 +438,7 @@ class EntanglementSwappingB(EntanglementProtocol):
                       }
                 self.own.snapshots.append(dict)
                 #print("dict",dict)
-                print("node\n",self.own.name,self.own.snapshots)
+                #print("node\n",self.own.name,self.own.snapshots)
                 
         else:
             # #print(f'Entanglement swap failed between {self.own.name, msg.kwargs["remote_node"]}')

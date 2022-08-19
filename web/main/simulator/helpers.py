@@ -7,6 +7,8 @@ def load_topology(network_config_json, backend):
     Timeline.DLCZ=False
     Timeline.bk=True
     from qntsim.topology.topology import Topology
+    #from qntsim.topology.node import force_import
+    #force_import("bk")
     print(f'Loading Topology: {network_config_json}')
     
     tl = Timeline(20e12,backend)
