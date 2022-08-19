@@ -1,5 +1,5 @@
 var currentTab;
-var pages = 8;
+var pages = 7;
 var nodes = [];
 
 $(document).ready(function () {
@@ -162,53 +162,6 @@ function createCCTable() {
 	$(`#cc`).html(HTML);
 }
 
-function setAppOptions() {
-	console.log(`Fetching options for ${$("#app").val()}`);
-	$.ajax({
-		type: "GET",
-		url: "fetchAppOptions",
-		data: {
-			"nodes": JSON.stringify(nodes),
-			"app": fetchApp(),
-		},
-		success: function (response) {
-			$("#appConf").html(response);
-		}
-	});
-}
-
-function fetchLogs(){
-	var last_response_len = false;
-	$.ajax('appLog', {
-		xhrFields: {
-			onprogress: function(e)
-			{
-				var this_response, response = e.currentTarget.response;
-				if(last_response_len === false)
-				{
-					this_response = response;
-					last_response_len = response.length;
-				}
-				else
-				{
-					this_response = response.substring(last_response_len);
-					last_response_len = response.length;
-				}
-				$("#appLogs").append(this_response);
-			}
-		}
-	})
-	.done(function(data)
-	{
-		// console.log('Complete response = ' + data);
-	})
-	.fail(function(data)
-	{
-		// console.log('Error: ', data);
-	});
-	console.log('Request Sent');
-}
-
 function getResults(){
 	var appConf = {
 		"application": fetchApp(),
@@ -250,9 +203,6 @@ function showTab(n) {
 		case 5:
 			break;
 		case 6:
-			setAppOptions();
-			break;
-		case 7:
 			getResults();
 			break;
 	}
