@@ -65,11 +65,11 @@ def run(request):
     elif application == "ip1":
         results = ip1(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"] )
     elif application == "ping_pong":
-        results = ping_pong(topology, appSettings["sender"], appSettings["receiver"], appSettings["sequenceLength"], appSettings["message"] )
+        results = ping_pong(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["sequenceLength"]), appSettings["message"] )
     elif application == "qsdc1":
-        results = qsdc1(topology, appSettings["sender"], appSettings["receiver"], appSettings["sequenceLength"], appSettings["key"] )
+        results = qsdc1(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["sequenceLength"]), appSettings["key"] )
     elif application == "teleportation":
-        results = teleportation(topology, appSettings["sender"], appSettings["receiver"], appSettings["amplitude1"], appSettings["amplitude2"] )
+        results = teleportation(topology, appSettings["sender"], appSettings["receiver"], complex(appSettings["amplitude1"]), complex(appSettings["amplitude2"]) )
 
     print(results)
     return render(request, f'apps/{application}/results.html', results)

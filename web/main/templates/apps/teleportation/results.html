@@ -1,15 +1,35 @@
 <table id="teleportation_results">
     <caption><h3>Teleportation results</h3></caption>
     <tr>
+        <th>Alice Bob entanglement</th>
+        {% for alice_bob_entanglement_i in alice_bob_entanglement %}
+        <td>{{ alice_bob_entanglement_i }}</td>
+        {% endfor %}
+    </tr>
+    <tr>
         <th>Random Qubit</th>
-        <td>{{ random_qubit }}</td>
+        {% for random_qubit_i in random_qubit %}
+        <td>{{ random_qubit_i }}</td>
+        {% endfor %}
     </tr>
     <tr>
-        <th>Receiver Initial State</th>
-        <td>{{ bob_initial_state }}</td>
+        <th>MEAS RQ</th>
+        <td>{{ meas_rq }}</td>
     </tr>
     <tr>
-        <th>Receiver Final State</th>
-        <td>{{ bob_final_state }}</td>
+        <th>MEAS R1</th>
+        <td>{{ meas_r1 }}</td>
+    </tr>
+    <tr>
+        <th>Bob Initial State</th>
+        {% for bob_initial_state_i in bob_initial_state %}
+        <td>{{ bob_initial_state_i }}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <th>Bob Final State</th>
+        {% for bob_final_state_i in bob_final_state %}
+        <td>{{ bob_final_state_i }}</td>
+        {% endfor %}
     </tr>
 </table>

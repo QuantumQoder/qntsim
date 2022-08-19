@@ -194,7 +194,7 @@ class QSDC1():
             "display_msg":removed_bits,
             "key_transmitted": message,
             "key_shared_received": message_received,
-            "Final key" : final_key
+            "final_key" : final_key
         }
         return res
 

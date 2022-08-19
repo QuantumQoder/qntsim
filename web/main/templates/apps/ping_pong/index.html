@@ -8,17 +8,11 @@
 <form id="appSettings">
 
     <label for="sender">Select Sender: </label>
-    <select name="sender" id="sender">
-        {% for node in nodes %}
-        <option value="{{node}}">{{node}}</option>
-        {% endfor %}
+    <select name="sender" id="sender" class="appnode">
     </select>
 
     <label for="receiver">Select Receiver: </label>
-    <select name="receiver" id="receiver">
-        {% for node in nodes %}
-        <option value="{{node}}">{{node}}</option>
-        {% endfor %}
+    <select name="receiver" id="receiver" class="appnode">
     </select>
 
     <label for="sequenceLength">Set sequence length: </label>

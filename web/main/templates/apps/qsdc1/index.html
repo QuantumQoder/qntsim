@@ -9,14 +9,14 @@
 <form id="appSettings">
 
     <label for="sender">Select Sender: </label>
-    <select name="sender" id="sender">
+    <select name="sender" id="sender" class="appnode">
         {% for node in nodes %}
         <option value="{{node}}">{{node}}</option>
         {% endfor %}
     </select>
 
     <label for="receiver">Select Receiver: </label>
-    <select name="receiver" id="receiver">
+    <select name="receiver" id="receiver" class="appnode">
         {% for node in nodes %}
         <option value="{{node}}">{{node}}</option>
         {% endfor %}
