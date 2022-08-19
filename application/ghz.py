@@ -96,7 +96,9 @@ class GHZ():
         print("\nGHZ State\n",  qm_middle.get(middle_key).state)
 
         res = {
-            "output": output,
+            "node1": output[0],
+            "node2": output[500],
+            "node3": output[1000],
             "ghz_state" : ghz_state
         }
 
@@ -127,7 +129,7 @@ def ghz(path,endnode1,endnode2,endnode3,middlenode):
     ghz= GHZ()
     alice,bob,charlie,middlenode=ghz.roles(alice,bob,charlie,middlenode)
     tl.init()
-    tl.run()  
+    tl.run()
     res = ghz.run(alice,bob,charlie,middlenode)
     print(res)
 

@@ -65,16 +65,14 @@ function addRow(tableID) {
 }
 
 function setSenderReceiver() {
-	$("#sender").empty();
-	$("#receiver").empty();
+	$(".appnode").empty();
 
 	var nodeOpts = ``;
 	nodes.forEach(node => {
 		nodeOpts += `<option name="${node}" value="${node}">${node}</option>`;
 	});
 
-	$("#sender").append(nodeOpts);
-	$("#receiver").append(nodeOpts);
+	$(".appnode").append(nodeOpts);
 }
 
 function fetchTopology(){

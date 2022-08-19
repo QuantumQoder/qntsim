@@ -6,17 +6,17 @@
 <h3>E2E Application Parameters</h3>
 <form id="appSettings">
     <label for="sender">Select Sender: </label>
-    <select name="sender" id="sender">
-        {% for node in nodes %}
+    <select class="appnode" name="sender" id="sender">
+        {% comment %} {% for node in nodes %}
         <option value="{{node}}">{{node}}</option>
-        {% endfor %}
+        {% endfor %} {% endcomment %}
     </select>
 
     <label for="receiver">Select Receiver: </label>
-    <select name="receiver" id="receiver">
-        {% for node in nodes %}
+    <select class="appnode" name="receiver" id="receiver">
+        {% comment %} {% for node in nodes %}
         <option value="{{node}}">{{node}}</option>
-        {% endfor %}
+        {% endfor %} {% endcomment %}
     </select>
 
     <label for="startTime">Start Time: </label>
