@@ -127,12 +127,14 @@ class QSDC1():
         alice_meas, bob_meas = [], []
         choose_pos = random.sample(range(len(entangled_keys)), int(len(entangled_keys)/4))
         choose_keys = []
+        removed_bits=[]
         print("message thrown out because we measure it for eavesdrop check : ", )
         thrown_message = []
         for pos in choose_pos:
             alice_meas.append(self.z_measurement(qm_alice, entangled_keys[pos]))
             bob_meas.append(self.z_measurement(qm_bob,alice_bob_keys_dict[entangled_keys[pos]]))
             print(message[2*pos:2*pos+2])
+            removed_bits.append(message[2*pos:2*pos+2])
             thrown_message.append(message[2*pos:2*pos+2])
             choose_keys.append(entangled_keys[pos])
 
@@ -146,7 +148,7 @@ class QSDC1():
 
         print("eavesdrop check passed!")
         print(alice_meas, bob_meas)
-        return choose_keys
+        return choose_keys,removed_bits
 
     def bell_measure(self,qm, keys):
         qc=QutipCircuit(2) 
@@ -169,22 +171,30 @@ class QSDC1():
         message_received = ""
         c = 0
         sequence_len = 1
-        measured_keys = self.eavesdrop_check(alice,bob,protocol_keys, message,alice_bob_keys_dict )
+        measured_keys,removed_bits = self.eavesdrop_check(alice,bob,protocol_keys, message,alice_bob_keys_dict )
 
         for keys in protocol_keys:
-            if keys in measured_keys:continue
+            if keys in measured_keys:
+                message_received += "__"
+                continue
             #if (c == len(message)):break
 
             output = self.bell_measure(qm_alice, [keys, alice_bob_keys_dict[keys]])
             message_received += str(output[keys]) + str(output[alice_bob_keys_dict[keys]])
             c+=2
-
+        final_key = message_received.replace("__", "")
+        print("message thrown out because we measure it for eavesdrop check : ",removed_bits)
         print(f"key transmitted : {message}")
         print(f"key shared received : {message_received}")
+        print(f"Final key : {final_key}")
 
+        ###"message thrown out because we measure it for eavesdrop check : ",removed_bits
+        ###display_msg : "message thrown out because we measure it for eavesdrop check : "
         res = {
+            "display_msg":removed_bits,
             "key_transmitted": message,
-            "key_shared_received": message_received
+            "key_shared_received": message_received,
+            "Final key" : final_key
         }
         return res
 

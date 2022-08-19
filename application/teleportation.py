@@ -96,7 +96,7 @@ class Teleportation():
         #qm_alice,key,alice_state=alice_keys()
         #alice_state.append()
         #print('output',key_0,key,output,crz,crx)
-        return crz,crx,case, random_qubit
+        return crz,crx,case, random_qubit,alice_state
         
 
     def bob_gates(self,crz,crx,case,bob):
@@ -243,13 +243,21 @@ class Teleportation():
         return state.state, qm_bob.get(key).state
 
     def run(self,alice,bob,A_0,A_1):
-        crz,crx,case, random_qubit=self.alice_measurement(A_0,A_1,alice)
+        crz,crx,case, random_qubit,alice_state=self.alice_measurement(A_0,A_1,alice)
         print("Measurement result of random qubit crz",crz)
         print("Measurement result of alice qubit crx",crx)
         bob_initial_state, bob_final_state = self.bob_gates(crz,crx,case,bob)
-
+        
+        # initial entanglement alice_bob_entanglement: alice_bob_entangled_state
+        # measurement_result_of_random_qubit near alice's end : meas_rq
+        # measurement_result_of_alice_qubit  near alice's end :meas_r1
+        # bob_initial_state_before_corrective_measures: bob_initial_state
+        # bob_final_state_after_corrective_measures:bob_final_state
         res = {
+            "alice_bob_entanglement": alice_state.state,
             "random_qubit" : random_qubit,
+            "meas_rq":crz,
+            "meas_r1":crx,
             "bob_initial_state" : bob_initial_state,
             "bob_final_state" : bob_final_state
         }
@@ -339,3 +347,4 @@ conf["classical_connections"].append(cc23)
 
 tel( conf, "N1", "N2", complex(0.70710678118+0j), complex(0-0.70710678118j))
 """
+

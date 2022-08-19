@@ -248,14 +248,18 @@ class IP1():
         print("Alice's encoded r : ", r)
         assert (Bobs_r == r), "Bob's r is different from Alice's r! Some error!"
         print("Bob's r is same as Alice's r! Authentication procedure passed")
+        ##for output
+        return Bobs_r,r
 
     def authenticate_r(self,qm, IB_keys, Q5A_keys, IdB, r):
         local_IdB1 = self.Bobs_IdB1(qm, IB_keys, Q5A_keys, IdB)
-        self.check_r(IdB, local_IdB1, r)
+        Bobs_r,r=self.check_r(IdB, local_IdB1, r)
+        return Bobs_r,r
 
     def run_authentication_procedure(self,qm, IdA, IdB, IA_keys, IB_keys, Q5A_keys, r):
         self.authenticate_IdA(qm, IA_keys, Q5A_keys, IdA)
-        self.authenticate_r(qm, IB_keys, Q5A_keys, IdB, r)
+        Bobs_r,r=self.authenticate_r(qm, IB_keys, Q5A_keys, IdB, r)
+        return Bobs_r,r
 
     def Bob_get_theta(self,qm, IdB, theta_keys):
         bin_theta = []
@@ -334,13 +338,24 @@ class IP1():
         ## Maybe use identity gates. Currently simulating it by copying keys
 
         self.run_security_check(qm_bob, Q5A_keys, decoy_pos, decoy_results)
-        self.run_authentication_procedure(qm_bob, IdA, IdB, IA_keys, IB_keys, Q5A_keys, r)
+        Bobs_r,r=self.run_authentication_procedure(qm_bob, IdA, IdB, IA_keys, IB_keys, Q5A_keys, r)
+        
+
         Bob_message = self.run_decoding_process(qm_bob, IdB, theta_keys, Q5A_keys, Q1A_keys, check_bits_pos, check_bits)
         print(f"input message : {message}")
         print(f"Bob_message : {Bob_message}")
+        
+        if Bobs_r == r : 
+            display_msg="Bob's r is same as Alice's r! Authentication procedure passed"
+        else:
+            display_msg="Bob's r is different from Alice's r! Authentication procedure failed!"
 
-
+        #Bobs_r : Bobs_r that he gets 
+        #Alice_r: Alice's encoded r
         res ={
+            "Bobs_r": Bobs_r,
+            "Alice_r ": r,
+            "display_msg":display_msg,
             "input_message": message,
             "bob_message" : Bob_message
         }
