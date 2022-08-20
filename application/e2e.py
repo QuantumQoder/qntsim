@@ -34,7 +34,7 @@ def get_res(network_topo,req_pairs):
 				table.append([info.index,dst,info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
 		print(tabulate(table, headers=cols, tablefmt='grid'))
 		memoryDict["reciver"] = pd.DataFrame(table, columns=cols)
-
+		print('memory dict', memoryDict)
 		return memoryDict
 		 
 def set_parameters(topology:Topology):
