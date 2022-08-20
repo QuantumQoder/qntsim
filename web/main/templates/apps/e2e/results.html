@@ -2,7 +2,16 @@
     Memories after running e2e
 </h5>
 
-{% for key, df in data.items %}
-    <h3>{{key}} memories</h3>
-    {{df.to_html | safe}}
-{% endfor %}
+
+<table id="Keys">
+    <caption><h3>Entanglements</h3></caption>
+
+    <tr>
+        <th>Sender</th>
+        <td>{{ sender.to_html|safe}}</td>
+    </tr>
+    <tr>
+        <th>Receiver</th>
+        <td>{{ receiver.to_html|safe}}</td>
+    </tr>
+</table>

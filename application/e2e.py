@@ -24,7 +24,7 @@ def get_res(network_topo,req_pairs):
 			if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
 				table.append([info.index,src,info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
 		print(tabulate(table, headers=cols, tablefmt='grid'))
-		memoryDict["sender"] = pd.DataFrame(table, columns=cols)
+		memoryDict["sender"] = pd.DataFrame(table, columns=cols).style.hide_index()
 		
 		table=[]
 		print('dst ',pair[1])
@@ -33,8 +33,8 @@ def get_res(network_topo,req_pairs):
 			if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
 				table.append([info.index,dst,info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
 		print(tabulate(table, headers=cols, tablefmt='grid'))
-		memoryDict["reciver"] = pd.DataFrame(table, columns=cols)
-
+		memoryDict["receiver"] = pd.DataFrame(table, columns=cols).style.hide_index()
+		print('memory dict', memoryDict)
 		return memoryDict
 		 
 def set_parameters(topology:Topology):
