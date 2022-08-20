@@ -59,7 +59,8 @@ function addRow(tableID) {
 				break;
 	}
 
-	HTML += `<td><button type="button" class="deleteRow" onclick="deleteRow(this)">Delete Node</button></td></tr>`;
+	//HTML += `<td><button type="button" class="deleteRow" onclick="deleteRow(this)">Delete Node</button></td></tr>`;
+	HTML += `<td><a class="banner-button btn rounded-pill btn-outline-primary btn-md px-4 deleteRow" role="button" onclick="deleteRow(this)">Delete</a></td></tr>`;
 
 	$(`#${tableID}`).append(HTML);
 }
