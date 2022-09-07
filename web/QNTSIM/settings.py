@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-he$()-i)($x%8kl#j*@%m($(p6=#t4!)cv8-w1=11f&iwx!fvx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["qntsim.qulabz.ai"]
+ALLOWED_HOSTS = ["qntsim.qulabz.ai","127.0.0.1"]
 
 
 # Application definition

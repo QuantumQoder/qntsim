@@ -81,7 +81,7 @@ class GHZ():
         #print('Alice',qm_alice,alice_key,state)
         qm_bob,bob_key,state=self.bob_keys(bob)
         qm_charlie,charlie_key,state=self.charlie_keys(charlie)
-        qm_middle,middle_key,state=self.middle_keys(middlenode)
+        qm_middle,middle_key,state,middle_entangled_keys=self.middle_keys(middlenode)
 
         circ = QutipCircuit(3)
         circ.cx(0,2)
@@ -90,19 +90,21 @@ class GHZ():
         circ.measure(0)
         circ.measure(1)
         circ.measure(2)
-        output = qm_middle.run_circuit(circ,[alice_key,bob_key,charlie_key])
+        output = qm_middle.run_circuit(circ,middle_entangled_keys)
         print("Output", output)
         ghz_state = qm_middle.get(middle_key).state
         print("\nGHZ State\n",  qm_middle.get(middle_key).state)
-
+        print("\nGHZ State alice\n",  qm_middle.get(alice_key).state)
+        print("\nGHZ State bob\n",  qm_middle.get(bob_key).state)
+        print("\nGHZ State charlie\n",  qm_middle.get(charlie_key).state)
         res = {
-            "node1": output[0],
-            "node2": output[500],
-            "node3": output[1000],
+            "alice_state":qm_middle.get(alice_key).state ,
+            "bob_state": qm_middle.get(bob_key).state,
+            "charlie_state":qm_middle.get(charlie_key).state,
             "ghz_state" : ghz_state
         }
 
-        return res
+        return res 
         # print("Output", output, qm_middle.get(alice_key))
 
 ####################################################################################
@@ -113,7 +115,7 @@ class GHZ():
 
 # path (Type : String) -Path to config Json file
 
-def ghz(path,endnode1,endnode2,endnode3,middlenode):
+def ghz1(path,endnode1,endnode2,endnode3,middlenode):
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
     Timeline.bk=True
@@ -132,6 +134,7 @@ def ghz(path,endnode1,endnode2,endnode3,middlenode):
     tl.run()
     res = ghz.run(alice,bob,charlie,middlenode)
     print(res)
+    return res
 
 
 
