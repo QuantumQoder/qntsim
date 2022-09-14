@@ -151,7 +151,7 @@ def decode(node, corrections):
 # 
 # The function takes the message from the sender as an input and returns the receiver-decoded message.
 
-# In[5]:
+# In[7]:
 
 
 def main(message="Hello World"):
@@ -169,14 +169,14 @@ def main(message="Hello World"):
     for word in words:
         msg += ''.join(bin(ord(w))[2:] for w in word)
         msg += '0'+bin(ord(' '))[2:]
-    ghz = Centralized_GHZ(topology="/Users/aman/QNT/QNTSim/example/3n_linear.json", size=len(msg))
+    ghz = Centralized_GHZ(topology="/Users/aman/QNT/QNTSim/application/3n_central.json", size=len(msg))
     nodes = ghz.nodes.copy()
     corrections = teleport(nodes[0], message=msg)
     corrections = phase_measurement(nodes[1], corrections)
     decode(nodes[2], corrections)
 
 
-# In[6]:
+# In[8]:
 
 
 main()

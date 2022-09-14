@@ -3,7 +3,7 @@
 
 # # Importing necessary modules
 
-# In[2]:
+# In[1]:
 
 
 import math
@@ -17,7 +17,7 @@ from qntsim.components.circuit import QutipCircuit
 # 
 # The function takes the teleporting node and the message to be teleported as the inputs and, returns a list of indices of the receiver's nodes over which the message was teleported with the list of the x and z measurements on the photons of the sender.
 
-# In[3]:
+# In[2]:
 
 
 def teleport(a, message="01001"):
@@ -74,7 +74,7 @@ def teleport(a, message="01001"):
 # 
 # The function takes the other end node, list of the bell states at the end node and, the list of the x and z measurements for each bit of message and, returns the message that the block has decoded from the inputs it got.
 
-# In[4]:
+# In[3]:
 
 
 def decode(b, indices, crx, crz):
@@ -113,8 +113,8 @@ def decode(b, indices, crx, crz):
         qtc.measure(0)
         result = b_qm.run_circuit(qtc, [index])
         message = message+str(result.get(index))
-    
-    return message
+    message = ''.join(chr(int(message[i:i+7], 2)) for i in range(0, len(message), 7))
+    print("Received: ", message)
 
 
 # # The main() function
@@ -130,7 +130,7 @@ def decode(b, indices, crx, crz):
 # 
 # The function takes the message from the sender as an input and returns the receiver-decoded message.
 
-# In[11]:
+# In[4]:
 
 
 def main(message='Hello World'):
@@ -146,31 +146,16 @@ def main(message='Hello World'):
     for word in words:
         msg += ''.join(bin(ord(w))[2:] for w in word)
         msg += '0'+bin(ord(' '))[2:]
-    nodes, network = initiate(topology="/Users/aman/QNT/QNTSim/example/3n_linear.json",size=len(msg))
+    nodes, network = initiate("/Users/aman/QNT/QNTSim/application/2n_linear.json", size=len(msg))
     #a = rectify_entanglements(a)
     indices, crx, crz = teleport(nodes[0], message=msg)
-    msg = decode(nodes[1], indices, crx, crz)
-    message = ''.join(chr(int(msg[i:i+7], 2)) for i in range(0, len(msg), 7))
-    
-    return message
+    decode(nodes[1], indices, crx, crz)
 
 
-# In[12]:
+# In[5]:
 
 
-message = main()
-
-
-# In[13]:
-
-
-print("Received: ", message)
-
-
-# In[ ]:
-
-
-
+main()
 
 
 # In[ ]:

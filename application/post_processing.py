@@ -1,4 +1,5 @@
 import qntsim
+from qntsim.components.circuit import Circuit
 from qntsim.kernel.timeline import Timeline
 from qntsim.kernel.quantum_manager import QuantumManager, QuantumManagerKet
 # from qntsim.topology.node import QuantumRouter
@@ -22,6 +23,64 @@ def print_memories(node):
         print("{:6}\t{:15}\t{:9}\t{}\t{}".format(str(info.index), str(info.remote_node),
                                             str(info.fidelity), str(info.entangle_time * 1e-12),str(info.state)))
 
+def z_measurement(qm, keys):
+    circ=Circuit(1)       #Z Basis measurement
+    circ.measure(0)
+    output=qm.run_circuit(circ, keys)
+    return list(output.values())[0]
+
+def initilize_states(qm, state):
+    keys = []
+    for i in state:
+        if i == '0':
+            keys.append(qm.new([1, 0]))
+        elif i == '1' : 
+            keys.append(qm.new([0, 1]))
+    return keys
+
+def hadamard_transform(qm, keys):
+    circ = Circuit(len(keys))
+    for i in range(len(keys)):
+        circ.h(i)
+    qm.run_circuit(circ, keys)
+
+def bell_measure_2(qm, keys):
+    circ=Circuit(2)   
+    #change to bell basis
+    circ.cx(0,1)
+    circ.h(1)   
+    circ.measure(0)
+    circ.measure(1)
+    output=qm.run_circuit(circ, keys)
+    return list(output.values())
+
+def bell_measure(qm, keys):
+    circ=Circuit(2)   
+    #change to bell basis
+    circ.cx(0,1)
+    circ.h(0)   
+    circ.measure(0)
+    circ.measure(1)
+    output=qm.run_circuit(circ, keys)
+    return list(output.values())
+
+def change_bell_state(qm, keys, state):
+
+    circ=Circuit(2)   
+    #change to bell basis
+    circ.cx(0,1)
+    circ.h(0)   
+
+    #Changing Bell States
+    if state[0] == 1:
+        circ.x(0)
+    if state[1] == 1:
+        circ.x(1)
+
+    #back to computational basiss
+    circ.h(0) 
+    circ.cx(0,1)
+    qm.run_circuit(circ, keys)
 
 def check_phi_plus(state):
     assert(len(state) == 4)
@@ -56,7 +115,7 @@ def create_phi_plus_entanglement(node):
         if(not check_phi_plus(state.state)):continue
 
         #Check that state is indeed phi_+
-        print(state)
+        #print(state)
 
         entangled_keys.append(key)
 
