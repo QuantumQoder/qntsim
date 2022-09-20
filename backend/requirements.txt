@@ -56,3 +56,4 @@ tabulate==0.8.9
 traitlets==5.4.0
 tweedledum==1.1.1
 wcwidth==0.2.5
+psycopg2
