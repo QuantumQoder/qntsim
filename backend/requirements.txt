@@ -57,3 +57,7 @@ traitlets==5.4.0
 tweedledum==1.1.1
 wcwidth==0.2.5
 psycopg2
+qiskit-aer
+djangorestframework==3.13.1
+django-cors-headers
+djangorestframework-simplejwt==5.1.0
