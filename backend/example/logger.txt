@@ -535,3 +535,7 @@
 ----Random generated in swap---- 0.7376940266745787
 ----Random generated in swap---- 0.36457384709726803
 ----Random generated in swap---- 0.5416823784035976
+----Random generated in swap---- 0.17718976551312393
+----Random generated in swap---- 0.2613320612719282
+----Random generated in swap---- 0.5930685755312775
+----Random generated in swap---- 0.9568861549151301

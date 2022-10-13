@@ -7,4 +7,5 @@ urlpatterns = [
     path('graph', views.graph, name='graph'),
     path('run', views.run, name='run'),
     path('testrun', views.testrun, name='testrun'),
+    path('applog', views.appLog, name='applog'),
 ]
