@@ -1,0 +1,73 @@
+//import { animate, style, transition, trigger, useAnimation } from '@angular/animations';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { MenuItem } from 'primeng/api/menuitem';
+import { ConditionsService } from 'src/services/conditions.service';
+
+
+@Component({
+  selector: 'app-applications',
+  templateUrl: './applications.component.html',
+  styleUrls: ['./applications.component.less'],
+})
+export class ApplicationsComponent implements OnInit {
+  responsiveOptions: any
+  items: MenuItem[] = [
+    { label: 'Home', routerLink: ['/'] },
+    { label: 'Application', routerLink: ['applications'] },
+
+  ];
+
+  constructor(private conService: ConditionsService, private _router: Router) { }
+
+  ngOnInit(): void {
+    this.conService.currentSection = 'applications'
+    this.responsiveOptions = [
+      {
+        breakpoint: '1024px',
+        numVisible: 3,
+        numScroll: 3
+      },
+      {
+        breakpoint: '768px',
+        numVisible: 2,
+        numScroll: 2
+      },
+      {
+        breakpoint: '560px',
+        numVisible: 1,
+        numScroll: 1
+      }
+    ];
+
+  }
+  e2e() {
+    sessionStorage.setItem('app_id', '1')
+    this._router.navigate(['/drag2'])
+  }
+  e91() {
+    sessionStorage.setItem('app_id', '2')
+    this._router.navigate(['/drag2'])
+  }
+  teleportation() {
+    sessionStorage.setItem('app_id', '3')
+    this._router.navigate(['/drag2'])
+  }
+  ghz() {
+    sessionStorage.setItem('app_id', '4')
+    this._router.navigate(['/drag2'])
+  }
+  qsdc_epr() {
+    sessionStorage.setItem('app_id', '5')
+    this._router.navigate(['/drag2'])
+  }
+  pingpong() {
+    sessionStorage.setItem('app_id', '6')
+    this._router.navigate(['/drag2'])
+  }
+  qsdc_mutual_auth() {
+    sessionStorage.setItem('app_id', '7')
+    this._router.navigate(['/drag2'])
+  }
+
+}

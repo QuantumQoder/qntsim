@@ -1,0 +1,62 @@
+<div class="row">
+    <p-toast position="top-right"></p-toast>
+    <div id="sample" class="col-md-10">
+        <div style="width: 100%; display: flex; justify-content: space-between">
+            <div id="myPaletteDiv" class="col-md-4"
+                style="width: 110px; margin: 2px; background-color: whitesmoke; border: solid 1px black"></div>
+            <div id="myDiagramDiv" class="col-md-8" style="flex-grow: 1; height: 620px; border: solid 1px black"></div>
+        </div>
+        <div>
+            <div>
+                <button type="button" pButton pRipple (click)="save()" label="Save" class="ui-button-warning"></button>
+                &nbsp;
+                <button type="button" pButton pRipple (click)="load()" label="Load" class="ui-button-warning"></button>
+                <!-- Diagram Model saved in JSON format: -->
+            </div>
+            <!-- <textarea id="mySavedModel" style="width:100%;height:300px">
+    { "class": "go.GraphLinksModel",
+      "linkFromPortIdProperty": "fromPort",
+      "linkToPortIdProperty": "toPort",
+      "nodeDataArray": [
+     ],
+      "linkDataArray": [
+     ]}
+        </textarea> -->
+        </div>
+
+    </div>
+
+    <p-sidebar [(visible)]="visibleSideNav" position="right" [baseZIndex]="10000" styleClass="sidebar">
+        <div id="toolbox" class="col" [formGroup]="toolbox">
+
+            <br>
+            <div class="col">
+                <label style="padding-bottom: 5px;" for="formControlName">
+                    <h5>Name:</h5>
+                </label>
+                <br>
+                <input style="padding-bottom: 5px;" type="text" formControlName="name" placeholder="Name">
+            </div>
+            <br>
+            <div class="col">
+                <label style="padding-bottom: 5px;" for="formControlName">
+                    <h5>No of Memories</h5>
+                </label>
+                <br>
+                <input style="padding-bottom: 5px;" type="text" formControlName="noOfMemories"
+                    placeholder="No of Memories">
+            </div>
+            <br>
+            <div class="col">
+                <label style="padding-bottom: 5px;" for="formControlName">
+                    <h5>Memory Fidelity</h5>
+                </label>
+                <br>
+                <input style="padding-bottom: 5px;" type="text" class="input-lg" formControlName="memoryFidelity"
+                    placeholder="Memory Fidelity">
+            </div>
+        </div>
+    </p-sidebar>
+
+
+</div>

@@ -1,0 +1,12 @@
+<nav class="navbar navbar-expand-lg">
+
+    <img src="assets/images/logo-removebg-preview.png" alt="">
+
+    <div *ngIf="!loggedIn" class="btn-group justify-content-end">
+        <a class="btn text-black" pTooltip="Home" tooltipPosition="right" tooltipStyleClass="tooltip"
+            routerLink="/">Home</a>
+        <a class="btn text-black" pTooltip="Applications" tooltipPosition="right"
+            routerLink="/applications/">Applications</a>
+    </div>
+
+</nav>

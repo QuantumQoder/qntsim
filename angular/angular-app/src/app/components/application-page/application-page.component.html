@@ -1,0 +1,42 @@
+<div class="container-sm" style="padding:2px;height: 100;">
+    <div class="card">
+        <h2 class="text-white">
+            <u>Define Nodes:</u>
+        </h2>
+        <div class="cont table-responsive" style="margin-top: 5%">
+            <table class="table table-striped table-sm table-bordered" width="500">
+                <thead>
+                    <tr>
+                        <th class="pr-4">Name</th>
+                        <th fxFlex="22" class="pr-4">Type</th>
+                        <th fxFlex="22" class="pr-4">No of Memories</th>
+                        <th fxFlex="22" class="pr-4">Memory Frequency(Hz)</th>
+                        <th fxFlex="22" class="pr-4">Memory Expiry Time</th>
+                        <th fxFlex="22" class="pr-4">Memory Efficiency</th>
+                        <th fxFlex="22" class="pr-4">Memory Fidelity</th>
+                        <th fxFlex="22" class="pr-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody [formGroup]="form">
+                    <ng-container formArrayName="formArray">
+                        <tr *ngFor="let line of formArray.controls; let i=index" formGroupName="{{i}}">
+                            <td><input type="text" formControlName="name" size="4"></td>
+                            <td><input type="text" formControlName="type" size="2"></td>
+                            <td><input type="text" formControlName="noOfMemories" size="2"></td>
+                            <td><input type="text" formControlName="memoryFrequency" size="2"></td>
+                            <td><input type="text" formControlName="memoryExpiryTime" size="2"></td>
+                            <td><input type="text" formControlName="memoryEfficiency" size="2"></td>
+                            <td><input type="text" formControlName="memoryFidelity" size="2"></td>
+                            <td><button class="btn btn-primary" (click)="deleteTableRow(i)">Delete</button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button type="button" class="btn btn-secondary" (click)="addTableRow()">Add Row</button>
+                            </td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
