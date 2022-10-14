@@ -8,7 +8,7 @@ from qiskit import *
 from qutip.qip.operations import gate_sequence_product
 #from qiskit.ignis.verification import marginal_counts
 from qiskit.quantum_info import random_statevector
-import math
+ 
 
 class GHZ():
 
@@ -17,9 +17,8 @@ class GHZ():
         endnode1.transport_manager.request(middlenode.owner.name, 5e12,1, 20e12, 0 , 0.5,2e12) 
         endnode2.transport_manager.request(middlenode.owner.name, 5e12,1, 20e12, 0 , 0.5,2e12) 
         endnode3.transport_manager.request(middlenode.owner.name, 5e12,1, 20e12, 0 , 0.5,2e12) 
-
-        
-        return endnode1,endnode2,endnode3,middlenode
+        source_node_list=[endnode1.name,endnode2.name,endnode3.name]
+        return endnode1,endnode2,endnode3,middlenode,source_node_list
 
     # set's alice , bob ,charlie and middlenode 
     def roles(self,alice,bob,charlie,middlenode):
@@ -100,6 +99,7 @@ class GHZ():
         print("\nGHZ State bob\n",  qm_middle.get(bob_key).state)
         print("\nGHZ State charlie\n",  qm_middle.get(charlie_key).state)
         res = {
+            
             "alice_state":qm_middle.get(alice_key).state ,
             "bob_state": qm_middle.get(bob_key).state,
             "charlie_state":qm_middle.get(charlie_key).state,
@@ -116,12 +116,14 @@ class GHZ():
 #TODO: Support on Qiskit
 
 # path (Type : String) -Path to config Json file
-
+"""
 def ghz(path,endnode1,endnode2,endnode3,middlenode):
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
     Timeline.bk=True
     from qntsim.topology.topology import Topology
+    
+    report,graph={},{}
     
     tl = Timeline(20e12,"Qutip")
     network_topo = Topology("network_topo", tl)
@@ -131,15 +133,32 @@ def ghz(path,endnode1,endnode2,endnode3,middlenode):
     charlie=network_topo.nodes[endnode3]
     middlenode=network_topo.nodes[middlenode]
     ghz= GHZ()
-    alice,bob,charlie,middlenode=ghz.roles(alice,bob,charlie,middlenode)
+    alice,bob,charlie,middlenode,source_node_list=ghz.roles(alice,bob,charlie,middlenode)
     tl.init()
     tl.run()
     res = ghz.run(alice,bob,charlie,middlenode)
-    print(res)
-
-
-
+    
+    t=1
+    timel ,fidelityl,latencyl,fc_throughl,pc_throughl,nc_throughl=[],[],[],[],[],[]
+    while t < 20:
+        fidelityl= utils.calcfidelity (network_topo,source_node_list,t*1e12,fidelityl)
+        
+        latencyl= utils.calclatency(network_topo,source_node_list,t*1e12,latencyl)
+        fc_throughl,pc_throughl,nc_throughl= utils.throughput(network_topo,source_node_list,t*1e12,fc_throughl,pc_throughl,nc_throughl)
+        t=t+2
+        timel.append(t)
+    
+    graph["latency"]    = latencyl
+    graph["fidelity"]   = fidelityl
+    graph["throughput"] ={fc_throughl,pc_throughl,nc_throughl}
+    graph["time"] = timel
+    
+    report["application"]=res
+    report["graph"]=graph
+    
+    print(report)
 # jsonConfig (Type : Json) -Json Configuration of network 
+"""
 """
 def ghz(jsonConfig,endnode1,endnode2,endnode3,middlenode):
     from qntsim.kernel.timeline import Timeline 
@@ -147,6 +166,7 @@ def ghz(jsonConfig,endnode1,endnode2,endnode3,middlenode):
     Timeline.bk=True
     from qntsim.topology.topology import Topology
     
+    report,graph={},{}
     tl = Timeline(20e12,"Qutip")
     network_topo = Topology("network_topo", tl)
     network_topo.load_config_json(jsonConfig)
@@ -155,37 +175,55 @@ def ghz(jsonConfig,endnode1,endnode2,endnode3,middlenode):
     charlie=network_topo.nodes[endnode3]
     middlenode=network_topo.nodes[middlenode]
     ghz= GHZ()
-    alice,bob,charlie,middlenode=ghz.roles(alice,bob,charlie,middlenode)
+    alice,bob,charlie,middlenode,source_node_list=ghz.roles(alice,bob,charlie,middlenode)
+    print(source_node_list)
     tl.init()
     tl.run()  
     ghz.run(alice,bob,charlie,middlenode)
-
-
+    res = ghz.run(alice,bob,charlie,middlenode)
+    
+    t=1
+    timel ,fidelityl,latencyl,fc_throughl,pc_throughl,nc_throughl=[],[],[],[],[],[]
+    while t < 20:
+        fidelityl= utils.calcfidelity (network_topo,source_node_list,t,fidelityl)
+        
+        latencyl= utils.calclatency(network_topo,source_node_list,t,latencyl)
+        fc_throughl,pc_throughl,nc_throughl= utils.throughput(network_topo,source_node_list,t,fc_throughl,pc_throughl,nc_throughl)
+        t=t+1
+        timel.append(t)
+    
+    graph["latency"]    = latencyl
+    graph["fidelity"]   = fidelityl
+    graph["throughput"] = {}
+    graph["throughput"]["fc"]= fc_throughl  
+    graph["throughput"]["pc"]= pc_throughl
+    graph["throughput"]["nc"]= nc_throughl              #{fc_throughl,pc_throughl,nc_throughl}
+    graph["time"] = timel
+    
+    report["application"]=res
+    report["graph"]=graph
+    
+    print(report)
 conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
-
 memo = {"frequency": 2e3, "expiry": 0, "efficiency": 1, "fidelity": 1}
 node1 = {"Name": "N1", "Type": "end", "noOfMemory": 50, "memory":memo}
 node2 = {"Name": "N2", "Type": "end", "noOfMemory": 50, "memory":memo}
 node3 = {"Name": "N3", "Type": "end", "noOfMemory": 50, "memory":memo}
 node4 = {"Name": "N4", "Type": "service", "noOfMemory": 50, "memory":memo}
-
 conf["nodes"].append(node1)
 conf["nodes"].append(node2)
 conf["nodes"].append(node3)
 conf["nodes"].append(node4)
-
 qc1 = {"Nodes": ["N1", "N4"], "Attenuation": 1e-5, "Distance": 70}
 qc2 = {"Nodes": ["N2", "N4"], "Attenuation": 1e-5, "Distance": 70}
 qc3 = {"Nodes": ["N3", "N4"], "Attenuation": 1e-5, "Distance": 70}
 conf["quantum_connections"].append(qc1)
 conf["quantum_connections"].append(qc2)
 conf["quantum_connections"].append(qc3)
-
 cc1 = {"Nodes": ["N1", "N1"], "Delay": 0, "Distance": 0}
 cc1 = {"Nodes": ["N2", "N2"], "Delay": 0, "Distance": 0}
 cc1 = {"Nodes": ["N3", "N3"], "Delay": 0, "Distance": 0}
 cc1 = {"Nodes": ["N4", "N4"], "Delay": 0, "Distance": 0}
-
 cc12 = {"Nodes": ["N1", "N2"], "Delay": 1e9, "Distance": 1e3}
 cc13 = {"Nodes": ["N1", "N3"], "Delay": 1e9, "Distance": 1e3}
 cc14 = {"Nodes": ["N1", "N4"], "Delay": 1e9, "Distance": 1e3}
@@ -198,8 +236,5 @@ conf["classical_connections"].append(cc14)
 conf["classical_connections"].append(cc23)
 conf["classical_connections"].append(cc24)
 conf["classical_connections"].append(cc34)
-
-
 ghz(conf,"N1","N2","N3","N4")
 """
-

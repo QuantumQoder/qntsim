@@ -20,12 +20,13 @@ class QSDC1():
     
     def request_entanglements(self,sender,receiver,n):
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.5,5e12)
-        return sender,receiver
+        source_node_list=[sender.name]
+        return sender,receiver,source_node_list
 
     def roles(self,alice,bob,n):
         sender=alice
         receiver=bob
-        print('sender, receiver',sender.owner.name,receiver.owner.name)
+        print('sender, receiver',sender.owner.name,receiver.owner.name)    
         return self.request_entanglements(sender,receiver,n)
 
 
@@ -170,7 +171,7 @@ class QSDC1():
         protocol_keys = self.generate_QSDC_entanglement(qm_alice, message, entangled_keys,alice_bob_keys_dict )
         message_received = ""
         c = 0
-        sequence_len = 1
+        sequence_len = 8
         measured_keys,removed_bits = self.eavesdrop_check(alice,bob,protocol_keys, message,alice_bob_keys_dict )
 
         for keys in protocol_keys:
@@ -221,9 +222,9 @@ class QSDC1():
 # message (Type: String)--a bit string
 # message length  should be even
 # sequence length (Type : Integer) should be less than 5
-'''
+"""
 def qsdc1(path, sender,receiver,sequence_length,message):
-
+    import utils
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
     Timeline.bk=True
@@ -243,18 +244,17 @@ def qsdc1(path, sender,receiver,sequence_length,message):
         tl.run()  
         res = qsdc1.run(alice,bob,sequence_length,message)
         print(res)
-
-
-
 # jsonConfig (Type : Json) -Json Configuration of network 
-
+"""
+"""
 def qsdc1(jsonConfig,sender,receiver,sequence_length,message):
-
+    import utils
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
     Timeline.bk=True
     from qntsim.topology.topology import Topology
     
+    report,graph={},{}
     tl = Timeline(20e12,"Qutip")
     network_topo = Topology("network_topo", tl)
     network_topo.load_config_json(jsonConfig)
@@ -264,28 +264,47 @@ def qsdc1(jsonConfig,sender,receiver,sequence_length,message):
         alice=network_topo.nodes[sender]
         bob = network_topo.nodes[receiver]
         qsdc1=QSDC1()
-        alice,bob=qsdc1.roles(alice,bob,n)
+        alice,bob,source_node_list=qsdc1.roles(alice,bob,n)
+        print(source_node_list)
         tl.init()
         tl.run()  
         res = qsdc1.run(alice,bob,sequence_length,message)
         print(res)
-
-
+    
+    t=1
+    timel ,fidelityl,latencyl,fc_throughl,pc_throughl,nc_throughl=[],[],[],[],[],[]
+    while t < 20:
+        fidelityl= utils.calcfidelity(network_topo,source_node_list,t,fidelityl)
+        
+        latencyl= utils.calclatency(network_topo,source_node_list,t,latencyl)
+        fc_throughl,pc_throughl,nc_throughl= utils.throughput(network_topo,source_node_list,t,fc_throughl,pc_throughl,nc_throughl)
+        t=t+1
+        timel.append(t)
+    
+    graph["latency"]    = latencyl
+    graph["fidelity"]   = fidelityl
+    graph["throughput"] = {}
+    graph["throughput"]["fc"]= fc_throughl  
+    graph["throughput"]["pc"]= pc_throughl
+    graph["throughput"]["nc"]= nc_throughl          #{fc_throughl,pc_throughl,nc_throughl}
+    graph["time"] = timel
+    
+    report["application"]=res
+    report["graph"]=graph
+    
+    print(report)
 conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
-
 memo = {"frequency": 2e3, "expiry": 0, "efficiency": 1, "fidelity": 1}
-node1 = {"Name": "N1", "Type": "end", "noOfMemory": 50, "memory":memo}
-node2 = {"Name": "N2", "Type": "end", "noOfMemory": 50, "memory":memo}
-node3 = {"Name": "N3", "Type": "service", "noOfMemory": 50, "memory":memo}
+node1 = {"Name": "N1", "Type": "end", "noOfMemory": 500, "memory":memo}
+node2 = {"Name": "N2", "Type": "end", "noOfMemory": 500, "memory":memo}
+node3 = {"Name": "N3", "Type": "service", "noOfMemory": 500, "memory":memo}
 conf["nodes"].append(node1)
 conf["nodes"].append(node2)
 conf["nodes"].append(node3)
-
 qc1 = {"Nodes": ["N1", "N3"], "Attenuation": 1e-5, "Distance": 70}
 qc2 = {"Nodes": ["N2", "N3"], "Attenuation": 1e-5, "Distance": 70}
 conf["quantum_connections"].append(qc1)
 conf["quantum_connections"].append(qc2)
-
 cc1 = {"Nodes": ["N1", "N1"], "Delay": 0, "Distance": 0}
 cc1 = {"Nodes": ["N2", "N2"], "Delay": 0, "Distance": 0}
 cc1 = {"Nodes": ["N3", "N3"], "Delay": 0, "Distance": 0}
@@ -295,5 +314,5 @@ cc23 = {"Nodes": ["N2", "N3"], "Delay": 1e9, "Distance": 1e3}
 conf["classical_connections"].append(cc12)
 conf["classical_connections"].append(cc13)
 conf["classical_connections"].append(cc23)
-'''
-# qsdc1("a", "b",3,"110011001001010101010100")
+qsdc1(conf ,"N1", "N2",8,"110011000000111100110011000011")
+"""

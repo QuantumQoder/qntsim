@@ -22,7 +22,8 @@ class Teleportation():
 
     def request_entanglements(self,sender,receiver):
         sender.transport_manager.request(receiver.owner.name,5e12,1,20e12,0,.5,5e12)
-        return sender,receiver
+        source_node_list=[sender.name]
+        return sender,receiver,source_node_list
 
     def roles(self,alice,bob):
         sender=alice
