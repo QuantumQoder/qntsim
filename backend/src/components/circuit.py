@@ -10,6 +10,10 @@ import numpy as np
 from qutip.qip.circuit import QubitCircuit
 from qutip import Qobj
 from qutip.qip.operations import gate_sequence_product
+from qutip.qip.operations import (
+    controlled_gate, qasmu_gate, rz, snot, gate_sequence_product,
+)
+
 #from sympy import Q
 #from QNTSim.build.lib.qntsim.components import circuit
 #from QNTSim.build.lib.qntsim.kernel.quantum_manager import QuantumManager
@@ -45,6 +49,9 @@ def t_gate():
     mat = np.array([[1.,   0],
                     [0., e ** (1.j * (pi / 4))]])
     return Qobj(mat, dims=[[2], [2]])
+
+def tdg_gate():
+        return rz(-1 * np.pi/4)
 
 
 def validator(func):
@@ -264,7 +271,8 @@ class QutipCircuit(BaseCircuit):
                              "Y": y_gate,
                              "Z": z_gate,
                              "S": s_gate,
-                             "T": t_gate}
+                             "T": t_gate,
+                             "tdg":tdg_gate}
             for gate in self.gates:
                 name, indices = gate
                 if name == 'h':
@@ -285,6 +293,8 @@ class QutipCircuit(BaseCircuit):
                     qc.add_gate('T', indices[0])
                 elif name == 's':
                     qc.add_gate('S', indices[0])
+                elif name == 'tdg':
+                    qc.add_gate('tdg', indices[0])
                 elif name == 'ry':
                     qc.add_gate('RY', indices[0],arg_value=indices[1])
                 elif name == 'rx':
@@ -393,6 +403,15 @@ class QutipCircuit(BaseCircuit):
         """
 
         self.gates.append(['s', [qubit]])
+    
+    @validator
+    def tdg(self, qubit: int):
+        """Method to apply single TDG gate on a qubit.
+        Args:
+            qubit (int): the index of qubit in the circuit.
+        """
+
+        self.gates.append(['tdg', [qubit]])
 
     @validator
     def measure(self, qubit: int):
