@@ -1,3 +1,4 @@
+from unittest import result
 from django.shortcuts import render
 
 from rest_framework.views import APIView
@@ -15,9 +16,11 @@ class RunApp(APIView):
     def post(self,request):
 
         topology = json.loads(request.POST['topology'])
-        application = request.POST['application']
+        application_id = request.POST['application']
         appSettings = json.loads(request.POST['appSettings'])
         # Add check for getting application id and extracting name.
+        print('application id', application_id)
+        application = Applications.objects.filter(id = application_id).values("name").first().get('name')
         print(f"Running applications: {application}")
         print('request user', request.user.username, request.user.id)
         results = {}
@@ -38,8 +41,11 @@ class RunApp(APIView):
             results = teleportation(topology, appSettings["sender"], appSettings["receiver"], complex(appSettings["amplitude1"]), complex(appSettings["amplitude2"]) )
 
         # Add code for results here
-        
-        res = Results.objects.create(user = request.user, topology = topology, app_name = application, input =appSettings, output = results)
+        print('results', results)
+        graphs = results.get('graph')
+        output = results.get('application')
+        print('graphs', graphs)
+        res = Results.objects.create(user = request.user, topology = topology, app_name = application, input =appSettings, output = output,graphs = graphs)
         res.save()
 
         return JsonResponse(results)
@@ -74,3 +80,33 @@ class ApplicationList(mixins.CreateModelMixin,
     def patch(self, request, *args, **kwargs):
         # queryset = PortfolioDetails.objects.get(id = request.data.get("portfolio_id"))
         return self.partial_update(request, *args, **kwargs)
+
+
+
+class PastResultsList(generics.GenericAPIView):
+
+    def get(self, request):
+
+        results = Results.objects.filter(user = request.user)
+        print('all results', results)
+        result_list=[]
+        for result in results:
+            list ={}
+            list["id"] = result.id
+            list["name"] = result.app_name
+            list["time"] = result.created_at
+            list["descryption"] = "Completed" 
+            result_list.append(list)
+        print('result', result_list,result.user, result.created_at)
+        return JsonResponse(result_list, safe =False)
+
+
+
+class ApplicationResult(generics.GenericAPIView):
+
+
+    def get(self, request):
+        result_id = request.data.get('id')
+        result = Results.objects.filter(id = result_id).values().first()
+        print('result', result)
+        return JsonResponse(result)

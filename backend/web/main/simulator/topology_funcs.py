@@ -64,7 +64,7 @@ def e91(network_config, sender, receiver, keyLength):
         report["application"]=results
         report=network_graph(network_topo,source_node_list,report)
         print(report)
-        return results
+        return report
     else:
         print("key length should be between 0 and 50")
         return None
