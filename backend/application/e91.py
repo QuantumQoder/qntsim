@@ -1,6 +1,11 @@
-
 import numpy as np
 from qntsim.components.circuit import BaseCircuit
+import math
+from qntsim.kernel.quantum_kernel import KetState
+import random
+
+
+_psi_minus = [complex(0) , complex(math.sqrt(1 / 2)), -complex(math.sqrt(1 / 2)), complex(0)]
 
 
 class E91():
@@ -8,8 +13,10 @@ class E91():
     # Request transport manager  for entanglements
     def request_entanglements(self,sender,receiver,n):
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.7,5e12)
-        return sender,receiver
+        source_node_list=[sender.name]
+        return sender,receiver,source_node_list
     
+
     # Sets the sender and receiver as alice and bob respectively, and request entanglements 
     def roles(self,alice,bob,n):
         sender=alice
@@ -19,15 +26,15 @@ class E91():
 
     # circuit measurements
     def measurement(self,qm,choice, key):
-        #print('choice',choice)
         if choice == 1: 
-            Circuit=BaseCircuit.create("Qiskit")      #X observable
+            Circuit=BaseCircuit.create("Qutip")      #X observable
             circ=Circuit(1)
             circ.h(0)
             circ.measure(0)
             output=qm.run_circuit(circ,[key])
+
         if choice == 2:  
-            Circuit=BaseCircuit.create("Qiskit")       #W observable
+            Circuit=BaseCircuit.create("Qutip")       #W observable
             circ=Circuit(1)
             circ.s(0)
             # circ.
@@ -36,13 +43,15 @@ class E91():
             circ.h(0)
             circ.measure(0)
             output=qm.run_circuit(circ,[key])
+
         if choice == 3:  
-            Circuit=BaseCircuit.create("Qiskit")       #Z observable
+            Circuit=BaseCircuit.create("Qutip")       #Z observable
             circ=Circuit(1)
             circ.measure(0)
             output=qm.run_circuit(circ,[key])
+
         if choice == 4: 
-            Circuit=BaseCircuit.create("Qiskit")        #V observable
+            Circuit=BaseCircuit.create("Qutip")        #V observable
             circ=Circuit(1)
             circ.s(0)
             circ.h(0)
@@ -50,42 +59,140 @@ class E91():
             circ.h(0)
             circ.measure(0)
             output=qm.run_circuit(circ,[key])
-        #print('output',output)
+        
         return output
+    
+   
+    ###Set  entangled state to psi_minus 
+    ###TODO: Unitary Operations to change state instead of hard coding value
 
-    # measurements on alice side
+    def set_state_psi_minus(self , alice ,bob) :  
+        
+        qm_alice=alice.timeline.quantum_manager
+        qm_bob=bob.timeline.quantum_manager
+        bob_entangled_key=[] ##Entangled states of Bob Nodes
+        alice_bob_map={}  ### Bob key<---->Alice key Map of entanglement
+        
+        for info in bob.resource_manager.memory_manager:
+            
+            if info.state=='ENTANGLED':
+
+                key=info.memory.qstate_key
+                state0=qm_bob.get(key) 
+                
+                ##Update bob's state in all keys associated with the state at bob node
+                for key1 in state0.keys:
+                    qm_bob.states[key1].state = _psi_minus
+                
+                bob_entangled_key.append(key) 
+        
+
+        for info in alice.resource_manager.memory_manager:
+            if info.state=='ENTANGLED':
+                
+                key=info.memory.qstate_key
+                state0=qm_alice.get(key) 
+               
+                ##Update alice's state in all keys associated with the state at alice node
+                for key1 in state0.keys:
+                    qm_alice.states[key1].state = _psi_minus
+                    if key1!=key :
+                        alice_bob_map[key1]=key          
+
+        return alice,bob,alice_bob_map,bob_entangled_key
+
+
+    ### Alice measurement of entangled qubits
     def alice_measurement(self,alice):
         choice=[1,2,3]
         qm_alice=alice.timeline.quantum_manager
-        meas_results_alice=[]
-        alice_choice_list=[]
+        meas_results_alice={} ###entangled key <---> measure result at that qubit MAP
+        alice_choice_list={} ###entangled key <---> Random Basis Choice of Alice MAP
+
         for info in alice.resource_manager.memory_manager:
-            key=info.memory.qstate_key
-            state=qm_alice.get(key)
-            #print('initial state',info.index,info.state,type(state))
-            alice_choice=np.random.choice(choice)
-            #print('keys alice',key)
-            meas_results_alice.append(self.measurement(qm_alice,alice_choice,key))
-            alice_choice_list.append(alice_choice)
-        # print('Alice measuremnt reuslts',meas_results_alice)
+            if info.state=='ENTANGLED':
+                
+                key=info.memory.qstate_key 
+                state1=qm_alice.get(key)
+                
+                ##Alice Random Basis Choice and measure result for a particular entangled qubit
+                alice_choice=random.randint(1, 3)
+                meas_results_alice[key]=self.measurement(qm_alice,alice_choice,key)
+                alice_choice_list[key]=alice_choice
+        
         return alice_choice_list,meas_results_alice
-    
-    #measurements on bob side
-    def bob_measurement(self,bob):
-        qm_bob=bob.timeline.quantum_manager
-        meas_results_bob=[]
-        bob_choice_list=[]
+
+   
+    ### Bob measurement of entangled qubits
+    def bob_measurement(self,bob,bob_entangled_key):
         choice=[2,3,4]
+        qm_bob=bob.timeline.quantum_manager
+        meas_results_bob={} ###entangled key <---> measure result at that qubit: MAP
+        bob_choice_list={} ###entangled key <---> Random Basis Choice of Bob :MAP
+        
+        
         for info in bob.resource_manager.memory_manager:
+            
             key=info.memory.qstate_key
-            bob_choice=np.random.choice(choice)
-            #print('keys bob',key)
-            meas_results_bob.append(self.measurement(qm_bob,bob_choice,key))
-            bob_choice_list.append(bob_choice)
+            state0=qm_bob.get(key) 
+
+            ##Bob Random Basis Choice and measure result for a particular entangled qubit
+            if key in bob_entangled_key:
+                bob_choice=random.randint(2, 4)
+                meas_results_bob[key]=self.measurement(qm_bob,bob_choice,key)
+                bob_choice_list[key]=bob_choice
         return bob_choice_list,meas_results_bob
 
+    
 
-    def chsh_correlation(self,alice_results,bob_results,alice_choice,bob_choice,n):
+    ### ACTION OF EVE:
+        ##Eve has access to both Alice Qubit or Bob Qubit Or Both Qubits( Hence have access to the node's quantum memory information)
+            #Eve detects/measures those Qubits 
+            #where alice and bob doesnt have knowledge of eve's presence  
+            #Hence ALice and Bob Continues to measure the qubits     
+    def eve_measurement(self,alice,bob,alice_bob_map,bob_entangled_key):
+               # eveMeasurementChoices = []
+
+        
+
+        choice=[2,3] ### These basis choices are involved in Secret key detection
+        qm_alice=alice.timeline.quantum_manager
+        qm_bob=bob.timeline.quantum_manager
+        eve_meas_results_alice={} ##Eve measurement of Alice side Qubit
+        eve_alice_choice_list={}  ## Random Basis Choice for Above
+        eve_meas_results_bob={} ##Eve measurement of Bob side Qubit
+        eve_bob_choice_list={}  ##Random Basis Choice for Above
+
+        
+
+        for bob_key in bob_entangled_key:
+            alice_key=alice_bob_map[bob_key]
+            if random.uniform(0, 1) <= 0.5:
+                eve_alice_choice_list[alice_key]=2
+                eve_bob_choice_list[bob_key]=2
+            else:
+                eve_alice_choice_list[alice_key]=3
+                eve_bob_choice_list[bob_key]=3
+          
+        
+        for info in alice.resource_manager.memory_manager:  
+            if info.state=='ENTANGLED': 
+                key=info.memory.qstate_key 
+                eve_alice_choice= eve_alice_choice_list[key]
+                eve_meas_results_alice[key]=self.measurement(qm_alice,eve_alice_choice,key)
+                
+       
+        for info in bob.resource_manager.memory_manager:
+            key=info.memory.qstate_key
+            if key in bob_entangled_key:
+                eve_bob_choice= eve_bob_choice_list[key]
+                eve_meas_results_bob[key]=self.measurement(qm_bob,eve_bob_choice,key)
+               
+       
+        return eve_meas_results_alice,eve_alice_choice_list,eve_meas_results_bob,eve_bob_choice_list
+        
+    
+    def chsh_correlation(self,alice_meas,bob_meas,alice_choice,bob_choice,bob_entangled_key,alice_bob_map):
 
         countA1B2=[0,0,0,0]
         countA1B4=[0,0,0,0]
@@ -93,38 +200,33 @@ class E91():
         countA3B4=[0,0,0,0]
         check_list = ['00','01','10','11']
         res=[]
-    
-        for i in range(len(alice_results)):
-            # res[i]=str(alice_results[i])+str(bob_results[i])
-            res.append((alice_results[i],bob_results[i]))
-        #print('reslist',res)
-        for i in range(n):
-            res2=''.join(map(str,res[i]))
-            #print('aa',res[i],res2,alice_choice[i],bob_choice[i])
-            if (alice_choice[i]==1 and bob_choice[i]==2):
+
+        for bob_key in bob_entangled_key:
+
+            bob_meas_i=list(bob_meas[bob_key].items())
+            alice_key=alice_bob_map[bob_key]
+            alice_meas_i=list(alice_meas[alice_key].items())
+
+            res2=str(alice_meas_i[0][1])+str(bob_meas_i[0][1])
+           
+            if (alice_choice[alice_key]==1 and bob_choice[bob_key]==2):
                 for j in range(4):
-                    # print('rs and check',res[i],check_list[j])
                     if res2 == check_list[j]:
                         countA1B2[j] +=1
-            if (alice_choice[i]==1 and bob_choice[i]==4):
+            if (alice_choice[alice_key]==1 and bob_choice[bob_key]==4):
                 for j in range(4):
                     if res2 == check_list[j]:
                         countA1B4[j] +=1
 
-            if (alice_choice[i]==3 and bob_choice[i]==2):
+            if (alice_choice[alice_key]==3 and bob_choice[bob_key]==2):
                 for j in range(4):
                     if res2 == check_list[j]:
                         countA3B2[j] +=1
             
-            if (alice_choice[i]==3 and bob_choice[i]==4):
+            if (alice_choice[alice_key]==3 and bob_choice[bob_key]==4):
                 for j in range(4):
                     if res2 == check_list[j]:
                         countA3B4[j] +=1
-
-        #print('countA1B2', countA1B2)
-        #print('countA1B4', countA1B4)
-        #print('countA3B2', countA3B2)
-        #print('countA3B4', countA3B4)
 
         total12=sum(countA1B2)
         total14=sum(countA1B4)
@@ -144,44 +246,181 @@ class E91():
             return 0
 
 
-    def run(self,alice,bob,n):
+    ####TODO: Generalise Eve's Access to qubits
+                ## All entangled qubits /only few entangled qubits
+                ## Only Alice or bob or Both
+    def eve_run(self,alice,bob,n):
+
+        alice,bob,alice_bob_map,bob_entangled_key=self.set_state_psi_minus(alice,bob)
+
+        eve_meas_alice,eve_alice_choice_list,eve_meas_bob,eve_bob_choice_list=self.eve_measurement(alice,bob,alice_bob_map, bob_entangled_key)
+
         alice_choice,alice_meas=self.alice_measurement(alice)
-        bob_choice,bob_meas=self.bob_measurement(bob)
+
+        bob_choice,bob_meas=self.bob_measurement(bob,bob_entangled_key)
+
         key_mismatch=0
-        alice_key,bob_key=[],[]
-        alice_results, bob_results =[],[]
-        #print('Alice Measurements',alice_meas)
-        #print('Bob Measuremenst', bob_meas)
-        for i in range(n):
-            alice_meas_i=list(alice_meas[i].items())
-            bob_meas_i=list(bob_meas[i].items())
-            alice_results.append(alice_meas_i[0][1]) 
-            bob_results.append(bob_meas_i[0][1])
-            #print("bob_results",bob_meas_i[0][1])
-            if (alice_choice[i]==2 and bob_choice[i]==2) or (alice_choice[i]==3 and bob_choice[i]==3):
-                #print('Base match',alice_meas[i],bob_meas[i])
-                alice_key.append(alice_meas_i[0][1])
-                bob_key.append(bob_meas_i[0][1])
+
+   
+        alice_keyl, bob_keyl,eve_keyl=[],[],[] ###Alice , Bob ,Eve Key List
+        alice_results,bob_results,eve_alice_results,eve_bob_results ={},{},{},{} ### Qubit Key <---> Meas results MAPs
+
+        for bob_key in bob_entangled_key:
+           
+            bob_meas_i=list(bob_meas[bob_key].items())
+            alice_key=alice_bob_map[bob_key]
+            alice_meas_i=list(alice_meas[alice_key].items())
+            eve_meas_bob_i=list(eve_meas_bob[bob_key].items())
+            eve_meas_alice_i=list(eve_meas_alice[alice_key].items())
+
+            if alice_meas_i[0][1]==0 and bob_meas_i[0][1] ==0:
+                alice_results[alice_key]=-1 
+                bob_results[bob_key]=-1
+
+            if alice_meas_i[0][1]==0 and bob_meas_i[0][1] ==1:
+                alice_results[alice_key]=1 
+                bob_results[bob_key]=-1
+
+            if alice_meas_i[0][1]==1 and bob_meas_i[0][1] ==0:
+                alice_results[alice_key]=-1 
+                bob_results[bob_key]=1
+
+            if alice_meas_i[0][1]==1 and bob_meas_i[0][1] ==1:
+                alice_results[alice_key]=1  
+                bob_results[bob_key]=1
+            
+            if eve_meas_alice_i[0][1]==0 and eve_meas_bob_i[0][1] ==0:
+                eve_alice_results[alice_key]=-1 
+                eve_bob_results[bob_key]=-1
+                
+            if eve_meas_alice_i[0][1]==0 and eve_meas_bob_i[0][1] ==1:
+                eve_alice_results[alice_key]=1 
+                eve_bob_results[bob_key]=-1
+                
+            if eve_meas_alice_i[0][1]==1 and eve_meas_bob_i[0][1] ==0:
+                eve_alice_results[alice_key]=-1 
+                eve_bob_results[bob_key]=1
+                
+            if eve_meas_alice_i[0][1]==1 and eve_meas_bob_i[0][1] ==1:
+                eve_alice_results[alice_key]=1 
+                eve_bob_results[bob_key]=1
+                
+
+            if (alice_choice[alice_key]==2 and bob_choice[bob_key]==2) or (alice_choice[alice_key]==3 and bob_choice[bob_key]==3):
+                print('Base match',alice_meas[alice_key],bob_meas[bob_key])
+                alice_keyl.append(alice_results[alice_key])
+                bob_keyl.append(-bob_results[bob_key])
+                eve_keyl.append([eve_alice_results[alice_key],eve_bob_results[bob_key]])
+
+        key_error=0
+        checkKeyIndexl=random.sample(range(1, len(alice_keyl)), int(0.2*len(alice_keyl)))
+        for j in checkKeyIndexl:
+            if alice_keyl[j] != bob_keyl[j]:
+                key_error= key_error+1
+           
+        keyLength=len(alice_keyl)
+        abKeyMismatches = 0 # number of mismatching bits in the keys of Alice and Bob
+        eaKeyMismatches = 0 # number of mismatching bits in the keys of Eve and Alice
+        ebKeyMismatches = 0 # number of mismatching bits in the keys of Eve and Bob
+
+        for j in range(len(alice_keyl)):
+            if alice_keyl[j] != bob_keyl[j]:
+                abKeyMismatches += 1
+            if eve_keyl[j][0]!= alice_keyl[j]:
+                eaKeyMismatches += 1
+            if eve_keyl[j][1]!= bob_keyl[j]:
+                ebKeyMismatches +=1
+
+            
+        eaKnowledge = (keyLength - eaKeyMismatches)/keyLength # Eve's knowledge of Bob's key
+        ebKnowledge = (keyLength - ebKeyMismatches)/keyLength
+          
+        print('Alice keys', alice_keyl)
+        print('Bob keys', bob_keyl)
+        print('Eve keys',eve_keyl)
+        print('Key length',len(alice_keyl))
+        print('ab Mismatched keys', abKeyMismatches)
+        print('ab check key error',key_error)
+        print('Eve\'s knowledge of Alice\'s key: ' + str(round(eaKnowledge * 100, 2)) + ' %')
+        print('Eve\'s knowledge of Bob\'s key: ' + str(round(ebKnowledge * 100, 2)) + ' %')  
+        chsh_value=self.chsh_correlation(alice_meas,bob_meas,alice_choice,bob_choice,bob_entangled_key,alice_bob_map)
+        print('Correlation value', chsh_value, round(chsh_value,2))
+        
+
+        res = {
+            "sender_keys": alice_keyl,
+            "receiver_keys": bob_keyl,
+            "keyLength": len(alice_keyl),
+            'mismatch': key_mismatch,
+            'correlation': str(round(chsh_value,3))
+        }
+        
+        return res
+
+
+    def run(self,alice,bob,n):
+
+        alice,bob,alice_bob_map,bob_entangled_key=self.set_state_psi_minus(alice,bob)
+        alice_choice,alice_meas=self.alice_measurement(alice)
+        bob_choice,bob_meas=self.bob_measurement(bob,bob_entangled_key)
+        key_mismatch=0
+        alice_keyl,bob_keyl=[],[]
+        alice_results, bob_results ={},{}
+        
+        print('Alice Measurements',alice_meas)
+        print('Alice choice',alice_choice)
+        print('Bob Measuremenst', bob_meas)
+        print('Bob choice',bob_choice)
+        print(bob_entangled_key)
+        print("e91 check",n)
+        
+        for bob_key in bob_entangled_key:
+
+            
+            
+            bob_meas_i=list(bob_meas[bob_key].items())
+            alice_key=alice_bob_map[bob_key]
+            alice_meas_i=list(alice_meas[alice_key].items())
+
+            if alice_meas_i[0][1]==0 and bob_meas_i[0][1] ==0:
+                alice_results[alice_key]=-1 
+                bob_results[bob_key]=-1
+            elif alice_meas_i[0][1]==0 and bob_meas_i[0][1] ==1:
+                alice_results[alice_key]=1 
+                bob_results[bob_key]=-1
+            elif alice_meas_i[0][1]==1 and bob_meas_i[0][1] ==0:
+                alice_results[alice_key]=-1 
+                bob_results[bob_key]=1
+            elif alice_meas_i[0][1]==1 and bob_meas_i[0][1] ==1:
+                alice_results[alice_key]=1  
+                bob_results[bob_key]=1
+            
+            if (alice_choice[alice_key]==2 and bob_choice[bob_key]==2) or (alice_choice[alice_key]==3 and bob_choice[bob_key]==3):
+                print('Base match',alice_meas[alice_key],bob_meas[bob_key])
+                alice_keyl.append(alice_results[alice_key])
+                bob_keyl.append(-bob_results[bob_key])
         
     
-        for j in range(len(alice_key)):
-            if alice_key[j] != bob_key[j]:
+        for j in range(len(alice_keyl)):
+            if alice_keyl[j] != bob_keyl[j]:
                 key_mismatch += 1
-        #print('Alice choicec',alice_choice)
-        #print('Bob choicec',bob_choice)
-        #print('Alice results',alice_results)
-        #print('Bob results',bob_results)
-        print('Alice keys', alice_key)
-        print('Bob keys', bob_key)
-        print('Key length',len(alice_key))
+       
+        print('Alice keys', alice_keyl)
+        print('Bob keys', bob_keyl)
+        print('Alice res', alice_results)
+        print('Bob res', bob_results)
         print('Mismatched keys', key_mismatch)
-        chsh_value=self.chsh_correlation(alice_results,bob_results,alice_choice,bob_choice,n)
-        print('Correlation value', round(chsh_value,3))
+        chsh_value=self.chsh_correlation(alice_meas,bob_meas,alice_choice,bob_choice,bob_entangled_key,alice_bob_map)
+        print('Correlation value', chsh_value, round(chsh_value,3))
         
+
+        alice_msg="qulabs"
+        
+      
         res = {
-            "sender_keys": alice_key,
-            "receiver_keys": bob_key,
-            "keyLength": len(alice_key),
+            "sender_keys": alice_keyl,
+            "receiver_keys": bob_keyl,
+            "keyLength": len(alice_keyl),
             'mismatch': key_mismatch,
             'correlation': str(round(chsh_value,3))
         }
@@ -195,42 +434,122 @@ class E91():
 # TODO: support on Qutip 
 # key_length(Type : Integer ) should be <50 and >0
 # virtual liks : [{"sender": a, "reveiver": b, "demand": 50}]
+def set_parameters(topology):
+   
+   MEMO_FREQ = 2e4
+   MEMO_EXPIRE = 0
+   MEMO_EFFICIENCY = 1
+   MEMO_FIDELITY = 0.9349367588934053
+   for node in topology.get_nodes_by_type("EndNode"):
+      node.memory_array.update_memory_params("frequency", MEMO_FREQ)
+      node.memory_array.update_memory_params("coherence_time", MEMO_EXPIRE)
+      node.memory_array.update_memory_params("efficiency", MEMO_EFFICIENCY)
+      node.memory_array.update_memory_params("raw_fidelity", MEMO_FIDELITY)
+   
+   for node in topology.get_nodes_by_type("ServiceNode"):
+      node.memory_array.update_memory_params("frequency", MEMO_FREQ)
+      node.memory_array.update_memory_params("coherence_time", MEMO_EXPIRE)
+      node.memory_array.update_memory_params("efficiency", MEMO_EFFICIENCY)
+      node.memory_array.update_memory_params("raw_fidelity", MEMO_FIDELITY)
+
+
+   DETECTOR_EFFICIENCY = 0.9
+   DETECTOR_COUNT_RATE = 5e7
+   DETECTOR_RESOLUTION = 100
+   for node in topology.get_nodes_by_type("BSMNode"):
+      node.bsm.update_detectors_params("efficiency", DETECTOR_EFFICIENCY)
+      node.bsm.update_detectors_params("count_rate", DETECTOR_COUNT_RATE)
+      node.bsm.update_detectors_params("time_resolution", DETECTOR_RESOLUTION)
+      
+
+   SWAP_SUCC_PROB = 0.9
+   SWAP_DEGRADATION = 0.99
+
+   ATTENUATION = 1e-5
+   QC_FREQ = 1e11
+   for qc in topology.qchannels:
+      qc.attenuation = ATTENUATION
+      qc.frequency = QC_FREQ
 
 
 
 # path (Type : String) -Path to config Json file
 """
 def e91(backend,path,sender,receiver,key_length):
-
-    from qntsim.kernel.timeline import Timeline 
-    Timeline.DLCZ=False
-    Timeline.bk=True
-    from qntsim.topology.topology import Topology
-
-    tl = Timeline(20e12,backend)
-    network_topo = Topology("network_topo", tl)
-    network_topo.load_config(path)
-    if key_length<50 and key_length>0:
-        n=int((9*key_length)/2)
-        alice=network_topo.nodes[sender]
-        bob = network_topo.nodes[receiver]
-        e91=E91()
-        alice,bob=e91.roles(alice,bob,n)
-        tl.init()
-        tl.run()  
-        e91.run(alice,bob,n)
-
-e91("Qiskit", "../example/3node.json", "a", "b", 8)
-"""
+    trials=5
+    while (trials>0):
+        from qntsim.kernel.timeline import Timeline 
+        Timeline.DLCZ=False
+        Timeline.bk=True
+        from qntsim.topology.topology import Topology
+        tl = Timeline(20e12,backend)
+        network_topo = Topology("network_topo", tl)
+        network_topo.load_config(path)
+        set_parameters(network_topo)
+        if key_length<30 and key_length>0:
+            #n=int((9*key_length)/2)
+            n=int(8*key_length)
+            alice=network_topo.nodes[sender]
+            bob = network_topo.nodes[receiver]
+            e91=E91()
+            alice,bob=e91.roles(alice,bob,n)
+            tl.init()
+            tl.run()  
+            res=e91.run(alice,bob,n)
+            if key_length<=len(res["sender_keys"]):
+                res1 = {
+                "sender_keys": res["sender_keys"][:key_length],
+                "receiver_keys": res["receiver_keys"][:key_length],
+                "keyLength": key_length,
+                'mismatch': res['mismatch'],
+                'correlation': res['correlation']
+                }
+                print("res1",res1)
+                return res1
+        
+        trails=trails-1
+def eve_e91(backend,path,sender,receiver,key_length):
+    trials=5
+    while (trials>0):
+        from qntsim.kernel.timeline import Timeline 
+        Timeline.DLCZ=False
+        Timeline.bk=True
+        from qntsim.topology.topology import Topology
+        tl = Timeline(20e12,backend)
+        network_topo = Topology("network_topo", tl)
+        network_topo.load_config(path)
+        set_parameters(network_topo)
+        if key_length<51 and key_length>0:
+            #n=int((9*key_length)/2)
+            n=int(8*key_length)
+            alice=network_topo.nodes[sender]
+            bob = network_topo.nodes[receiver]
+            e91=E91()
+            alice,bob=e91.roles(alice,bob,n)
+            tl.init()
+            tl.run()  
+            res=e91.eve_run(alice,bob,n)
+            if key_length<=len(res["sender_keys"]):
+                res1 = {
+                "sender_keys": res["sender_keys"][:key_length],
+                "receiver_keys": res["receiver_keys"][:key_length],
+                "keyLength": key_length,
+                'mismatch': res['mismatch'],
+                'correlation': res['correlation']
+                }
+                print("res1",res1)
+                return res1
+        
+        trials=trials-1
+eve_e91("Qutip", "/home/bhanusree/Desktop/QNTv1/QNTSim-Demo/QNTSim/example/3node.json", "a", "s1", 10)
 # jsonConfig (Type : Json) -Json Configuration of network 
-
+"""
+"""
 def e91(backend,jsonConfig,sender,receiver,key_length):
-
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
     Timeline.bk=True
     from qntsim.topology.topology import Topology
-
     tl = Timeline(20e12,backend)
     network_topo = Topology("network_topo", tl)
     network_topo.load_config_json(jsonConfig)
@@ -247,7 +566,6 @@ def e91(backend,jsonConfig,sender,receiver,key_length):
 """
 """
 conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
-
 memo = {"frequency": 2e3, "expiry": 0, "efficiency": 1, "fidelity": 1}
 node1 = {"Name": "N1", "Type": "end", "noOfMemory": 50, "memory":memo}
 node2 = {"Name": "N2", "Type": "end", "noOfMemory": 50, "memory":memo}
@@ -255,12 +573,10 @@ node3 = {"Name": "N3", "Type": "service", "noOfMemory": 50, "memory":memo}
 conf["nodes"].append(node1)
 conf["nodes"].append(node2)
 conf["nodes"].append(node3)
-
 qc1 = {"Nodes": ["N1", "N3"], "Attenuation": 1e-5, "Distance": 70}
 qc2 = {"Nodes": ["N2", "N3"], "Attenuation": 1e-5, "Distance": 70}
 conf["quantum_connections"].append(qc1)
 conf["quantum_connections"].append(qc2)
-
 cc11 = {"Nodes": ["N1", "N1"], "Delay": 0, "Distance": 0}
 cc22 = {"Nodes": ["N2", "N2"], "Delay": 0, "Distance": 0}
 cc33 = {"Nodes": ["N3", "N3"], "Delay": 0, "Distance": 0}
@@ -277,27 +593,23 @@ conf["classical_connections"].append(cc12)
 conf["classical_connections"].append(cc13)
 conf["classical_connections"].append(cc23)
 conf["classical_connections"].append(cc21)
-# conf["classical_connections"].append(cc31)
+conf["classical_connections"].append(cc31)
 conf["classical_connections"].append(cc32)
-
 e91("Qiskit", conf, "N1", "N2", 8)
-
-
-
 # from qntsim.kernel.timeline import Timeline 
 # Timeline.DLCZ=False
 # Timeline.bk=True
 # from qntsim.topology.topology import Topology
-
 # tl1 = Timeline(20e12,"Qiskit")
 # network_topo = Topology("network_topo", tl1)
 # network_topo.load_config("test.json")
 # print('network_topo ', network_topo.__dict__["_cc_graph"])
-
 # print("========================================================")
 # tl2 = Timeline(20e12,"Qiskit")
 # network_topo_json = Topology("network_topo_json", tl2)
 # network_topo_json.load_config_json(conf)
 # print('network_topo_json ',network_topo_json.__dict__["_cc_graph"])
-# conf={'nodes': [{'Name': 'n1', 'Type': 'end', 'noOfMemory': 500, 'memory': {'frequency': 2000, 'expiry': 2000, 'efficiency': 0, 'fidelity': 0.93}}, {'Name': 'n2', 'Type': 'service', 'noOfMemory': 500, 'memory': {'frequency': 2000, 'expiry': 2000, 'efficiency': 0, 'fidelity': 0.93}}], 'quantum_connections': [{'Nodes': ['n1', 'n2'], 'Attenuation': 1e-05, 'Distance': 70}], 'classical_connections': [{'Nodes': ['n1', 'n1'], 'Delay': 0, 'Distance': 1000}, {'Nodes': ['n1', 'n2'], 'Delay': 1000000000, 'Distance': 1000}, {'Nodes': ['n2', 'n1'], 'Delay': 1000000000, 'Distance': 1000}, {'Nodes': ['n2', 'n2'], 'Delay': 0, 'Distance': 1000}]}
-# e91("Qiskit", conf, "n1", "n2", 8)
+"""
+
+#conf={'nodes': [{'Name': 'n1', 'Type': 'end', 'noOfMemory': 500, 'memory': {'frequency': 2000, 'expiry': 2000, 'efficiency': 0, 'fidelity': 0.93}}, {'Name': 'n2', 'Type': 'service', 'noOfMemory': 500, 'memory': {'frequency': 2000, 'expiry': 2000, 'efficiency': 0, 'fidelity': 0.93}}], 'quantum_connections': [{'Nodes': ['n1', 'n2'], 'Attenuation': 1e-05, 'Distance': 70}], 'classical_connections': [{'Nodes': ['n1', 'n1'], 'Delay': 0, 'Distance': 1000}, {'Nodes': ['n1', 'n2'], 'Delay': 1000000000, 'Distance': 1000}, {'Nodes': ['n2', 'n1'], 'Delay': 1000000000, 'Distance': 1000}, {'Nodes': ['n2', 'n2'], 'Delay': 0, 'Distance': 1000}]}
+#e91("Qiskit", conf, "n1", "n2", 8)

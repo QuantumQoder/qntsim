@@ -17,7 +17,8 @@ class IP1():
 
     def request_entanglements(self,sender,receiver,n=50):
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.5,5e12)
-        return sender,receiver
+        source_node_list=[sender.name]
+        return sender,receiver,source_node_list
 
     def roles(self,alice,bob,n):
         sender=alice
@@ -395,11 +396,7 @@ def ip1(path,sender,receiver,message):
     tl.run()  
     res = ip1.run(alice,bob,message)
     print(res)
-
-
-
 # jsonConfig (Type : Json) -Json Configuration of network 
-
 def ip1(jsonConfig,sender,receiver,message):
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
@@ -417,10 +414,7 @@ def ip1(jsonConfig,sender,receiver,message):
     tl.init()
     tl.run()  
     ip1.run(alice,bob,message)
-
-
 conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
-
 memo = {"frequency": 2e3, "expiry": 0, "efficiency": 1, "fidelity": 1}
 node1 = {"Name": "N1", "Type": "end", "noOfMemory": 50, "memory":memo}
 node2 = {"Name": "N2", "Type": "end", "noOfMemory": 50, "memory":memo}
@@ -428,12 +422,10 @@ node3 = {"Name": "N3", "Type": "service", "noOfMemory": 50, "memory":memo}
 conf["nodes"].append(node1)
 conf["nodes"].append(node2)
 conf["nodes"].append(node3)
-
 qc1 = {"Nodes": ["N1", "N3"], "Attenuation": 1e-5, "Distance": 70}
 qc2 = {"Nodes": ["N2", "N3"], "Attenuation": 1e-5, "Distance": 70}
 conf["quantum_connections"].append(qc1)
 conf["quantum_connections"].append(qc2)
-
 cc1 = {"Nodes": ["N1", "N1"], "Delay": 0, "Distance": 0}
 cc1 = {"Nodes": ["N2", "N2"], "Delay": 0, "Distance": 0}
 cc1 = {"Nodes": ["N3", "N3"], "Delay": 0, "Distance": 0}
@@ -443,6 +435,5 @@ cc23 = {"Nodes": ["N2", "N3"], "Delay": 1e9, "Distance": 1e3}
 conf["classical_connections"].append(cc12)
 conf["classical_connections"].append(cc13)
 conf["classical_connections"].append(cc23)
-
 ip1( conf, "N1", "N2", "010010")
 """

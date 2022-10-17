@@ -1,82 +1,65 @@
+#nodelist is list of unique source nodes of entanglement requests
+#nodelist=['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9']
 
 
 
-templist=['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9']
+def throughput(network_topo,nodelist,t,fc_throughl,pc_throughl,nc_throughl):
+    
+    ctotal , pc , rj , ap = 0,0,0,0
 
-fc_throughl,pc_throughl,nc_throughl=[],[],[]
-
-
-def throughput(network_topo,t,templist):
-
-    csuccess , cfullcomplete , cpartialcomplete , NC , ctotal , pc , inc , rc , ap = 0,0,0,0,0,0,0,0,0
-
-    for src in templist:
+    for src in nodelist:
 
         src=src
-        #if time == t:
-            #ctotal +=1
-            #flag=False
-           
-            
-        for ReqId,ResObj in network_topo.nodes[src].network_manager.requests.items():
-            #print('iiiiii',ReqId, ResObj.status)
-            temp=False
-            tsize=0
+        print(t,network_topo.nodes[src].network_manager.requests.items())
 
+        for ReqId,ResObj in network_topo.nodes[src].network_manager.requests.items():
             if ResObj.start_time>=t*1e12 and ResObj.start_time< (t+1)*1e12 :
-                ctotal+=1
-                print("\n") 
+                ctotal+=1 
                 #print("requests ,src ,resobj id ,dst",src, ResObj.initiator,ResObj.responder, ResObj.start_time,ReqId,network_topo.nodes[src].network_manager.requests.items())
                 #print("network map example ,src ,resobj id ",src,ReqId,network_topo.nodes[src].network_manager.networkmap)
-                #print("example check",ReqId in network_topo.nodes[src].network_manager.networkmap.keys())
                 if ReqId in network_topo.nodes[src].network_manager.networkmap.keys():
                     
-                    #ctotal+=1
                     
                     if ResObj.isvirtual:
                         continue
 
-                    #if ResObj.start_time*1e-12 != t:
-                        #continue
-                
                     if ResObj.status=='PARTIALCOMPLETE':
-                        pc +=1
+                        pc +=1 
 
-                    #elif ResObj.status=='INCOMPLETE':
-                        #inc +=1
-                
                     elif ResObj.status=='REJECT':
-                        rc +=1
+                        rj +=1
                     
                     elif ResObj.status=='APPROVED':
                         ap +=1
                                         
                 print("through put map , src ",src,network_topo.nodes[src].resource_manager.reservation_id_to_memory_map)
                 
-    ctotal1=pc+ap+rc           
+    ctotal1=pc+ap+rj           
     print("\n")
-    print(f'At {t} secs ctotal:{ctotal} pc:{pc},fc:{ap},nc:{rc}')
+    print(f'At {t} secs ctotal:{ctotal} pc:{pc},fc:{ap},nc:{rj}')
+    
     
     try:
-        #thru=(csuccess)/(ctotal)
-        #print(f'Throughput = {thru*100}%')
         pc_through=(pc)/(ctotal)
         pc_throughl.append(pc_through*100)
-        nc_through=(rc)/(ctotal)
+        nc_through=(rj)/(ctotal)
         nc_throughl.append(nc_through*100)
         fc_through=(ap)/(ctotal)
         fc_throughl.append(fc_through*100)
         print(f' pc_through:{pc_through*100}%,nc_through:{nc_through*100}%,fc_through:{fc_through*100}%')
-    
+        return fc_throughl , pc_throughl , nc_throughl 
+
     except ZeroDivisionError:
         fc_throughl.append(0)
         pc_throughl.append(0)
         nc_throughl.append(0)
-        print(f'No Requests at {t} secs')          
+        print(f'No Requests at {t} secs') 
+        return fc_throughl , pc_throughl , nc_throughl         
                 
 
 
-def throughput_cal():
+def throughput_cal(fc_throughl,pc_throughl,nc_throughl):
+    
     import matplotlib.pyplot as plt
 
     y=[]
@@ -106,84 +89,103 @@ def throughput_cal():
     #print("node",node.name)
 #templist=['v0','v1','v2','v3','v4']
 
-nodelist=['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9']
+#nodelist=['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9']
 
-def calctime(network_topo):
+def calclatency(network_topo,nodelist,t,latencyl):
         
     time=[]
 
     for node in nodelist:
 
-        src=node.name
+        src=node
         
         for ReqId,ResObj in network_topo.nodes[src].network_manager.requests.items():
-            if ResObj.isvirtual:
-                continue
-            starttime=ResObj.start_time*1e-12
-            
-            maxtime=0
-            print('Starttime', starttime,ResObj.initiator, ResObj.responder)
-            #print('check',network_topo.nodes[src].resource_manager.reservation_id_to_memory_map.keys())
-            if ReqId in network_topo.nodes[src].resource_manager.reservation_id_to_memory_map.keys():
-                #memId=self.nodes[node].resource_manager.reservation_to_memory_map.get(ReqId)
-                memId = network_topo.nodes[src].resource_manager.reservation_id_to_memory_map.get(ReqId)
-                print(memId)
-                
-                for info in network_topo.nodes[src].resource_manager.memory_manager:
-                    ###need to check these changes
-                    if info.index in memId and info.entangle_time > maxtime and info.entangle_time != 20 and info.state =='ENTANGLED':
-                        #print('ddd',info.entangle_time)
-                        maxtime=info.entangle_time*1e-12
 
-            latency=maxtime-starttime
-            if latency > 0 :
-                time.append(latency)
-            
+            if ResObj.start_time>=t*1e12 and ResObj.start_time<(t+1)*1e12 :
+
+                if ResObj.isvirtual:
+                    continue
+                starttime=ResObj.start_time*1e-12
+                
+                maxtime=0
+                print('Starttime', starttime,ResObj.initiator, ResObj.responder)
+                #print('check',network_topo.nodes[src].resource_manager.reservation_id_to_memory_map.keys())
+                if ReqId in network_topo.nodes[src].resource_manager.reservation_id_to_memory_map.keys():
+                    #memId=self.nodes[node].resource_manager.reservation_to_memory_map.get(ReqId)
+                    memId = network_topo.nodes[src].resource_manager.reservation_id_to_memory_map.get(ReqId)
+                    print(memId)
+                    
+                    for info in network_topo.nodes[src].resource_manager.memory_manager:
+                        ###need to check these changes
+                        if info.index in memId and info.entangle_time > maxtime and info.entangle_time != 20 and info.state =='ENTANGLED':
+                            #print('ddd',info.entangle_time)
+                            maxtime=info.entangle_time*1e-12
+
+                latency=maxtime-starttime
+                if latency > 0 :
+                    time.append(latency)
+    
+       
+
     if len(time)>0:
         avgtime=sum(time)/len(time)
         print('Average latency',avgtime)
+        latencyl.append(avgtime)
+        return latencyl
+        
     else:
         print('Exception error No entanglements')
+        latencyl.append(-1)
+        return latencyl
+       
 
 
 
-def calcfidelity(network_topo):
+#Method to calculate average fidelity
 
+def calcfidelity(network_topo,nodelist,t,fidelityl):
 
+    """
+    Method to calculate average fidelity 
+    """
     import math
+    
     fid=[]
 
     for node in nodelist:
 
-        src=node.name
+        src=node
         
         for ReqId,ResObj in network_topo.nodes[src].network_manager.requests.items():
 
-            if ResObj.isvirtual:
-                continue
+            if ResObj.start_time>=t*1e12 and ResObj.start_time<(t+1)*1e12 :
 
-            minfid =math.inf
+                if ResObj.isvirtual:
+                    continue
 
-            if ReqId in network_topo.nodes[src].resource_manager.reservation_id_to_memory_map.keys():
+                minfid =math.inf
 
-                memId = network_topo.nodes[src].resource_manager.reservation_id_to_memory_map.get(ReqId)
-                print(memId)
-                
-                for info in network_topo.nodes[src].resource_manager.memory_manager:
+                if ReqId in network_topo.nodes[src].resource_manager.reservation_id_to_memory_map.keys():
 
-                    if info.index in memId and info.state == 'ENTANGLED' and info.fidelity<minfid:
-                        minfid= info.fidelity
+                    memId = network_topo.nodes[src].resource_manager.reservation_id_to_memory_map.get(ReqId)
+                    print(memId)
+                    
+                    for info in network_topo.nodes[src].resource_manager.memory_manager:
 
-            if minfid!=math.inf:
-                fid.append(minfid)
+                        if info.index in memId and info.state == 'ENTANGLED' and info.fidelity<minfid:
+                            minfid= info.fidelity
 
+                if minfid!=math.inf:
+                    fid.append(minfid)
+    
+    
     if len(fid)>0:
 
         avgfid=sum(fid)/len(fid)
         print("avgfid",avgfid)
-        return avgfid
+        fidelityl.append(avgfid)
+        return fidelityl
     else:
         print("exception error no entangled states")
-
-
-
+        fidelityl.append(-1)
+        return fidelityl

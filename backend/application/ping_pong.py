@@ -26,7 +26,8 @@ class PingPong():
     
     def request_entanglements(self,sender,receiver,n):
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.5,5e12)
-        return sender,receiver
+        source_node_list=[sender.name]
+        return sender,receiver,source_node_list
 
     def roles(self,alice,bob,n):
         sender=alice
@@ -237,7 +238,7 @@ class PingPong():
             n = n+1
             print(" whil n",n,len(message))
 
-            result, round_num = self.one_bit_ping_pong(message[n-1], c, sequence_length, entangled_keys, round_num)
+            result, round_num = self.one_bit_ping_pong(message[n-1], c,1, entangled_keys, round_num)
 
             if(result == -1): 
                 print("Protocol doesn't run because of the aforesaid mistakes!")
@@ -286,8 +287,7 @@ class PingPong():
 
 # path (Type : String) -Path to config Json file
 """
-def ping_pong(path,sender,receiver,sequence_length,message):
-
+def ping_pong1(path,sender,receiver,sequence_length,message):
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
     Timeline.bk=True
@@ -307,12 +307,9 @@ def ping_pong(path,sender,receiver,sequence_length,message):
         pp.create_key_lists(alice,bob)
         res = pp.run(sequence_length,message)
         print(res)
-
-
+#ping_pong("/home/bhanusree/Desktop/QNTv1/QNTSim-Demo/QNTSim/example/4node.json","a","b",1,"0101")
 # jsonConfig (Type : Json) -Json Configuration of network 
-
 def ping_pong(jsonConfig,sender,receiver,sequence_length,message):
-
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
     Timeline.bk=True
@@ -321,33 +318,31 @@ def ping_pong(jsonConfig,sender,receiver,sequence_length,message):
     tl = Timeline(20e12,"Qutip")
     network_topo = Topology("network_topo", tl)
     network_topo.load_config_json(jsonConfig)
-    if len(message)<=9:
-        n=int(sequence_length*len(message))
-        alice=network_topo.nodes[sender]
-        bob = network_topo.nodes[receiver]
-        pp=PingPong()
-        alice,bob=pp.roles(alice,bob,n)
-        tl.init()
-        tl.run() 
-        pp.create_key_lists(alice,bob)
-        res = pp.run(sequence_length,message)
-        print(res)
-
+    
+    n=int(sequence_length)*len(message)
+    alice=network_topo.nodes[sender]
+    bob = network_topo.nodes[receiver]
+    pp=PingPong()
+    alice,bob=pp.roles(alice,bob,2*n)
+    tl.init()
+    tl.run() 
+    pp.create_key_lists(alice,bob)
+    res = pp.run(sequence_length,message)
+    print(res)
+   
+    
 conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
-
 memo = {"frequency": 2e3, "expiry": 0, "efficiency": 1, "fidelity": 1}
-node1 = {"Name": "N1", "Type": "end", "noOfMemory": 50, "memory":memo}
-node2 = {"Name": "N2", "Type": "end", "noOfMemory": 50, "memory":memo}
-node3 = {"Name": "N3", "Type": "service", "noOfMemory": 50, "memory":memo}
+node1 = {"Name": "N1", "Type": "end", "noOfMemory": 500, "memory":memo}
+node2 = {"Name": "N2", "Type": "end", "noOfMemory": 500, "memory":memo}
+node3 = {"Name": "N3", "Type": "service", "noOfMemory": 500, "memory":memo}
 conf["nodes"].append(node1)
 conf["nodes"].append(node2)
 conf["nodes"].append(node3)
-
 qc1 = {"Nodes": ["N1", "N3"], "Attenuation": 1e-5, "Distance": 70}
 qc2 = {"Nodes": ["N2", "N3"], "Attenuation": 1e-5, "Distance": 70}
 conf["quantum_connections"].append(qc1)
 conf["quantum_connections"].append(qc2)
-
 cc1 = {"Nodes": ["N1", "N1"], "Delay": 0, "Distance": 0}
 cc1 = {"Nodes": ["N2", "N2"], "Delay": 0, "Distance": 0}
 cc1 = {"Nodes": ["N3", "N3"], "Delay": 0, "Distance": 0}
@@ -357,7 +352,5 @@ cc23 = {"Nodes": ["N2", "N3"], "Delay": 1e9, "Distance": 1e3}
 conf["classical_connections"].append(cc12)
 conf["classical_connections"].append(cc13)
 conf["classical_connections"].append(cc23)
-
-ping_pong( conf, "N1", "N2", 4 ,"01001010")
-
+ping_pong( conf, "N1", "N2", 4 ,"010010100000111000010001111111")
 """
