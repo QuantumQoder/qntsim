@@ -366,6 +366,9 @@ class E91():
         key_mismatch=0
         alice_keyl,bob_keyl=[],[]
         alice_results, bob_results ={},{}
+        alicechoice , bobchoice = [],[]
+        aliceresults ,bobresults = [],[]
+
         
         print('Alice Measurements',alice_meas)
         print('Alice choice',alice_choice)
@@ -399,6 +402,13 @@ class E91():
                 print('Base match',alice_meas[alice_key],bob_meas[bob_key])
                 alice_keyl.append(alice_results[alice_key])
                 bob_keyl.append(-bob_results[bob_key])
+            
+            alicechoice.append(alice_choice[alice_key])
+            aliceresults.append(alice_results[alice_key])
+            bobchoice.append(bob_choice[bob_key])
+            bobresults.append(bob_results[bob_key])
+
+            ###TODO:For binary key replace -1 with 0 in measurement results
         
     
         for j in range(len(alice_keyl)):
@@ -418,6 +428,10 @@ class E91():
         
       
         res = {
+            "sender_basis_list":alicechoice,
+            "sender_meas_list":aliceresults,
+            "receiver_basis_list":bobchoice,
+            "receiver_meas_list":bobresults,
             "sender_keys": alice_keyl,
             "receiver_keys": bob_keyl,
             "keyLength": len(alice_keyl),
