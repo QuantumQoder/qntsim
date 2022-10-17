@@ -17,7 +17,7 @@ class RunApp(APIView):
         topology = json.loads(request.POST['topology'])
         application = request.POST['application']
         appSettings = json.loads(request.POST['appSettings'])
-        
+        # Add check for getting application id and extracting name.
         print(f"Running applications: {application}")
         print('request user', request.user.username, request.user.id)
         results = {}
@@ -37,6 +37,7 @@ class RunApp(APIView):
         elif application == "teleportation":
             results = teleportation(topology, appSettings["sender"], appSettings["receiver"], complex(appSettings["amplitude1"]), complex(appSettings["amplitude2"]) )
 
+        # Add code for results here
         
         res = Results.objects.create(user = request.user, topology = topology, app_name = application, input =appSettings, output = results)
         res.save()
