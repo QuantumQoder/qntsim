@@ -41,9 +41,9 @@ def network_graph(network_topo,source_node_list,report):
     graph["latency"]    = latencyl
     graph["fidelity"]   = fidelityl
     graph["throughput"] = {}
-    graph["throughput"]["fc"]= fc_throughl  
-    graph["throughput"]["pc"]= pc_throughl
-    graph["throughput"]["nc"]= nc_throughl          #{fc_throughl,pc_throughl,nc_throughl}
+    graph["throughput"]["fully_complete"]= fc_throughl  
+    graph["throughput"]["partially_complete"]= pc_throughl
+    graph["throughput"]["rejected"]= nc_throughl        #{fc_throughl,pc_throughl,nc_throughl}
     graph["time"] = timel
     report["graph"] =graph
     print(report)
