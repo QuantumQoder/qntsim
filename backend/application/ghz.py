@@ -78,10 +78,10 @@ class GHZ():
 
     def run(self,alice,bob,charlie,middlenode):
 
-        qm_alice,alice_key,state=self.alice_keys(alice)
-        #print('Alice',qm_alice,alice_key,state)
-        qm_bob,bob_key,state=self.bob_keys(bob)
-        qm_charlie,charlie_key,state=self.charlie_keys(charlie)
+        qm_alice,alice_key,ialicestate=self.alice_keys(alice)
+        print('Alicerun',qm_alice,alice_key,ialicestate.state)
+        qm_bob,bob_key,ibobstate=self.bob_keys(bob)
+        qm_charlie,charlie_key,icharliestate=self.charlie_keys(charlie)
         qm_middle,middle_key,state,middle_entangled_keys=self.middle_keys(middlenode)
 
         circ = QutipCircuit(3)
@@ -99,13 +99,15 @@ class GHZ():
         print("\nGHZ State bob\n",  qm_middle.get(bob_key).state)
         print("\nGHZ State charlie\n",  qm_middle.get(charlie_key).state)
         res = {
+            "initial_alice_state":ialicestate.state,          
+            "initial_bob_state":ibobstate.state,
+            "initial_charlie_state":icharliestate.state,          
+            "final_alice_state":qm_alice.get(alice_key).state ,
+            "final_bob_state": qm_bob.get(bob_key).state,
+            "final_charlie_state":qm_charlie.get(charlie_key).state,
             
-            "alice_state":qm_middle.get(alice_key).state ,
-            "bob_state": qm_middle.get(bob_key).state,
-            "charlie_state":qm_middle.get(charlie_key).state,
-            "ghz_state" : ghz_state
         }
-
+        #print(res)
         return res
         # print("Output", output, qm_middle.get(alice_key))
 
@@ -176,34 +178,11 @@ def ghz(jsonConfig,endnode1,endnode2,endnode3,middlenode):
     middlenode=network_topo.nodes[middlenode]
     ghz= GHZ()
     alice,bob,charlie,middlenode,source_node_list=ghz.roles(alice,bob,charlie,middlenode)
-    print(source_node_list)
     tl.init()
     tl.run()  
-    ghz.run(alice,bob,charlie,middlenode)
     res = ghz.run(alice,bob,charlie,middlenode)
     
-    t=1
-    timel ,fidelityl,latencyl,fc_throughl,pc_throughl,nc_throughl=[],[],[],[],[],[]
-    while t < 20:
-        fidelityl= utils.calcfidelity (network_topo,source_node_list,t,fidelityl)
-        
-        latencyl= utils.calclatency(network_topo,source_node_list,t,latencyl)
-        fc_throughl,pc_throughl,nc_throughl= utils.throughput(network_topo,source_node_list,t,fc_throughl,pc_throughl,nc_throughl)
-        t=t+1
-        timel.append(t)
-    
-    graph["latency"]    = latencyl
-    graph["fidelity"]   = fidelityl
-    graph["throughput"] = {}
-    graph["throughput"]["fc"]= fc_throughl  
-    graph["throughput"]["pc"]= pc_throughl
-    graph["throughput"]["nc"]= nc_throughl              #{fc_throughl,pc_throughl,nc_throughl}
-    graph["time"] = timel
-    
-    report["application"]=res
-    report["graph"]=graph
-    
-    print(report)
+    return res
 conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
 memo = {"frequency": 2e3, "expiry": 0, "efficiency": 1, "fidelity": 1}
 node1 = {"Name": "N1", "Type": "end", "noOfMemory": 50, "memory":memo}
