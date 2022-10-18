@@ -101,14 +101,17 @@ class Teleportation():
         
 
     def bob_gates(self,crz,crx,case,bob):
-
+        
+        gatesl=[]
         qm_bob,key,state=self.bob_keys(bob)
         if case=="psi+":
             circ=QutipCircuit(1)
             if crx==1:
                 circ.x(0)
+                gatesl.append('x')
             if crz==1:
                 circ.z(0)
+                gatesl.append('z')
                 #circ.measure(0)
             
         if case=="-psi+":
@@ -118,33 +121,46 @@ class Teleportation():
                 circ.x(0)
                 circ.z(0)
                 circ.x(0)
+                gatesl=['z','x','z','x']
+
                 #circ.measure(0)
             elif crz==0 and crx==1:
                 circ.z(0)
                 circ.x(0)
-                circ.z(0)   
+                circ.z(0)  
+                gatesl=['z','x','z']
+
             elif crz==1 and crx==0:
                 circ.x(0)
                 circ.z(0)
                 circ.x(0)
+                gatesl=['x','z','x']
+
             elif crz==1 and crx==1:
                 circ.z(0)
                 circ.x(0)
+                gatesl=['z','x']
 
         if case=="psi-":
             circ=QutipCircuit(1)
             if crz==0 and crx==0:
                 circ.z(0)
-                #circ.measure(0)
+                gatesl=['z']
+
             elif crz==0 and crx==1:  
                 circ.z(0)
                 circ.x(0)
+                gatesl=['z','x']
+
             elif crz==1 and crx==0:
+                gatesl=[]
                 pass
+
             elif crz==1 and crx==1:
                 circ.z(0)
                 circ.x(0)
                 circ.z(0)
+                gatesl=['z','x','z']
 
         if case=="-psi-":
             circ=QutipCircuit(1)
@@ -153,28 +169,39 @@ class Teleportation():
                 circ.z(0)
                 circ.x(0)
                 #circ.measure(0)
+                gatesl=['x','z','x']
+
             elif crz==0 and crx==1:
                 circ.x(0)
                 circ.z(0)
+                gatesl=['x','z']
+
             elif crz==1 and crx==0:
                 circ.z(0)
                 circ.x(0)
                 circ.z(0)
                 circ.x(0)
+                gatesl=['z','x','z','x']
+
             elif crz==1 and crx==1:
                 circ.x(0)
+                gatesl=['x']
 
         if case=="phi+":
             circ=QutipCircuit(1)
             if crz==0 and crx==0:
-                circ.x(0)    
+                circ.x(0)
+                gatesl=['x']    
             elif crz==0 and crx==1:
+                gatesl=[]
                 pass
             elif crz==1 and crx==0:
                 circ.x(0)
                 circ.z(0)
+                gatesl=['x','z']
             elif crz==1 and crx==1:
                 circ.z(0)
+                gatesl=['z']
         
         if case=="-phi+":
             circ=QutipCircuit(1)
@@ -183,20 +210,25 @@ class Teleportation():
                 circ.z(0)
                 circ.x(0)
                 circ.z(0)
+                gatesl=['z','x','z']
                 
             elif crz==0 and crx==1:
                 circ.z(0)
                 circ.x(0)
                 circ.z(0)
                 circ.x(0)
+                gatesl=['z','x','z','x']
+
             elif crz==1 and crx==0:
                 circ.z(0)
                 circ.x(0)
-                
+                gatesl=['z','x']
+
             elif crz==1 and crx==1:
                 circ.x(0)
                 circ.z(0)
                 circ.x(0)
+                gatesl=['x','z','x']
                 
         if case=="-phi-":
             circ=QutipCircuit(1)
@@ -204,20 +236,25 @@ class Teleportation():
                 print('crz 1')
                 circ.x(0)
                 circ.z(0)
+                gatesl=['x','z']
                     
             elif crz==0 and crx==1:
                 print('crz 1')
                 circ.x(0)
                 circ.z(0)
                 circ.x(0)
+                gatesl=['x','z','x']
+
             elif crz==1 and crx==0:
                 circ.x(0)
+                gatesl=['x']
                 
             elif crz==1 and crx==1:
                 circ.z(0)
                 circ.x(0)
                 circ.z(0)
                 circ.x(0)
+                gatesl=['z','x','z','x']
         
         if case=="phi-":
             circ=QutipCircuit(1)
@@ -225,29 +262,34 @@ class Teleportation():
                 print('crz 1') 
                 circ.z(0)
                 circ.x(0)
-                
+                gatesl=['z','x']
                 #circ.measure(0)
             elif crz==0 and crx==1:
                 print('crz 1')
                 circ.z(0)
+                gatesl=['z']
+
             elif crz==1 and crx==0:
                 circ.z(0)
                 circ.x(0)
                 circ.z(0)
+                gatesl=['z','x','z']
+
             elif crz==1 and crx==1:
+                gatesl=[]
                 pass
         #circ.measure(0)
         
         output=qm_bob.run_circuit(circ,[key])
         print("Bob's state before corrective measures",state.state)
         print('bob final state after corrective measures',qm_bob.get(key).state)
-        return state.state, qm_bob.get(key).state
+        return state.state, qm_bob.get(key).state,gatesl
 
     def run(self,alice,bob,A_0,A_1):
         crz,crx,case, random_qubit,alice_state=self.alice_measurement(A_0,A_1,alice)
         print("Measurement result of random qubit crz",crz)
         print("Measurement result of alice qubit crx",crx)
-        bob_initial_state, bob_final_state = self.bob_gates(crz,crx,case,bob)
+        bob_initial_state, bob_final_state,gatesl = self.bob_gates(crz,crx,case,bob)
         
         # initial entanglement alice_bob_entanglement: alice_bob_entangled_state
         # measurement_result_of_random_qubit near alice's end : meas_rq
@@ -258,11 +300,12 @@ class Teleportation():
             "alice_bob_entanglement": alice_state.state,
             "random_qubit" : random_qubit,
             "meas_rq":crz,
-            "meas_r1":crx,
+            "meas_alice":crx,
+            "Corrective_operation":gatesl,
             "bob_initial_state" : bob_initial_state,
             "bob_final_state" : bob_final_state
         }
-
+        print(res)
         return res
 
 #################################################################################################
@@ -299,7 +342,6 @@ def tel(path,sender,receiver,A_0,A_1):
 """
 
 # jsonConfig (Type : Json) -Json Configuration of network 
-
 """
 def tel(jsonConfig,sender,receiver,A_0,A_1):
 
@@ -315,7 +357,7 @@ def tel(jsonConfig,sender,receiver,A_0,A_1):
     alice=network_topo.nodes[sender]
     bob = network_topo.nodes[receiver]
     tel= Teleportation()
-    alice,bob=tel.roles(alice,bob)
+    alice,bob,source_node_list=tel.roles(alice,bob)
     tl.init()
     tl.run()  
     res = tel.run(alice,bob,A_0,A_1)

@@ -183,4 +183,4 @@ def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
     report["application"]=results
     report=network_graph(network_topo,source_node_list,report)
     print(report)
-    return results
+    return report
