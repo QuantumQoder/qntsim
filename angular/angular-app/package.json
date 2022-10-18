@@ -33,6 +33,7 @@
     "jquery": "^3.6.1",
     "material-icons": "^1.12.0",
     "ng-particles": "^3.3.3",
+    "ngx-cookie-service": "^14.0.1",
     "ngx-owl-carousel-o": "^14.0.1",
     "ngx-typed-js": "^2.1.1",
     "primeflex": "^3.2.1",
