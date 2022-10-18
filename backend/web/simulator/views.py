@@ -14,10 +14,12 @@ class RunApp(APIView):
 
 
     def post(self,request):
+        
 
-        topology = json.loads(request.POST['topology'])
-        application_id = request.POST['application']
-        appSettings = json.loads(request.POST['appSettings'])
+        print('request', request.data.get('topology'))
+        topology = request.data.get('topology')
+        application_id = request.data.get('application')
+        appSettings = request.data.get('appSetting')
         # Add check for getting application id and extracting name.
         print('application id', application_id)
         application = Applications.objects.filter(id = application_id).values("name").first().get('name')
