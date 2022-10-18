@@ -1,7 +1,10 @@
+import { HttpHeaders } from '@angular/common/http';
 import { AfterViewInit, Component, OnChanges, OnInit, SimpleChanges, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import * as go from 'gojs'
-import { MessageService } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
+import { ApiServiceService } from 'src/services/api-service.service';
+//import { Interface } from 'readline';
 import { ConditionsService } from 'src/services/conditions.service';
 @Component({
   selector: 'app-drag',
@@ -11,6 +14,22 @@ import { ConditionsService } from 'src/services/conditions.service';
   encapsulation: ViewEncapsulation.None
 })
 export class DragComponent implements OnInit, AfterViewInit, OnChanges {
+  app_id: any
+
+  ip1: any
+  e91: any
+  e2e: any;
+  pingPong: any
+  teleportation: any
+  ghz: any
+  firstqsdc: any
+
+  graphModel: any
+  nodes: any = []
+  selectedNode1: any
+  displayPosition: boolean;
+  items: MenuItem[];
+  position: string;
   node: any = {};
   toolbox: any
   public selectedNode: any;
@@ -19,15 +38,18 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   public myPalette: go.Palette
   public myRotate: go.RotatingTool
   public savedModel: any = {
-    "class": "go.GraphLinksModel",
-    "linkFromPortIdProperty": "fromPort",
-    "linkToPortIdProperty": "toPort",
-    "nodeDataArray": [
+    class: "go.GraphLinksModel",
+    linkFromPortIdProperty: "fromPort",
+    linkToPortIdProperty: "toPort",
+    nodeDataArray: [
     ],
-    "linkDataArray": [
+    linkDataArray: [
     ]
   }
-  constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService) { }
+
+
+  constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService) { }
+
   ngOnChanges(changes: SimpleChanges): void {
     console.log(this.myDiagram.nodes)
   }
@@ -286,16 +308,85 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
             { color: "blue", text: "VC", points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) }
           ])
         });
-
+    this.toolbox = this.fb.group({
+      'name': new FormControl(''),
+      'noOfMemories': new FormControl(''),
+      'memoryFidelity': new FormControl('')
+    })
+    this.e2e = this.fb.group({
+      'sender': new FormControl(''),
+      'receiver': new FormControl(''),
+      'startTime': new FormControl(''),
+      'size': new FormControl(''),
+      'priority': new FormControl(''),
+      'targetFidelity': new FormControl(''),
+      'timeout': new FormControl('')
+    })
+    this.e91 = this.fb.group({
+      'sender': new FormControl(''),
+      'receiver': new FormControl(''),
+      'keyLength': new FormControl('')
+    })
+    this.ip1 = this.fb.group({
+      'sender': new FormControl(''),
+      'receiver': new FormControl(''),
+      'message': new FormControl('')
+    })
+    this.pingPong = this.fb.group({
+      'sender': new FormControl(''),
+      'receiver': new FormControl(''),
+      'sequenceLength': new FormControl(''),
+      'message': new FormControl('')
+    })
+    this.firstqsdc = this.fb.group({
+      'sender': new FormControl(''),
+      'receiver': new FormControl(''),
+      'sequenceLength': new FormControl(''),
+      'key': new FormControl('')
+    })
+    this.teleportation = this.fb.group({
+      'sender': new FormControl(''),
+      'receiver': new FormControl(''),
+      'randomQubitAmplitude1': new FormControl(''),
+      'randomQubitAmplitude2': new FormControl('')
+    })
+    this.ghz = this.fb.group({
+      'node1': new FormControl(''),
+      'node2': new FormControl(''),
+      'node3': new FormControl(''),
+      'middleNode': new FormControl('')
+    })
 
   }
   selected(): any {
     console.log("selected")
   }
-  // TopRotatingTool() {
-  //   go.RotatingTool.call(this)
-  // };
 
+  save() {
+    this.app_id = sessionStorage.getItem("app_id")
+    console.log(this.app_id)
+    //console.log(this.myDiagram.model.toJson)
+    this.saveDiagramProperties();
+    this.graphModel = this.myDiagram.model.nodeDataArray
+
+    //console.log(this.graphModel)
+
+    this.position = 'bottom';
+    this.displayPosition = true;
+  }
+  parameters() {
+    this.displayPosition = false
+    var token = localStorage.getItem('access')
+    var topology = { "nodes": [{ "Name": "n1", "Type": "service", "noOfMemory": 500, "memory": { "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93 } }, { "Name": "n2", "Type": "end", "noOfMemory": 500, "memory": { "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93 } }], "quantum_connections": [{ "Nodes": ["n1", "n2"], "Attenuation": 0.00001, "Distance": 70 }], "classical_connections": [{ "Nodes": ["n1", "n1"], "Delay": 0, "Distance": 1000 }, { "Nodes": ["n1", "n2"], "Delay": 1000000000, "Distance": 1000 }, { "Nodes": ["n2", "n1"], "Delay": 1000000000, "Distance": 1000 }, { "Nodes": ["n2", "n2"], "Delay": 0, "Distance": 1000 }] }
+    var req = {
+      "application": 1,
+      "topology": topology,
+      "appSettings": { "sender": "n1", "receiver": "n2", "keyLength": "5" }
+    }
+    this.apiService.runApplication(req).subscribe((result) => {
+      console.log(result)
+    })
+  }
   load() {
     //var savedModel = document.getElementById("mySavedModel") as HTMLInputElement
     this.myDiagram.model = go.Model.fromJson(this.savedModel);
@@ -303,18 +394,19 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   }
   saveDiagramProperties() {
     this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
-    console.log(this.myDiagram.model.modelData.position)
+    //console.log(this.myDiagram.model.modelData.position)
   }
-  save() {
+  showPositionDialog() {
     //var savedModel = document.getElementById("mySavedModel") as HTMLInputElement
     this.saveDiagramProperties();  // do this first, before writing to JSON
-    this.savedModel = this.myDiagram.model.toJson();
+    this.savedModel = this.myDiagram.model;
+
+    //console.log(this.savedModel)
+    this.myDiagram.isModified = false;
+    this.visibleSideNav = true
     this.messageService.add({
       severity: 'success', summary: 'The graph has been saved.', life: 2000
     })
-    console.log(this.savedModel)
-    this.myDiagram.isModified = false;
-    this.visibleSideNav = true
   }
   loadDiagramProperties() {
     // set Diagram.initialPosition, not Diagram.position, to handle initialization side-effects
@@ -377,5 +469,4 @@ export class selectedNode {
   key: string;
   figure: string;
 }
-
 

@@ -1,6 +1,63 @@
 <div class="main">
-    <p-tabMenu [model]="items" [activeItem]="activeItem"></p-tabMenu>
-    <div class="container-fluid">
+    <p-tabMenu #menuItems [model]="items" [activeItem]="activeItem" (click)="activateMenu()"></p-tabMenu>
+    <br>
+    <br>
+    <div class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+        <div class="row" *ngFor="let data of data">
+            <div class="col">
 
+                <table *ngIf="keyGen" class="table table-bordered">
+                    <thead class="thead-light">
+                        <h5><u>{{data}}</u></h5>
+                    </thead>
+                    <tbody>
+                        <tr class="row">
+                            <td class="col">Basis</td>
+                            <td class="col">2</td>
+                            <td class="col">2</td>
+                            <td class="col">2</td>
+                            <td class="col">2</td>
+                            <td class="col">2</td>
+                            <td class="col">2</td>
+                            <td class="col">2</td>
+                            <td class="col">2</td>
+                        </tr>
+                        <tr class="row">
+                            <td class="col">Value</td>
+                            <td class="col">2</td>
+                            <td class="col">2</td>
+                            <td class="col">2</td>
+                            <td class="col">2</td>
+                            <td class="col">2</td>
+                            <td class="col">2</td>
+                            <td class="col">2</td>
+                            <td class="col">2</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+            </div>
+
+
+        </div>
+        <div class="row">
+            <div class="col">
+
+                <table *ngIf="keyBits" class="table table-bordered align-middle">
+                    <thead class="thead-light">
+                        <tr class="row">
+                            <th class="col" *ngFor="let data of data">{{data}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="row">
+                            <td class="col" *ngFor="let data of data">{{data}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+
 </div>

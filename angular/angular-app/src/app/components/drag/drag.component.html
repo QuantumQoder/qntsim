@@ -1,16 +1,33 @@
+<!-- <div class="speeddial-linear-demo">
+    <p-speedDial [model]="items" direction="top-left" buttonClassName="p-button-success" styleClass="speed-dial">
+    </p-speedDial>
+</div> -->
 <div class="row">
     <p-toast position="top-right"></p-toast>
-    <div id="sample" class="col-md-10">
+
+
+    <div id="sample" class="col-md-12">
+
         <div style="width: 100%; display: flex; justify-content: space-between">
             <div id="myPaletteDiv" class="col-md-4"
                 style="width: 110px; margin: 2px; background-color: whitesmoke; border: solid 1px black"></div>
-            <div id="myDiagramDiv" class="col-md-8" style="flex-grow: 1; height: 620px; border: solid 1px black"></div>
+            <div id="myDiagramDiv" [ngClass]="visibleSideNav ? 'col-md-6': 'col-md-8'" style=" flex-grow: 1; height:
+                580px; border: solid 1px black">
+                <!-- <p-speedDial [model]="items" direction="bottom-left" buttonClassName="p-button-success"
+                    styleClass="speed-dial">
+                </p-speedDial> -->
+            </div>
         </div>
         <div>
-            <div>
+            <div style="padding-top: 5px;">
+
                 <button type="button" pButton pRipple (click)="save()" label="Save" class="ui-button-warning"></button>
                 &nbsp;
                 <button type="button" pButton pRipple (click)="load()" label="Load" class="ui-button-warning"></button>
+                &nbsp;
+                <button type="button" pButton pRipple (click)="showPositionDialog()" label="Select"
+                    class="ui-button-warning">
+                </button>
                 <!-- Diagram Model saved in JSON format: -->
             </div>
             <!-- <textarea id="mySavedModel" style="width:100%;height:300px">
@@ -25,37 +42,245 @@
         </div>
 
     </div>
+    <p-dialog header="Select Parameters" [(visible)]="displayPosition" [position]="position" [modal]="true"
+        [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
+        <div *ngIf="app_id=='1'" [formGroup]="e2e">
+            <div class="row">
+                <div class="col">
+                    <label for="serviceNode">Sender</label>&nbsp;
+                    <select class="form-control" formControlName="sender">
+                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="endNode">Receiver</label>&nbsp;
+                    <select class="form-control" formControlName="receiver">
+                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="endNode">Start Time</label>&nbsp;
+                    <input type="text" class="form-control" formControlName="startTime">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="endNode">Size</label>&nbsp;
+                    <input type="number" class="form-control" formControlName="size">
+                </div>
+                <div class="col">
+                    <label for="endNode">Priority</label>&nbsp;
+                    <input type="text" class="form-control" formControlName="priority">
+                </div>
+                <div class="col">
+                    <label for="endNode">Target Fidelity</label>&nbsp;
+                    <input type="text" class="form-control" formControlName="targetFidelity">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="timeout">TimeOut</label>&nbsp;
+                    <input type="text" class="form-control" formControlName="timeout">
+                </div>
+            </div>
+        </div>
+        <div *ngIf="app_id=='2'" class="row" [formGroup]="e91">
+            <div class="col">
+                <label for="serviceNode">Sender</label>&nbsp;
+                <select class="form-control" formControlName="sender">
+                    <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                    </option>
+                </select>
+            </div>
+            <div class="col">
+                <label for="endNode">Receiver</label>&nbsp;
+                <select class="form-control" formControlName="receiver">
+                    <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                    </option>
+                </select>
+            </div>
+            <div class="col">
+                <label for="endNode">Key Length</label>&nbsp;
+                <input type="text" class="form-control" formControlName="keyLength">
+            </div>
 
-    <p-sidebar [(visible)]="visibleSideNav" position="right" [baseZIndex]="10000" styleClass="sidebar">
+        </div>
+        <div *ngIf="app_id=='3'" [formGroup]="teleportation">
+            <div class="row">
+                <div class="col">
+                    <label for="serviceNode">Sender</label>&nbsp;
+                    <select class="form-control" formControlName="sender">
+                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="endNode">Receiver</label>&nbsp;
+                    <select class="form-control" formControlName="receiver">
+                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="endNode">Random Qubit Amplitude 1</label>&nbsp;
+                    <input type="text" class="form-control" formControlName="randomQUbitAmplitude1">
+                </div>
+                <div class="col">
+                    <label for="endNode">Random Qubit Amplitude 2</label>&nbsp;
+                    <input type="text" class="form-control" formControlName="randomQUbitAmplitude2">
+                </div>
+            </div>
+        </div>
+        <div *ngIf="app_id=='4'" [formGroup]="ghz">
+            <div class="row">
+                <div class="col">
+                    <label for="serviceNode">Node 1</label>&nbsp;
+                    <select class="form-control" formControlName="node1">
+                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="endNode">Node 2</label>&nbsp;
+                    <select class="form-control" formControlName="node2">
+                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="serviceNode">Node 3</label>&nbsp;
+                    <select class="form-control" formControlName="node1">
+                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="endNode">Middle Node</label>&nbsp;
+                    <select class="form-control" formControlName="node2">
+                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="app_id=='5'" [formGroup]="firstqsdc">
+            <div class="row">
+                <div class="col">
+                    <label for="serviceNode">Sender</label>&nbsp;
+                    <select class="form-control" formControlName="sender">
+                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="endNode">Receiver</label>&nbsp;
+                    <select class="form-control" formControlName="receiver">
+                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="endNode">Set Sequence Length</label>&nbsp;
+                    <input type="number" class="form-control" formControlName="sequenceLength">
+                </div>
+                <div class="col">
+                    <label for="endNode">Set Sequence Length</label>&nbsp;
+                    <input type="number" class="form-control" formControlName="key">
+                </div>
+            </div>
+        </div>
+        <div *ngIf="app_id=='6'" [formGroup]="pingPong">
+            <div class="row">
+                <div class="col">
+                    <label for="serviceNode">Sender</label>&nbsp;
+                    <select class="form-control" formControlName="sender">
+                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="endNode">Receiver</label>&nbsp;
+                    <select class="form-control" formControlName="receiver">
+                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="endNode">Set Sequence Length</label>&nbsp;
+                    <input type="number" class="form-control" formControlName="sequenceLength">
+                </div>
+                <div class="col">
+                    <label for="endNode">Message</label>&nbsp;
+                    <input type="text" class="form-control" formControlName="message">
+                </div>
+            </div>
+        </div>
+        <div *ngIf="app_id=='7'" class="row" [formGroup]="ip1">
+            <div class="col">
+                <label for="serviceNode">Sender</label>&nbsp;
+                <select class="form-control" formControlName="sender">
+                    <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                    </option>
+                </select>
+            </div>
+            <div class="col">
+                <label for="endNode">Receiver</label>&nbsp;
+                <select class="form-control" formControlName="receiver">
+                    <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                    </option>
+                </select>
+            </div>
+            <div class="col">
+                <label for="endNode">Message</label>&nbsp;
+                <input type="text" class="form-control" formControlName="message">
+            </div>
+
+        </div>
+
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-check" (click)="parameters()" label="Ok" styleClass="p-button-text">
+            </p-button>
+        </ng-template>
+    </p-dialog>
+    <p-sidebar [(visible)]="visibleSideNav" position="right" [baseZIndex]="10000" [transitionOptions]="'100ms'"
+        styleClass="sidebar">
         <div id="toolbox" class="col" [formGroup]="toolbox">
 
             <br>
-            <div class="col">
-                <label style="padding-bottom: 5px;" for="formControlName">
-                    <h5>Name:</h5>
-                </label>
-                <br>
-                <input style="padding-bottom: 5px;" type="text" formControlName="name" placeholder="Name">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="email" class="form-control" id="name" aria-describedby="emailHelp"
+                    placeholder="Enter Name">
+                <!-- <small id="emailHelp" class="form-text text-muted">Your information is safe with us.</small> -->
             </div>
             <br>
-            <div class="col">
-                <label style="padding-bottom: 5px;" for="formControlName">
-                    <h5>No of Memories</h5>
-                </label>
-                <br>
-                <input style="padding-bottom: 5px;" type="text" formControlName="noOfMemories"
-                    placeholder="No of Memories">
+            <div class="form-group">
+                <label for="noOfMemories">No of Memories</label>
+                <input type="number" class="form-control" id="noOfMemories" placeholder="No of Memories">
             </div>
             <br>
+            <div class="form-group">
+                <label for="memoryFidelity">Memory Fidelity</label>
+                <input type="text" class="form-control" id="memoryFidelity" placeholder="Memory Fidelity">
+            </div>
+
+        </div>
+        <div class="row">
             <div class="col">
-                <label style="padding-bottom: 5px;" for="formControlName">
-                    <h5>Memory Fidelity</h5>
-                </label>
-                <br>
-                <input style="padding-bottom: 5px;" type="text" class="input-lg" formControlName="memoryFidelity"
-                    placeholder="Memory Fidelity">
+                <button type="button" pButton pRipple (click)="save()" label="Save" class="ui-button-warning"></button>
             </div>
         </div>
+
     </p-sidebar>
 
 

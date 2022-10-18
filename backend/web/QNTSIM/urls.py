@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework_simplejwt import views as jwt_views
 from users.views import UserSignup
-from simulator.views import RunApp, ApplicationList
+from simulator.views import RunApp, ApplicationList,PastResultsList,ApplicationResult
 
 urlpatterns = [
     path('api/token/',jwt_views.TokenObtainPairView.as_view(),name ='token_obtain_pair'),
@@ -26,5 +26,7 @@ urlpatterns = [
     path('run/', RunApp.as_view()),
     path('', include('main.urls')),
     path('admin/', admin.site.urls),    
-    path('application_list/',ApplicationList.as_view())
+    path('application_list/',ApplicationList.as_view()),
+    path('result_list/', PastResultsList.as_view()),
+    path('result/',ApplicationResult.as_view())
 ]

@@ -25,7 +25,7 @@ import { CarouselModule } from 'primeng/carousel';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { ApplicationPageComponent } from './components/application-page/application-page.component';
 import { TableModule } from 'primeng/table';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DraggableLinkComponent } from './components/draggable-link/draggable-link.component';
 import { DragComponent } from './components/drag/drag.component';
 import { TabMenuModule } from 'primeng/tabmenu';
@@ -35,6 +35,11 @@ import { NetworkResultsComponent } from './components/network-results/network-re
 import { LogsComponent } from './components/logs/logs.component';
 import { ToastModule } from 'primeng/toast';
 import { SidebarModule } from 'primeng/sidebar';
+import { DialogModule } from 'primeng/dialog';
+import { SpeedDialModule } from 'primeng/speeddial';
+import { DropdownModule } from 'primeng/dropdown';
+import { CookieService } from 'ngx-cookie-service';
+import { HttpClientModule } from '@angular/common/http';
 // import { Alert } from '@ng-bootstrap/ng-bootstrap';
 //import { AngularAnimationsLibraryModule } from 'angular-animations-library'
 @NgModule({
@@ -55,6 +60,11 @@ import { SidebarModule } from 'primeng/sidebar';
     //AngularAnimationsLibraryModule
   ],
   imports: [
+    HttpClientModule,
+    FormsModule,
+    DropdownModule,
+    SpeedDialModule,
+    DialogModule,
     SidebarModule,
     ToastModule,
     TabMenuModule,
@@ -80,7 +90,7 @@ import { SidebarModule } from 'primeng/sidebar';
     BrowserAnimationsModule
     //NgbModule,
   ],
-  providers: [],
+  providers: [CookieService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
