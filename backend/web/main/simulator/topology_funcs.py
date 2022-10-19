@@ -108,7 +108,7 @@ def ghz(network_config, endnode1, endnode2, endnode3, middlenode):
     report["application"]=results
     report=network_graph(network_topo,source_node_list,report)
     print(report)
-    return results
+    return report
 
 def ip1(network_config, sender, receiver, message):
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
