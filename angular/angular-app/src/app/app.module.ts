@@ -40,6 +40,8 @@ import { SpeedDialModule } from 'primeng/speeddial';
 import { DropdownModule } from 'primeng/dropdown';
 import { CookieService } from 'ngx-cookie-service';
 import { HttpClientModule } from '@angular/common/http';
+import { BlockUIModule } from 'primeng/blockui';
+import { ProgressSpinnerModule } from 'primeng/progressspinner'
 // import { Alert } from '@ng-bootstrap/ng-bootstrap';
 //import { AngularAnimationsLibraryModule } from 'angular-animations-library'
 @NgModule({
@@ -60,6 +62,8 @@ import { HttpClientModule } from '@angular/common/http';
     //AngularAnimationsLibraryModule
   ],
   imports: [
+    ProgressSpinnerModule,
+    BlockUIModule,
     HttpClientModule,
     FormsModule,
     DropdownModule,
