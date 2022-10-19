@@ -19,7 +19,7 @@ class RunApp(APIView):
         print('request', request.data.get('topology'))
         topology = request.data.get('topology')
         application_id = request.data.get('application')
-        appSettings = request.data.get('appSetting')
+        appSettings = request.data.get('appSettings')
         # Add check for getting application id and extracting name.
         print('application id', application_id)
         application = Applications.objects.filter(id = application_id).values("name").first().get('name')
