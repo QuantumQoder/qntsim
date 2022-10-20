@@ -1,63 +1,144 @@
 <div class="main">
     <p-tabMenu #menuItems [model]="items" [activeItem]="activeItem" (click)="activateMenu()"></p-tabMenu>
     <br>
-    <br>
-    <div class="container shadow p-4 mb-5 bg-white rounded mx-auto">
-        <div class="row" *ngFor="let data of data">
+    <div *ngIf="app_id=='2'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+        <div *ngIf="keyGen" class="row">
             <div class="col">
-
-                <table *ngIf="keyGen" class="table table-bordered">
+                <table class="table table-bordered">
                     <thead class="thead-light">
-                        <h5><u>{{data}}</u></h5>
+                        <h5><u>Sender</u></h5>
                     </thead>
                     <tbody>
-                        <tr class="row">
+                        <tr>
                             <td class="col">Basis</td>
-                            <td class="col">2</td>
-                            <td class="col">2</td>
-                            <td class="col">2</td>
-                            <td class="col">2</td>
-                            <td class="col">2</td>
-                            <td class="col">2</td>
-                            <td class="col">2</td>
-                            <td class="col">2</td>
+                            <td class="col" *ngFor="let app of e91.sender_basis_list">{{app}}</td>
                         </tr>
-                        <tr class="row">
+                        <tr>
                             <td class="col">Value</td>
-                            <td class="col">2</td>
-                            <td class="col">2</td>
-                            <td class="col">2</td>
-                            <td class="col">2</td>
-                            <td class="col">2</td>
-                            <td class="col">2</td>
-                            <td class="col">2</td>
-                            <td class="col">2</td>
+                            <td class="col" *ngFor="let app of e91.sender_meas_list">{{app}}</td>
                         </tr>
                     </tbody>
                 </table>
-
-
             </div>
-
-
         </div>
-        <div class="row">
+        <div *ngIf="keyGen" class="row">
             <div class="col">
-
-                <table *ngIf="keyBits" class="table table-bordered align-middle">
+                <table class="table table-bordered">
                     <thead class="thead-light">
-                        <tr class="row">
-                            <th class="col" *ngFor="let data of data">{{data}}</th>
+                        <h5><u>Receiver</u></h5>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="col">Basis</td>
+                            <td class="col" *ngFor="let app of e91.receiver_basis_list">{{app}}</td>
+                        </tr>
+                        <tr>
+                            <td class="col">Value</td>
+                            <td class="col" *ngFor="let app of e91.receiver_meas_list">{{app}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div *ngIf="keyBits" class="row">
+            <div class="col">
+                <table class="table table-bordered align-middle">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col">Sender</th>
+                            <th class="col">Receiver</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="row">
-                            <td class="col" *ngFor="let data of data">{{data}}</td>
+                        <tr>
+                            <td class="col">{{e91.sender_keys}}</td>
+                            <td class="col">{{e91.receiver_keys}}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
+    <div *ngIf="app_id=='1'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+        <div class="col">
+            <div class="row">
+                <table class="table table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col">Request Id</th>
+                            <th class="col">Source</th>
+                            <th class="col">Destination</th>
+                            <th class="col">Demand Size</th>
+                            <th class="col">Start Time</th>
+                            <th class="col">End Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="col">1</td>
+                            <td class="col">e1</td>
+                            <td class="col">e2</td>
+                            <td class="col">2</td>
+                            <td class="col">1s</td>
+                            <td class="col">6s</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="row">
+                <table class="table table-bordered">
+                    <thead>
+                        <h5>Node:E1</h5>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th class="col">Memory Index</th>
+                            <th class="col">Current Node</th>
+                            <th class="col">Entangled Node</th>
+                            <th class="col">Fidelity</th>
+                            <th class="col">Entangled Time</th>
+                            <th class="col">Expire Time</th>
+                            <th class="col">State</th>
+                        </tr>
+                        <tr>
+                            <th class="col"></th>
+                            <th class="col"></th>
+                            <th class="col"></th>
+                            <th class="col"></th>
+                            <th class="col"></th>
+                            <th class="col"></th>
+                            <th class="col"></th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="row">
+                <table class="table table-bordered">
+                    <thead>
+                        <h5>Node:E2</h5>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th class="col">Memory Index</th>
+                            <th class="col">Current Node</th>
+                            <th class="col">Entangled Node</th>
+                            <th class="col">Fidelity</th>
+                            <th class="col">Entangled Time</th>
+                            <th class="col">Expire Time</th>
+                            <th class="col">State</th>
+                        </tr>
+                        <tr>
+                            <th class="col"></th>
+                            <th class="col"></th>
+                            <th class="col"></th>
+                            <th class="col"></th>
+                            <th class="col"></th>
+                            <th class="col"></th>
+                            <th class="col"></th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>

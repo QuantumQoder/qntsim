@@ -13,7 +13,7 @@ export class ApiServiceService {
     return this.cookieService.get('access');
   }
   set setAccessToken(data: any) {
-    this.cookieService.set('access', data)
+    this.cookieService.set('access', data);
   }
   get getRefreshToken() {
     return this.cookieService.get('refresh');

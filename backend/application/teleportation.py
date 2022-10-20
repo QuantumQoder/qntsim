@@ -297,13 +297,13 @@ class Teleportation():
         # bob_initial_state_before_corrective_measures: bob_initial_state
         # bob_final_state_after_corrective_measures:bob_final_state
         res = {
-            "alice_bob_entanglement": alice_state.state,
-            "random_qubit" : random_qubit,
+            "alice_bob_entanglement": str(alice_state.state),
+            "random_qubit" : str(random_qubit),
             "meas_rq":crz,
             "meas_alice":crx,
             "Corrective_operation":gatesl,
-            "bob_initial_state" : bob_initial_state,
-            "bob_final_state" : bob_final_state
+            "bob_initial_state" : str(bob_initial_state),
+            "bob_final_state" : str(bob_final_state)
         }
         print(res)
         return res

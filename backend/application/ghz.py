@@ -8,7 +8,7 @@ from qiskit import *
 from qutip.qip.operations import gate_sequence_product
 #from qiskit.ignis.verification import marginal_counts
 from qiskit.quantum_info import random_statevector
- 
+import json
 
 class GHZ():
 
@@ -106,6 +106,10 @@ class GHZ():
             "final_bob_state": qm_bob.get(bob_key).state,
             "final_charlie_state":qm_charlie.get(charlie_key).state,
             
+            "alice_state":str(qm_middle.get(alice_key).state) ,
+            "bob_state": str(qm_middle.get(bob_key).state),
+            "charlie_state":str(qm_middle.get(charlie_key).state),
+            "ghz_state" : str(ghz_state)
         }
         #print(res)
         return res

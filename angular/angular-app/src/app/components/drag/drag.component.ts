@@ -1,6 +1,8 @@
 import { HttpHeaders } from '@angular/common/http';
 import { AfterViewInit, Component, OnChanges, OnInit, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+//import { error } from 'console';
 import * as go from 'gojs'
 import { MenuItem, MessageService } from 'primeng/api';
 import { ApiServiceService } from 'src/services/api-service.service';
@@ -16,6 +18,9 @@ import { ConditionsService } from 'src/services/conditions.service';
 export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   app_id: any
 
+  nodeKey: any = []
+  spinner: boolean = false
+  blocked: boolean = false
   ip1: any
   e91: any
   e2e: any;
@@ -48,7 +53,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
 
-  constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService) { }
+  constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private _route: Router) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log(this.myDiagram.nodes)
@@ -78,35 +83,8 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   ngOnInit(): void {
 
     // init for these samples -- you don't need to call this
-    var $ = go.GraphObject.make;  // for conciseness in defining templates
-
-    this.myDiagram =
-      $(go.Diagram, "myDiagramDiv",  // must name or refer to the DIV HTML element
-        {
-          grid: $(go.Panel, "Grid",
-            $(go.Shape, "LineH", { stroke: "lightgray", strokeWidth: 0.5 }),
-            $(go.Shape, "LineH", { stroke: "gray", strokeWidth: 0.5, interval: 10 }),
-            $(go.Shape, "LineV", { stroke: "lightgray", strokeWidth: 0.5 }),
-            $(go.Shape, "LineV", { stroke: "gray", strokeWidth: 0.5, interval: 10 })
-          ),
-          allowDrop: true,  // must be true to accept drops from the Palette
-          "draggingTool.dragsLink": true,
-          "draggingTool.isGridSnapEnabled": true,
-          "linkingTool.isUnconnectedLinkValid": true,
-          "linkingTool.portGravity": 20,
-          "relinkingTool.isUnconnectedLinkValid": true,
-          "relinkingTool.portGravity": 20,
-          "relinkingTool.fromHandleArchetype":
-            $(go.Shape, "Diamond", { segmentIndex: 0, cursor: "pointer", desiredSize: new go.Size(8, 8), fill: "tomato", stroke: "darkred" }),
-          "relinkingTool.toHandleArchetype":
-            $(go.Shape, "Diamond", { segmentIndex: -1, cursor: "pointer", desiredSize: new go.Size(8, 8), fill: "darkred", stroke: "tomato" }),
-          "linkReshapingTool.handleArchetype":
-            $(go.Shape, "Diamond", { desiredSize: new go.Size(7, 7), fill: "lightblue", stroke: "deepskyblue" }),
-          // rotatingTool: go.RotatingTool,  // defined below
-          // "rotatingTool.snapAngleMultiple": 15,
-          // "rotatingTool.snapAngleEpsilon": 15,
-          // "undoManager.isEnabled": true
-        });
+    var $ = go.GraphObject.make;
+    this.myDiagram = this.initDiagram()
 
     // when the document is modified, add a "*" to the title and enable the "Save" button
     this.myDiagram.addDiagramListener("Modified", e => {
@@ -170,7 +148,9 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.myDiagram.nodeTemplate =
       $(go.Node, "Spot",
         {
-          click: this.nodeClicked,
+          click: (e: go.InputEvent, obj: go.GraphObject) => {
+            this.nodeClicked(e, obj)
+          },
           doubleClick: this.nodeClicked,
           contextMenu:
             $("ContextMenu",
@@ -235,12 +215,18 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           routing: go.Link.AvoidsNodes,
           curve: go.Link.JumpOver,
           corner: 5,
-          toShortLength: 4
+          toShortLength: 4,
+          cursor: 'pointer',
+          click: function (e: any, obj: any) {
+            console.log(e, obj)
+          }
         },
         new go.Binding("points").makeTwoWay(),
         $(go.Shape,  // the link path shape
           { isPanelMain: true, strokeWidth: 2 },
           new go.Binding("stroke", "color")),
+        $(go.TextBlock, { textAlign: "center" },  // centered multi-line text
+          new go.Binding("text", "text")),
         // $(go.Shape,  // the link path shape
         //   { isPanelMain: true, strokeWidth: 2 }),
         $(go.Shape,  // the arrowhead
@@ -280,7 +266,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
                     $(go.Shape,  // the arrowhead
                       { toArrow: "Standard", stroke: "black", strokeWidth: 4 }),
                     $(go.Shape,  // the arrowhead
-                      { toArrow: "Standard", stroke: "blue", strokeWidth: 4 }),
+                      { toArrow: "Standard", stroke: "grey", strokeWidth: 4 }),
                   )
               },
               {
@@ -294,8 +280,12 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
                 { isPanelMain: true, strokeWidth: 2 }),
               $(go.Shape,  // the arrowhead
                 { toArrow: "Standard", stroke: null, strokeWidth: 2 }),
+              $(go.TextBlock, { textAlign: "center" },  // centered multi-line text
+                new go.Binding("text", "text")),
               $(go.Shape,  // the arrowhead
                 { toArrow: "Standard", stroke: null, strokeWidth: 2 }),
+              $(go.TextBlock, { textAlign: "center" },  // centered multi-line text
+                new go.Binding("text", "text")),
               new go.Binding('fill', 'color'),
             ),
           model: new go.GraphLinksModel([  // specify the contents of the Palette
@@ -305,9 +295,10 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           ], [
             // the Palette also has a disconnected Link, which the user can drag-and-drop
             { text: "QC", points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) },
-            { color: "blue", text: "VC", points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) }
+            { color: "grey", text: "VC", points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) }
           ])
         });
+    this.myDiagram
     this.toolbox = this.fb.group({
       'name': new FormControl(''),
       'noOfMemories': new FormControl(''),
@@ -375,6 +366,8 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.displayPosition = true;
   }
   parameters() {
+    this.blocked = true
+
     this.displayPosition = false
     var token = localStorage.getItem('access')
     var topology = { "nodes": [{ "Name": "n1", "Type": "service", "noOfMemory": 500, "memory": { "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93 } }, { "Name": "n2", "Type": "end", "noOfMemory": 500, "memory": { "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93 } }], "quantum_connections": [{ "Nodes": ["n1", "n2"], "Attenuation": 0.00001, "Distance": 70 }], "classical_connections": [{ "Nodes": ["n1", "n1"], "Delay": 0, "Distance": 1000 }, { "Nodes": ["n1", "n2"], "Delay": 1000000000, "Distance": 1000 }, { "Nodes": ["n2", "n1"], "Delay": 1000000000, "Distance": 1000 }, { "Nodes": ["n2", "n2"], "Delay": 0, "Distance": 1000 }] }
@@ -383,9 +376,46 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       "topology": topology,
       "appSettings": { "sender": "n1", "receiver": "n2", "keyLength": "5" }
     }
-    this.apiService.runApplication(req).subscribe((result) => {
-      console.log(result)
+    this.apiService.runApplication(req).subscribe((result: any) => {
+      this.con.setResult(result)
+      this.spinner = true;
+    }, (error) => {
+      console.error(error)
+    }, () => {
+      this._route.navigate(['/results'])
     })
+  }
+  initDiagram(): go.Diagram {
+    var $ = go.GraphObject.make;  // for conciseness in defining templates
+
+    var myDiagram =
+      $(go.Diagram, "myDiagramDiv",  // must name or refer to the DIV HTML element
+        {
+          grid: $(go.Panel, "Grid",
+            $(go.Shape, "LineH", { stroke: "lightgray", strokeWidth: 0.5 }),
+            $(go.Shape, "LineH", { stroke: "gray", strokeWidth: 0.5, interval: 10 }),
+            $(go.Shape, "LineV", { stroke: "lightgray", strokeWidth: 0.5 }),
+            $(go.Shape, "LineV", { stroke: "gray", strokeWidth: 0.5, interval: 10 })
+          ),
+          allowDrop: true,  // must be true to accept drops from the Palette
+          "draggingTool.dragsLink": true,
+          "draggingTool.isGridSnapEnabled": true,
+          "linkingTool.isUnconnectedLinkValid": true,
+          "linkingTool.portGravity": 20,
+          "relinkingTool.isUnconnectedLinkValid": true,
+          "relinkingTool.portGravity": 20,
+          "relinkingTool.fromHandleArchetype":
+            $(go.Shape, "Diamond", { segmentIndex: 0, cursor: "pointer", desiredSize: new go.Size(8, 8), fill: "tomato", stroke: "darkred" }),
+          "relinkingTool.toHandleArchetype":
+            $(go.Shape, "Diamond", { segmentIndex: -1, cursor: "pointer", desiredSize: new go.Size(8, 8), fill: "darkred", stroke: "tomato" }),
+          "linkReshapingTool.handleArchetype":
+            $(go.Shape, "Diamond", { desiredSize: new go.Size(7, 7), fill: "lightblue", stroke: "deepskyblue" }),
+          // rotatingTool: go.RotatingTool,  // defined below
+          // "rotatingTool.snapAngleMultiple": 15,
+          // "rotatingTool.snapAngleEpsilon": 15,
+          // "undoManager.isEnabled": true
+        });
+    return myDiagram;
   }
   load() {
     //var savedModel = document.getElementById("mySavedModel") as HTMLInputElement
@@ -413,11 +443,11 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     var pos = this.myDiagram.model.modelData.position;
     if (pos) this.myDiagram.initialPosition = go.Point.parse(pos);
   }
-  nodeClicked(e: any, obj: any) {
+  nodeClicked(e: go.InputEvent, obj: go.GraphObject) {
     // var evt = e.copy();
     // console.log(evt)
     var node = obj.part;
-    console.log(node.data);
+    // console.log(node.data);
 
     // var array1 = [];
     // array1.push(array)
@@ -425,22 +455,10 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     sessionStorage.setItem('nodeName', node.data.text)
     sessionStorage.setItem('nodeKey', node.data.key)
     sessionStorage.setItem('figure', node.data.figure)
-    // var Node = {
-    //   name: sessionStorage.getItem('nodeName'),
-    //   key: sessionStorage.getItem("nodeKey")
-    // }
-    // console.log(Node)
-    // this.selectedNode.key = "Start"
-    // console.log(this.selectedNode)
-    // this.con.updateNode(node.data);
-    // this.con._node.subscribe((result) => {
-    //   this.selectedNode = result;
-    //   console.log(this.selectedNode)
-    // })
-    //this.selectedNode = obj.part.data
-    // var type = evt.clickCount === 2 ? "Double-Clicked: " : "Clicked: ";
-    // var msg = type + node.data.key + ". ";
-    // console.log(msg)
+
+    this.selectedNode = node.data
+    console.log(this.selectedNode);
+
   }
   showProperties(e: any, obj: any) {  // executed by ContextMenuButton
     var node = obj.part.adornedPart;

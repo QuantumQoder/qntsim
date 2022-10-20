@@ -19,17 +19,18 @@ class RunApp(APIView):
         print('request', request.data.get('topology'))
         topology = request.data.get('topology')
         application_id = request.data.get('application')
-        appSettings = request.data.get('appSetting')
+        appSettings = request.data.get('appSettings')
         # Add check for getting application id and extracting name.
         print('application id', application_id)
         application = Applications.objects.filter(id = application_id).values("name").first().get('name')
-        print(f"Running applications: {application}")
+        print(f"Running applications: {application}", appSettings)
         print('request user', request.user.username, request.user.id)
         results = {}
 
         if application == "e91":
             results = e91(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["keyLength"]))
         elif application == "e2e":
+            print('e2e',appSettings["sender"], appSettings["receiver"], appSettings["startTime"], appSettings["size"], appSettings["priority"], appSettings["targetFidelity"], appSettings["timeout"])
             results = e2e(topology, appSettings["sender"], appSettings["receiver"], appSettings["startTime"], appSettings["size"], appSettings["priority"], appSettings["targetFidelity"], appSettings["timeout"] )
         elif application == "ghz":
             results = ghz(topology, appSettings["endnode1"], appSettings["endnode2"], appSettings["endnode3"], appSettings["middlenode"] )
@@ -45,12 +46,14 @@ class RunApp(APIView):
         # Add code for results here
         print('results', results)
         graphs = results.get('graph')
-        output = results.get('application')
+        # output = results.get('results')
+        output = results
         print('graphs', graphs)
+        print('output', output)
         res = Results.objects.create(user = request.user, topology = topology, app_name = application, input =appSettings, output = output,graphs = graphs)
         res.save()
 
-        return JsonResponse(results)
+        return JsonResponse(output, safe = False)
 
 
 

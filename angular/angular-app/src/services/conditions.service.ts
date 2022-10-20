@@ -6,11 +6,18 @@ import { BehaviorSubject, Subject } from 'rxjs';
 })
 export class ConditionsService {
   currentSection: any;
-  public selectedApp = new Subject();
-  public _node = this.selectedApp.asObservable();
+  public selectedAppResult = new Subject();
+  public _result = this.selectedAppResult.asObservable();
   constructor() { }
   updateNode(value: any) {
-    this.selectedApp.next(value);
+    this.selectedAppResult.next(value)
+  }
+  public result: any
+  getResult() {
+    return this.result;
+  }
+  setResult(value: any) {
+    this.result = value
   }
 
 }
