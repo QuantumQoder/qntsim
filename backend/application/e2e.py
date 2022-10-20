@@ -15,9 +15,14 @@ def load_topo(path,backend):
 def get_res(network_topo,req_pairs):
 	cols = ['Index','Source node', 'Entangled Node' , 'Fidelity', 'Entanglement Time' ,'Expire Time', 'State']
 	memoryDict = {}
+	source_node_list=[]
 	#table=[]
 	for pair in req_pairs:
 		print('src ',pair[0])
+
+		if pair[0] not in source_node_list:
+			source_node_list.append(pair[0])
+	
 		table=[]
 		src=pair[0]
 		for info in network_topo.nodes[src].resource_manager.memory_manager:
@@ -35,7 +40,7 @@ def get_res(network_topo,req_pairs):
 		print(tabulate(table, headers=cols, tablefmt='grid'))
 		memoryDict["receiver"] = str(pd.DataFrame(table, columns=cols).style.hide_index())
 		print('memory dict', memoryDict)
-		return memoryDict
+		return memoryDict ,source_node_list
 		 
 def set_parameters(topology:Topology):
    

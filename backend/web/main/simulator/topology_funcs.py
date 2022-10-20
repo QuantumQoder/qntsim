@@ -121,7 +121,12 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     tl.init()
     tl.run()
     
-    results = get_res(network_topo,req_pairs)
+    results ,source_node_list = get_res(network_topo,req_pairs)
+    report={}
+    report["application"]=results
+    report=network_graph(network_topo,source_node_list,report)
+    print(report)
+    return report
     #graph = network_topo.get_virtual_graph()
     
     """results={
