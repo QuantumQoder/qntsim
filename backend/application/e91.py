@@ -12,7 +12,7 @@ class E91():
 
     # Request transport manager  for entanglements
     def request_entanglements(self,sender,receiver,n):
-        sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.7,5e12)
+        sender.transport_manager.request(receiver.owner.name,3e12,n,20e12,0,.7,5e12)
         source_node_list=[sender.name]
         return sender,receiver,source_node_list
     
@@ -129,8 +129,7 @@ class E91():
         qm_bob=bob.timeline.quantum_manager
         meas_results_bob={} ###entangled key <---> measure result at that qubit: MAP
         bob_choice_list={} ###entangled key <---> Random Basis Choice of Bob :MAP
-        
-        
+          
         for info in bob.resource_manager.memory_manager:
             
             key=info.memory.qstate_key
@@ -352,66 +351,85 @@ class E91():
             evebobresults= list(map(lambda x: x.replace('-1', '0'),evebobresults))
         
         key_error=0
-        
-        checkKeyIndexl=random.sample(range(1, len(alice_keyl)), int(0.2*len(alice_keyl)))
-        for j in checkKeyIndexl:
-            if alice_keyl[j] != bob_keyl[j]:
-                key_error= key_error+1
-        test_error_rate=key_error/len(checkKeyIndexl)
-           
-        keyLength=len(alice_keyl)
-        abKeyMismatches = 0 # number of mismatching bits in the keys of Alice and Bob
-        eaKeyMismatches = 0 # number of mismatching bits in the keys of Eve and Alice
-        ebKeyMismatches = 0 # number of mismatching bits in the keys of Eve and Bob
 
-        for j in range(len(alice_keyl)):
-            if alice_keyl[j] != bob_keyl[j]:
-                abKeyMismatches += 1
-            if eve_keyl[j][0]!= alice_keyl[j]:
-                eaKeyMismatches += 1
-            if eve_keyl[j][1]!= bob_keyl[j]:
-                ebKeyMismatches +=1
+        if len(alice_keyl)!=0:
+            checkKeyIndexl=random.sample(range(1, len(alice_keyl)), math.ceil(0.2*len(alice_keyl)))
+            for j in checkKeyIndexl:
+                if alice_keyl[j] != bob_keyl[j]:
+                    key_error= key_error+1
+            test_error_rate=key_error/len(checkKeyIndexl)
+                
+            keyLength=len(alice_keyl)
+            abKeyMismatches = 0 # number of mismatching bits in the keys of Alice and Bob
+            eaKeyMismatches = 0 # number of mismatching bits in the keys of Eve and Alice
+            ebKeyMismatches = 0 # number of mismatching bits in the keys of Eve and Bob
 
+            for j in range(len(alice_keyl)):
+                if alice_keyl[j] != bob_keyl[j]:
+                    abKeyMismatches += 1
+                if eve_keyl[j][0]!= alice_keyl[j]:
+                    eaKeyMismatches += 1
+                if eve_keyl[j][1]!= bob_keyl[j]:
+                    ebKeyMismatches +=1
+
+                
+            eaKnowledge = (keyLength - eaKeyMismatches)/keyLength # Eve's knowledge of Alice's key
+            ebKnowledge = (keyLength - ebKeyMismatches)/keyLength
+
+            error_rate=abKeyMismatches/len(alice_keyl)
+                
+            print('Alice keys', alice_keyl)
+            print('Bob keys', bob_keyl)
+            print('Eve keys',eve_keyl)
+            print('Key length',len(alice_keyl))
+            print('ab Mismatched keys', abKeyMismatches)
+            print('ab check key error',key_error)
+            print('Eve\'s knowledge of Alice\'s key: ' + str(round(eaKnowledge * 100, 2)) + ' %')
+            print('Eve\'s knowledge of Bob\'s key: ' + str(round(ebKnowledge * 100, 2)) + ' %')  
+            chsh_value=self.chsh_correlation(alice_meas,bob_meas,alice_choice,bob_choice,bob_entangled_key,alice_bob_map)
+            print('Correlation value', chsh_value, round(chsh_value,2))
             
-        eaKnowledge = (keyLength - eaKeyMismatches)/keyLength # Eve's knowledge of Bob's key
-        ebKnowledge = (keyLength - ebKeyMismatches)/keyLength
 
-        error_rate=abKeyMismatches/len(alice_keyl)
-          
-        print('Alice keys', alice_keyl)
-        print('Bob keys', bob_keyl)
-        print('Eve keys',eve_keyl)
-        print('Key length',len(alice_keyl))
-        print('ab Mismatched keys', abKeyMismatches)
-        print('ab check key error',key_error)
-        print('Eve\'s knowledge of Alice\'s key: ' + str(round(eaKnowledge * 100, 2)) + ' %')
-        print('Eve\'s knowledge of Bob\'s key: ' + str(round(ebKnowledge * 100, 2)) + ' %')  
-        chsh_value=self.chsh_correlation(alice_meas,bob_meas,alice_choice,bob_choice,bob_entangled_key,alice_bob_map)
-        print('Correlation value', chsh_value, round(chsh_value,2))
-        
+            res = {
+                "sender_basis_list":alicechoice,
+                "sender_meas_list":aliceresults,
+                "eve_sender_basis_list":evealicechoice,
+                "eve_sender_meas_list":evealiceresults,
+                "receiver_basis_list":bobchoice,
+                "receiver_meas_list":bobresults,
+                "eve_receiver_basis_list":evebobchoice,
+                "eve_receiver_meas_list":evebobresults,
+                "sender_keys": alice_keyl,
+                "receiver_keys": bob_keyl,
+                "keyLength": len(alice_keyl),
+                'keymismatch': abKeyMismatches,
+                'Error_rate': error_rate,
+                'Testkeylength':math.ceil(0.2*len(alice_keyl)),
+                'Testkeymismatch':key_error,
+                'Testerror_rate':test_error_rate,
+                'correlation': str(round(chsh_value,3)),
+                'Success':True
+            }
+            #print(res)
+            return res
+        else :
 
-        res = {
-            "sender_basis_list":alicechoice,
-            "sender_meas_list":aliceresults,
-            "eve_sender_basis_list":evealicechoice,
-            "eve_sender_meas_list":evealiceresults,
-            "receiver_basis_list":bobchoice,
-            "receiver_meas_list":bobresults,
-            "eve_receiver_basis_list":evebobchoice,
-            "eve_receiver_meas_list":evebobresults,
-            "sender_keys": alice_keyl,
-            "receiver_keys": bob_keyl,
-            "keyLength": len(alice_keyl),
-            'keymismatch': abKeyMismatches,
-            'Error_rate': error_rate,
-            'Testkeylength':int(0.2*len(alice_keyl)),
-            'Testkeymismatch':key_error,
-            'Testerror_rate':test_error_rate,
-            'correlation': str(round(chsh_value,3))
-        }
-        
-        #print(res)
-        return res
+            res = {
+                "sender_basis_list":alicechoice,
+                "sender_meas_list":aliceresults,
+                "eve_sender_basis_list":evealicechoice,
+                "eve_sender_meas_list":evealiceresults,
+                "receiver_basis_list":bobchoice,
+                "receiver_meas_list":bobresults,
+                "eve_receiver_basis_list":evebobchoice,
+                "eve_receiver_meas_list":evebobresults,
+                "sender_keys": alice_keyl,
+                "receiver_keys": bob_keyl,
+                "keyLength": len(alice_keyl),
+                "Success":False   
+            }
+            return res
+            
 
 
     def run(self,alice,bob,n):
@@ -494,30 +512,46 @@ class E91():
         error_rate=key_mismatch/len(alice_keyl)
 
         key_error=0
-        checkKeyIndexl=random.sample(range(1, len(alice_keyl)), int(0.2*len(alice_keyl)))
-        for j in checkKeyIndexl:
-            if alice_keyl[j] != bob_keyl[j]:
-                key_error= key_error+1
-        test_error_rate=key_error/len(checkKeyIndexl)
+        if len(alice_keyl)!=0:
+            checkKeyIndexl=random.sample(range(1, len(alice_keyl)), math.ceil(0.2*len(alice_keyl)))
+            for j in checkKeyIndexl:
+                if alice_keyl[j] != bob_keyl[j]:
+                    key_error= key_error+1
+            test_error_rate=key_error/len(checkKeyIndexl)
 
-        res = {
-            "sender_basis_list":alicechoice,
-            "sender_meas_list":aliceresults,
-            "receiver_basis_list":bobchoice,
-            "receiver_meas_list":bobresults,
-            "sender_keys": alice_keyl,
-            "receiver_keys": bob_keyl,
-            "keyLength": len(alice_keyl),
-            'keymismatch': key_mismatch,
-            'Error_rate': error_rate,
-            'Testkeylength':int(0.2*len(alice_keyl)),
-            'Testkeymismatch':key_error,
-            'Testerror_rate':test_error_rate,
-            'correlation': str(round(chsh_value,3))
-        }
-        
-        #print(res)
-        return res
+            res = {
+                "sender_basis_list":alicechoice,
+                "sender_meas_list":aliceresults,
+                "receiver_basis_list":bobchoice,
+                "receiver_meas_list":bobresults,
+                "sender_keys": alice_keyl,
+                "receiver_keys": bob_keyl,
+                "keyLength": len(alice_keyl),
+                'keymismatch': key_mismatch,
+                'Error_rate': error_rate,
+                'Testkeylength':math.ceil(0.2*len(alice_keyl)),
+                'Testkeymismatch':key_error,
+                'Testerror_rate':test_error_rate,
+                'correlation': str(round(chsh_value,3)),
+                'Success':True
+            }    
+            print(res)
+            return res
+
+        else:
+
+            res = {
+                "sender_basis_list":alicechoice,
+                "sender_meas_list":aliceresults,
+                "receiver_basis_list":bobchoice,
+                "receiver_meas_list":bobresults,
+                "sender_keys": alice_keyl,
+                "receiver_keys": bob_keyl,
+                "keyLength": len(alice_keyl),
+                'keymismatch': key_mismatch,
+                'Success':False
+            }
+            
         
 ###############################################################################################
 
@@ -568,7 +602,8 @@ def set_parameters(topology):
 # path (Type : String) -Path to config Json file
 """
 def e91(backend,path,sender,receiver,key_length):
-    trials=5
+
+    trials=4
     while (trials>0):
         from qntsim.kernel.timeline import Timeline 
         Timeline.DLCZ=False
@@ -578,6 +613,9 @@ def e91(backend,path,sender,receiver,key_length):
         network_topo = Topology("network_topo", tl)
         network_topo.load_config(path)
         set_parameters(network_topo)
+        if key_length==0:
+            return {"Error_Msg":"key should be greater than 0.Retry Again"}
+
         if key_length<30 and key_length>0:
             #n=int((9*key_length)/2)
             n=int(8*key_length)
@@ -589,20 +627,17 @@ def e91(backend,path,sender,receiver,key_length):
             tl.run()  
             res=e91.run(alice,bob,n)
             #print("res",res)
-            if key_length<=len(res["sender_keys"]):
-                res1 = {
-                "sender_keys": res["sender_keys"][:key_length],
-                "receiver_keys": res["receiver_keys"][:key_length],
-                "keyLength": key_length,
-                'mismatch': res['keymismatch'],
-                'correlation': res['correlation']
-                }
-                #print("res1",res1)
-                return res1
-        
-        trails=trails-1
+            if key_length<len(res["sender_keys"]):
+                res["sender_keys"]=res["sender_keys"][:key_length]
+                res["receiver_keys"]=res["receiver_keys"][:key_length] 
+                res["sifted_keylength"]=key_length 
+                print(res)
+                return res
+        trials=trials-1
+    return {"Error_Msg":"Couldn't generate required length.Retry Again"}
+
 def eve_e91(backend,path,sender,receiver,key_length):
-    trials=5
+    trials=4
     while (trials>0):
         from qntsim.kernel.timeline import Timeline 
         Timeline.DLCZ=False
@@ -612,8 +647,11 @@ def eve_e91(backend,path,sender,receiver,key_length):
         network_topo = Topology("network_topo", tl)
         network_topo.load_config(path)
         set_parameters(network_topo)
+        if key_length==0:
+            return {"Error_Msg":"key should be greater than 0.Retry Again"}
+
         if key_length<51 and key_length>0:
-            #n=int((9*key_length)/2)
+            #n=int((9*key_length)/2
             n=int(8*key_length)
             alice=network_topo.nodes[sender]
             bob = network_topo.nodes[receiver]
@@ -622,20 +660,16 @@ def eve_e91(backend,path,sender,receiver,key_length):
             tl.init()
             tl.run()  
             res=e91.eve_run(alice,bob,n)
-            if key_length<=len(res["sender_keys"]):
-                res1 = {
-                "sender_keys": res["sender_keys"][:key_length],
-                "receiver_keys": res["receiver_keys"][:key_length],
-                "keyLength": key_length,
-                'mismatch': res['keymismatch'],
-                'correlation': res['correlation']
-                }
-                #print("res1",res1)
-                return res1
-        
+            if key_length<len(res["sender_keys"]):
+                res["sender_keys"]=res["sender_keys"][:key_length]
+                res["receiver_keys"]=res["receiver_keys"][:key_length] 
+                res["sifted_keylength"]=key_length
+                print(res) 
+                return res
         trials=trials-1
+    return {"Error_Msg":"Couldn't generate required length.Retry Again"}
 """
-#eve_e91("Qutip", "/home/bhanusree/Desktop/QNTv1/QNTSim-Demo/QNTSim/example/3node.json", "a", "s1", 30)
+#e91("Qutip", "/home/bhanusree/Desktop/QNTv1/QNTSim-Demo/QNTSim/example/3node.json", "a", "s1", 2)
 
 # jsonConfig (Type : Json) -Json Configuration of network 
 

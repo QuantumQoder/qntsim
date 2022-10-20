@@ -49,25 +49,64 @@ def network_graph(network_topo,source_node_list,report):
     print(report)
     return report
 
+def eve_e91(network_config, sender, receiver, keyLength):
+    network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
+    trials=4
+    while (trials>0):
+        if keyLength<=0 or keyLength>30:
+            return {"Error_Msg":"keyLength Should be Greater than 0 and less than 30 .Retry Again"}
+        if keyLength<=30 and keyLength>0:
+            #n=int((9*key_length)/2)
+            n=int(8*keyLength)
+            alice=network_topo.nodes[sender]
+            bob = network_topo.nodes[receiver]
+            e91=E91()
+            alice,bob,source_node_list=e91.roles(alice,bob,n)
+            tl.init()
+            tl.run() 
+            results=e91.eve_run(alice,bob,n)
+            if keyLength<len(results["sender_keys"]):
+                results["sender_keys"]=results["sender_keys"][:keyLength]
+                results["receiver_keys"]=results["receiver_keys"][:keyLength] 
+                results["sifted_keylength"]=keyLength 
+            report={}
+            report["application"]=results
+            report=network_graph(network_topo,source_node_list,report)
+            print(report)
+            return report
+        trials=trials-1    
+    return {"Error_Msg":"Couldn't generate required length.Retry Again"}
+
 def e91(network_config, sender, receiver, keyLength):
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
-    if keyLength<50 and keyLength>0:
-        n=int((9*keyLength)/2)
-        alice=network_topo.nodes[sender]
-        bob = network_topo.nodes[receiver]
-        e91=E91()
-        alice,bob,source_node_list=e91.roles(alice,bob,n)
-        tl.init()
-        tl.run()  
-        results = e91.run(alice,bob,n)
-        report={}
-        report["application"]=results
-        report=network_graph(network_topo,source_node_list,report)
-        print(report)
-        return report
-    else:
-        print("key length should be between 0 and 50")
-        return None
+    trials=4
+    while (trials>0):
+        if keyLength<=0 or keyLength>30:
+            return {"Error_Msg":"keyLength Should be Greater than 0 and less than 30 .Retry Again"}
+
+        if keyLength<=30 and keyLength>0:
+            #n=int((9*key_length)/2)
+            n=int(8*keyLength)
+            alice=network_topo.nodes[sender]
+            bob = network_topo.nodes[receiver]
+            e91=E91()
+            alice,bob,source_node_list=e91.roles(alice,bob,n)
+            tl.init()
+            tl.run()  
+            results = e91.run(alice,bob,n)
+            if keyLength<len(results["sender_keys"]):
+                results["sender_keys"]=results["sender_keys"][:keyLength]
+                results["receiver_keys"]=results["receiver_keys"][:keyLength] 
+                results["sifted_keylength"]=keyLength 
+            report={}
+            report["application"]=results
+            report=network_graph(network_topo,source_node_list,report)
+            print(report)
+            return report
+        trials=trials-1
+        
+    return {"Error_Msg":"Couldn't generate required length.Retry Again"}
+
     
 def e2e(network_config, sender, receiver, startTime, size, priority, targetFidelity, timeout):
 
