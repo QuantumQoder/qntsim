@@ -144,8 +144,17 @@ class QSDC1():
             b_val = list(bob_meas[i].values())[0]
 
             if thrown_message[i] == "00" or thrown_message[i] == "10":
-                assert a_val == b_val
-            else : assert a_val == 1 - b_val
+                if a_val ==b_val:
+                    self.eavesdrop=False
+                else:
+                    self.eavesdrop=True
+                #assert a_val == b_val
+            else : 
+                if a_val == 1-b_val:
+                    self.eavesdrop=False
+                else:
+                    self.eavesdrop=True
+                #assert a_val == 1 - b_val
 
         print("eavesdrop check passed!")
         print(alice_meas, bob_meas)
@@ -192,11 +201,13 @@ class QSDC1():
         ###"message thrown out because we measure it for eavesdrop check : ",removed_bits
         ###display_msg : "message thrown out because we measure it for eavesdrop check : "
         res = {
+            "eavesdrop":self.eavesdrop,
             "display_msg":removed_bits,
             "key_transmitted": message,
             "key_shared_received": message_received,
             "final_key" : final_key
         }
+        print(res)
         return res
 
 # In the request if the runtime is till the simulation, then memory will be sequentially allotted 
@@ -291,8 +302,7 @@ def qsdc1(jsonConfig,sender,receiver,sequence_length,message):
     
     report["application"]=res
     report["graph"]=graph
-    
-    print(report)
+    return report
 conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
 memo = {"frequency": 2e3, "expiry": 0, "efficiency": 1, "fidelity": 1}
 node1 = {"Name": "N1", "Type": "end", "noOfMemory": 500, "memory":memo}

@@ -187,6 +187,8 @@ class PingPong():
 
     def one_bit_ping_pong(self,x_n, c, sequence_length, entangled_keys, round_num):
         #print("round_num ", round_num)
+        self.impurities=[False]
+        self.eve_present=False
         memory_size = 10
 
         current_keys = entangled_keys[round_num*sequence_length : (round_num + 1)*sequence_length]
@@ -199,6 +201,7 @@ class PingPong():
             for i in range(len(meas_results_alice)):
                 if not (list(meas_results_alice[i].values())[0] == 1 - list(meas_results_bob[i].values())[0]):
                     #print("Alice and Bob get same states -> Stop Protocol!")
+                    self.eve_present=True
                     return -1
 
             print("Protocol c passes through without trouble! No Eve detected yet")
@@ -213,12 +216,13 @@ class PingPong():
             round_num = round_num + 1
             #print("HERE", bell_results)
             accuracy = self.get_percentage_accurate(bell_results, x_n)
-            print(accuracy)
+            #print(accuracy)
             if accuracy == 1 :
                 return self.decode_bell(bell_results[0]), round_num
 
             else : 
                 print("protocol m has some impurities; accuracy of transmission is ", accuracy)
+                self.impurities=[True,accuracy]
                 return -1
 
 
@@ -250,10 +254,12 @@ class PingPong():
 
 
         res = {
+            "Eve_presence":self.eve_present,
+            "Impurities_presence":self.impurities,
             "message_transmitted": message,
             "message_received": bob_message
         }
-
+        print(res)
         return res
     #start = time.time()
     #run_ping_pong(alice,bob,sequence_length,message = "010110100")
@@ -301,7 +307,7 @@ def ping_pong1(path,sender,receiver,sequence_length,message):
         alice=network_topo.nodes[sender]
         bob = network_topo.nodes[receiver]
         pp=PingPong()
-        alice,bob=pp.roles(alice,bob,n)
+        alice,bob,source_node_list=pp.roles(alice,bob,n)
         tl.init()
         tl.run() 
         pp.create_key_lists(alice,bob)
@@ -323,7 +329,7 @@ def ping_pong(jsonConfig,sender,receiver,sequence_length,message):
     alice=network_topo.nodes[sender]
     bob = network_topo.nodes[receiver]
     pp=PingPong()
-    alice,bob=pp.roles(alice,bob,2*n)
+    alice,bob,source_node_list=pp.roles(alice,bob,2*n)
     tl.init()
     tl.run() 
     pp.create_key_lists(alice,bob)

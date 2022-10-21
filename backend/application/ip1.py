@@ -208,7 +208,11 @@ class IP1():
                 self.hadamard_transform(qm, [Q5A_keys[pos]])
             output = self.z_measurement(qm, [Q5A_keys[pos]])
             print("key : ", Q5A_keys[pos], " output : ", output, " expected output : ", decoy_results[i][0])
-            assert(output == int(decoy_results[i][0])), "Security check did not pass!"
+            #assert(output == int(decoy_results[i][0])), "Security check did not pass!"
+            if output == int(decoy_results[i][0]):
+                self.security_msg="Security check passed"  #Security check did not pass!
+            else :
+                self.security_msg="Security check did not pass" 
             to_remove.append(Q5A_keys[pos])
 
         print("Security check successful!")
@@ -225,8 +229,13 @@ class IP1():
                 self.hadamard_transform(qm, [key])
 
             output = self.z_measurement(qm, [key])
-            assert(output == int(IdA[c + 1])), "IdA authentication did not pass!"
+            if output == int(IdA[c + 1]):
+                self.IdA_msg="IdA authenticated"
+            else:
+                self.IdA_msg="IdA authentication did not pass"
+               
 
+            #assert(output == int(IdA[c + 1])), "IdA authentication did not pass!"
             c = c + 2
         print("IdA authenticated!")
 
@@ -354,13 +363,15 @@ class IP1():
         #Bobs_r : Bobs_r that he gets 
         #Alice_r: Alice's encoded r
         res ={
+            "Security_msg":self.security_msg,
+            "IdA_msg":self.IdA_msg,
             "Bobs_r": Bobs_r,
             "Alice_r ": r,
             "display_msg":display_msg,
             "input_message": message,
             "bob_message" : Bob_message
         }
-
+        print(res)
         return res
     # One question - technically all of this is happening on Alice's nodes. How do 
     # I send everything to Bob's nodes
@@ -396,7 +407,9 @@ def ip1(path,sender,receiver,message):
     tl.run()  
     res = ip1.run(alice,bob,message)
     print(res)
+"""
 # jsonConfig (Type : Json) -Json Configuration of network 
+"""
 def ip1(jsonConfig,sender,receiver,message):
     from qntsim.kernel.timeline import Timeline 
     Timeline.DLCZ=False
@@ -410,7 +423,7 @@ def ip1(jsonConfig,sender,receiver,message):
     alice=network_topo.nodes[sender]
     bob = network_topo.nodes[receiver]
     ip1=IP1()
-    alice,bob=ip1.roles(alice,bob,n=50)
+    alice,bob,source_node_list=ip1.roles(alice,bob,n=50)
     tl.init()
     tl.run()  
     ip1.run(alice,bob,message)
