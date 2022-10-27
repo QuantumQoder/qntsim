@@ -99,12 +99,12 @@ class GHZ():
         print("\nGHZ State bob\n",  qm_middle.get(bob_key).state)
         print("\nGHZ State charlie\n",  qm_middle.get(charlie_key).state)
         res = {
-            "initial_alice_state":ialicestate.state,          
-            "initial_bob_state":ibobstate.state,
-            "initial_charlie_state":icharliestate.state,          
-            "final_alice_state":qm_alice.get(alice_key).state ,
-            "final_bob_state": qm_bob.get(bob_key).state,
-            "final_charlie_state":qm_charlie.get(charlie_key).state,
+            "initial_alice_state":str(ialicestate.state),          
+            "initial_bob_state":str(ibobstate.state),
+            "initial_charlie_state":str(icharliestate.state),          
+            "final_alice_state":str(qm_alice.get(alice_key).state) ,
+            "final_bob_state": str(qm_bob.get(bob_key).state),
+            "final_charlie_state":str(qm_charlie.get(charlie_key).state),
             
             "alice_state":str(qm_middle.get(alice_key).state) ,
             "bob_state": str(qm_middle.get(bob_key).state),

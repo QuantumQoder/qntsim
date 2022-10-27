@@ -44,12 +44,13 @@ class RunApp(APIView):
             results = teleportation(topology, appSettings["sender"], appSettings["receiver"], complex(appSettings["amplitude1"]), complex(appSettings["amplitude2"]) )
 
         # Add code for results here
-        print('results', results)
+        print('results', type(results))
         graphs = results.get('graph')
         # output = results.get('results')
         output = results
-        print('graphs', graphs)
-        print('output', output)
+        print('graphs', type(graphs))
+        print('output', type(output))
+        print('request user', request.user)
         res = Results.objects.create(user = request.user, topology = topology, app_name = application, input =appSettings, output = output,graphs = graphs)
         res.save()
 
