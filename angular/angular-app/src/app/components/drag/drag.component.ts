@@ -17,8 +17,15 @@ import { ConditionsService } from 'src/services/conditions.service';
 })
 export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   app_id: any
-
-  nodeKey: any = []
+  nodeParams: boolean
+  link: boolean
+  memory: any = {
+    "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93
+  }
+  nodeWithKey: any
+  paramsSet = new Map()
+  topology: any
+  nodeKey: any
   spinner: boolean = false
   blocked: boolean = false
   ip1: any
@@ -36,7 +43,13 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   items: MenuItem[];
   position: string;
   node: any = {};
-  toolbox: any
+  toolbox = this.fb.group({
+    'name': new FormControl(''),
+    'noOfMemories': new FormControl(''),
+    'memoryFidelity': new FormControl(''),
+    'attenuation': new FormControl(''),
+    'distance': new FormControl('')
+  })
   public selectedNode: any;
   visibleSideNav: boolean
   public myDiagram: go.Diagram
@@ -119,7 +132,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     }
     var nodeSelectionAdornmentTemplate =
       $(go.Adornment, "Auto",
-        $(go.Shape, { fill: null, stroke: "blue", strokeWidth: 1.5, strokeDashArray: [4, 2] }),
+        $(go.Shape, { fill: null, stroke: "blue", strokeWidth: 1.5, strokeDashArray: [2, 2] }),
         $(go.Placeholder)
       );
 
@@ -162,7 +175,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         { locationSpot: go.Spot.Center },
         new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
         { selectable: true, selectionAdornmentTemplate: nodeSelectionAdornmentTemplate },
-        { resizable: true, resizeObjectName: "PANEL", resizeAdornmentTemplate: nodeResizeAdornmentTemplate },
+        { resizable: false, resizeObjectName: "PANEL", resizeAdornmentTemplate: nodeResizeAdornmentTemplate },
         { rotatable: true, rotateAdornmentTemplate: nodeRotateAdornmentTemplate },
         new go.Binding("angle").makeTwoWay(),
         // the main object is a Panel that surrounds a TextBlock with a Shape
@@ -186,7 +199,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
             margin: 8,
             maxSize: new go.Size(160, NaN),
             wrap: go.TextBlock.WrapFit,
-            editable: true
+            editable: false
           },
           new go.Binding("text").makeTwoWay())
       ),
@@ -206,7 +219,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           // isPanelMain declares that this Shape shares the Link.geometry
           { isPanelMain: true, fill: null, stroke: "deepskyblue", strokeWidth: 0 })  // use selection object's strokeWidth
       );
-
     this.myDiagram.linkTemplate =
       $(go.Link,  // the whole link panel
         { selectable: true, selectionAdornmentTemplate: linkSelectionAdornmentTemplate },
@@ -217,18 +229,18 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           corner: 5,
           toShortLength: 4,
           cursor: 'pointer',
-          click: function (e: any, obj: any) {
-            console.log(e, obj)
+          click: (e: any, obj: any) => {
+            this.linkClicked(e, obj)
           }
         },
         new go.Binding("points").makeTwoWay(),
         $(go.Shape,  // the link path shape
           { isPanelMain: true, strokeWidth: 2 },
           new go.Binding("stroke", "color")),
-        $(go.TextBlock, { textAlign: "center" },  // centered multi-line text
+        $(go.TextBlock, { segmentOffset: new go.Point(0, -10) },  // centered multi-line text
           new go.Binding("text", "text")),
-        // $(go.Shape,  // the link path shape
-        //   { isPanelMain: true, strokeWidth: 2 }),
+        $(go.Shape,  // the link path shape
+          { isPanelMain: true, strokeWidth: 2 }),
         $(go.Shape,  // the arrowhead
           { toArrow: "Standard", stroke: null },
           new go.Binding('fill', 'color')),
@@ -238,7 +250,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
             { fill: "#F8F8F8", stroke: null }),
           $(go.TextBlock,
             {
-              textAlign: "center",
+              // textAlign: segmentOffset: new go.Point(0, -10)",
               font: "10pt helvetica, arial, sans-serif",
               stroke: "#919191",
               margin: 2,
@@ -264,10 +276,10 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
                     $(go.Shape,
                       { isPanelMain: true, fill: null, stroke: "deepskyblue", strokeWidth: 0 }),
                     $(go.Shape,  // the arrowhead
-                      { toArrow: "Standard", stroke: "black", strokeWidth: 4 }),
-                    $(go.Shape,  // the arrowhead
-                      { toArrow: "Standard", stroke: "grey", strokeWidth: 4 }),
-                  )
+                      { toArrow: "Standard", stroke: "grey" })
+                    // $(go.Shape,  // the arrowhead
+                    // { toArrow: "Standard", stroke: "grey", strokeWidth: 4 }),
+                  ),
               },
               {
                 routing: go.Link.AvoidsNodes,
@@ -278,13 +290,13 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
               new go.Binding("points"),
               $(go.Shape,  // the link path shape
                 { isPanelMain: true, strokeWidth: 2 }),
+              // $(go.Shape,  // the arrowhead
+              //   { toArrow: "Standard", stroke: null }),
+              // $(go.TextBlock, { segmentOffset: new go.Point(0, -20) },  // centered multi-line text
+              //   new go.Binding("text", "text")),
               $(go.Shape,  // the arrowhead
                 { toArrow: "Standard", stroke: null, strokeWidth: 2 }),
-              $(go.TextBlock, { textAlign: "center" },  // centered multi-line text
-                new go.Binding("text", "text")),
-              $(go.Shape,  // the arrowhead
-                { toArrow: "Standard", stroke: null, strokeWidth: 2 }),
-              $(go.TextBlock, { textAlign: "center" },  // centered multi-line text
+              $(go.TextBlock, { segmentOffset: new go.Point(0, -10) },  // centered multi-line text
                 new go.Binding("text", "text")),
               new go.Binding('fill', 'color'),
             ),
@@ -295,15 +307,11 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           ], [
             // the Palette also has a disconnected Link, which the user can drag-and-drop
             { text: "QC", points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) },
-            { color: "grey", text: "VC", points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) }
+            // { color: "grey", text: "VC", points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) }
           ])
         });
     this.myDiagram
-    this.toolbox = this.fb.group({
-      'name': new FormControl(''),
-      'noOfMemories': new FormControl(''),
-      'memoryFidelity': new FormControl('')
-    })
+
     this.e2e = this.fb.group({
       'sender': new FormControl(''),
       'receiver': new FormControl(''),
@@ -352,29 +360,86 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   selected(): any {
     console.log("selected")
   }
-
+  linkClicked(e: any, obj: any) {
+    this.visibleSideNav = true
+    //console.log("hello")
+    this.nodeParams = false;
+    this.link = true
+  }
   save() {
     this.app_id = sessionStorage.getItem("app_id")
-    console.log(this.app_id)
+    //console.log(this.app_id)
     //console.log(this.myDiagram.model.toJson)
+
     this.saveDiagramProperties();
     this.graphModel = this.myDiagram.model.nodeDataArray
+    console.log(this.graphModel)
 
     //console.log(this.graphModel)
-
     this.position = 'bottom';
     this.displayPosition = true;
   }
+  add() {
+    var nodereq;
+    var linkreq;
+    if (this.nodeParams) {
+      var nodesarray = this.savedModel.nodeDataArray
+      //let length = nodesarray.length
+      nodereq = {
+        "Name": this.toolbox.get('name')?.value,
+        "Type": this.selectedNode.text,
+        "noOfMemories": this.toolbox.get('noOfMemories')?.value,
+        "memory": this.memory
+      }
+      var key = this.selectedNode.key
+      console.log(key)
+      let positivekey = key.toString().substring(1)
+      console.log(positivekey * 2)
+      sessionStorage.setItem("selected_node", this.selectedNode.key)
+      var indexFromKey = positivekey - 1
+      if (this.nodes[indexFromKey] == null)
+        this.nodes.splice(indexFromKey, 0, nodereq)
+      if (this.nodes[indexFromKey] != null) {
+        this.nodes.splice(indexFromKey, 1, nodereq)
+      }
+      console.log(this.nodes)
+      console.log(indexFromKey)
+      // console.log(this.nodes)
+    }
+    if (this.link) {
+      //var linksarray = this.savedModel.linkDataArray
+      let array = []
+      for (let i = 0; i < this.nodes.length; i++) {
+        array.push(this.nodes[i].Name)
+        console.log(array)
+      }
+      linkreq = {
+        Nodes: array,
+        Attenuation: this.toolbox.get('attenuation')?.value,
+        Distance: this.toolbox.get('distance')?.value,
+      }
+      console.log(linkreq)
+    }
+    this.visibleSideNav = false
+  }
   parameters() {
     this.blocked = true
+    var e2e = {
 
+      "application": 2,
+
+      "topology": { "nodes": [{ "Name": "n1", "Type": "service", "noOfMemory": 500, "memory": { "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93 } }, { "Name": "n2", "Type": "end", "noOfMemory": 500, "memory": { "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93 } }], "quantum_connections": [{ "Nodes": ["n1", "n2"], "Attenuation": 0.00001, "Distance": 70 }], "classical_connections": [{ "Nodes": ["n1", "n1"], "Delay": 0, "Distance": 1000 }, { "Nodes": ["n1", "n2"], "Delay": 1000000000, "Distance": 1000 }, { "Nodes": ["n2", "n1"], "Delay": 1000000000, "Distance": 1000 }, { "Nodes": ["n2", "n2"], "Delay": 0, "Distance": 1000 }] },
+
+      "appSettings": { "sender": "n1", "receiver": "n2", "startTime": "1e12", "size": "6", "priority": "0", "targetFidelity": "0.5", "timeout": "2e12" }
+
+    }
     this.displayPosition = false
     var token = localStorage.getItem('access')
     var topology = { "nodes": [{ "Name": "n1", "Type": "service", "noOfMemory": 500, "memory": { "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93 } }, { "Name": "n2", "Type": "end", "noOfMemory": 500, "memory": { "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93 } }], "quantum_connections": [{ "Nodes": ["n1", "n2"], "Attenuation": 0.00001, "Distance": 70 }], "classical_connections": [{ "Nodes": ["n1", "n1"], "Delay": 0, "Distance": 1000 }, { "Nodes": ["n1", "n2"], "Delay": 1000000000, "Distance": 1000 }, { "Nodes": ["n2", "n1"], "Delay": 1000000000, "Distance": 1000 }, { "Nodes": ["n2", "n2"], "Delay": 0, "Distance": 1000 }] }
     var req = {
       "application": 1,
       "topology": topology,
-      "appSettings": { "sender": "n1", "receiver": "n2", "keyLength": "5" }
+      "appSettings": { "sender": "n1", "receiver": "n2", "keyLength": "7" }
     }
     this.apiService.runApplication(req).subscribe((result: any) => {
       this.con.setResult(result)
@@ -387,7 +452,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   }
   initDiagram(): go.Diagram {
     var $ = go.GraphObject.make;  // for conciseness in defining templates
-
     var myDiagram =
       $(go.Diagram, "myDiagramDiv",  // must name or refer to the DIV HTML element
         {
@@ -429,7 +493,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   showPositionDialog() {
     //var savedModel = document.getElementById("mySavedModel") as HTMLInputElement
     this.saveDiagramProperties();  // do this first, before writing to JSON
-    this.savedModel = this.myDiagram.model;
+
 
     //console.log(this.savedModel)
     this.myDiagram.isModified = false;
@@ -448,17 +512,48 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     // console.log(evt)
     var node = obj.part;
     // console.log(node.data);
-
+    this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
+    this.savedModel = this.myDiagram.model;
+    console.log(this.savedModel.linkDataArray)
+    console.log(this.savedModel.linkDataArray[0].from)
     // var array1 = [];
     // array1.push(array)
     // sessionStorage.setItem('node', ...array1)
-    sessionStorage.setItem('nodeName', node.data.text)
-    sessionStorage.setItem('nodeKey', node.data.key)
-    sessionStorage.setItem('figure', node.data.figure)
-
+    // sessionStorage.setItem('nodeName', node.data.text)
+    // sessionStorage.setItem('nodeKey', node.data.key)
+    // sessionStorage.setItem('figure', node.data.figure)
+    // console.log((-1) * (-1))
     this.selectedNode = node.data
     console.log(this.selectedNode);
+    var key = this.selectedNode.key
+    if (this.nodes.length != 0) {
+      let positivekey = key.toString().substring(1)
+      // console.log(positivekey * 2)
+      var indexFromKey = positivekey - 1
+      console.log(this.nodes.length)
+      let node
+      if (this.nodes.length > indexFromKey) {
+        node = this.nodes[indexFromKey]
+        console.log(node)
+        this.toolbox.get('name')?.patchValue(node.Name)
+        this.toolbox.get('noOfMemories')?.patchValue(node.noOfMemories)
+      }
+      else {
+        this.toolbox.get('name')?.patchValue('');
+        this.toolbox.get('noOfMemories')?.patchValue('')
+      }
+    }
+    //   for (var i = 0; i < this.nodes.length; i++) {
+    //     console.log(this.nodes[i].Type)
+    //     console.log(this.nodes[i].Type == this.selectedNode.text)
+    //     if (this.nodes[i].Name == this.selectedNode.text) {
+    //       this.toolbox.get('name')?.setValue('')
+    //     }
 
+    //   }
+    this.visibleSideNav = true
+    this.nodeParams = true
+    this.link = false
   }
   showProperties(e: any, obj: any) {  // executed by ContextMenuButton
     var node = obj.part.adornedPart;

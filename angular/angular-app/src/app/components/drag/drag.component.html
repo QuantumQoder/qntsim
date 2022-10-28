@@ -27,9 +27,9 @@
                 &nbsp;
                 <button type="button" pButton pRipple (click)="load()" label="Load" class="ui-button-warning"></button>
                 &nbsp;
-                <button type="button" pButton pRipple (click)="showPositionDialog()" label="Select"
+                <!-- <button type="button" pButton pRipple (click)="showPositionDialog()" label="Select"
                     class="ui-button-warning">
-                </button>
+                </button> -->
                 <!-- Diagram Model saved in JSON format: -->
             </div>
             <!-- <textarea id="mySavedModel" style="width:100%;height:300px">
@@ -259,27 +259,47 @@
         <div id="toolbox" class="col" [formGroup]="toolbox">
 
             <br>
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="email" class="form-control" id="name" aria-describedby="emailHelp"
-                    placeholder="Enter Name">
-                <!-- <small id="emailHelp" class="form-text text-muted">Your information is safe with us.</small> -->
+            <div *ngIf="nodeParams">
+                <div class="display-5">Node Parameters</div>
+                <br>
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="email" class="form-control" id="name" formControlName="name"
+                        aria-describedby="emailHelp" placeholder="Enter Name">
+                    <!-- <small id="emailHelp" class="form-text text-muted">Your information is safe with us.</small> -->
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="noOfMemories">No of Memories</label>
+                    <input type="number" class="form-control" id="noOfMemories" formControlName="noOfMemories"
+                        placeholder="No of Memories">
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="memoryFidelity">Memory Fidelity</label>
+                    <input type="text" class="form-control" id="memoryFidelity" placeholder="Memory Fidelity">
+                </div>
             </div>
-            <br>
-            <div class="form-group">
-                <label for="noOfMemories">No of Memories</label>
-                <input type="number" class="form-control" id="noOfMemories" placeholder="No of Memories">
+            <div *ngIf="link">
+                <div class="display-5">Link Parameters</div>
+                <br>
+                <div class="form-group">
+                    <label for="attenuation">Attenuation</label>
+                    <input numeric decimals="2" type="text" class="form-control" formControlName="attenuation"
+                        id="attenuation" placeholder="Enter in decimals">
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="distance">Distance</label>
+                    <input type="number" class="form-control" id="distance" formControlName="distance"
+                        placeholder="Enter Distance">
+                </div>
+                <br>
             </div>
-            <br>
-            <div class="form-group">
-                <label for="memoryFidelity">Memory Fidelity</label>
-                <input type="text" class="form-control" id="memoryFidelity" placeholder="Memory Fidelity">
-            </div>
-
         </div>
         <div class="row">
             <div class="col">
-                <button type="button" pButton pRipple (click)="save()" label="Save" class="ui-button-warning"></button>
+                <button type="button" pButton pRipple (click)="add()" label="Save" class="ui-button-warning"></button>
             </div>
         </div>
 

@@ -3,38 +3,47 @@
     <br>
     <div *ngIf="app_id=='2'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
         <div *ngIf="keyGen" class="row">
-            <div class="col">
+            <div class="tabel">
+                <h5><u>Sender</u></h5>
                 <table class="table table-bordered">
                     <thead class="thead-light">
-                        <h5><u>Sender</u></h5>
+
                     </thead>
                     <tbody>
                         <tr>
                             <td class="col">Basis</td>
-                            <td class="col" *ngFor="let app of e91.sender_basis_list">{{app}}</td>
+                            <td class="col" [ngClass]="senderbasis(i)"
+                                *ngFor="let app of e91.sender_basis_list;let i=index">
+                                {{app}}
+                            </td>
                         </tr>
                         <tr>
                             <td class="col">Value</td>
-                            <td class="col" *ngFor="let app of e91.sender_meas_list">{{app}}</td>
+                            <td class="col" [ngClass]="senderbasis(i)"
+                                *ngFor="let app of e91.sender_meas_list;let i=index">{{app}}
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
         <div *ngIf="keyGen" class="row">
-            <div class="col">
+            <div class="tabel">
+                <h5><u>Receiver</u></h5>
                 <table class="table table-bordered">
                     <thead class="thead-light">
-                        <h5><u>Receiver</u></h5>
+
                     </thead>
                     <tbody>
                         <tr>
                             <td class="col">Basis</td>
-                            <td class="col" *ngFor="let app of e91.receiver_basis_list">{{app}}</td>
+                            <td class="col" [ngClass]="senderbasis(i)"
+                                *ngFor="let app of e91.receiver_basis_list;let i=index">{{app}}</td>
                         </tr>
                         <tr>
                             <td class="col">Value</td>
-                            <td class="col" *ngFor="let app of e91.receiver_meas_list">{{app}}</td>
+                            <td class="col" [ngClass]="senderbasis(i)"
+                                *ngFor="let app of e91.receiver_meas_list;let i=index">{{app}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -140,5 +149,275 @@
                 </table>
             </div>
         </div>
+    </div>
+    <div *ngIf="app_id=='3'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+        <div class="display-4">
+            Teleportation
+        </div>
+        <br>
+        <!-- <div class="row"> -->
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <td class="col">
+                        AliceBobEntanglement ​
+                    </td>
+                    <td class="col">
+                        State : []​
+                    </td>
+                </tr>
+            </thead>
+        </table>
+        <br>
+        <h6><u>At Sender</u></h6>
+        <br>
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <th class="col">
+                        Qubit to teleport
+                    </th>
+                    <th class="col">
+                        0+1j
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="2" class="col">
+                        Classical Measurement results​
+                        (At sender)
+                    </td>
+                    <td class="col">(meas_res at sending qubit) meas_rq:0</td>
+                </tr>
+                <tr>
+
+                    <td class="col">(meas_res at sending qubit) meas_rq:1</td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <h6><u>At Receiver</u></h6>
+        <br>
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <th class="col">
+                        State​
+                        (after measurement at alice ,before corrective operations)​
+                    </th>
+                    <th class="col">1+0j </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col">Corrective Unitary Transformations​
+                        (At receiver)​</td>
+                    <td>(gates applied on bob's entangled qubit ) : X , Z , X​</td>
+                </tr>
+                <tr>
+                    <td class="col">Qubit Received</td>
+                    <td class="col">0+1j</td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- </div> -->
+    </div>
+    <div *ngIf="app_id=='4'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+        <div class="display-4">
+            GHZ
+        </div>
+        <br>
+        <div class="row">
+            <div class="col">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="table-primary">
+                            <td class="col">
+                                Node 1
+                            </td>
+                            <td class="col">E1</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="2" class="col">
+                                Initial Entanglement state (2party)​
+                            </td>
+                            <td>State: Phi+</td>
+                        </tr>
+                        <tr>
+                            <td>Entangled State:S1</td>
+                        </tr>
+                        <tr>
+                            <td>Final Entangled State</td>
+                            <td>[]</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="table-primary">
+                            <td class="col">
+                                Node 2
+                            </td>
+                            <td class="col">E2</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="2" class="col">
+                                Initial Entanglement state (2party)​
+                            </td>
+                            <td>State: Phi+</td>
+                        </tr>
+                        <tr>
+                            <td>Entangled State:S1</td>
+                        </tr>
+                        <tr>
+                            <td>Final Entangled State</td>
+                            <td>[]</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="table-primary">
+                            <td class="col">
+                                Node 3
+                            </td>
+                            <td class="col">E3</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="2" class="col">
+                                Initial Entanglement state (2party)​
+                            </td>
+                            <td>State: Phi+</td>
+                        </tr>
+                        <tr>
+                            <td>Entangled State:S1</td>
+                        </tr>
+                        <tr>
+                            <td>Final Entangled State</td>
+                            <td>[]</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="app_id=='5'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+        <div class="display-4">
+            IP1
+        </div>
+        <br>
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <td class="col">
+                        Sender's (Alice: E1) Input Message
+                    </td>
+                    <td class="col">
+                        "010101010110"
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="table-secondary">
+                    <td class="col">
+                        Security Checked
+                    </td>
+                    <td class="col">
+                        Passed
+                    </td>
+                </tr>
+                <tr class="table-secondary">
+                    <td class="col">IdA Authentication</td>
+                    <td class="col">Passed</td>
+                </tr>
+                <tr class="table-secondary">
+                    <td class="col">
+                        Sender Key
+                    </td>
+                    <td class="col">
+                        1010
+                    </td>
+                </tr>
+                <tr class="table-secondary">
+                    <td class="col">
+                        Receiver Key
+                    </td>
+                    <td class="col">
+                        1010
+                    </td>
+                </tr>
+                <tr class="table-secondary">
+                    <td colspan="2" class="col">
+                        (Display message Receiver's key is same as Sender's key! Authentication procedure passed)​
+                    </td>
+                </tr>
+                <tr class="table-primary">
+                    <td class="col">
+                        Receiver's (Bob: E2) Output message
+                    </td>
+                    <td class="col">
+                        "010101010110"
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div *ngIf="app_id=='7'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+        <div class="display-4">
+            QSDC1
+        </div>
+        <br>
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <td class="col">
+                        Sender's (Alice: E1) Key Transimitted
+                    </td>
+                    <td class="col">
+                        "001010101100"
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="table-secondary">
+                    <td class="col">
+                        EvesDrop
+                    </td>
+                    <td class="col">
+                        Detected/NotDetected
+                    </td>
+                </tr>
+                <tr class="table-secondary">
+                    <td class="col">
+                        Bits Used for Eves Detection
+                    </td>
+                    <td class="col">
+                        [01,00]
+                    </td>
+                </tr>
+                <tr class="table-primary">
+                    <td rowspan="2" class="col">
+                        Received key at Receiver (Bob: E2)
+                    </td>
+                    <td class="col">
+                        Key after Removed Bits : "00—0101011--"​
+                    </td>
+                </tr>
+                <tr class="table-primary">
+                    <td class="col">Final Key  : 000101011</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
