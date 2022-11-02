@@ -16,15 +16,19 @@ import { ConditionsService } from 'src/services/conditions.service';
   encapsulation: ViewEncapsulation.None
 })
 export class DragComponent implements OnInit, AfterViewInit, OnChanges {
+  info: string;
+  link_array: any = []
   app_id: any
   nodeParams: boolean
   link: boolean
   memory: any = {
     "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93
   }
+  cc: any = []
   nodeWithKey: any
   paramsSet = new Map()
   topology: any
+  appSettings: any
   nodeKey: any
   spinner: boolean = false
   blocked: boolean = false
@@ -46,11 +50,12 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   toolbox = this.fb.group({
     'name': new FormControl(''),
     'noOfMemories': new FormControl(''),
-    'memoryFidelity': new FormControl(''),
-    'attenuation': new FormControl(''),
-    'distance': new FormControl('')
+    'memoryFidelity': new FormControl('0.98'),
+    'attenuation': new FormControl('0.00001'),
+    'distance': new FormControl('70')
   })
   public selectedNode: any;
+  public selectedLink: any
   visibleSideNav: boolean
   public myDiagram: go.Diagram
   public myPalette: go.Palette
@@ -64,6 +69,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     linkDataArray: [
     ]
   }
+  links: any = [];
 
 
   constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private _route: Router) { }
@@ -361,6 +367,12 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     console.log("selected")
   }
   linkClicked(e: any, obj: any) {
+    var link = obj.part;
+    console.log(link)
+    this.selectedLink = link.data
+    console.log(this.selectedLink)
+    this.savedModel = this.myDiagram.model;
+
     this.visibleSideNav = true
     //console.log("hello")
     this.nodeParams = false;
@@ -382,19 +394,24 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   add() {
     var nodereq;
     var linkreq;
+    var cc = []
+    this.cc = []
+    let linkArray = this.savedModel.linkDataArray
+    console.log(linkArray)
     if (this.nodeParams) {
       var nodesarray = this.savedModel.nodeDataArray
       //let length = nodesarray.length
+      console.log(this.toolbox.get('noOfMemories')?.value)
       nodereq = {
         "Name": this.toolbox.get('name')?.value,
-        "Type": this.selectedNode.text,
-        "noOfMemories": this.toolbox.get('noOfMemories')?.value,
+        "Type": this.selectedNode.text.toLowerCase(),
+        "noOfMemory": this.toolbox.get('noOfMemories')?.value,
         "memory": this.memory
       }
       var key = this.selectedNode.key
       console.log(key)
       let positivekey = key.toString().substring(1)
-      console.log(positivekey * 2)
+      // console.log(positivekey * 2)
       sessionStorage.setItem("selected_node", this.selectedNode.key)
       var indexFromKey = positivekey - 1
       if (this.nodes[indexFromKey] == null)
@@ -407,39 +424,108 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       // console.log(this.nodes)
     }
     if (this.link) {
-      //var linksarray = this.savedModel.linkDataArray
+      // var linksarray = this.savedModel.linkDataArray
       let array = []
-      for (let i = 0; i < this.nodes.length; i++) {
-        array.push(this.nodes[i].Name)
-        console.log(array)
-      }
+
+      // for (let i = 0; i < this.nodes.length; i++) {
+      //   array.push(this.nodes[i].Name)
+      //   // console.log(array)
+      // }
+      var from = this.selectedLink.from
+      var to = this.selectedLink.to
+      let positiveFromkey = from.toString().substring(1)
+      // console.log(positivekey * 2)
+      let positivetoKey = to.toString().substring(1)
+      var fromKey = positiveFromkey - 1;
+      let toKey = positivetoKey - 1;
+      array.push(this.nodes[fromKey].Name)
+      array.push(this.nodes[toKey].Name)
       linkreq = {
         Nodes: array,
-        Attenuation: this.toolbox.get('attenuation')?.value,
-        Distance: this.toolbox.get('distance')?.value,
+        Attenuation: Number(this.toolbox.get('attenuation')?.value),
+        Distance: Number(this.toolbox.get('distance')?.value),
       }
-      console.log(linkreq)
+      console.log(typeof (linkreq.Distance))
+      this.links.push(linkreq)
+      array = []
     }
+    if (this.nodes.length != 0) {
+      for (var i = 0; i < this.nodes.length; i++) {
+        for (var j = 0; j < this.nodes.length; j++) {
+          cc.push([this.nodes[i].Name, this.nodes[j].Name]);
+        }
+      }
+      console.log(cc)
+      if (cc.length != 0) {
+        var distance
+        var delay
+        for (var i = 0; i < cc.length; i++) {
+          console.log(cc[i][0], cc[i][1])
+          if (cc[i][0] == cc[i][1]) {
+            distance = 0;
+            delay = 0;
+            console.log("same")
+          } else {
+            distance = 1000;
+            delay = 1000000000;
+            console.log("not same")
+          }
+          let ccreq = {
+            Nodes: cc[i],
+            Delay: delay,
+            Distance: distance
+          }
+          this.cc.push(ccreq)
+        }
+        console.log(this.cc)
+      }
+    }
+
+    this.topology = {
+      nodes: this.nodes,
+      quantum_connections: this.links,
+      classical_connections: this.cc,
+    }
+    console.log(this.topology)
+    console.log(this.nodes)
+    console.log(this.links)
     this.visibleSideNav = false
   }
   parameters() {
     this.blocked = true
-    var e2e = {
 
-      "application": 2,
-
-      "topology": { "nodes": [{ "Name": "n1", "Type": "service", "noOfMemory": 500, "memory": { "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93 } }, { "Name": "n2", "Type": "end", "noOfMemory": 500, "memory": { "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93 } }], "quantum_connections": [{ "Nodes": ["n1", "n2"], "Attenuation": 0.00001, "Distance": 70 }], "classical_connections": [{ "Nodes": ["n1", "n1"], "Delay": 0, "Distance": 1000 }, { "Nodes": ["n1", "n2"], "Delay": 1000000000, "Distance": 1000 }, { "Nodes": ["n2", "n1"], "Delay": 1000000000, "Distance": 1000 }, { "Nodes": ["n2", "n2"], "Delay": 0, "Distance": 1000 }] },
-
-      "appSettings": { "sender": "n1", "receiver": "n2", "startTime": "1e12", "size": "6", "priority": "0", "targetFidelity": "0.5", "timeout": "2e12" }
-
-    }
     this.displayPosition = false
     var token = localStorage.getItem('access')
-    var topology = { "nodes": [{ "Name": "n1", "Type": "service", "noOfMemory": 500, "memory": { "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93 } }, { "Name": "n2", "Type": "end", "noOfMemory": 500, "memory": { "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93 } }], "quantum_connections": [{ "Nodes": ["n1", "n2"], "Attenuation": 0.00001, "Distance": 70 }], "classical_connections": [{ "Nodes": ["n1", "n1"], "Delay": 0, "Distance": 1000 }, { "Nodes": ["n1", "n2"], "Delay": 1000000000, "Distance": 1000 }, { "Nodes": ["n2", "n1"], "Delay": 1000000000, "Distance": 1000 }, { "Nodes": ["n2", "n2"], "Delay": 0, "Distance": 1000 }] }
+    if (this.app_id == 1)
+      this.appSettings = {
+        sender: this.e91.get('sender')?.value,
+        receiver: this.e91.get('receiver')?.value,
+        keyLength: this.e91.get('keyLength')?.value
+      }
+    if (this.app_id == 2) {
+      this.appSettings = {
+        sender: this.e2e.get('sender')?.value,
+        receiver: this.e2e.get('receiver')?.value,
+        startTime: this.e2e.get('startTime')?.value,
+        size: this.e2e.get('size')?.value,
+        priority: this.e2e.get('priority')?.value,
+        targetFidelity: this.e2e.get('targetFidelity')?.value,
+        timeout: this.e2e.get('timeout')?.value
+      }
+    }
+    if (this.app_id == 4) {
+      this.appSettings = {
+        sender: this.teleportation.get('sender')?.value,
+        receiver: this.teleportation.get('receiver')?.value,
+        amplitude1: this.teleportation.get('randomQubitAmplitude1')?.value,
+        amplitude2: this.teleportation.get('randomQubitAmplitude2')?.value
+      }
+    }
+    console.log(this.appSettings)
     var req = {
-      "application": 1,
-      "topology": topology,
-      "appSettings": { "sender": "n1", "receiver": "n2", "keyLength": "7" }
+      "application": sessionStorage.getItem('app_id'),
+      "topology": this.topology,
+      "appSettings": this.appSettings
     }
     this.apiService.runApplication(req).subscribe((result: any) => {
       this.con.setResult(result)
@@ -478,6 +564,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           // "rotatingTool.snapAngleMultiple": 15,
           // "rotatingTool.snapAngleEpsilon": 15,
           // "undoManager.isEnabled": true
+          "panningTool.isEnabled": false
         });
     return myDiagram;
   }
@@ -515,7 +602,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
     this.savedModel = this.myDiagram.model;
     console.log(this.savedModel.linkDataArray)
-    console.log(this.savedModel.linkDataArray[0].from)
+    // console.log(this.savedModel.linkDataArray[0].from)
     // var array1 = [];
     // array1.push(array)
     // sessionStorage.setItem('node', ...array1)
@@ -535,8 +622,9 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       if (this.nodes.length > indexFromKey) {
         node = this.nodes[indexFromKey]
         console.log(node)
+        console.log(node.noOfMemory)
         this.toolbox.get('name')?.patchValue(node.Name)
-        this.toolbox.get('noOfMemories')?.patchValue(node.noOfMemories)
+        this.toolbox.get('noOfMemories')?.patchValue(node.noOfMemory)
       }
       else {
         this.toolbox.get('name')?.patchValue('');
@@ -551,6 +639,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     //     }
 
     //   }
+
     this.visibleSideNav = true
     this.nodeParams = true
     this.link = false

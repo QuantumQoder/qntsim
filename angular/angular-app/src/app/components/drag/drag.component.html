@@ -4,35 +4,54 @@
 </div> -->
 
 <!-- <p-blockUI [blocked]="blocked" [target]="comp"></p-blockUI> -->
-<div #comp class="row">
+<div #comp class="row-1">
     <p-toast position="top-right"></p-toast>
 
+    <div>
+        <div class="row">
+            <div class="col-md-2">
+                <!-- <h4 class="toolbox">Toolbox</h4> -->
+                <p class="small text-muted">Click a component to change its settings.</p>
+            </div>
+            <h3 class="col-md-8 display-4" style="padding-top:1% ;">Configure the quantum network topology</h3>
+            <div style="padding-top: 5px;" class="btn-group col-md-2">
 
-    <div id="sample" class="col-md-12">
+                <button type="button" pButton pRipple (click)="save()" label="Lock Topology" class="ui-button-warning"
+                    styleClass="lock"></button>
+                &nbsp;
+                <!-- <button type="button" pButton pRipple (click)="load()" label="Load" class="ui-button-warning"></button>
+                        &nbsp; -->
+            </div>
+        </div>
 
-        <div style="width: 100%; display: flex; justify-content: space-between">
-            <div id="myPaletteDiv" class="col-md-4"
-                style="width: 110px; margin: 2px; background-color: whitesmoke; border: solid 1px black"></div>
-            <div id="myDiagramDiv" [ngClass]="visibleSideNav ? 'col-md-6': 'col-md-8'" style=" flex-grow: 1; height:
-                580px; border: solid 1px black">
+    </div>
+
+    <div id="sample" style="width: 98%;">
+
+        <div style="width: 98%; display: flex">
+            <div id="myPaletteDiv" class="col-4"
+                style="width: 120px; margin: 2px;margin-left: 30px; background-color: whitesmoke; border: solid 1px black">
+            </div>
+            <div id="myDiagramDiv" class="col-8" style=" flex-grow: 1; height:
+                570px;margin-left: 10px; border: solid 1px black">
                 <!-- <p-speedDial [model]="items" direction="bottom-left" buttonClassName="p-button-success"
                     styleClass="speed-dial">
                 </p-speedDial> -->
             </div>
         </div>
-        <div>
+        <!-- <div>
             <div style="padding-top: 5px;">
 
                 <button type="button" pButton pRipple (click)="save()" label="Save" class="ui-button-warning"></button>
                 &nbsp;
                 <button type="button" pButton pRipple (click)="load()" label="Load" class="ui-button-warning"></button>
                 &nbsp;
-                <!-- <button type="button" pButton pRipple (click)="showPositionDialog()" label="Select"
+                 <button type="button" pButton pRipple (click)="showPositionDialog()" label="Select"
                     class="ui-button-warning">
                 </button> -->
-                <!-- Diagram Model saved in JSON format: -->
-            </div>
-            <!-- <textarea id="mySavedModel" style="width:100%;height:300px">
+        <!-- Diagram Model saved in JSON format: -->
+        <!-- </div>  -->
+        <!-- <textarea id="mySavedModel" style="width:100%;height:300px">
     { "class": "go.GraphLinksModel",
       "linkFromPortIdProperty": "fromPort",
       "linkToPortIdProperty": "toPort",
@@ -41,24 +60,24 @@
       "linkDataArray": [
      ]}
         </textarea> -->
-        </div>
+        <!-- </div> -->
 
     </div>
-    <p-dialog header="Select Parameters" [(visible)]="displayPosition" [position]="position" [modal]="true"
+    <p-dialog header="Set Application Parameters" [(visible)]="displayPosition" [position]="position" [modal]="true"
         [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
-        <div *ngIf="app_id=='1'" [formGroup]="e2e">
+        <div *ngIf="app_id=='2'" [formGroup]="e2e">
             <div class="row">
                 <div class="col">
                     <label for="serviceNode">Sender</label>&nbsp;
                     <select class="form-control" formControlName="sender">
-                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
                         </option>
                     </select>
                 </div>
                 <div class="col">
                     <label for="endNode">Receiver</label>&nbsp;
                     <select class="form-control" formControlName="receiver">
-                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
                         </option>
                     </select>
                 </div>
@@ -70,7 +89,7 @@
             <div class="row">
                 <div class="col">
                     <label for="endNode">Size</label>&nbsp;
-                    <input type="number" class="form-control" formControlName="size">
+                    <input type="text" class="form-control" formControlName="size">
                 </div>
                 <div class="col">
                     <label for="endNode">Priority</label>&nbsp;
@@ -88,18 +107,18 @@
                 </div>
             </div>
         </div>
-        <div *ngIf="app_id=='2'" class="row" [formGroup]="e91">
+        <div *ngIf="app_id=='1'" class="row" [formGroup]="e91">
             <div class="col">
                 <label for="serviceNode">Sender</label>&nbsp;
                 <select class="form-control" formControlName="sender">
-                    <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                    <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
                     </option>
                 </select>
             </div>
             <div class="col">
                 <label for="endNode">Receiver</label>&nbsp;
                 <select class="form-control" formControlName="receiver">
-                    <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                    <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
                     </option>
                 </select>
             </div>
@@ -109,19 +128,19 @@
             </div>
 
         </div>
-        <div *ngIf="app_id=='3'" [formGroup]="teleportation">
+        <div *ngIf="app_id=='4'" [formGroup]="teleportation">
             <div class="row">
                 <div class="col">
                     <label for="serviceNode">Sender</label>&nbsp;
                     <select class="form-control" formControlName="sender">
-                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
                         </option>
                     </select>
                 </div>
                 <div class="col">
                     <label for="endNode">Receiver</label>&nbsp;
                     <select class="form-control" formControlName="receiver">
-                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
                         </option>
                     </select>
                 </div>
@@ -137,19 +156,19 @@
                 </div>
             </div>
         </div>
-        <div *ngIf="app_id=='4'" [formGroup]="ghz">
+        <div *ngIf="app_id=='3'" [formGroup]="ghz">
             <div class="row">
                 <div class="col">
                     <label for="serviceNode">Node 1</label>&nbsp;
                     <select class="form-control" formControlName="node1">
-                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
                         </option>
                     </select>
                 </div>
                 <div class="col">
                     <label for="endNode">Node 2</label>&nbsp;
                     <select class="form-control" formControlName="node2">
-                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
                         </option>
                     </select>
                 </div>
@@ -250,7 +269,7 @@
         </div>
 
         <ng-template pTemplate="footer">
-            <p-button icon="pi pi-check" (click)="parameters()" label="Ok" styleClass="p-button-text">
+            <p-button (click)="parameters()" label="Run Application">
             </p-button>
         </ng-template>
     </p-dialog>
@@ -260,7 +279,7 @@
 
             <br>
             <div *ngIf="nodeParams">
-                <div class="display-5">Node Parameters</div>
+                <div class="display-5">Node Settings</div>
                 <br>
                 <div class="form-group">
                     <label for="name">Name</label>
@@ -275,18 +294,18 @@
                         placeholder="No of Memories">
                 </div>
                 <br>
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label for="memoryFidelity">Memory Fidelity</label>
                     <input type="text" class="form-control" id="memoryFidelity" placeholder="Memory Fidelity">
-                </div>
+                </div> -->
             </div>
             <div *ngIf="link">
-                <div class="display-5">Link Parameters</div>
+                <div class="display-5">Connection Settings</div>
                 <br>
                 <div class="form-group">
                     <label for="attenuation">Attenuation</label>
-                    <input numeric decimals="2" type="text" class="form-control" formControlName="attenuation"
-                        id="attenuation" placeholder="Enter in decimals">
+                    <input type="number" class="form-control" formControlName="attenuation" id="attenuation"
+                        placeholder="Enter in decimals">
                 </div>
                 <br>
                 <div class="form-group">

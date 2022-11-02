@@ -52,32 +52,32 @@ export class ApplicationsComponent implements OnInit {
 
   }
   e2e() {
-    sessionStorage.setItem('app_id', '1')
-    this._router.navigate(['/drag2'])
+    sessionStorage.setItem('app_id', '2')
+    this._router.navigate(['/intro'])
   }
   e91() {
-    sessionStorage.setItem('app_id', '2')
-    this._router.navigate(['/drag2'])
+    sessionStorage.setItem('app_id', '1')
+    this._router.navigate(['/intro'])
   }
   teleportation() {
-    sessionStorage.setItem('app_id', '3')
-    this._router.navigate(['/drag2'])
+    sessionStorage.setItem('app_id', '4')
+    this._router.navigate(['/intro'])
   }
   ghz() {
-    sessionStorage.setItem('app_id', '4')
-    this._router.navigate(['/drag2'])
+    sessionStorage.setItem('app_id', '3')
+    this._router.navigate(['/intro'])
   }
   qsdc_epr() {
     sessionStorage.setItem('app_id', '5')
-    this._router.navigate(['/drag2'])
+    this._router.navigate(['/intro'])
   }
   pingpong() {
     sessionStorage.setItem('app_id', '6')
-    this._router.navigate(['/drag2'])
+    this._router.navigate(['/intro'])
   }
   qsdc_mutual_auth() {
     sessionStorage.setItem('app_id', '7')
-    this._router.navigate(['/drag2'])
+    this._router.navigate(['/intro'])
   }
 
 }
