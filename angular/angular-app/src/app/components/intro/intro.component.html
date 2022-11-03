@@ -100,7 +100,7 @@
             <li>End to end entanglement will be completed</li>
         </ol>
     </div>
-    <div *ngIf="app=='3'">
+    <div *ngIf="app=='4'">
         <h1 class="display-1">Teleportation Protocol Introduction</h1>
         <br><br>
         <p>The sender (Alice) wants to send quantum information (qubit state |ψ⟩=α|0⟩+β|1⟩) to receiver (Bob). Due to
@@ -122,6 +122,6 @@
             at the end , Bob will have |ψ⟩ and Alice won't anymore.</p>
     </div>
 
-    <p-splitButton label="Actions" [model]="this.items" styleClass="p-button-plain p-button-text mr-2 mb-2">
-    </p-splitButton>
+    <p-button label="Go To Application" (click)="goto()" styleClass="p-button-secondary mr-2 mb-2">
+    </p-button>
 </div>

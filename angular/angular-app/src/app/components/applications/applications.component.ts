@@ -52,31 +52,38 @@ export class ApplicationsComponent implements OnInit {
 
   }
   e2e() {
-    sessionStorage.setItem('app_id', '2')
-    this._router.navigate(['/intro'])
+    sessionStorage.setItem('app_id', '2');
+    sessionStorage.setItem('app', 'E2E')
+    this._router.navigate(['/intro']);
   }
   e91() {
     sessionStorage.setItem('app_id', '1')
+    sessionStorage.setItem('app', 'E91')
     this._router.navigate(['/intro'])
   }
   teleportation() {
     sessionStorage.setItem('app_id', '4')
+    sessionStorage.setItem('app', 'TEL')
     this._router.navigate(['/intro'])
   }
   ghz() {
     sessionStorage.setItem('app_id', '3')
+    sessionStorage.setItem('app', 'GHZ')
     this._router.navigate(['/intro'])
   }
   qsdc_epr() {
     sessionStorage.setItem('app_id', '5')
+    sessionStorage.setItem('app', 'EPR')
     this._router.navigate(['/intro'])
   }
   pingpong() {
     sessionStorage.setItem('app_id', '6')
+    sessionStorage.setItem('app', 'PP')
     this._router.navigate(['/intro'])
   }
   qsdc_mutual_auth() {
     sessionStorage.setItem('app_id', '7')
+    sessionStorage.setItem('app', 'QSDC')
     this._router.navigate(['/intro'])
   }
 

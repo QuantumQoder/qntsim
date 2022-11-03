@@ -16,7 +16,7 @@ import { ConditionsService } from 'src/services/conditions.service';
   encapsulation: ViewEncapsulation.None
 })
 export class DragComponent implements OnInit, AfterViewInit, OnChanges {
-  info: string;
+  info: boolean;
   link_array: any = []
   app_id: any
   nodeParams: boolean
@@ -49,7 +49,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   node: any = {};
   toolbox = this.fb.group({
     'name': new FormControl(''),
-    'noOfMemories': new FormControl(''),
+    'noOfMemories': new FormControl('100'),
     'memoryFidelity': new FormControl('0.98'),
     'attenuation': new FormControl('0.00001'),
     'distance': new FormControl('70')
@@ -70,6 +70,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     ]
   }
   links: any = [];
+  application: string | null;
 
 
   constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private _route: Router) { }
@@ -307,7 +308,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
               new go.Binding('fill', 'color'),
             ),
           model: new go.GraphLinksModel([  // specify the contents of the Palette
-            { text: "Service", figure: "Circle", fill: "#00AD5F" },
+            { text: "Service", figure: "Ellipse", fill: "#00AD5F" },
             { text: "End", figure: "Circle", fill: "#CE0620" },
             // { text: "Comment", figure: "RoundedRectangle", fill: "lightyellow" }
           ], [
@@ -317,6 +318,8 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           ])
         });
     this.myDiagram
+
+    this.application = sessionStorage.getItem('app')
 
     this.e2e = this.fb.group({
       'sender': new FormControl(''),
@@ -330,7 +333,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.e91 = this.fb.group({
       'sender': new FormControl(''),
       'receiver': new FormControl(''),
-      'keyLength': new FormControl('')
+      'keyLength': new FormControl('10')
     })
     this.ip1 = this.fb.group({
       'sender': new FormControl(''),
@@ -352,8 +355,8 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.teleportation = this.fb.group({
       'sender': new FormControl(''),
       'receiver': new FormControl(''),
-      'randomQubitAmplitude1': new FormControl(''),
-      'randomQubitAmplitude2': new FormControl('')
+      'amplitude1': new FormControl(''),
+      'amplitude2': new FormControl('')
     })
     this.ghz = this.fb.group({
       'node1': new FormControl(''),
@@ -361,7 +364,12 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       'node3': new FormControl(''),
       'middleNode': new FormControl('')
     })
+    this.showBottomCenter()
 
+
+  }
+  info_demo() {
+    this.info = true;
   }
   selected(): any {
     console.log("selected")
@@ -401,19 +409,34 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     if (this.nodeParams) {
       var nodesarray = this.savedModel.nodeDataArray
       //let length = nodesarray.length
+      let type;
       console.log(this.toolbox.get('noOfMemories')?.value)
-      nodereq = {
-        "Name": this.toolbox.get('name')?.value,
-        "Type": this.selectedNode.text.toLowerCase(),
-        "noOfMemory": this.toolbox.get('noOfMemories')?.value,
-        "memory": this.memory
-      }
+      console.log(nodesarray)
       var key = this.selectedNode.key
       console.log(key)
       let positivekey = key.toString().substring(1)
+      var indexFromKey = positivekey - 1
+
+      if (nodesarray[indexFromKey].figure === "Ellipse") {
+        type = 'service'
+      } else {
+        type = 'end'
+      }
+      nodereq = {
+        "Name": this.toolbox.get('name')?.value,
+        "Type": type,
+        "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
+        "memory": this.memory
+      }
+
       // console.log(positivekey * 2)
       sessionStorage.setItem("selected_node", this.selectedNode.key)
-      var indexFromKey = positivekey - 1
+
+      // console.log(this.savedModel.nodeDataArray[indexFromKey])
+      // console.log(this.toolbox.get('name')?.value)
+
+      this.savedModel.nodeDataArray[indexFromKey].text = this.toolbox.get('name')?.value
+      this.load()
       if (this.nodes[indexFromKey] == null)
         this.nodes.splice(indexFromKey, 0, nodereq)
       if (this.nodes[indexFromKey] != null) {
@@ -491,6 +514,10 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     console.log(this.links)
     this.visibleSideNav = false
   }
+  showBottomCenter() {
+    console.log("hi")
+    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message Content' });
+  }
   parameters() {
     this.blocked = true
 
@@ -500,7 +527,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       this.appSettings = {
         sender: this.e91.get('sender')?.value,
         receiver: this.e91.get('receiver')?.value,
-        keyLength: this.e91.get('keyLength')?.value
+        keyLength: Number(this.e91.get('keyLength')?.value)
       }
     if (this.app_id == 2) {
       this.appSettings = {
@@ -517,8 +544,16 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       this.appSettings = {
         sender: this.teleportation.get('sender')?.value,
         receiver: this.teleportation.get('receiver')?.value,
-        amplitude1: this.teleportation.get('randomQubitAmplitude1')?.value,
-        amplitude2: this.teleportation.get('randomQubitAmplitude2')?.value
+        amplitude1: this.teleportation.get('amplitude1')?.value,
+        amplitude2: this.teleportation.get('amplitude2')?.value
+      }
+    }
+    if (this.app_id == 3) {
+      this.appSettings = {
+        endnode1: this.ghz.get('node1')?.value,
+        endnode2: this.ghz.get('node2')?.value,
+        endnode3: this.ghz.get('node3')?.value,
+        middlenode: this.ghz.get('middlenode')?.value,
       }
     }
     console.log(this.appSettings)
@@ -580,8 +615,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   showPositionDialog() {
     //var savedModel = document.getElementById("mySavedModel") as HTMLInputElement
     this.saveDiagramProperties();  // do this first, before writing to JSON
-
-
     //console.log(this.savedModel)
     this.myDiagram.isModified = false;
     this.visibleSideNav = true
@@ -602,14 +635,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
     this.savedModel = this.myDiagram.model;
     console.log(this.savedModel.linkDataArray)
-    // console.log(this.savedModel.linkDataArray[0].from)
-    // var array1 = [];
-    // array1.push(array)
-    // sessionStorage.setItem('node', ...array1)
-    // sessionStorage.setItem('nodeName', node.data.text)
-    // sessionStorage.setItem('nodeKey', node.data.key)
-    // sessionStorage.setItem('figure', node.data.figure)
-    // console.log((-1) * (-1))
+
     this.selectedNode = node.data
     console.log(this.selectedNode);
     var key = this.selectedNode.key
@@ -628,7 +654,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       }
       else {
         this.toolbox.get('name')?.patchValue('');
-        this.toolbox.get('noOfMemories')?.patchValue('')
+        this.toolbox.get('noOfMemories')?.patchValue('100')
       }
     }
     //   for (var i = 0; i < this.nodes.length; i++) {

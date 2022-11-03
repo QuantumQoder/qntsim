@@ -10,7 +10,9 @@ export class IntroComponent implements OnInit {
   items: MenuItem[]
   app: any
   constructor(private router: Router) { }
-
+  goto() {
+    this.router.navigate(['/drag2'])
+  }
   ngOnInit(): void {
     this.app = sessionStorage.getItem('app_id')
     this.items = [
