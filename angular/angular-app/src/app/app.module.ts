@@ -17,16 +17,16 @@ import { SplitterModule } from 'primeng/splitter';
 import { FieldsetModule } from 'primeng/fieldset';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AccordionModule } from 'primeng/accordion'
-// import { Index2Component } from './components/index2/index2.component';
+import { Index2Component } from './components/index2/index2.component';
 import { CommonModule } from '@angular/common';
-// import { ComponentsModule } from './components/module/components.module';
+import { ComponentsModule } from './components/module/components.module';
 import { FooterComponent } from './utilities/footer/footer.component';
 import { CarouselModule } from 'primeng/carousel';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { ApplicationPageComponent } from './components/application-page/application-page.component';
 import { TableModule } from 'primeng/table';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-// import { DraggableLinkComponent } from './components/draggable-link/draggable-link.component';
+import { DraggableLinkComponent } from './components/draggable-link/draggable-link.component';
 import { DragComponent } from './components/drag/drag.component';
 import { TabMenuModule } from 'primeng/tabmenu';
 //import { MenuItem } from 'primeng/api';
@@ -41,11 +41,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CookieService } from 'ngx-cookie-service';
 import { HttpClientModule } from '@angular/common/http';
 import { BlockUIModule } from 'primeng/blockui';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { IntroComponent } from './components/intro/intro.component';
-import { SplitButtonModule } from 'primeng/splitbutton';
-import { HowtouseComponent } from './components/howtouse/howtouse.component';
-// import { ToastModule } from 'primeng/toast';
+import { ProgressSpinnerModule } from 'primeng/progressspinner'
 // import { Alert } from '@ng-bootstrap/ng-bootstrap';
 //import { AngularAnimationsLibraryModule } from 'angular-animations-library'
 @NgModule({
@@ -54,20 +50,18 @@ import { HowtouseComponent } from './components/howtouse/howtouse.component';
     HomePageComponent,
     NavbarComponent,
     ApplicationsComponent,
-    // Index2Component,
+    Index2Component,
     FooterComponent,
     ApplicationPageComponent,
-    // DraggableLinkComponent,
+    DraggableLinkComponent,
     DragComponent,
     ResultsComponent,
     NetworkResultsComponent,
-    LogsComponent,
-    IntroComponent,
-    HowtouseComponent
+    LogsComponent
     //ButtonModule
     //AngularAnimationsLibraryModule
   ],
-  imports: [SplitButtonModule,
+  imports: [
     ProgressSpinnerModule,
     BlockUIModule,
     HttpClientModule,
@@ -82,7 +76,7 @@ import { HowtouseComponent } from './components/howtouse/howtouse.component';
     TableModule,
     ScrollPanelModule,
     AccordionModule,
-    // ComponentsModule,
+    ComponentsModule,
     CommonModule,
     ScrollToModule.forRoot(),
     NgxTypedJsModule,

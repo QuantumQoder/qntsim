@@ -16,8 +16,6 @@ import { ConditionsService } from 'src/services/conditions.service';
   encapsulation: ViewEncapsulation.None
 })
 export class DragComponent implements OnInit, AfterViewInit, OnChanges {
-  info: boolean;
-  link_array: any = []
   app_id: any
   nodeParams: boolean
   link: boolean
@@ -49,10 +47,10 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   node: any = {};
   toolbox = this.fb.group({
     'name': new FormControl(''),
-    'noOfMemories': new FormControl('100'),
-    'memoryFidelity': new FormControl('0.98'),
-    'attenuation': new FormControl('0.00001'),
-    'distance': new FormControl('70')
+    'noOfMemories': new FormControl(''),
+    'memoryFidelity': new FormControl(''),
+    'attenuation': new FormControl(''),
+    'distance': new FormControl('')
   })
   public selectedNode: any;
   public selectedLink: any
@@ -70,7 +68,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     ]
   }
   links: any = [];
-  application: string | null;
 
 
   constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private _route: Router) { }
@@ -308,7 +305,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
               new go.Binding('fill', 'color'),
             ),
           model: new go.GraphLinksModel([  // specify the contents of the Palette
-            { text: "Service", figure: "Ellipse", fill: "#00AD5F" },
+            { text: "Service", figure: "Circle", fill: "#00AD5F" },
             { text: "End", figure: "Circle", fill: "#CE0620" },
             // { text: "Comment", figure: "RoundedRectangle", fill: "lightyellow" }
           ], [
@@ -318,8 +315,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           ])
         });
     this.myDiagram
-
-    this.application = sessionStorage.getItem('app')
 
     this.e2e = this.fb.group({
       'sender': new FormControl(''),
@@ -333,7 +328,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.e91 = this.fb.group({
       'sender': new FormControl(''),
       'receiver': new FormControl(''),
-      'keyLength': new FormControl('10')
+      'keyLength': new FormControl('')
     })
     this.ip1 = this.fb.group({
       'sender': new FormControl(''),
@@ -355,8 +350,8 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.teleportation = this.fb.group({
       'sender': new FormControl(''),
       'receiver': new FormControl(''),
-      'amplitude1': new FormControl(''),
-      'amplitude2': new FormControl('')
+      'randomQubitAmplitude1': new FormControl(''),
+      'randomQubitAmplitude2': new FormControl('')
     })
     this.ghz = this.fb.group({
       'node1': new FormControl(''),
@@ -364,12 +359,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       'node3': new FormControl(''),
       'middleNode': new FormControl('')
     })
-    this.showBottomCenter()
 
-
-  }
-  info_demo() {
-    this.info = true;
   }
   selected(): any {
     console.log("selected")
@@ -409,34 +399,18 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     if (this.nodeParams) {
       var nodesarray = this.savedModel.nodeDataArray
       //let length = nodesarray.length
-      let type;
-      console.log(this.toolbox.get('noOfMemories')?.value)
-      console.log(nodesarray)
+      nodereq = {
+        "Name": this.toolbox.get('name')?.value,
+        "Type": this.selectedNode.text,
+        "noOfMemory": this.toolbox.get('noOfMemories')?.value,
+        "memory": this.memory
+      }
       var key = this.selectedNode.key
       console.log(key)
       let positivekey = key.toString().substring(1)
-      var indexFromKey = positivekey - 1
-
-      if (nodesarray[indexFromKey].figure === "Ellipse") {
-        type = 'service'
-      } else {
-        type = 'end'
-      }
-      nodereq = {
-        "Name": this.toolbox.get('name')?.value,
-        "Type": type,
-        "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
-        "memory": this.memory
-      }
-
       // console.log(positivekey * 2)
       sessionStorage.setItem("selected_node", this.selectedNode.key)
-
-      // console.log(this.savedModel.nodeDataArray[indexFromKey])
-      // console.log(this.toolbox.get('name')?.value)
-
-      this.savedModel.nodeDataArray[indexFromKey].text = this.toolbox.get('name')?.value
-      this.load()
+      var indexFromKey = positivekey - 1
       if (this.nodes[indexFromKey] == null)
         this.nodes.splice(indexFromKey, 0, nodereq)
       if (this.nodes[indexFromKey] != null) {
@@ -447,7 +421,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       // console.log(this.nodes)
     }
     if (this.link) {
-      // var linksarray = this.savedModel.linkDataArray
+      //var linksarray = this.savedModel.linkDataArray
       let array = []
 
       // for (let i = 0; i < this.nodes.length; i++) {
@@ -465,12 +439,13 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       array.push(this.nodes[toKey].Name)
       linkreq = {
         Nodes: array,
-        Attenuation: Number(this.toolbox.get('attenuation')?.value),
-        Distance: Number(this.toolbox.get('distance')?.value),
+        Attenuation: this.toolbox.get('attenuation')?.value,
+        Distance: this.toolbox.get('distance')?.value,
       }
-      console.log(typeof (linkreq.Distance))
+
       this.links.push(linkreq)
       array = []
+
     }
     if (this.nodes.length != 0) {
       for (var i = 0; i < this.nodes.length; i++) {
@@ -489,16 +464,18 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
             delay = 0;
             console.log("same")
           } else {
-            distance = 1000;
-            delay = 1000000000;
+            distance = '1e3';
+            delay = '1e9';
             console.log("not same")
           }
           let ccreq = {
             Nodes: cc[i],
             Delay: delay,
             Distance: distance
+
           }
           this.cc.push(ccreq)
+
         }
         console.log(this.cc)
       }
@@ -514,51 +491,19 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     console.log(this.links)
     this.visibleSideNav = false
   }
-  showBottomCenter() {
-    console.log("hi")
-    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message Content' });
-  }
   parameters() {
     this.blocked = true
 
     this.displayPosition = false
     var token = localStorage.getItem('access')
-    if (this.app_id == 1)
-      this.appSettings = {
-        sender: this.e91.get('sender')?.value,
-        receiver: this.e91.get('receiver')?.value,
-        keyLength: Number(this.e91.get('keyLength')?.value)
-      }
-    if (this.app_id == 2) {
-      this.appSettings = {
-        sender: this.e2e.get('sender')?.value,
-        receiver: this.e2e.get('receiver')?.value,
-        startTime: this.e2e.get('startTime')?.value,
-        size: this.e2e.get('size')?.value,
-        priority: this.e2e.get('priority')?.value,
-        targetFidelity: this.e2e.get('targetFidelity')?.value,
-        timeout: this.e2e.get('timeout')?.value
-      }
+    this.appSettings = {
+      sender: this.e91.get('sender')?.value,
+      receiver: this.e91.get('receiver')?.value,
+      keyLength: this.e91.get('keyLength')?.value
     }
-    if (this.app_id == 4) {
-      this.appSettings = {
-        sender: this.teleportation.get('sender')?.value,
-        receiver: this.teleportation.get('receiver')?.value,
-        amplitude1: this.teleportation.get('amplitude1')?.value,
-        amplitude2: this.teleportation.get('amplitude2')?.value
-      }
-    }
-    if (this.app_id == 3) {
-      this.appSettings = {
-        endnode1: this.ghz.get('node1')?.value,
-        endnode2: this.ghz.get('node2')?.value,
-        endnode3: this.ghz.get('node3')?.value,
-        middlenode: this.ghz.get('middlenode')?.value,
-      }
-    }
-    console.log(this.appSettings)
+
     var req = {
-      "application": sessionStorage.getItem('app_id'),
+      "application": 1,
       "topology": this.topology,
       "appSettings": this.appSettings
     }
@@ -599,7 +544,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           // "rotatingTool.snapAngleMultiple": 15,
           // "rotatingTool.snapAngleEpsilon": 15,
           // "undoManager.isEnabled": true
-          "panningTool.isEnabled": false
         });
     return myDiagram;
   }
@@ -615,6 +559,8 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   showPositionDialog() {
     //var savedModel = document.getElementById("mySavedModel") as HTMLInputElement
     this.saveDiagramProperties();  // do this first, before writing to JSON
+
+
     //console.log(this.savedModel)
     this.myDiagram.isModified = false;
     this.visibleSideNav = true
@@ -635,7 +581,14 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
     this.savedModel = this.myDiagram.model;
     console.log(this.savedModel.linkDataArray)
-
+    // console.log(this.savedModel.linkDataArray[0].from)
+    // var array1 = [];
+    // array1.push(array)
+    // sessionStorage.setItem('node', ...array1)
+    // sessionStorage.setItem('nodeName', node.data.text)
+    // sessionStorage.setItem('nodeKey', node.data.key)
+    // sessionStorage.setItem('figure', node.data.figure)
+    // console.log((-1) * (-1))
     this.selectedNode = node.data
     console.log(this.selectedNode);
     var key = this.selectedNode.key
@@ -648,13 +601,12 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       if (this.nodes.length > indexFromKey) {
         node = this.nodes[indexFromKey]
         console.log(node)
-        console.log(node.noOfMemory)
         this.toolbox.get('name')?.patchValue(node.Name)
-        this.toolbox.get('noOfMemories')?.patchValue(node.noOfMemory)
+        this.toolbox.get('noOfMemories')?.patchValue(node.noOfMemories)
       }
       else {
         this.toolbox.get('name')?.patchValue('');
-        this.toolbox.get('noOfMemories')?.patchValue('100')
+        this.toolbox.get('noOfMemories')?.patchValue('')
       }
     }
     //   for (var i = 0; i < this.nodes.length; i++) {
