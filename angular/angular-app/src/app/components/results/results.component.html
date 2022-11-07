@@ -1,7 +1,9 @@
 <div class="main">
     <p-tabMenu #menuItems [model]="items" [activeItem]="activeItem" (click)="activateMenu()"></p-tabMenu>
     <br>
-    <div *ngIf="app_id=='2'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+
+    <div *ngIf="app_id=='1'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+        <h1 class="display-3">E91</h1>
         <div *ngIf="keyGen" class="row">
             <div class="tabel">
                 <h5><u>Sender</u></h5>
@@ -68,7 +70,8 @@
             </div>
         </div>
     </div>
-    <div *ngIf="app_id=='1'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+    <div *ngIf="app_id=='2'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+        <div class="display-4">E2E</div>
         <div class="col">
             <div class="row">
                 <table class="table table-bordered">
@@ -95,7 +98,7 @@
                 </table>
             </div>
             <div class="row">
-                <table class="table table-bordered">
+                <table id="table1" class="table table-bordered">
                     <thead>
                         <h5>Node:E1</h5>
                     </thead>
@@ -109,20 +112,12 @@
                             <th class="col">Expire Time</th>
                             <th class="col">State</th>
                         </tr>
-                        <tr>
-                            <th class="col"></th>
-                            <th class="col"></th>
-                            <th class="col"></th>
-                            <th class="col"></th>
-                            <th class="col"></th>
-                            <th class="col"></th>
-                            <th class="col"></th>
-                        </tr>
+
                     </tbody>
                 </table>
             </div>
             <div class="row">
-                <table class="table table-bordered">
+                <table id="table2" class="table table-bordered">
                     <thead>
                         <h5>Node:E2</h5>
                     </thead>
@@ -136,21 +131,13 @@
                             <th class="col">Expire Time</th>
                             <th class="col">State</th>
                         </tr>
-                        <tr>
-                            <th class="col"></th>
-                            <th class="col"></th>
-                            <th class="col"></th>
-                            <th class="col"></th>
-                            <th class="col"></th>
-                            <th class="col"></th>
-                            <th class="col"></th>
-                        </tr>
+
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-    <div *ngIf="app_id=='3'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+    <div *ngIf="app_id=='4'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
         <div class="display-4">
             Teleportation
         </div>
@@ -163,7 +150,7 @@
                         AliceBobEntanglement ​
                     </td>
                     <td class="col">
-                        State : []​
+                        State : {{tel.alice_bob_entanglement}}​
                     </td>
                 </tr>
             </thead>
@@ -178,7 +165,7 @@
                         Qubit to teleport
                     </th>
                     <th class="col">
-                        0+1j
+                        {{tel.random_qubit}}
                     </th>
                 </tr>
             </thead>
@@ -188,11 +175,11 @@
                         Classical Measurement results​
                         (At sender)
                     </td>
-                    <td class="col">(meas_res at sending qubit) meas_rq:0</td>
+                    <td class="col">(meas_res at sending qubit) meas_rq: {{tel.meas_rq}}</td>
                 </tr>
                 <tr>
 
-                    <td class="col">(meas_res at sending qubit) meas_rq:1</td>
+                    <td class="col">(meas_res at sending qubit) meas_rq:{{tel.meas_alice}}</td>
                 </tr>
             </tbody>
         </table>
@@ -206,24 +193,24 @@
                         State​
                         (after measurement at alice ,before corrective operations)​
                     </th>
-                    <th class="col">1+0j </th>
+                    <th class="col">{{tel.bob_initial_state}}</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td class="col">Corrective Unitary Transformations​
                         (At receiver)​</td>
-                    <td>(gates applied on bob's entangled qubit ) : X , Z , X​</td>
+                    <td>(gates applied on bob's entangled qubit ) : {{tel.Corrective_operation}}​</td>
                 </tr>
                 <tr>
                     <td class="col">Qubit Received</td>
-                    <td class="col">0+1j</td>
+                    <td class="col">{{tel.bob_final_state}}</td>
                 </tr>
             </tbody>
         </table>
         <!-- </div> -->
     </div>
-    <div *ngIf="app_id=='4'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+    <div *ngIf="app_id=='3'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
         <div class="display-4">
             GHZ
         </div>

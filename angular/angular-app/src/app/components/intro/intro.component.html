@@ -1,0 +1,144 @@
+<div class="container shadow p-4 mb-3 bg-white rounded mx-auto">
+    <div class="menu">
+        <div *ngIf="app=='1'">
+            <h1 class="display-1">E91 Protocol Introduction</h1>
+            <p>In cryptography, Ciphers are algorithms which describe steps for encrypting and decrypting information.
+                Modern
+                ciphers
+                include the secure transmission of a key which is sent with the plaintext and the encryption algorithm.
+                The
+                main
+                problem
+                of modern cryptographic systems is the distribution among the participants of the communication session
+                of a
+                secret
+                key,
+                possession of which should not be available to third parties. In principle transmitting messages using
+                classical
+                channels allows an eavesdropper to gain information about the key without being detected. However,
+                constructing
+                transmission techniques based on quantum mechanics allows parties to transmit messages and detect the
+                presence
+                of an
+                eavesdropper every time. ​
+                <br>
+                Proposed in 1991 by Artur Ekert, E91 protocol is an entanglement based protocol which uses Bell states
+                shared
+                between
+                Alice and Bob for secure distribution of secret key .
+            </p>​
+            <ul>
+                <li>The sender (Alice) and receiver (Bob) share |ψ-⟩ bell state. Alice makes a measurement with a
+                    direction
+                    randomly
+                    chosen
+                    Horizontal (X observable),Diagonal (W observable),Vertical (Z observable). Whereas Bob makes a
+                    measurement
+                    with
+                    a
+                    direction randomly chosen between Diagonal (W observable),Vertical (Z observable), Anti Diagonal (V
+                    observable).
+                    Alice
+                    and Bob record the measurement results and broadcast the measurement basis which they used, through
+                    the
+                    classical
+                    channel .If Alice and Bob have measured the spin projections of the entangled pair of qubits onto
+                    the
+                    same
+                    direction
+                    (i.e. W--W or Z--Z for Alice's and Bob's qubit respectively), then they are sure that they obtained
+                    opposite
+                    results.
+                    Thus, if Alice got the result ±1, then Bob definitely will get the result ∓1, i.e. the results will
+                    be
+                    perfectly
+                    anticorrelated. Both Alice and Bob agree on that the measurement +1 represents the classical bit 1,
+                    while
+                    the
+                    measurement –1 represents the classical bit 0, and thus get their key string.​</li>
+                <li>Suppose some third party wants to interfere in the communication session of Alice and Bob and obtain
+                    a
+                    secret
+                    key.
+                    The
+                    eavesdropper can use the intercept-resend attacks: Eve intercepts one or both of the entangled
+                    qubits,
+                    measures
+                    the
+                    spin
+                    projections of these qubits, prepares new ones depending on the results obtained (|01⟩ or |10⟩) and
+                    sends
+                    them
+                    to
+                    Alice
+                    and Bob.</li>
+
+                <li>Inorder to check presence of eves dropper random part of Secret key generated (test key) is used for
+                    eve
+                    detection .
+                    If
+                    the error rate is above threshold value the quantum channel is not safe ( eve is detected) .If its
+                    less
+                    then
+                    quantum
+                    channel is safe ( eve not detected) then sifted key can be used as secret key.</li>
+                ​
+            </ul>
+        </div>
+        <div *ngIf="app=='2'">
+            <h1 class="display-1">E2E Protocol Introduction</h1>
+            <br>
+            <p>E2E (End to End entanglement) application is related to generate n-entangled pair of a target fidelity
+                between two
+                nodes, the source and the destination, those can be present anywhere in a given topology.</p>
+            <br><br>
+            <p>The steps of the application is following-​</p>
+
+            <ol>
+
+                <li>Topology of the quantum Network will be prepared </li>
+                <li>Request of n- entangled pairs of target fidelity F, between source (S) and Destination (D) raised by
+                    user.</li>
+                <li>A routing algorithm will choose best path according the resource availability of the intermediate
+                    node
+                    between source
+                    (S) and Destination (D).</li>
+                <li>Required resources will be reserved on the selected path.</li>
+                <li>Entanglement generation between the adjacent nodes.</li>
+                <li>Entanglement Purification for the increasing fidelity of the generated (will be repeated after
+                    Swapping
+                    as well)​</li>
+                <li>Entanglement Swapping at the intermediate nodes</li>
+                <li>End to end entanglement will be completed</li>
+            </ol>
+        </div>
+        <div *ngIf="app=='4'">
+            <h1 class="display-1">Teleportation Protocol Introduction</h1>
+            <br><br>
+            <p>The sender (Alice) wants to send quantum information (qubit state |ψ⟩=α|0⟩+β|1⟩) to receiver (Bob). Due
+                to
+                No-cloning
+                theorem Alice cannot simply make an exact copy of an unknown quantum state and give the copy to Bob. We
+                can
+                only copy
+                classical states (not superpositions).To transfer a quantum bit, Alice and Bob must share an entangled
+                qubit
+                pair. Alice
+                then performs a Hadamard operation followed by a CNOT gate between a qubit it wants to send/teleport and
+                the
+                entangled
+                qubit at Alice’s end . And then she measures the qubits out, which is called Bell-state measurement and
+                sends the
+                measurement results to Bob over a classical communication channel, After Bob receives the message and he
+                applies a
+                corrective unitary operations (based on the results data that he gets from Alice ) on his entangled part
+                of
+                the qubit.
+                The updated qubit that bob has now is the qubit that was at Alice’s end initially .We call this
+                teleportation because,
+                at the end , Bob will have |ψ⟩ and Alice won't anymore.</p>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-custom" (click)="goto()">Go To Application</button>
+    </div>
+</div>
