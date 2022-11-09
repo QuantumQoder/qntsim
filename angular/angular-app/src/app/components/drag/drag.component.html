@@ -4,7 +4,7 @@
 </div> -->
 
 <!-- <p-blockUI [blocked]="blocked" [target]="comp"></p-blockUI> -->
-<div #comp class="row-1 container-fluid shadow p-4 mb-5 bg-white rounded mx-auto">
+<div #comp class="row-1 container-fluid shadow p-1 mb-1 bg-white rounded mx-auto">
 
     <p-toast position="bottom-center" [baseZIndex]="5000"></p-toast>
 
@@ -85,16 +85,17 @@
                 <h2 class="display-3">{{application}}</h2>
                 <!-- <p class="small text-muted">Click a component to change its settings.</p> -->
             </div>
-            <h3 class="col-md-9 display-4" style="padding-left: 4%;;"><small>Configure the quantum network
+            <h3 class="col-md-9 display-4" style="margin-top:30px;padding-left: 4%;;"><small>Configure the quantum
+                    network
                     topology</small></h3>
 
-            <div style="padding-right: 2px;padding-bottom: 2px;" class="btn-group1 col-md-2">
+            <div style="padding-right: 2px;" class="btn-group1 col-md-2">
                 <button pButton pRipple type="button" icon="pi pi-question"
                     class="p-button-rounded p-button-info p-button-outlined" styleClass="info"
-                    (click)="info_demo()"></button>&nbsp;&nbsp;&nbsp;&nbsp;
-                <button type="button" pButton pRipple (click)="save()" label="Lock Topology" class="ui-button-warning"
-                    styleClass="lock"></button>
-
+                    (click)="info_demo()"></button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <!-- <button type="button" pButton pRipple label="Lock Topology" class="ui-button-warning" -->
+                <!-- styleClass="lock"></button> -->
+                <button class="btn btn-primary btn-custom" (click)="save()">Lock Topology</button>
                 <!-- <button type="button" pButton pRipple (click)="load()" label="Load" class="ui-button-warning"></button>
                         &nbsp; -->
             </div>
@@ -105,11 +106,19 @@
     <div id="sample" style="width: 98%;">
 
         <div style="width: 98%; display: flex">
+
             <div id="myPaletteDiv" class="col-4"
-                style="width: 120px; margin: 2px;margin-left: 30px; background-color: whitesmoke; border: solid 1px black">
+                style="width: 120px; margin: 2px;margin-left: 30px; background-color: whitesmoke; border: solid 1px black"
+                ngbPopover="Drag and drop components to create the topology graph." triggers="mouseenter:mouseleave"
+                popoverTitle="Tips!" [openDelay]="100" popoverClass="popover1" [closeDelay]="200">
+            </div>
+            <div id="toolTipDIV" style="position: absolute; background: white; z-index: 1000; display: none;">
+                <p id="toolTipParagraph">Tooltip</p>
             </div>
             <div id="myDiagramDiv" class="col-8" style=" flex-grow: 1; height:
-                500px;margin-left: 10px; border: solid 1px black">
+                500px;margin-left: 10px; border: solid 1px black"
+                ngbPopover="Click a component to modify its settings." triggers="mouseenter:mouseleave"
+                popoverTitle="Tips!" [openDelay]="100" popoverClass="popover2" [closeDelay]="200" placement="top">
                 <!-- <p-speedDial [model]="items" direction="bottom-left" buttonClassName="p-button-success"
                     styleClass="speed-dial">
                 </p-speedDial> -->
@@ -159,11 +168,8 @@
                     </select>
                     <div class="text-muted">Name of node to establish entanglement with</div>
                 </div>
-                <div class="col">
-                    <label for="endNode">Start Time</label>&nbsp;
-                    <input type="text" class="form-control" formControlName="startTime">
-                    <div class="text-muted">simulation start time of entanglement</div>
-                </div>
+
+
             </div>
             <div class="row">
                 <div class="col">
@@ -171,11 +177,11 @@
                     <input type="text" class="form-control" formControlName="size">
                     <div class="text-muted">number of entangled memory pairs to create</div>
                 </div>
-                <div class="col">
+                <!-- <div class="col">
                     <label for="endNode">Priority</label>&nbsp;
                     <input type="text" class="form-control" formControlName="priority">
                     <div class="text-muted">Priority of the request</div>
-                </div>
+                </div> -->
                 <div class="col">
                     <label for="endNode">Target Fidelity</label>&nbsp;
                     <input type="text" class="form-control" formControlName="targetFidelity">
@@ -183,13 +189,21 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-4">
-                    <label for="timeout">TimeOut</label>&nbsp;
-                    <input type="text" class="form-control" formControlName="timeout">
-                    <div class="text-muted">From startTime the time window within which entanglements need to be
-                        generated</div>
+                <div class="col-6">
+                    <div class="input-group">
+                        <label for="timeout" class="col-12">TimeOut</label>&nbsp;
+                        <input type="text" class="form-control col-12" aria-label="Amount (to the nearest dollar)"
+                            formControlName="timeout">
+                        <div class="input-group-append">
+                            <span class="input-group-text">sec</span>
+                        </div>
+                        <div class="text-muted col-12">Time window within which entanglements need to be
+                            generated</div>
+                    </div>
                 </div>
+
             </div>
+
         </div>
         <div *ngIf="app_id=='1'" class="row" [formGroup]="e91">
             <div class="col">

@@ -45,6 +45,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { IntroComponent } from './components/intro/intro.component';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { HowtouseComponent } from './components/howtouse/howtouse.component';
+import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 // import { ToastModule } from 'primeng/toast';
 // import { Alert } from '@ng-bootstrap/ng-bootstrap';
 //import { AngularAnimationsLibraryModule } from 'angular-animations-library'
@@ -97,7 +98,7 @@ import { HowtouseComponent } from './components/howtouse/howtouse.component';
     DividerModule,
     SplitterModule,
     FieldsetModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule, NgbPopoverModule
     //NgbModule,
   ],
   providers: [CookieService],

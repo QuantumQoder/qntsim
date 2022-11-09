@@ -52,13 +52,14 @@ export class ResultsComponent implements OnInit, OnDestroy, AfterViewInit {
       for (var i = 0; i < this.e91.receiver_keys.length; i++) {
         receiverKeys.push(this.e91.receiver_keys[i])
       }
-      console.log(senderKeys.join(''))
+      // console.log(senderKeys.join(''))
       this.e91.sender_keys = senderKeys.join('')
       this.e91.receiver_keys = receiverKeys.join('')
       this.items = [
-        { label: 'Key Generation', icon: 'pi pi-fw pi-home' },
-        { label: 'Key Bits', icon: 'pi pi-fw pi-calendar' },
-        { label: 'Error', icon: 'pi pi-fw pi-pencil' }];
+        { label: 'Key Bits', icon: 'pi pi-fw pi-home' },
+        { label: 'Key Generation', icon: 'pi pi-fw pi-calendar' }
+        // { label: 'Error', icon: 'pi pi-fw pi-pencil' }
+      ];
       this.activeItem = this.items[0]
     }
     if (this.app_id == '2') {
