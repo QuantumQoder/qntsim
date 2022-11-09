@@ -4,7 +4,7 @@ This module introduces the QuantumCircuit class. The qutip library is used to ca
 
 from abc import abstractmethod
 from math import e, pi
-from typing import List
+from typing import List,TYPE_CHECKING
 
 import numpy as np
 from qutip.qip.circuit import QubitCircuit
@@ -51,7 +51,7 @@ def t_gate():
     return Qobj(mat, dims=[[2], [2]])
 
 def tdg_gate():
-        return rz(-1 * np.pi/4)
+    return rz(-1 * np.pi/4)
 
 
 def validator(func):
@@ -421,3 +421,4 @@ class QutipCircuit(BaseCircuit):
         """
 
         self.measured_qubits.append(qubit)
+

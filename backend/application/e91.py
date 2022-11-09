@@ -55,6 +55,7 @@ class E91():
             circ=Circuit(1)
             circ.s(0)
             circ.h(0)
+            print(circ)
             circ.tdg(0)
             circ.h(0)
             circ.measure(0)
