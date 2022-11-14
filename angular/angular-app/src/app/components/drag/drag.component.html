@@ -112,13 +112,13 @@
                 ngbPopover="Drag and drop components to create the topology graph." triggers="mouseenter:mouseleave"
                 popoverTitle="Tips!" [openDelay]="100" popoverClass="popover1" [closeDelay]="200">
             </div>
-            <div id="toolTipDIV" style="position: absolute; background: white; z-index: 1000; display: none;">
+            <!-- <div id="toolTipDIV" style="position: absolute; background: white; z-index: 1000; display: none;">
                 <p id="toolTipParagraph">Tooltip</p>
-            </div>
+            </div> -->
             <div id="myDiagramDiv" class="col-8" style=" flex-grow: 1; height:
-                500px;margin-left: 10px; border: solid 1px black"
-                ngbPopover="Click a component to modify its settings." triggers="mouseenter:mouseleave"
-                popoverTitle="Tips!" [openDelay]="100" popoverClass="popover2" [closeDelay]="200" placement="top">
+                500px;margin-left: 10px; border: solid 1px black" [ngbPopover]="popover2"
+                triggers="mouseenter:mouseleave" popoverTitle="Tips!" [openDelay]="100" popoverClass="popover2"
+                [closeDelay]="200" placement="top">
                 <!-- <p-speedDial [model]="items" direction="bottom-left" buttonClassName="p-button-success"
                     styleClass="speed-dial">
                 </p-speedDial> -->
@@ -291,7 +291,7 @@
                 </div>
                 <div class="col">
                     <label for="endNode">Middle Node</label>&nbsp;
-                    <select class="form-control" formControlName="node2">
+                    <select class="form-control" formControlName="middlenode">
                         <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
                         </option>
                     </select>
@@ -389,13 +389,13 @@
             <div *ngIf="nodeParams">
                 <div class="display-5">Node Settings</div>
                 <br>
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label for="name">Name</label>
                     <input type="email" class="form-control" id="name" formControlName="name"
                         aria-describedby="emailHelp" placeholder="Enter Name">
                     <small class="text-muted">Name of the selected node</small>
-                    <!-- <small id="emailHelp" class="form-text text-muted">Your information is safe with us.</small> -->
-                </div>
+                     <small id="emailHelp" class="form-text text-muted">Your information is safe with us.</small> 
+            </div> -->
                 <br>
                 <div class="form-group">
                     <label for="noOfMemories">No of Memories</label>

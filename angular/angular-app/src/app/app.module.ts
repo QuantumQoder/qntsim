@@ -19,6 +19,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AccordionModule } from 'primeng/accordion'
 // import { Index2Component } from './components/index2/index2.component';
 import { CommonModule } from '@angular/common';
+import { StepsModule } from 'primeng/steps';
 // import { ComponentsModule } from './components/module/components.module';
 import { FooterComponent } from './utilities/footer/footer.component';
 import { CarouselModule } from 'primeng/carousel';
@@ -98,7 +99,8 @@ import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
     DividerModule,
     SplitterModule,
     FieldsetModule,
-    BrowserAnimationsModule, NgbPopoverModule
+    BrowserAnimationsModule, NgbPopoverModule,
+    StepsModule
     //NgbModule,
   ],
   providers: [CookieService],
