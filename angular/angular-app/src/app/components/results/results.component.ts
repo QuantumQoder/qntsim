@@ -1,7 +1,9 @@
 import { AfterViewInit, Component, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+// import { info } from 'console';
 
 import { MenuItem } from 'primeng/api';
+import { ApiServiceService } from 'src/services/api-service.service';
 import { ConditionsService } from 'src/services/conditions.service';
 @Component({
   selector: 'app-results',
@@ -20,7 +22,10 @@ export class ResultsComponent implements OnInit, OnDestroy, AfterViewInit {
   e2e: any
   tel: any
   cols: any
-  constructor(private _formBuilder: FormBuilder, private con: ConditionsService) { }
+  ghz: any;
+  info1: boolean;
+  info2: boolean;
+  constructor(private _formBuilder: FormBuilder, private con: ConditionsService, public api: ApiServiceService) { }
   ngAfterViewInit(): void {
     if (this.app_id == '2') {
       // var e2e = this.con.getResult();
@@ -57,34 +62,45 @@ export class ResultsComponent implements OnInit, OnDestroy, AfterViewInit {
       this.e91.receiver_keys = receiverKeys.join('')
       this.items = [
         { label: 'Key Bits', icon: 'pi pi-fw pi-home' },
+        { label: 'Statistics', icon: 'pi pi-fw pi-pencil' },
         { label: 'Key Generation', icon: 'pi pi-fw pi-calendar' }
-        // { label: 'Error', icon: 'pi pi-fw pi-pencil' }
       ];
       this.activeItem = this.items[0]
     }
     if (this.app_id == '2') {
-      var e2e = this.con.getResult();
-      this.e2e = e2e.application
+      // var e2e = this.con.getResult();
+      // this.e2e = e2e.application
+      this.e2e = this.api.gete2e()
+    }
+    if (this.app_id == '3') {
+      var ghz = this.con.getResult();
+      this.ghz = ghz.application
     }
     if (this.app_id == '4') {
       var tele = this.con.getResult();
       this.tel = tele.application
-
-
     }
 
-    // { label: 'Documentation', icon: 'pi pi-fw pi-file' },
-    // { label: 'Settings', icon: 'pi pi-fw pi-cog' }
+
 
 
     this.data = ['Alice', 'Bob', 'Eve']
 
-    this.keyGen = true
-    this.keyBits = false
+    this.keyGen = false
+    this.keyBits = true
   }
   ngOnDestroy(): void {
 
   }
+  info_1() {
+    this.info2 = false;
+    this.info1 = true;
+  }
+  info_2() {
+    this.info1 = false;
+    this.info2 = true;
+  }
+
   senderbasis(index: any) {
     var bool = this.match.includes(index)
     //console.log(index + ":" + this.match.includes(this.e91.sender_basis_list[index]))

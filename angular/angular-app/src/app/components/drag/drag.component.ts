@@ -2,6 +2,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { AfterViewInit, Component, OnChanges, OnInit, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+
 //import { error } from 'console';
 import * as go from 'gojs'
 import { MenuItem, MessageService } from 'primeng/api';
@@ -15,16 +16,18 @@ import { ConditionsService } from 'src/services/conditions.service';
   providers: [MessageService],
   encapsulation: ViewEncapsulation.None
 })
-export class DragComponent implements OnInit, AfterViewInit, OnChanges {
+export class DragComponent implements OnInit, OnChanges {
   position_popover: string = 'top'
   info: boolean;
   link_array: any = []
   app_id: any
   nodeParams: boolean
   link: boolean
+  finalNodes: any = []
   memory: any = {
     "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93
   }
+  popover2: string = "1.Click on component's name to modify its name." + "2.Click a component to modify its settings."
   cc: any = []
   nodeWithKey: any
   paramsSet = new Map()
@@ -50,7 +53,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   node: any = {};
   toolbox = this.fb.group({
     'name': new FormControl(''),
-    'noOfMemories': new FormControl('100'),
+    'noOfMemories': new FormControl('500'),
     'memoryFidelity': new FormControl('0.98'),
     'attenuation': new FormControl('0.00001'),
     'distance': new FormControl('70')
@@ -60,8 +63,16 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   visibleSideNav: boolean
   public myDiagram: go.Diagram
   public myPalette: go.Palette
+  public linksModel: go.GraphLinksModel
   public myRotate: go.RotatingTool
   public savedModel: any = {
+    class: "go.GraphLinksModel",
+    linkFromPortIdProperty: "fromPort",
+    linkToPortIdProperty: "toPort",
+    nodeDataArray: [],
+    linkDataArray: []
+  }
+  public savedModel1: any = {
     class: "go.GraphLinksModel",
     linkFromPortIdProperty: "fromPort",
     linkToPortIdProperty: "toPort",
@@ -73,10 +84,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       "points": {
         "__gohashid": 4712,
         "P": true,
-        "n": [{ "x": 441, "y": 100 }, { "x": 451, "y": 100 }, { "x": 590, "y": 100 }, { "x": 590, "y": 230 }, { "x": 729, "y": 230 }, { "x": 739, "y": 230 }],
-        "F": 8,
-        "Gb": null,
-        "Ti": null
+        "n": [{ "x": 441, "y": 100 }, { "x": 451, "y": 100 }, { "x": 590, "y": 100 }, { "x": 590, "y": 230 }, { "x": 729, "y": 230 }, { "x": 739, "y": 230 }], "F": 8, "Gb": null, "Ti": null
       },
       "__gohashid": 4047,
       "from": -2,
@@ -169,117 +177,95 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     console.log(this.myDiagram.nodes)
   }
-  ngAfterViewInit(): void {
-    this.myDiagram.addDiagramListener("ChangedSelection", function (event) {
+  // ngAfterViewInit(): void {
+  //   this.myDiagram.addDiagramListener("ChangedSelection", function (event) {
+  //     console.log("selection changed")
+  //   })
+  //   var nodesarray = this.savedModel.nodeDataArray
+  //   let linkArray = this.savedModel.linkDataArray
+  //   var nodereq
+  //   console.log(nodesarray)
+  //   var nodelength = nodesarray.length
+  //   // console.log(linkArray)
+  //   for (var i = 0; i < nodelength; i++) {
+  //     var type;
+  //     if (nodesarray[i].figure == "Ellipse") {
+  //       type = 'service'
+  //     } else {
+  //       type = 'end'
+  //     }
+  //     console.log(type)
+  //     var namevar = {
+  //       0: 'node1',
+  //       1: 'node2',
+  //       2: 'node3',
+  //       3: 'node4'
+  //     }
+  //     nodereq = {
+  //       "Name": namevar[i],
+  //       "Type": type,
+  //       "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
+  //       "memory": this.memory
+  //     }
 
-      // console.log(node.key);
-      // console.log(node.name)
-    })
-    var nodesarray = this.savedModel.nodeDataArray
-    let linkArray = this.savedModel.linkDataArray
-    var nodereq
-    console.log(nodesarray)
-    var nodelength = nodesarray.length
-    console.log(linkArray)
-
-
-    for (var i = 0; i < nodelength; i++) {
-      var type;
-      if (nodesarray[i].figure == "Ellipse") {
-        type = 'service'
-      } else {
-        type = 'end'
-      }
-      console.log(type)
-      var namevar = {
-        0: 'node1',
-        1: 'node2',
-        2: 'node3',
-        3: 'node4'
-      }
-      nodereq = {
-        "Name": namevar[i],
-        "Type": type,
-        "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
-        "memory": this.memory
-      }
-
-      this.nodes.push(nodereq)
-    }
-    let array = []
-    var linkreq
-    let chunk = 2;
-    for (var i = 0; i < linkArray.length; i++) {
-      var from = linkArray[i].from
-      var to = linkArray[i].to
-      let positiveFromkey = from.toString().substring(1)
-      // console.log(positivekey * 2)
-      let positivetoKey = to.toString().substring(1)
-      var fromKey = positiveFromkey - 1;
-      let toKey = positivetoKey - 1;
-      array.push(this.nodes[fromKey].Name)
-      array.push(this.nodes[toKey].Name)
-      console.log(array)
-      linkreq = {
-        Nodes: array,
-        Attenuation: Number(this.toolbox.get('attenuation')?.value),
-        Distance: Number(this.toolbox.get('distance')?.value),
-      }
-      array = []
-      // console.log(typeof (linkreq.Distance))
-      this.links.push(linkreq)
-    }
-    this.topology = {
-      nodes: this.nodes,
-      quantum_connections: this.links,
-      classical_connections: this.cc,
-    }
-    var cc = []
-    for (var i = 0; i < this.nodes.length; i++) {
-      for (var j = 0; j < this.nodes.length; j++) {
-        cc.push([this.nodes[i].Name, this.nodes[j].Name]);
-      }
-    }
-    // console.log(cc)
-    if (cc.length != 0) {
-      var distance
-      var delay
-      for (var i = 0; i < cc.length; i++) {
-        // console.log(cc[i][0], cc[i][1])
-        if (cc[i][0] == cc[i][1]) {
-          distance = 0;
-          delay = 0;
-          // console.log("same")
-        } else {
-          distance = 1000;
-          delay = 1000000000;
-          // console.log("not same")
-        }
-        let ccreq = {
-          Nodes: cc[i],
-          Delay: delay,
-          Distance: distance
-        }
-        this.cc.push(ccreq)
-      }
-    }
-    console.log(this.links)
-    console.log(this.nodes)
-
-    // go.Diagram.inherit(go, go.RotatingTool);
-    // this.TopRotatingTool.prototype.updateAdornments = function (part: any) {
-    //   go.RotatingTool.prototype.updateAdornments.call(this, part);
-    //   var adornment = part.findAdornment("Rotating");
-    //   if (adornment !== null) {
-    //     adornment.location = part.rotateObject.getDocumentPoint(new go.Spot(0.5, 0, 0, -30));  // above middle top
-    //   }
-    // };
-
-    // /** @override */
-    // this.TopRotatingTool.prototype.rotate = function (newangle: any) {
-    //   go.RotatingTool.prototype.rotate.call(this, newangle + 90);
-    // };
-  }
+  //     this.nodes.push(nodereq)
+  //   }
+  //   let array = []
+  //   var linkreq
+  //   let chunk = 2;
+  //   for (var i = 0; i < linkArray.length; i++) {
+  //     var from = linkArray[i].from
+  //     var to = linkArray[i].to
+  //     let positiveFromkey = from.toString().substring(1)
+  //     // console.log(positivekey * 2)
+  //     let positivetoKey = to.toString().substring(1)
+  //     var fromKey = positiveFromkey - 1;
+  //     let toKey = positivetoKey - 1;
+  //     array.push(this.nodes[fromKey].Name)
+  //     array.push(this.nodes[toKey].Name)
+  //     console.log(array)
+  //     linkreq = {
+  //       Nodes: array,
+  //       Attenuation: Number(this.toolbox.get('attenuation')?.value),
+  //       Distance: Number(this.toolbox.get('distance')?.value),
+  //     }
+  //     array = []
+  //     this.links.push(linkreq)
+  //   }
+  //   this.topology = {
+  //     nodes: this.nodes,
+  //     quantum_connections: this.links,
+  //     classical_connections: this.cc,
+  //   }
+  //   var cc = []
+  //   for (var i = 0; i < this.nodes.length; i++) {
+  //     for (var j = 0; j < this.nodes.length; j++) {
+  //       cc.push([this.nodes[i].Name, this.nodes[j].Name]);
+  //     }
+  //   }
+  //   if (cc.length != 0) {
+  //     var distance
+  //     var delay
+  //     for (var i = 0; i < cc.length; i++) {
+  //       if (cc[i][0] == cc[i][1]) {
+  //         distance = 0;
+  //         delay = 0;
+  //       } else {
+  //         distance = 1000;
+  //         delay = 1000000000;
+  //       }
+  //       let ccreq = {
+  //         Nodes: cc[i],
+  //         Delay: delay,
+  //         Distance: distance
+  //       }
+  //       this.cc.push(ccreq)
+  //     }
+  //   }
+  //   console.log(this.links)
+  //   console.log(this.nodes)
+  //   this.load()
+  // }
 
   ngOnInit(): void {
 
@@ -298,30 +284,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         if (idx >= 0) document.title = document.title.slice(0, idx);
       }
     });
-    this.myDiagram.addDiagramListener("SelectionMoved", (e) => {
-      console.log("SelectionMoved ...");
-      // https://gojs.net/latest/api/symbols/Part.html#location // * PART
 
-      var selectedNode = e.diagram.selection.first();
-      var key = selectedNode.key;
-      var coorX = selectedNode.location.x;
-      var coorY = selectedNode.location.y;
-    })
-    this.myDiagram.addDiagramListener("SelectionCopied", (e) => {
-      console.log("SelectionMoved ...");
-      // https://gojs.net/latest/api/symbols/Part.html#location // * PART
-
-      var selectedNode = e.diagram.selection.first();
-      var key = selectedNode.key;
-      var coorX = selectedNode.location.x;
-      var coorY = selectedNode.location.y;
-    })
-
-
-    // Define a function for creating a "port" that is normally transparent.
-    // The "name" is used as the GraphObject.portId, the "spot" is used to control how links connect
-    // and where the port is positioned on the node, and the boolean "output" and "input" arguments
-    // control whether the user can draw links from or to the port.
     function makePort(name: any, spot: any, output: any, input: any) {
       // the port is basically just a small transparent square
       return $(go.Shape, "Circle",
@@ -347,16 +310,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       $(go.Adornment, "Spot",
         { locationSpot: go.Spot.Right },
         $(go.Placeholder),
-        // $(go.Shape, { alignment: go.Spot.TopLeft, cursor: "nw-resize", desiredSize: new go.Size(6, 6), fill: "lightblue", stroke: "deepskyblue" }),
-        // $(go.Shape, { alignment: go.Spot.Top, cursor: "n-resize", desiredSize: new go.Size(6, 6), fill: "lightblue", stroke: "deepskyblue" }),
-        // $(go.Shape, { alignment: go.Spot.TopRight, cursor: "ne-resize", desiredSize: new go.Size(6, 6), fill: "lightblue", stroke: "deepskyblue" }),
-
-        // $(go.Shape, { alignment: go.Spot.Left, cursor: "w-resize", desiredSize: new go.Size(6, 6), fill: "lightblue", stroke: "deepskyblue" }),
-        // $(go.Shape, { alignment: go.Spot.Right, cursor: "e-resize", desiredSize: new go.Size(6, 6), fill: "lightblue", stroke: "deepskyblue" }),
-
-        // $(go.Shape, { alignment: go.Spot.BottomLeft, cursor: "se-resize", desiredSize: new go.Size(6, 6), fill: "lightblue", stroke: "deepskyblue" }),
-        // $(go.Shape, { alignment: go.Spot.Bottom, cursor: "s-resize", desiredSize: new go.Size(6, 6), fill: "lightblue", stroke: "deepskyblue" }),
-        // $(go.Shape, { alignment: go.Spot.BottomRight, cursor: "sw-resize", desiredSize: new go.Size(6, 6), fill: "lightblue", stroke: "deepskyblue" })
       );
 
     var nodeRotateAdornmentTemplate =
@@ -365,15 +318,10 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         $(go.Shape, "Circle", { name: "CIRCLE", cursor: "pointer", desiredSize: new go.Size(7, 7), fill: "lightblue", stroke: "deepskyblue" }),
         $(go.Shape, { geometryString: "M3.5 7 L3.5 30", isGeometryPositioned: true, stroke: "deepskyblue", strokeWidth: 1.5, strokeDashArray: [4, 2] })
       );
-    var myToolTip = $(go.HTMLInfo, {
-      show: showToolTip,
-      hide: hideToolTip
-      /*
-        since hideToolTip is very simple,
-        we could have set mainElement instead of setting hide:
-      mainElement: document.getElementById('toolTipDIV')
-      */
-    });
+    // var myToolTip = $(go.HTMLInfo, {
+    //   show: showToolTip,
+    //   hide: hideToolTip
+    // });
     this.myDiagram.nodeTemplate =
       $(go.Node, "Spot",
         {
@@ -400,7 +348,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         $(go.Panel, "Auto",
           {
             name: "PANEL",
-            toolTip: myToolTip
+            // toolTip: myToolTip
           },
           new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
           $(go.Shape, "Rectangle",  // default figure
@@ -419,19 +367,10 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
             font: "bold 11pt Helvetica, Arial, sans-serif",
             margin: 8,
             maxSize: new go.Size(160, NaN),
-            wrap: go.TextBlock.WrapFit,
-            editable: false
+            wrap: go.TextBlock.WrapDesiredSize,
+            editable: true
           },
           new go.Binding("text", "text").makeTwoWay()),
-        // {
-        //   toolTip:  // define a tooltip for each node that displays the color as text
-        //     $("ToolTip",
-        //       $(go.TextBlock, { margin: 4 },
-        //         new go.Binding("text", "", (d) => {
-        //           this.diagramInfo(d)
-        //         }))
-        //     )  // end of Adornment
-        // });
       );
     // four small named ports, one on each side:
     makePort("T", go.Spot.Top, false, true),
@@ -520,8 +459,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
                       { isPanelMain: true, fill: null, stroke: "deepskyblue", strokeWidth: 0 }),
                     $(go.Shape,  // the arrowhead
                       { toArrow: "Standard", stroke: "grey" })
-                    // $(go.Shape,  // the arrowhead
-                    // { toArrow: "Standard", stroke: "grey", strokeWidth: 4 }),
                   ),
               },
               {
@@ -533,10 +470,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
               new go.Binding("points"),
               $(go.Shape,  // the link path shape
                 { isPanelMain: true, strokeWidth: 2 }),
-              // $(go.Shape,  // the arrowhead
-              //   { toArrow: "Standard", stroke: null }),
-              // $(go.TextBlock, { segmentOffset: new go.Point(0, -20) },  // centered multi-line text
-              //   new go.Binding("text", "text")),
               $(go.Shape,  // the arrowhead
                 { toArrow: "Standard", stroke: null, strokeWidth: 2 }),
               $(go.TextBlock, { segmentOffset: new go.Point(0, -10) },  // centered multi-line text
@@ -546,28 +479,19 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           model: new go.GraphLinksModel([  // specify the contents of the Palette
             { text: "Service", figure: "Ellipse", fill: "#00AD5F" },
             { text: "End", figure: "Circle", fill: "#CE0620" },
-            // { text: "Comment", figure: "RoundedRectangle", fill: "lightyellow" }
+
           ], [
             // the Palette also has a disconnected Link, which the user can drag-and-drop
             { points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) },
             // { color: "grey", text: "VC", points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) }
           ])
         });
-    // this.myDiagram.toolTip =
-    //   $("ToolTip",
-    //     $(go.TextBlock, { margin: 4 },
-    //       // use a converter to display information about the diagram model
-    //       new go.Binding("text", "key", (model: go.Model) => {
-    //         this.diagramInfo(model)
-    //       }))
-    //   );
-    // this.info = true
     this.application = sessionStorage.getItem('app')
 
     this.e2e = this.fb.group({
       'sender': new FormControl(''),
       'receiver': new FormControl(''),
-      'startTime': new FormControl(''),
+      'startTime': new FormControl('1'),
       'size': new FormControl('2'),
       // 'priority': new FormControl(''),
       'targetFidelity': new FormControl('0.98'),
@@ -598,29 +522,18 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.teleportation = this.fb.group({
       'sender': new FormControl(''),
       'receiver': new FormControl(''),
-      'amplitude1': new FormControl(''),
-      'amplitude2': new FormControl('')
+      'amplitude1': new FormControl('0.70710678118+0j'),
+      'amplitude2': new FormControl('0-0.70710678118j')
     })
     this.ghz = this.fb.group({
       'node1': new FormControl(''),
       'node2': new FormControl(''),
       'node3': new FormControl(''),
-      'middleNode': new FormControl('')
+      'middlenode': new FormControl('')
     })
     this.showBottomCenter()
-    this.load()
-
+    // this.load()
   }
-  // diagramInfo(d: any) {
-  //   // Tooltip info for a node data object
-  //   var str = "Node " + d.key + ": " + d.text + "\n";
-  //   if (d.group)
-  //     str += "member of " + d.group;
-  //   else
-  //     str += "top-level node";
-  //   return str;
-
-  // }
   info_demo() {
     this.info = true;
   }
@@ -633,7 +546,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.selectedLink = link.data
     console.log(this.selectedLink)
     this.savedModel = this.myDiagram.model;
-
     this.visibleSideNav = true
     //console.log("hello")
     this.nodeParams = false;
@@ -642,22 +554,61 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   save() {
     this.app_id = sessionStorage.getItem("app_id")
     //console.log(this.app_id)
-    //console.log(this.myDiagram.model.toJson)
-
-    this.saveDiagramProperties();
+    this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
+    this.savedModel = this.myDiagram.model;
+    var memory = [];
+    console.log(this.savedModel.nodeDataArray)
     this.graphModel = this.myDiagram.model.nodeDataArray
+    console.log(this.savedModel.nodeDataArray.length)
+    console.log(this.nodes.length)
+    if (this.graphModel.length != this.nodes.length) {
+      alert("Nodes settings are not set properly!!");
+    } else if (this.savedModel.linkDataArray.length != this.links.length) {
+      alert("Configure connections properly!!")
+    } else {
+      this.finalNodes = []
+      for (var i = 0; i < this.savedModel.nodeDataArray.length; i++) {
+        var type;
+        if (this.savedModel.nodeDataArray[i].figure === "Ellipse") {
+          type = 'service'
+        } else {
+          type = 'end'
+        }
+        var nodeData = {
+          Name: this.savedModel.nodeDataArray[i].text,
+          Type: type,
+          noOfMemory: this.nodes[i].noOfMemory,
+          memory: this.memory
+        }
+        if (this.savedModel.nodeDataArray[i].text == null)
+          this.finalNodes.splice(i, 0, nodeData)
+        if (this.savedModel.nodeDataArray[i].text != null) {
+          this.finalNodes.splice(i, 1, nodeData)
+        }
+        this.finalNodes.push(nodeData)
+        console.log(nodeData)
+      }
+      console.log(this.finalNodes)
+      //console.log(this.myDiagram.model.toJson)
+      // this.saveDiagramProperties();
+
+      this.position = 'bottom';
+      this.displayPosition = true;
+    }
     console.log(this.graphModel)
     console.log(this.savedModel.linkDataArray)
     console.log(this.links)
     //console.log(this.graphModel)
-    this.position = 'bottom';
-    this.displayPosition = true;
   }
   add() {
     var nodereq;
     var linkreq;
     var cc = []
     this.cc = []
+    this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
+    console.log(this.myDiagram.model)
+    // this.myDiagram.model = new go.GraphLinksModel(this.savedModel.nodeDataArray, this.savedModel.linkDataArray)
+    this.savedModel = this.myDiagram.model;
     var nodesarray = this.savedModel.nodeDataArray
     let linkArray = this.savedModel.linkDataArray
     console.log(nodesarray)
@@ -665,38 +616,34 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     console.log(linkArray)
     console.log(this.nodes)
     if (this.nodeParams) {
-
-      //let length = nodesarray.length
       let type;
       console.log(this.toolbox.get('noOfMemories')?.value)
       console.log(nodesarray)
       var key = this.selectedNode.key
       console.log(key)
-      var indexFromKey
-      let positivekey
-      positivekey = key.toString().substring(1)
-      indexFromKey = positivekey - 1
-      // indexFromKey = positivekey + 3
-      if (nodesarray[indexFromKey].figure === "Ellipse") {
+      let positivekey = key.toString().substring(1)
+      var indexFromKey = positivekey - 1
+      if (this.selectedNode.figure === "Ellipse") {
         type = 'service'
       } else {
         type = 'end'
       }
+      // this.myDiagram.model.nodeDataArray.splice(indexFromKey, 1, this.savedModel.nodeDataArray[indexFromKey])
+      // this.myDiagram.model = go.Model.fromJson(this.savedModel);
+      console.log(this.selectedNode.text)
       nodereq = {
-        "Name": this.toolbox.get('name')?.value,
+        "Name": this.selectedNode.text,
         "Type": type,
         "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
         "memory": this.memory
       }
-
-      // console.log(positivekey * 2)
       sessionStorage.setItem("selected_node", this.selectedNode.key)
-
-      // console.log(this.savedModel.nodeDataArray[indexFromKey])
+      console.log(this.savedModel.nodeDataArray)
+      // console.log(this.savedModel.nodeDataArray[indexFromKey].text)
       // console.log(this.toolbox.get('name')?.value)
-
       this.savedModel.nodeDataArray[indexFromKey].text = this.toolbox.get('name')?.value
-      this.load()
+      // console.log(this.savedModel.nodeDataArray[indexFromKey].text)
+
       if (this.nodes[indexFromKey] == null)
         this.nodes.splice(indexFromKey, 0, nodereq)
       if (this.nodes[indexFromKey] != null) {
@@ -704,36 +651,42 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       }
       console.log(this.nodes)
       console.log(indexFromKey)
-      // console.log(this.nodes)
+      // this.myDiagram.model = go.Model.fromJson(this.savedModel);
+
+      console.log(this.myDiagram.model)
+      // this.loadDiagramProperties();
+      console.log("ok");
+
+      // this.myDiagram.model = go.Model.fromJson(this.savedModel);
+
+      // console.log(this.myDiagram.model)
+      // var pos = this.myDiagram.model.modelData.position;
+      // if (pos) this.myDiagram.initialPosition = go.Point.parse(pos);
     }
     if (this.link) {
-      // var linksarray = this.savedModel.linkDataArray
       let array = []
-
-      // for (let i = 0; i < this.nodes.length; i++) {
-      //   array.push(this.nodes[i].Name)
-      //   // console.log(array)
-      // }
 
       var from = this.selectedLink.from
       var to = this.selectedLink.to
-      if (from !== null && to != null) {
-        let positiveFromkey = from.toString().substring(1)
-        // console.log(positivekey * 2)
-        let positivetoKey = to.toString().substring(1)
-        var fromKey = positiveFromkey - 1;
-        let toKey = positivetoKey - 1;
-        array.push(this.nodes[fromKey].Name)
-        array.push(this.nodes[toKey].Name)
-        linkreq = {
-          Nodes: array,
-          Attenuation: Number(this.toolbox.get('attenuation')?.value),
-          Distance: Number(this.toolbox.get('distance')?.value),
+      if (from == null || to == null)
+        alert("Connections are not proper.Please check!!")
+      else
+        if (from !== null && to != null) {
+          let positiveFromkey = from.toString().substring(1)
+          let positivetoKey = to.toString().substring(1)
+          var fromKey = positiveFromkey - 1;
+          let toKey = positivetoKey - 1;
+          array.push(this.nodes[fromKey].Name)
+          array.push(this.nodes[toKey].Name)
+          linkreq = {
+            Nodes: array,
+            Attenuation: Number(this.toolbox.get('attenuation')?.value),
+            Distance: Number(this.toolbox.get('distance')?.value),
+          }
+          console.log(typeof (linkreq.Distance))
+          this.links.push(linkreq)
+          array = []
         }
-        console.log(typeof (linkreq.Distance))
-        this.links.push(linkreq)
-        array = []
-      }
     }
     if (this.nodes.length != 0) {
       for (var i = 0; i < this.nodes.length; i++) {
@@ -741,20 +694,18 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           cc.push([this.nodes[i].Name, this.nodes[j].Name]);
         }
       }
-      // console.log(cc)
+
       if (cc.length != 0) {
         var distance
         var delay
         for (var i = 0; i < cc.length; i++) {
-          // console.log(cc[i][0], cc[i][1])
           if (cc[i][0] == cc[i][1]) {
             distance = 0;
             delay = 0;
-            // console.log("same")
           } else {
             distance = 1000;
             delay = 1000000000;
-            // console.log("not same")
+
           }
           let ccreq = {
             Nodes: cc[i],
@@ -763,7 +714,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           }
           this.cc.push(ccreq)
         }
-        // console.log(this.cc)
       }
     }
 
@@ -784,9 +734,14 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
 
   parameters() {
     this.blocked = true
-
     this.displayPosition = false
     var token = localStorage.getItem('access')
+    console.log(this.finalNodes)
+    this.topology = {
+      nodes: this.nodes,
+      quantum_connections: this.links,
+      classical_connections: this.cc,
+    }
     if (this.app_id == 1)
       this.appSettings = {
         sender: this.e91.get('sender')?.value,
@@ -800,7 +755,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         startTime: 1e12,
         size: this.e2e.get('size')?.value,
         priority: 0,
-        targetFidelity: this.e2e.get('targetFidelity')?.value + 'e12',
+        targetFidelity: 0.5,
         timeout: this.e2e.get('timeout')?.value + 'e12'
       }
     }
@@ -869,7 +824,10 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   }
   load() {
     //var savedModel = document.getElementById("mySavedModel") as HTMLInputElement
-    this.myDiagram.model = go.Model.fromJson(this.savedModel);
+    // this.myDiagram.model.nodeDataArray = this.savedModel.nodeDataArray;
+    this.myDiagram.model = go.Model.fromJson(this.savedModel)
+
+    console.log(this.myDiagram.model)
     this.loadDiagramProperties();  // do this after the Model.modelData has been brought into memory
   }
   saveDiagramProperties() {
@@ -895,44 +853,48 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     // var evt = e.copy();
     // console.log(evt)
     var node = obj.part;
-    // console.log(node.data);
-    this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
-    this.savedModel = this.myDiagram.model;
-    console.log(this.savedModel.linkDataArray)
 
     this.selectedNode = node.data
-    console.log(this.selectedNode);
-    var key = this.selectedNode.key
-    if (this.nodes.length != 0) {
-      let positivekey = key.toString().substring(1)
-      // console.log(positivekey * 2)
-      var indexFromKey = positivekey - 1
-      console.log(this.nodes.length)
-      let node
-      if (this.nodes.length > indexFromKey) {
-        node = this.nodes[indexFromKey]
-        console.log(node)
-        console.log(node.noOfMemory)
-        this.toolbox.get('name')?.patchValue(node.Name)
-        this.toolbox.get('noOfMemories')?.patchValue(node.noOfMemory)
-      }
-      else {
-        this.toolbox.get('name')?.patchValue('');
-        this.toolbox.get('noOfMemories')?.patchValue('100')
-      }
+    console.log(this.selectedNode.text)
+    console.log(node.data);
+    this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
+    this.savedModel = this.myDiagram.model;
+    if (node.data.text == 'Service' || node.data.text == 'End') {
+      alert("Configure your Node Name inorder to modify its settings.")
     }
-    //   for (var i = 0; i < this.nodes.length; i++) {
-    //     console.log(this.nodes[i].Type)
-    //     console.log(this.nodes[i].Type == this.selectedNode.text)
-    //     if (this.nodes[i].Name == this.selectedNode.text) {
-    //       this.toolbox.get('name')?.setValue('')
-    //     }
+    else {
+      // this.saveDiagramProperties();
+      this.graphModel = this.myDiagram.model.nodeDataArray
+      console.log(this.savedModel.linkDataArray)
 
-    //   }
-
-    this.visibleSideNav = true
-    this.nodeParams = true
-    this.link = false
+      console.log(this.selectedNode);
+      var key = this.selectedNode.key
+      if (this.nodes.length != 0) {
+        let positivekey = key.toString().substring(1)
+        // console.log(positivekey * 2)
+        var indexFromKey = positivekey - 1
+        console.log(indexFromKey)
+        console.log(this.nodes.length)
+        let node
+        if (this.nodes.length > indexFromKey) {
+          node = this.nodes[indexFromKey]
+          console.log(node)
+          console.log(node.noOfMemory)
+          this.toolbox.get('name')?.patchValue(node.Name)
+          this.toolbox.get('noOfMemories')?.patchValue(node.noOfMemory)
+        }
+        else {
+          this.toolbox.get('name')?.patchValue('');
+          this.toolbox.get('noOfMemories')?.patchValue('500')
+        }
+      }
+      setTimeout(() => {
+        this.visibleSideNav = true
+        this.nodeParams = true
+        this.link = false
+      }
+        , 2000)
+    }
   }
   showProperties(e: any, obj: any) {  // executed by ContextMenuButton
     var node = obj.part.adornedPart;
@@ -946,12 +908,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       this.myDiagram.commitTransaction('Removed Node!')
       console.log("Removed!!")
     }
-
-    // console.log(msg)
-    // this.myDiagram.selection.each(function (part) {
-    //   msg += " " + part.toString();
-    // });
-    // document.getElementById("myStatus").textContent = msg;
   }
 }
 function showToolTip(obj: any, diagram: any, tool: any) {
@@ -960,7 +916,6 @@ function showToolTip(obj: any, diagram: any, tool: any) {
   var pt = diagram.lastInput.viewPoint;
   console.log(pt)
   toolTipDIV.style.left = (pt.x) - 13 + "px";
-  // toolTipDIV.style.top = (pt.y) + "px";
   document.getElementById('toolTipParagraph')!.textContent = "" + obj.part.data.text;
   toolTipDIV.style.display = "block";
 }
@@ -970,7 +925,7 @@ function hideToolTip(diagram: any, tool: any) {
 }
 function showSmallPorts(node: any, show: any) {
   node.ports.each(function (port: any) {
-    if (port.portId !== "") {  // don't change the default port, which is the big shape
+    if (port.portId !== "") {  //don't change the default port, which is the big shape
       port.fill = show ? "rgba(0,0,0,.3)" : null;
     }
   });

@@ -7,4 +7,12 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'QNTSim';
+
+  onActivate($event: any) {
+    window.scroll({
+      top: 0,
+      behavior: 'smooth'
+    });
+
+  }
 }

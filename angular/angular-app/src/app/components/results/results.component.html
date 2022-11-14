@@ -1,10 +1,82 @@
 <div class="main">
     <p-tabMenu #menuItems [model]="items" [activeItem]="activeItem" (click)="activateMenu()"></p-tabMenu>
     <br>
+    <p-dialog header="Details" [draggable]="true" [(visible)]="info1" [modal]="true" [style]="{width: '50vw'}"
+        position="right" [resizable]="true">
+        <ul>
+            <li>
+                <strong>Request Id:</strong> &nbsp;<small>Every request have a unique Id​</small>
+            </li>
+            <li>
+                <strong>Source:</strong>&nbsp;<small>Source is the end node from where request raised​</small>
+            </li>
+            <li>
+                <strong>Destination:</strong>&nbsp;<small>Destination is the end node where source should be
+                    entangled​</small>
+            </li>
+            <li>
+                <strong>Demand Size:</strong>&nbsp;<small>Demand size is the no. Of entangled pairs requested between
+                    source &
+                    destination​</small>
+            </li>
+            <li>
+                <strong>Start Time:</strong>&nbsp;<small>Start time of the simulation ​</small>
+            </li>
+            <li>
+                <strong>End Time:</strong>&nbsp;<small>End time of the simulation ​</small>
+            </li>
+        </ul>
+    </p-dialog>
+    <p-dialog header="Details" [draggable]="true" [(visible)]="info2" [modal]="true" [style]="{width: '50vw'}"
+        position="right" [resizable]="true">
+        <ul>
+            <li>
+                <strong>Memory Index:</strong>&nbsp;<small>Every memory array has a unique Id​</small>
+            </li>
+            <li>
+                <strong>Current Node:</strong>&nbsp;<small>Node initiating request.​</small>
+            </li>
+            <li>
+                <strong>Entangled Node:</strong>&nbsp;<small>Destination Node.​
 
+                    ​</small>
+            </li>
+            <li>
+                <strong>Fidelity:</strong>&nbsp;
+                <small>Fidelity is the quality parameter for the entanglement pair​ 0 < f < 1​ </small>
+            </li>
+            <li>
+                <strong>Entangled Time:</strong>&nbsp;<small>Time of end to end entanglement made after start time of
+                    simulation ​</small>
+            </li>
+            <li>
+                <strong>Expiry Time:</strong>&nbsp;<small>Time of expiry of end to end entanglement after the entangled
+                    time​</small>
+            </li>
+            <li>
+                <strong>State:</strong>&nbsp;<small>Status of the memory​
+
+                    Entangled- E2E​
+
+                    Occupied – memory in use​
+
+                    Raw- memory not in use​</small>
+            </li>
+        </ul>
+    </p-dialog>
     <div *ngIf="app_id=='1'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
         <h1 class="display-3">E91</h1>
         <div *ngIf="keyGen" class="row">
+            <p>Measurement results and randomly chosen basis at the sender and receiver end nodes at every
+                measurements
+                are given
+                below-​</p>
+            <br>
+            <p>Basis : Measurement basis /observables chosen by Alice or Bob.
+                <br>
+                Value: Measurement result obtained from the observables at Alice or Bob
+            </p>
+            <br>
             <div class="tabel">
                 <h5><u>Sender</u></h5>
                 <table class="table table-bordered">
@@ -30,6 +102,8 @@
             </div>
         </div>
         <div *ngIf="keyGen" class="row">
+
+
             <div class="tabel">
                 <h5><u>Receiver</u></h5>
                 <table class="table table-bordered">
@@ -53,6 +127,17 @@
         </div>
         <div *ngIf="keyBits" class="row">
             <div class="col">
+                <p>E91 protocols has been executed and key of the demanded length has been shared between sender &
+                    receiver.​
+
+                    At the end of the execution of protocol, the sifted key between the source and destination is
+                    given
+                    below​</p>
+                <br>
+                <p>Shifted Key [The final key] is obtained at Alice and Bob from Measurement results obtained from
+                    Matching
+                    basis (that are
+                    indicated in green above)</p>
                 <table class="table table-bordered align-middle">
                     <thead class="thead-light">
                         <tr>
@@ -72,6 +157,15 @@
     </div>
     <div *ngIf="app_id=='2'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
         <div class="display-4">E2E</div>
+        <div class="row">
+            <h5 class="text-center col-10" style="padding-top:10px ;">Details of the requests raised on the
+                constructed network topology</h5>
+            <div class="text-right col-2">
+                <button pButton pRipple type="button" icon="pi pi-question"
+                    class="p-button-rounded p-button-info p-button-outlined" styleClass="info" (click)="info_1()">
+                </button>
+            </div>
+        </div>
         <div class="col">
             <div class="row">
                 <table class="table table-bordered">
@@ -97,6 +191,19 @@
                     </tbody>
                 </table>
             </div>
+            <br>
+
+            <br>
+            <div class="row">
+                <h5 class="text-center col-10" style="padding-top:10px ;">Details of the memories of end nodes and
+                    entanglement
+                    between them</h5>
+                <div class="text-right col-2">
+                    <button pButton pRipple type="button" icon="pi pi-question"
+                        class="p-button-rounded p-button-info p-button-outlined" styleClass="info" (click)="info_2()">
+                    </button>
+                </div>
+            </div>
             <div class="row">
                 <table id="table1" class="table table-bordered">
                     <thead>
@@ -104,12 +211,14 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <th class="col">Memory Index</th>
+                            <th class="col" placement="top" ngbTooltip="Tooltip on top">
+                                Memory Index
+                            </th>
                             <th class="col">Current Node</th>
                             <th class="col">Entangled Node</th>
                             <th class="col">Fidelity</th>
                             <th class="col">Entangled Time</th>
-                            <th class="col">Expire Time</th>
+                            <th class="col">Expiry Time</th>
                             <th class="col">State</th>
                         </tr>
 
@@ -128,7 +237,7 @@
                             <th class="col">Entangled Node</th>
                             <th class="col">Fidelity</th>
                             <th class="col">Entangled Time</th>
-                            <th class="col">Expire Time</th>
+                            <th class="col">Expiry Time</th>
                             <th class="col">State</th>
                         </tr>
 
@@ -142,6 +251,10 @@
             Teleportation
         </div>
         <br>
+        <h5 class="text-center">
+            <p class="text-center">Entanglement shared between two parties​</p>
+            <p class="text-center">Two party Quantum State</p>
+        </h5>
         <!-- <div class="row"> -->
         <table class="table table-bordered">
             <thead class="table-primary">
@@ -155,9 +268,15 @@
                 </tr>
             </thead>
         </table>
+        <h5 class="text-center">
+            <p class="text-center">Quantum State of the qubit (at the sender node) that should be teleported between
+                two
+                parties.​</p>
+        </h5>
         <br>
         <h6><u>At Sender</u></h6>
         <br>
+
         <table class="table table-bordered">
             <thead class="table-primary">
                 <tr>
@@ -184,6 +303,11 @@
             </tbody>
         </table>
         <br>
+        <h5 class="text-center">
+            <p class="text-center">Quantum State of the qubit (at the receiver node) that should be teleported
+                between
+                two parties.​</p>​
+        </h5>
         <h6><u>At Receiver</u></h6>
         <br>
         <table class="table table-bordered">
@@ -208,22 +332,36 @@
                 </tr>
             </tbody>
         </table>
+        <p class="text-center">After getting the measurement result from sender, unitary operation will be applied
+            at
+            the receiver node.​</p>
         <!-- </div> -->
     </div>
-    <div *ngIf="app_id=='3'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+    <div *ngIf="app_id=='3'" class="container shadow p-4 mb-5 bg-white rounded">
         <div class="display-4">
             GHZ
         </div>
         <br>
+
+        <h5 class="text-center">Three party GHZ state has been prepared with the help of three two party
+            entanglement of
+            three end nodes with a common
+            central service node.​</h5>
+        <br>
+        <br>
+        <h5 class="text-center">Quantum state of two-party entanglement at all three end nodes with common central
+            node
+            who wanted to create GHZ state
+            between each other.</h5>
         <div class="row">
             <div class="col">
                 <table class="table table-bordered">
                     <thead>
                         <tr class="table-primary">
-                            <td class="col">
+                            <th class="col">
                                 Node 1
-                            </td>
-                            <td class="col">E1</td>
+                            </th>
+                            <th class="col">E1</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -231,14 +369,14 @@
                             <td rowspan="2" class="col">
                                 Initial Entanglement state (2party)​
                             </td>
-                            <td>State: Phi+</td>
+                            <td>State: {{ghz.initial_alice_state}}</td>
                         </tr>
                         <tr>
-                            <td>Entangled State:S1</td>
+                            <td>Entangled State:{{ghz.alice_state}}</td>
                         </tr>
                         <tr>
                             <td>Final Entangled State</td>
-                            <td>[]</td>
+                            <td>{{ghz.final_alice_state}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -247,10 +385,10 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr class="table-primary">
-                            <td class="col">
+                            <th class="col">
                                 Node 2
-                            </td>
-                            <td class="col">E2</td>
+                            </th>
+                            <th class="col">E2</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -258,14 +396,14 @@
                             <td rowspan="2" class="col">
                                 Initial Entanglement state (2party)​
                             </td>
-                            <td>State: Phi+</td>
+                            <td>State: {{ghz.initial_bob_state}}</td>
                         </tr>
                         <tr>
-                            <td>Entangled State:S1</td>
+                            <td>Entangled State:{{ghz.bob_state}}</td>
                         </tr>
                         <tr>
                             <td>Final Entangled State</td>
-                            <td>[]</td>
+                            <td>{{ghz.final_bob_state}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -274,10 +412,10 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr class="table-primary">
-                            <td class="col">
+                            <th class="col">
                                 Node 3
-                            </td>
-                            <td class="col">E3</td>
+                            </th>
+                            <th class="col">E3</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -285,14 +423,14 @@
                             <td rowspan="2" class="col">
                                 Initial Entanglement state (2party)​
                             </td>
-                            <td>State: Phi+</td>
+                            <td>State: {{ghz.initial_charlie_state}}</td>
                         </tr>
                         <tr>
-                            <td>Entangled State:S1</td>
+                            <td>Entangled State:{{ghz.charlie_state}}</td>
                         </tr>
                         <tr>
                             <td>Final Entangled State</td>
-                            <td>[]</td>
+                            <td>{{ghz.final_charlie_state}}</td>
                         </tr>
                     </tbody>
                 </table>
