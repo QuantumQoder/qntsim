@@ -26,6 +26,9 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "less",
+            "allowedCommonJsDependencies": [
+              "gojs"
+            ],
             "assets": [
               "src/favicon.ico",
               "src/assets"
@@ -50,7 +53,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "500kb",
-                  "maximumError": "4mb"
+                  "maximumError": "1mb"
                 },
                 {
                   "type": "anyComponentStyle",
