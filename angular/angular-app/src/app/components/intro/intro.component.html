@@ -1,13 +1,19 @@
-<div class="container shadow p-2 mb-3 bg-white rounded mx-auto">
+<div class="container shadow p-1 mb-2 bg-white rounded mx-auto">
     <div class="menu">
-        <div *ngIf="app=='1'">
+
+        <div *ngIf="app=='1'" class="col-10">
 
             <h1 class="display-1 text-center">E91 Protocol </h1>
-            <p>Proposed in 1991 by Artur Ekert, E91 protocol is an entanglement-based protocol which uses Bell states
+            <p>Proposed in 1991 by Artur Ekert, E91 protocol is an entanglement-based protocol which uses Bell
+                states
                 shared between
                 Alice and Bob for secure distribution of secret key . ​</p>
             <br>
-            <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
+            <div class="row">
+                <div class="col-10">
+                    <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
+                </div>
+            </div>
             <br>
             <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>SHARING BELL STATES</small></h3>
             <div *ngIf="activeIndex==0">
@@ -38,36 +44,45 @@
             <p *ngIf="activeIndex==2">Alice and Bob broadcast the measurement basis which they used, through the
                 classical channel .If Alice
                 and Bob have
-                measured the spin projections of the entangled pair of qubits onto the same direction (i.e. W--W or Z--Z
+                measured the spin projections of the entangled pair of qubits onto the same direction (i.e. W--W or
+                Z--Z
                 for Alice's and
-                Bob's qubit respectively), then they are sure that they obtained opposite results. i.e. the results will
+                Bob's qubit respectively), then they are sure that they obtained opposite results. i.e. the results
+                will
                 be perfectly
                 anticorrelated and thus get their key string.​​
                 ​</p>
             <br>
         </div>
-        <div *ngIf="app=='2'">
+        <div *ngIf="app=='2'" class="col-10">
             <h1 class="display-1">E2E Protocol</h1>
             <br>
-            <p>E2E (End to End entanglement) application is related to generate n-entangled pair of a target fidelity
-                between two
-                nodes, the source and the destination, those can be present anywhere in a given topology.</p>
+            <div class="row">
+                <p class="col-10">E2E (End to End entanglement) application is related to generate n-entangled pair of a
+                    target
+                    fidelity
+                    between two
+                    nodes, the source and the destination, those can be present anywhere in a given topology.</p>
+                <button class="btn btn-primary btn-custom col-2">Go To Application</button>
+            </div>
             <br>
-            <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
+            <div class="row">
+                <div class="col-10">
+                    <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
+                </div>
+            </div>
             <br>
-            <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>Request arising & Path finding</small></h3>
+            <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>{{e2e.e2e1|uppercase}}</small></h3>
             <div *ngIf="activeIndex==0">
                 <div class="text-center"><img src="assets/images/e2e1.png" alt="..." width="1000px"></div>
 
                 <p>A source node will raise a request to generate n-entangled pair of a target fidelity between a
                     destination node.​
-
                     Routing algorithm will choose the best path from the source to destination between all possible
                     paths.​​</p>
             </div>
             <br>
-            <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>Resource allocation, entanglement generation
-                    , purification, Swapping​</small></h3>
+            <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>{{e2e.e2e2|uppercase}}​</small></h3>
             <div *ngIf="activeIndex==1">
                 <div class="text-center col-10">
                     <img src="assets/images/e2e2.png" alt="..." width="1000px">
@@ -79,24 +94,30 @@
                     swapping will be done in between intermediate nodes.​</p>
             </div>
             <br>
-            <h3 *ngIf="activeIndex==2" class="display-4 text-center">End to End entanglement generation</h3>
+            <h3 *ngIf="activeIndex==2" class="display-4 text-center">{{e2e.e2e3|uppercase}}</h3>
             <div class="text-center col-10"><img *ngIf="activeIndex==2" src="assets/images/e2e3.png" alt="..."
                     width="1000px"></div>
 
-            <p *ngIf="activeIndex==2">After entanglement swapping between the intermediate nodes end to end entanglement
+            <p *ngIf="activeIndex==2">After entanglement swapping between the intermediate nodes end to end
+                entanglement
                 will be done in between the source &
                 destination node.​​​
                 ​</p>
             <br>
 
         </div>
-        <div *ngIf="app=='3'">
+        <div *ngIf="app=='3'" class="col-10">
             <h1 class="display-1">GHZ</h1>
-            <p>GHZ (Greenberger–Horne–Zeilinger state )state is a three party non-classically correlated quantum state.
+            <p>GHZ (Greenberger–Horne–Zeilinger state )state is a three party non-classically correlated quantum
+                state.
                 This
                 application is related to preparation of a three party entangled pair .​</p>
             <br>
-            <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
+            <div class="row">
+                <div class="col-10">
+                    <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
+                </div>
+            </div>
             <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>CHOOSE SOURCE , DESTINATION AND CENTRAL
                     NODES</small></h3>
             <div *ngIf="activeIndex==0">
@@ -105,7 +126,8 @@
                 </div>
                 <p>Specify the three nodes (one source and two destinations) and one central node ( which is the
                     approximately equidistant
-                    from three nodes and enough resources to get high fidelity entanglement) from the topology that was
+                    from three nodes and enough resources to get high fidelity entanglement) from the topology that
+                    was
                     setup prior.​</p>
             </div>
             <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>TWO PARTY BELL STATES</small></h3>
@@ -113,7 +135,8 @@
                 <div class="text-center">
                     <img src="assets/images/ghz-2.png" alt="...">
                 </div>
-                <p>Three end to end 2 party entanglements are shared between central node and other three nodes. ​​</p>
+                <p>Three end to end 2 party entanglements are shared between central node and other three nodes. ​​
+                </p>
             </div>
             <h3 *ngIf="activeIndex==2" class="display-4 text-center"><small>GHZ MEASUREMENT</small></h3>
             <div *ngIf="activeIndex==2">
@@ -130,21 +153,29 @@
             </div>
         </div>
 
-        <div *ngIf="app=='4'">
+        <div *ngIf="app=='4'" class="col-10">
             <h1 class="display-1">Teleportation Protocol</h1>
             <br>
-            <p>TEL( Teleportation) protocol is regarding sharing an arbitrary quantum state between two parties with the
+            <p>TEL( Teleportation) protocol is regarding sharing an arbitrary quantum state between two parties with
+                the
                 help of
                 entangled pair shared between them.​</p>
-            <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
+
+            <div class="row">
+                <div class="w-99">
+                    <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
+                </div>
+            </div>
             <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>{{tel.tel1|uppercase}}</small></h3>
             <div *ngIf="activeIndex==0">
                 <div class="text-center">
                     <img src="assets/images/tel1.png" alt="..." width="1000px">
                 </div>
-                <p>The sender (Alice) wants to send quantum information (qubit state |ψ⟩=α|0⟩+β|1⟩) to receiver (Bob).
+                <p>The sender (Alice) wants to send quantum information (qubit state |ψ⟩=α|0⟩+β|1⟩) to receiver
+                    (Bob).
                     Due to No-cloning
-                    theorem Alice cannot simply make an exact copy of an unknown quantum state and give the copy to Bob.
+                    theorem Alice cannot simply make an exact copy of an unknown quantum state and give the copy to
+                    Bob.
                     We can only copy
                     classical states (not superpositions).To transfer a quantum bit, Alice and Bob must share an
                     entangled qubit pair.​​</p>
@@ -157,7 +188,8 @@
                 </div>
                 <p>Alice then performs a Hadamard operation followed by a CNOT gate between a qubit it wants to
                     send/teleport and the
-                    entangled qubit at Alice’s end . And then she measures the qubits out, which is called Bell-state
+                    entangled qubit at Alice’s end . And then she measures the qubits out, which is called
+                    Bell-state
                     measurement and sends
                     the measurement results to Bob over a classical communication channel.​​</p>
                 <br>
@@ -167,7 +199,8 @@
                 <div class="text-center">
                     <img src="assets/images/tel3.png" alt="..." width="1000px">
                 </div>
-                <p>After Bob receives the message and he applies a corrective unitary operations (based on the results
+                <p>After Bob receives the message and he applies a corrective unitary operations (based on the
+                    results
                     data that he gets
                     from Alice ) on his entangled part of the qubit. The updated qubit that bob has now is the qubit
                     that was at Alice’s end
@@ -187,5 +220,6 @@
         <button type="button" *ngIf="activeIndex==2" class="btn btn-primary btn-custom" (click)="goto()">Go To
             Application</button>
         <br>
+
     </div>
 </div>

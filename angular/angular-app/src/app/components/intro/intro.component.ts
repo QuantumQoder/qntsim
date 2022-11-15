@@ -12,6 +12,7 @@ export class IntroComponent implements OnInit {
   activeIndex: number = 0;
   app: any
   tel = new Teleportation();
+  e2e = new E2E();
   constructor(private router: Router) { }
   goto() {
     this.router.navigate(['/drag2'])
@@ -21,17 +22,17 @@ export class IntroComponent implements OnInit {
     if (this.app == '1') {
       this.items = [
         {
-          label: 'SHARING BELL STATES', command: () => {
+          label: '', command: () => {
             console.log(1)
           }
         },
         {
-          label: 'MEASURE AND RECORD RESULTS', command: () => {
+          label: '', command: () => {
             console.log(2)
           }
         },
         {
-          label: 'REVEALING THE BASES', command: () => {
+          label: '', command: () => {
             console.log(3)
           }
         }
@@ -42,17 +43,17 @@ export class IntroComponent implements OnInit {
     if (this.app == '3') {
       this.items = [
         {
-          label: 'CHOOSE SOURCE , DESTINATION AND CENTRAL NODES', command: () => {
+          label: '', command: () => {
             console.log(1)
           }
         },
         {
-          label: ' TWO PARTY BELL STATES', command: () => {
+          label: '', command: () => {
             console.log(2)
           }
         },
         {
-          label: 'GHZ MEASUREMENT​', command: () => {
+          label: '​', command: () => {
             console.log(3)
           }
         }
@@ -63,38 +64,41 @@ export class IntroComponent implements OnInit {
     if (this.app == '2') {
       this.items = [
         {
-          label: 'REQUEST ARISING & PATH FINDING', command: () => {
+          label: '', command: () => {
             console.log(1)
           }
         },
         {
-          label: 'RESOURCE ALLOCATION, ENTANGLEMENT GENERATION , PURIFICATION, SWAPPING', command: () => {
+          label: '', command: () => {
             console.log(2)
           }
         },
         {
-          label: 'END TO END ENTANGLEMENT GENERATION​', command: () => {
+          label: '​', command: () => {
             console.log(3)
           }
         }
         // { separator: true },
         // { label: 'Setup', icon: 'pi pi-cog', routerLink: ['/setup'] }
       ];
+      this.e2e.e2e1 = 'Request arising & Path finding';
+      this.e2e.e2e2 = 'Resource allocation,entanglement generation,purification,Swapping';
+      this.e2e.e2e3 = 'End to End entanglement generation'
     }
     if (this.app == '4') {
       this.items = [
         {
-          label: 'END TO END ENTANGLEMENT BETWEEN ALICE & BOB​', command: () => {
+          label: '​', command: () => {
             console.log(1)
           }
         },
         {
-          label: "BELL-STATE MEASUREMENT AT ALICE'S END", command: () => {
+          label: "", command: () => {
             console.log(2)
           }
         },
         {
-          label: 'UNITARY OPERATIONS BASED ON ALICE RESULTS​', command: () => {
+          command: () => {
             console.log(3)
           }
         },
@@ -119,4 +123,9 @@ export class Teleportation {
   tel1: string;
   tel2: string;
   tel3: string;
+}
+export class E2E {
+  e2e1: string;
+  e2e2: string;
+  e2e3: string;
 }

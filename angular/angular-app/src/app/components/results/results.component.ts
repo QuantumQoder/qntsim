@@ -1,3 +1,4 @@
+import { ViewEncapsulation } from '@angular/compiler';
 import { AfterViewInit, Component, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 // import { info } from 'console';
@@ -68,9 +69,9 @@ export class ResultsComponent implements OnInit, OnDestroy, AfterViewInit {
       this.activeItem = this.items[0]
     }
     if (this.app_id == '2') {
-      // var e2e = this.con.getResult();
-      // this.e2e = e2e.application
-      this.e2e = this.api.gete2e()
+      var e2e = this.con.getResult();
+      this.e2e = e2e.application
+      // this.e2e = this.api.gete2e()
     }
     if (this.app_id == '3') {
       var ghz = this.con.getResult();
