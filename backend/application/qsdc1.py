@@ -104,6 +104,7 @@ class QSDC1():
         sequence_len = 1
         used_keys = []
         message_transmitted = ""
+        # Convert message here
         for n in range(0, int(len(message)/2)) : 
             keys = entangled_keys[n:n+sequence_len]
             key_pair = [[key, alice_bob_keys_dict[key]] for key in keys]
@@ -114,6 +115,18 @@ class QSDC1():
                 used_keys.append(key)
         return used_keys
             
+    def string_to_binary(self,messages):
+        print("Converting to binary...")
+        binary = [''.join('0'*(8-len(bin(ord(char))[2:]))+bin(ord(char))[2:] for char in message) for message in messages]
+        print("Conversion completed")
+    
+        return binary
+
+    def binary_to_string(self,message):
+
+        string = ''.join(chr(int(message[i*8:-~i*8], 2)) for i in range(len(message)//8))
+
+        return string
 
     def z_measurement(self,qm, key):
         circ=QutipCircuit(1)       #Z Basis measurement
@@ -173,6 +186,8 @@ class QSDC1():
 
     def run(self,alice,bob,sequence_length,message):
         #message = "110011001001010101010100"
+        #  convert message before run is called
+        message = string_to_binary(message)
         assert len(message)%2 == 0
         entangled_keys,alice_bob_keys_dict  = self.create_entanglement(alice,bob)
         qm_alice = alice.timeline.quantum_manager
@@ -200,6 +215,7 @@ class QSDC1():
 
         ###"message thrown out because we measure it for eavesdrop check : ",removed_bits
         ###display_msg : "message thrown out because we measure it for eavesdrop check : "
+        #  covert key abck to string
         res = {
             "eavesdrop":self.eavesdrop,
             "display_msg":removed_bits,
