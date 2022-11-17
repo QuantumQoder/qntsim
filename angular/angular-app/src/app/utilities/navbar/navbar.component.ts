@@ -1,4 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ConditionsService } from 'src/services/conditions.service';
 
 @Component({
@@ -9,7 +10,7 @@ import { ConditionsService } from 'src/services/conditions.service';
 export class NavbarComponent implements OnInit {
   loggedIn: boolean
   currentSection: any = this.conService.currentSection
-  constructor(private conService: ConditionsService) { }
+  constructor(private conService: ConditionsService, private router: Router) { }
 
   late = "0px 8px 8px -6px rgba(0, 0, 0, .5)"
   ngOnInit(): void {
@@ -20,6 +21,9 @@ export class NavbarComponent implements OnInit {
     //   this.loggedIn = false
     // }
     // window.addEventListener('scroll', this.scroll, true)
+  }
+  home() {
+    this.router.navigate(['/']);
   }
   // @HostListener("window:scroll", [])
   // onWindowsScroll() {

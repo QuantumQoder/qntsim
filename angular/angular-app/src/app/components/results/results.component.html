@@ -67,11 +67,6 @@
     <div *ngIf="app_id=='1'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
         <h1 class="display-3">E91</h1>
         <div *ngIf="keyGen" class="row">
-            <p>Measurement results and randomly chosen basis at the sender and receiver end nodes at every
-                measurements
-                are given
-                below-​</p>
-            <br>
             <p>Basis : Measurement basis /observables chosen by Alice or Bob.
                 <br>
                 Value: Measurement result obtained from the observables at Alice or Bob
@@ -102,7 +97,9 @@
             </div>
         </div>
         <div *ngIf="keyGen" class="row">
-
+            <p>Shifted Key [The final key] is obtained at Alice and Bob from Measurement results obtained from Matching
+                basis (that are
+                indicated in green above)</p>
 
             <div class="tabel">
                 <h5><u>Receiver</u></h5>
