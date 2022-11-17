@@ -27,7 +27,8 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "less",
             "allowedCommonJsDependencies": [
-              "gojs"
+              "gojs",
+              "typed.js"
             ],
             "assets": [
               "src/favicon.ico",
@@ -71,7 +72,14 @@
             },
             "development": {
               "buildOptimizer": true,
-              "optimization": true,
+              "aot": true,
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                }
+              },
               "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
