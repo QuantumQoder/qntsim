@@ -4,8 +4,6 @@ import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api/menuitem';
 import { ApiServiceService } from 'src/services/api-service.service';
 import { ConditionsService } from 'src/services/conditions.service';
-
-
 @Component({
   selector: 'app-applications',
   templateUrl: './applications.component.html',
@@ -23,6 +21,7 @@ export class ApplicationsComponent implements OnInit {
   constructor(private conService: ConditionsService, private _router: Router, private apiService: ApiServiceService) { }
 
   ngOnInit(): void {
+
     var data = {
       "username": 'admin',
       "password": 'qwerty'
@@ -32,59 +31,13 @@ export class ApplicationsComponent implements OnInit {
       localStorage.setItem('access', this.token.access)
     })
     this.conService.currentSection = 'applications'
-    this.responsiveOptions = [
-      {
-        breakpoint: '1024px',
-        numVisible: 3,
-        numScroll: 3
-      },
-      {
-        breakpoint: '768px',
-        numVisible: 2,
-        numScroll: 2
-      },
-      {
-        breakpoint: '560px',
-        numVisible: 1,
-        numScroll: 1
-      }
-    ];
 
   }
-  e2e() {
-    sessionStorage.setItem('app_id', '2');
-    sessionStorage.setItem('app', 'E2E')
-    this._router.navigate(['/intro']);
-  }
-  e91() {
-    sessionStorage.setItem('app_id', '1')
-    sessionStorage.setItem('app', 'E91')
+  app(app_id: number, app: string) {
+    this.conService.setapp_id(app_id);
+    this.conService.setApp(app)
     this._router.navigate(['/intro'])
   }
-  teleportation() {
-    sessionStorage.setItem('app_id', '4')
-    sessionStorage.setItem('app', 'TEL')
-    this._router.navigate(['/intro'])
-  }
-  ghz() {
-    sessionStorage.setItem('app_id', '3')
-    sessionStorage.setItem('app', 'GHZ')
-    this._router.navigate(['/intro'])
-  }
-  qsdc_epr() {
-    sessionStorage.setItem('app_id', '5')
-    sessionStorage.setItem('app', 'EPR')
-    this._router.navigate(['/intro'])
-  }
-  pingpong() {
-    sessionStorage.setItem('app_id', '6')
-    sessionStorage.setItem('app', 'PP')
-    this._router.navigate(['/intro'])
-  }
-  qsdc_mutual_auth() {
-    sessionStorage.setItem('app_id', '7')
-    sessionStorage.setItem('app', 'QSDC')
-    this._router.navigate(['/intro'])
-  }
+
 
 }

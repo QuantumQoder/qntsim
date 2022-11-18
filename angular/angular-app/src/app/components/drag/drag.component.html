@@ -4,7 +4,7 @@
 </div> -->
 
 <!-- <p-blockUI [blocked]="blocked" [target]="comp"></p-blockUI> -->
-<div *ngIf="spinner==false" class="spinner-border text-primary" role="status">
+<div *ngIf="spinner==true" class="spinner-border text-primary text-center" role="status">
     <span class="sr-only">Loading...</span>
 </div>
 <div id="comp" class="row-1 container-fluid shadow p-1 mb-1 bg-white rounded mx-auto">
@@ -87,7 +87,7 @@
             <div class="row" style="padding-left: 3%;">
                 <div class="col-md-1">
                     <!-- <h4 class="toolbox">Toolbox</h4> -->
-                    <h2 class="display-3">{{application}}</h2>
+                    <h2 class="display-3">{{application|uppercase}}</h2>
                     <!-- <p class="small text-muted">Click a component to change its settings.</p> -->
                 </div>
                 <h3 class="col-md-9 display-4" style="margin-top:30px;padding-left: 4%;"><small>Configure the quantum
@@ -98,35 +98,22 @@
                     <button pButton pRipple type="button" icon="pi pi-question"
                         class="p-button-rounded p-button-info p-button-outlined" styleClass="info"
                         (click)="info_demo()"></button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <!-- <button type="button" pButton pRipple label="Lock Topology" class="ui-button-warning" -->
-                    <!-- styleClass="lock"></button> -->
                     <button class="btn btn-primary btn-custom" (click)="save()">Lock Topology</button>
-                    <!-- <button type="button" pButton pRipple (click)="load()" label="Load" class="ui-button-warning"></button>
-                        &nbsp; -->
                 </div>
             </div>
-
         </div>
 
-        <div id="sample" style="width: 98%;">
-
-            <div style="width: 98%; display: flex">
-
+        <div id="sample" style="width: 100%;">
+            <div style="width: 99%; display: flex">
                 <div id="myPaletteDiv" class="col-4"
                     style="width: 120px; margin: 2px;margin-left: 30px; background-color: whitesmoke; border: solid 1px black"
                     ngbPopover="Drag and drop components to create the topology graph." triggers="mouseenter:mouseleave"
                     popoverTitle="Tips!" [openDelay]="100" popoverClass="popover1" [closeDelay]="200">
                 </div>
-                <!-- <div id="toolTipDIV" style="position: absolute; background: white; z-index: 1000; display: none;">
-                <p id="toolTipParagraph">Tooltip</p>
-            </div> -->
                 <div id="myDiagramDiv" class="col-8" style=" flex-grow: 1; height:
                 500px;margin-left: 10px; border: solid 1px black" [ngbPopover]="popover2"
                     triggers="mouseenter:mouseleave" popoverTitle="Tips!" [openDelay]="100" popoverClass="popover2"
                     [closeDelay]="200" placement="top">
-                    <!-- <p-speedDial [model]="items" direction="bottom-left" buttonClassName="p-button-success"
-                    styleClass="speed-dial">
-                </p-speedDial> -->
                 </div>
             </div>
             <!-- <div>
@@ -155,7 +142,7 @@
         </div>
         <p-dialog header="Set Application Parameters" [(visible)]="displayPosition" [position]="position" [modal]="true"
             [style]="{width: '80vw'}" [draggable]="true" [resizable]="false">
-            <div *ngIf="app_id=='2'" [formGroup]="e2e">
+            <div *ngIf="app_id==2" [formGroup]="e2e">
                 <div class="row">
                     <div class="col">
                         <label for="serviceNode">Sender</label>&nbsp;
@@ -210,7 +197,7 @@
                 </div>
 
             </div>
-            <div *ngIf="app_id=='1'" class="row" [formGroup]="e91">
+            <div *ngIf="app_id==1" class="row" [formGroup]="e91">
                 <div class="col">
                     <label for="serviceNode">Sender</label>&nbsp;
 
@@ -237,7 +224,7 @@
                 </div>
 
             </div>
-            <div *ngIf="app_id=='4'" [formGroup]="teleportation">
+            <div *ngIf="app_id==4" [formGroup]="teleportation">
                 <div class="row">
                     <div class="col">
                         <label for="serviceNode">Sender</label>&nbsp;
@@ -269,7 +256,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="app_id=='3'" [formGroup]="ghz">
+            <div *ngIf="app_id==3" [formGroup]="ghz">
                 <div class="row">
                     <div class="col">
                         <label for="serviceNode">Node 1</label>&nbsp;
@@ -303,7 +290,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="app_id=='5'" [formGroup]="firstqsdc">
+            <div *ngIf="app_id==5" [formGroup]="firstqsdc">
                 <div class="row">
                     <div class="col">
                         <label for="serviceNode">Sender</label>&nbsp;
@@ -326,12 +313,12 @@
                         <input type="number" class="form-control" formControlName="sequenceLength">
                     </div>
                     <div class="col">
-                        <label for="endNode">Set Sequence Length</label>&nbsp;
+                        <label for="endNode">Key</label>&nbsp;
                         <input type="number" class="form-control" formControlName="key">
                     </div>
                 </div>
             </div>
-            <div *ngIf="app_id=='6'" [formGroup]="pingPong">
+            <div *ngIf="app_id==7" [formGroup]="pingPong">
                 <div class="row">
                     <div class="col">
                         <label for="serviceNode">Sender</label>&nbsp;
@@ -359,7 +346,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="app_id=='7'" class="row" [formGroup]="ip1">
+            <div *ngIf="app_id==6" class="row" [formGroup]="ip1">
                 <div class="col">
                     <label for="serviceNode">Sender</label>&nbsp;
                     <select class="form-control" formControlName="sender">

@@ -121,6 +121,14 @@ export class ApiServiceService {
       ]
     ]
   }
+  public qsdc1: any = {
+    "eavesdrop": false,
+    "display_msg": ["01"],
+    "key_transmitted": "0101110111",
+    "key_shared_received": "01__110111",
+    "final_key": "01110111"
+
+  }
   public ghz: any = {
 
     "initial_alice_state": "[-0.70710678+0.j  0.        +0.j  0.        +0.j -0.70710678+0.j]",
@@ -134,6 +142,33 @@ export class ApiServiceService {
     "charlie_state": "[ 0.        +0.j  0.        +0.j  0.        +0.j -0.70710678+0.j\n  0.70710678+0.j  0.        +0.j  0.        +0.j  0.        +0.j]",
     "ghz_state": "[0.+0.j 1.+0.j]"
 
+  }
+  ip1: any = {
+    "Security_msg": "Security check passed",
+    "IdA_msg": "IdA authenticated",
+    "Bobs_r": [
+      "1",
+      "0",
+      "0",
+      "0"
+    ],
+    "Alice_r": [
+      "1",
+      "0",
+      "0",
+      "0"
+    ],
+    "display_msg": "Bob's r is same as Alice's r! Authentication procedure passed",
+    "input_message": "10011100",
+    "bob_message": "10011100"
+  };
+  public pingpong: any = {
+    "Eve_presence": false,
+    "Impurities_presence": [
+      false
+    ],
+    "message_transmitted": "10011100",
+    "message_received": "10011100"
   }
   constructor(private _http: HttpClient, private cookieService: CookieService) { }
   get getAccessToken() {
@@ -162,5 +197,13 @@ export class ApiServiceService {
   gete2e() {
     return this.e2e
   }
-
+  getqsdc1() {
+    return this.qsdc1;
+  }
+  getip1() {
+    return this.ip1
+  }
+  getPingPong() {
+    return this.pingpong
+  }
 }

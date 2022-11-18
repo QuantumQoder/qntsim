@@ -10,7 +10,7 @@ import { MenuItem, MessageService } from 'primeng/api';
 import { ApiServiceService } from 'src/services/api-service.service';
 //import { Interface } from 'readline';
 import { ConditionsService } from 'src/services/conditions.service';
-import { GameComponent } from '../game/game.component';
+// import { GameComponent } from '../game/game.component';
 @Component({
   selector: 'app-drag',
   templateUrl: './drag.component.html',
@@ -25,7 +25,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   app_id: any
   nodeParams: boolean
   link: boolean
-  finalNodes: any = []
+
   memory: any = {
     "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93
   }
@@ -36,7 +36,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   topology: any
   appSettings: any
   nodeKey: any
-  spinner: boolean = true
+  spinner: boolean = false
   blocked: boolean = false
   ip1: any
   e91: any
@@ -171,9 +171,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     ]
   }
   links: any = [];
-  application: string | null;
-
-
+  application: string;
   constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private _route: Router, private modal: NgbModal) { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -492,7 +490,8 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
             // { color: "grey", text: "VC", points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) }
           ])
         });
-    this.application = sessionStorage.getItem('app')
+    this.app_id = this.con.getapp_id()
+    this.application = this.con.getApp()
 
     this.e2e = this.fb.group({
       'sender': new FormControl(''),
@@ -511,19 +510,19 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.ip1 = this.fb.group({
       'sender': new FormControl(''),
       'receiver': new FormControl(''),
-      'message': new FormControl('')
+      'message': new FormControl('10011100')
     })
     this.pingPong = this.fb.group({
       'sender': new FormControl(''),
       'receiver': new FormControl(''),
-      'sequenceLength': new FormControl(''),
-      'message': new FormControl('')
+      'sequenceLength': new FormControl('2'),
+      'message': new FormControl('10011100')
     })
     this.firstqsdc = this.fb.group({
       'sender': new FormControl(''),
       'receiver': new FormControl(''),
-      'sequenceLength': new FormControl(''),
-      'key': new FormControl('')
+      'sequenceLength': new FormControl('3'),
+      'key': new FormControl('0101110111')
     })
     this.teleportation = this.fb.group({
       'sender': new FormControl(''),
@@ -559,7 +558,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.link = true
   }
   save() {
-    this.app_id = sessionStorage.getItem("app_id")
+    this.app_id = this.con.getapp_id()
     //console.log(this.app_id)
     this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
     this.savedModel = this.myDiagram.model;
@@ -570,6 +569,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     console.log(this.nodes.length)
     if (this.graphModel.length != this.nodes.length) {
       alert("Nodes settings are not set properly!!");
+      return
     }
     this.links = []
     var linkarray: any[]
@@ -588,31 +588,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         this.links.push(linkData)
       }
     }
-    // this.finalNodes = []
-    // for (var i = 0; i < this.savedModel.nodeDataArray.length; i++) {
-    //   var type;
-    //   if (this.savedModel.nodeDataArray[i].figure === "Ellipse") {
-    //     type = 'service'
-    //   } else {
-    //     type = 'end'
-    //   }
-    //   var nodeData = {
-    //     Name: this.savedModel.nodeDataArray[i].text,
-    //     Type: type,
-    //     noOfMemory: this.nodes[i].noOfMemory,
-    //     memory: this.memory
-    //   }
-    //   if (this.savedModel.nodeDataArray[i].text == null)
-    //     this.finalNodes.splice(i, 0, nodeData)
-    //   if (this.savedModel.nodeDataArray[i].text != null) {
-    //     this.finalNodes.splice(i, 1, nodeData)
-    //   }
-    //   this.finalNodes.push(nodeData)
-    //   console.log(nodeData)
-    // }
-    // console.log(this.finalNodes)
-    //console.log(this.myDiagram.model.toJson)
-    // this.saveDiagramProperties();
+
 
     this.position = 'bottom';
     this.displayPosition = true;
@@ -772,7 +748,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.visibleSideNav = false
   }
   showBottomCenter() {
-    console.log("hi")
+    // console.log("hi")
     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message Content' });
   }
 
@@ -786,14 +762,14 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       quantum_connections: this.links,
       classical_connections: this.cc,
     }
-    if (this.app_id == 1)
-      this.appSettings = {
+    switch (this.app_id) {
+      case 1: this.appSettings = {
         sender: this.e91.get('sender')?.value,
         receiver: this.e91.get('receiver')?.value,
         keyLength: Number(this.e91.get('keyLength')?.value)
       }
-    if (this.app_id == 2) {
-      this.appSettings = {
+        break;
+      case 2: this.appSettings = {
         sender: this.e2e.get('sender')?.value,
         receiver: this.e2e.get('receiver')?.value,
         startTime: 1e12,
@@ -802,26 +778,49 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         targetFidelity: 0.5,
         timeout: this.e2e.get('timeout')?.value + 'e12'
       }
-    }
-    if (this.app_id == 4) {
-      this.appSettings = {
-        sender: this.teleportation.get('sender')?.value,
-        receiver: this.teleportation.get('receiver')?.value,
-        amplitude1: this.teleportation.get('amplitude1')?.value,
-        amplitude2: this.teleportation.get('amplitude2')?.value
-      }
-    }
-    if (this.app_id == 3) {
-      this.appSettings = {
+        break;
+      case 3: this.appSettings = {
         endnode1: this.ghz.get('node1')?.value,
         endnode2: this.ghz.get('node2')?.value,
         endnode3: this.ghz.get('node3')?.value,
         middlenode: this.ghz.get('middlenode')?.value,
       }
+        break;
+      case 4: this.appSettings = {
+        sender: this.teleportation.get('sender')?.value,
+        receiver: this.teleportation.get('receiver')?.value,
+        amplitude1: this.teleportation.get('amplitude1')?.value,
+        amplitude2: this.teleportation.get('amplitude2')?.value
+      }
+        break;
+      case 5:
+        this.appSettings = {
+          sender: this.firstqsdc.get('sender')?.value,
+          receiver: this.firstqsdc.get('receiver')?.value,
+          sequenceLength: this.firstqsdc.get('sequenceLength')?.value,
+          key: this.firstqsdc.get('key')?.value
+        }
+        break;
+      case 6:
+        this.appSettings = {
+          sender: this.ip1.get('sender')?.value,
+          receiver: this.ip1.get('receiver')?.value,
+          message: this.ip1.get('message')?.value
+        }
+        break;
+      case 7:
+        console.log(this.pingPong.get('sender')?.value)
+        this.appSettings = {
+          sender: this.pingPong.get('sender')?.value,
+          receiver: this.pingPong.get('receiver')?.value,
+          sequenceLength: this.pingPong.get('sequenceLength')?.value,
+          message: this.pingPong.get('message')?.value,
+        }
+        break;
     }
     console.log(this.appSettings)
     var req = {
-      "application": sessionStorage.getItem('app_id'),
+      "application": this.con.getapp_id(),
       "topology": this.topology,
       "appSettings": this.appSettings
     }

@@ -8,7 +8,7 @@ import { ConditionsService } from 'src/services/conditions.service';
   styleUrls: ['./navbar.component.less']
 })
 export class NavbarComponent implements OnInit {
-  loggedIn: boolean
+  // loggedIn: boolean
   currentSection: any = this.conService.currentSection
   constructor(private conService: ConditionsService, private router: Router) { }
 

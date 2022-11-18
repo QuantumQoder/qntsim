@@ -6,13 +6,13 @@
 
 
     <div class="col-12 md:col-4">
-        <div class="container ">
+        <div class="container container-lg container-sm">
             <br>
             <!-- <p-scrollPanel [style]="{width: '100%', height: '400px'}"> -->
             <div class="row">
                 <div class="col-md-3">
-                    <div class="card" style="width: 16rem;height:26rem">
-                        <img src="assets/images/e2e.png" class="card-img-top" alt="...">
+                    <div class="card" style="width: 16rem;height:25rem">
+                        <img src="assets/images/e2e.png" class="card-img-top" alt="..." height="250px">
                         <div class="card-body">
                             <h5 class="card-title">E2E</h5>
                             <h6 class="card-subtitle mb-2 text-muted">End-to-End Entanglements</h6>
@@ -21,14 +21,14 @@
                                 of
                                 the
                                 card's content.</p> -->
-                            <a class="btn mr-2" (click)="e2e()"><i class="fas fa-link"></i> Visit Site</a>
+                            <a class="btn mr-2" (click)="app(2,'e2e')"> Visit Site</a>
                             <!-- <a class="btn "><i class="fab fa-github"></i> Github</a> -->
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card" style="width: 16rem;height:26rem">
-                        <img src="assets/images/qkd.jpg" class="card-img-top" alt="...">
+                    <div class="card" style="width: 16rem;height:25rem">
+                        <img src="assets/images/qkd.jpg" class="card-img-top" alt="..." height="250px">
                         <div class="card-body">
                             <h5 class="card-title">E91</h5>
                             <h6 class="card-subtitle mb-2 text-muted">Quantum Key Distribution</h6>
@@ -37,15 +37,15 @@
                                 of
                                 the
                                 card's content.</p> -->
-                            <a class="btn  mr-2" (click)="e91()"><i class="fas fa-link"></i> Visit Site</a>
+                            <a class="btn  mr-2" (click)="app(1,'e91')"> Visit Site</a>
                             <!-- <a href="#" class="btn"><i class="fab fa-github"></i> Github</a> -->
                         </div>
                     </div>
                 </div>
 
                 <div class="image-flip col-md-3">
-                    <div class="card" style="width: 16rem;height:26rem">
-                        <img src="assets/images/teleportation1.png" class="card-img-top" alt="...">
+                    <div class="card" style="width: 16rem;height:25rem">
+                        <img src="assets/images/teleportation1.png" class="card-img-top" alt="..." height="250px">
                         <div class="card-body">
                             <h5 class="card-title">Teleportation</h5>
                             <h6 class="card-subtitle mb-2 text-muted">Quantum Teleportation from one node to another
@@ -55,7 +55,7 @@
                                 of
                                 the
                                 card's content.</p> -->
-                            <a class="btn mr-2" (click)="teleportation()"><i class="fas fa-link"></i> Visit
+                            <a class="btn mr-2" (click)="app(4,'tel')"><i class="fas fa-link"></i> Visit
                                 Site</a>
                             <!-- <a href="#" class="btn "><i class="fab fa-github"></i> Github</a> -->
                         </div>
@@ -64,8 +64,8 @@
                 </div>
 
                 <div class="col-md-3">
-                    <div class="card" style="width: 16rem;height:26rem">
-                        <img src="assets/images/GHZ2.png" class="card-img-top" alt="...">
+                    <div class="card" style="width: 16rem;height:25rem">
+                        <img src="assets/images/GHZ2.png" class="card-img-top" alt="..." height="250px">
                         <div class="card-body">
                             <h5 class="card-title">GHZ</h5>
                             <h6 class="card-subtitle mb-2 text-muted">Create GHZ state</h6>
@@ -74,7 +74,7 @@
                                 of
                                 the
                                 card's content.</p> -->
-                            <a class="btn mr-2" (click)="ghz()"><i class="fas fa-link"></i> Visit Site</a>
+                            <a class="btn mr-2" (click)="app(3,'ghz')"><i class="fas fa-link"></i> Visit Site</a>
 
                             <!-- <a href="#" class="btn"><i class="fab fa-github"></i> Github</a> -->
                         </div>
@@ -83,8 +83,8 @@
             </div>
             <div class="row">
                 <div class="col-md-3">
-                    <div class="card" style="width: 16rem;height: 26rem;">
-                        <img src="assets/images/QSDC.png" class="card-img-top" alt="...">
+                    <div class="card" style="width: 16rem;height: 25rem;">
+                        <img src="assets/images/QSDC.png" class="card-img-top" alt="..." height="250px">
                         <div class="card-body">
                             <h5 class="card-title">QSDC</h5>
                             <h6 class="card-subtitle mb-2 text-muted">Two Step QSDC using EPR pairs</h6>
@@ -93,13 +93,40 @@
                                 of
                                 the
                                 card's content.</p> -->
-                            <a class="btn mr-2" (click)="qsdc_epr()"><i class="fas fa-link"></i> Visit
+                            <a class="btn mr-2" (click)="app(5,'qsdc1')">Visit
                                 Site</a>
                             <!-- <a href="#" class="btn "><i class="fab fa-github"></i> Github</a> -->
                         </div>
                     </div>
                 </div>
+                <div class="col-md-3">
+                    <div class="card" style="width: 16rem;height: 25rem;">
+                        <img src="assets/images/Crypt2.png" class="card-img-top" alt="..." height="250px">
+                        <div class="card-body">
+                            <h5 class="card-title">Ping Pong</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">Message sharing with security</h6>
 
+                            <a class="btn  mr-2" (click)="app(7,'PP')">Visit
+                                Site</a>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card" style="width: 16rem;height: 25rem;">
+                        <img src="assets/images/Crypt4.png" class="card-img-top" alt="..." height="250px">
+                        <div class="card-body">
+                            <h5 class="card-title">QSDC</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">QSDC with mutual authentication</h6>
+
+                            <a class="btn mr-2" (click)="app(6,'ip1')"><i class="fas fa-link"></i> Visit
+                                Site</a>
+
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</div>

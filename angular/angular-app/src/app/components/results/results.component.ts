@@ -11,7 +11,7 @@ import { ConditionsService } from 'src/services/conditions.service';
   templateUrl: './results.component.html',
   styleUrls: ['./results.component.less']
 })
-export class ResultsComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ResultsComponent implements OnInit, AfterViewInit {
   match: any = []
   app_id: any
   items: MenuItem[];
@@ -26,6 +26,9 @@ export class ResultsComponent implements OnInit, OnDestroy, AfterViewInit {
   ghz: any;
   info1: boolean;
   info2: boolean;
+  qsdc1: any;
+  pingpong: any;
+  ip1: any;
   constructor(private _formBuilder: FormBuilder, private con: ConditionsService, public api: ApiServiceService) { }
   ngAfterViewInit(): void {
     if (this.app_id == '2') {
@@ -35,64 +38,70 @@ export class ResultsComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   @ViewChild('menuItems') menu: MenuItem[];
   ngOnInit(): void {
-    this.app_id = sessionStorage.getItem('app_id')
 
-    if (this.app_id == '1') {
-      var e91 = this.con.getResult()
-      this.e91 = e91.application
-      console.log(this.e91)
-      var length = this.e91.sender_basis_list.length
-      for (i = 0; i < length; i++) {
-        let x = this.e91.sender_basis_list[i];
-        let y = this.e91.receiver_basis_list[i];
-        if (x == y) {
-          this.match.push(i);
+    this.app_id = this.con.getapp_id()
+
+    switch (this.app_id) {
+      case 1:
+        var e91 = this.con.getResult()
+        this.e91 = e91.application
+        console.log(this.e91)
+        var length = this.e91.sender_basis_list.length
+        for (i = 0; i < length; i++) {
+          let x = this.e91.sender_basis_list[i];
+          let y = this.e91.receiver_basis_list[i];
+          if (x == y) {
+            this.match.push(i);
+          }
         }
-      }
-      console.log(this.match)
-      var senderKeys: any = []
-      var receiverKeys: any = []
-      for (var i = 0; i < this.e91.sender_keys.length; i++) {
-        senderKeys.push(this.e91.sender_keys[i])
-      }
-      for (var i = 0; i < this.e91.receiver_keys.length; i++) {
-        receiverKeys.push(this.e91.receiver_keys[i])
-      }
-      // console.log(senderKeys.join(''))
-      this.e91.sender_keys = senderKeys.join('')
-      this.e91.receiver_keys = receiverKeys.join('')
-      this.items = [
-        { label: 'Key Bits', icon: 'pi pi-fw pi-home' },
-        { label: 'Statistics', icon: 'pi pi-fw pi-pencil' },
-        { label: 'Key Generation', icon: 'pi pi-fw pi-calendar' }
-      ];
-      this.activeItem = this.items[0]
+        console.log(this.match)
+        var senderKeys: any = []
+        var receiverKeys: any = []
+        for (var i = 0; i < this.e91.sender_keys.length; i++) {
+          senderKeys.push(this.e91.sender_keys[i])
+        }
+        for (var i = 0; i < this.e91.receiver_keys.length; i++) {
+          receiverKeys.push(this.e91.receiver_keys[i])
+        }
+        // console.log(senderKeys.join(''))
+        this.e91.sender_keys = senderKeys.join('')
+        this.e91.receiver_keys = receiverKeys.join('')
+        this.items = [
+          { label: 'Key Bits', icon: 'pi pi-fw pi-home' },
+          { label: 'Statistics', icon: 'pi pi-fw pi-pencil' },
+          { label: 'Key Generation', icon: 'pi pi-fw pi-calendar' }
+        ];
+        this.activeItem = this.items[0]
+        break;
+      case 2:
+        var e2e = this.con.getResult();
+        this.e2e = e2e.application;
+        break;
+      case 3:
+        var ghz = this.con.getResult();
+        this.ghz = ghz.application;
+        break;
+      case 4:
+        var tele = this.con.getResult();
+        this.tel = tele.application;
+        break;
+      case 5:
+        this.qsdc1 = this.con.getResult();
+        break;
+      case 6:
+        var ip1 = this.api.getip1()
+        console.log("ip1")
+        this.ip1 = this.con.getResult();
+        break
+      case 7:
+        this.pingpong = this.con.getResult();
+        break;
     }
-    if (this.app_id == '2') {
-      var e2e = this.con.getResult();
-      this.e2e = e2e.application
-      // this.e2e = this.api.gete2e()
-    }
-    if (this.app_id == '3') {
-      var ghz = this.con.getResult();
-      this.ghz = ghz.application
-    }
-    if (this.app_id == '4') {
-      var tele = this.con.getResult();
-      this.tel = tele.application
-    }
-
-
-
-
-    this.data = ['Alice', 'Bob', 'Eve']
-
+    // this.data = ['Alice', 'Bob', 'Eve']
     this.keyGen = false
     this.keyBits = true
   }
-  ngOnDestroy(): void {
 
-  }
   info_1() {
     this.info2 = false;
     this.info1 = true;
@@ -104,19 +113,11 @@ export class ResultsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   senderbasis(index: any) {
     var bool = this.match.includes(index)
-    //console.log(index + ":" + this.match.includes(this.e91.sender_basis_list[index]))
-    //console.log(bool)
-    //console.log("hello" + this.match.includes(index))
-    // if (bool == true) {
-    //   return null;
-    // }
     return bool ? "table-success" : "";
   }
   createTableforE2E() {
-    var table1 = document.getElementById("table1")!;  // set this to your table
-    //  console.log(table1)
+    var table1 = document.getElementById("table1")!;
     var tbody = document.createElement("tbody");
-    // table.appendChild(tbody);
     this.e2e.sender.forEach(function (items: any) {
       var row = document.createElement("tr");
       items.forEach(function (item: any) {
@@ -125,13 +126,10 @@ export class ResultsComponent implements OnInit, OnDestroy, AfterViewInit {
         row.appendChild(cell);
       });
       tbody.appendChild(row);
-      // console.log(tbody)
       table1.appendChild(tbody)
     });
     var table2 = document.getElementById("table2")!;  // set this to your table
-    // console.log(table2)
     var tbody = document.createElement("tbody");
-    // table.appendChild(tbody);
     this.e2e.receiver.forEach(function (items: any) {
       var row = document.createElement("tr");
       items.forEach(function (item: any) {
@@ -140,10 +138,8 @@ export class ResultsComponent implements OnInit, OnDestroy, AfterViewInit {
         row.appendChild(cell);
       });
       tbody.appendChild(row);
-      // console.log(tbody)
       table2.appendChild(tbody)
     });
-    // table.appendChild(tbody)
   }
   activateMenu() {
     this.activeItem = this.menu['activeItem'];

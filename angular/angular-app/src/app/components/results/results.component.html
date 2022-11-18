@@ -64,7 +64,7 @@
             </li>
         </ul>
     </p-dialog>
-    <div *ngIf="app_id=='1'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+    <div *ngIf="app_id==1" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
         <h1 class="display-3">E91</h1>
         <div *ngIf="keyGen" class="row">
             <p>Basis : Measurement basis /observables chosen by Alice or Bob.
@@ -152,7 +152,7 @@
             </div>
         </div>
     </div>
-    <div *ngIf="app_id=='2'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+    <div *ngIf="app_id==2" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
         <div class="display-4">E2E</div>
         <div class="row">
             <h5 class="text-center col-10" style="padding-top:10px ;">Details of the requests raised on the
@@ -243,7 +243,7 @@
             </div>
         </div>
     </div>
-    <div *ngIf="app_id=='4'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+    <div *ngIf="app_id==4" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
         <div class="display-4">
             Teleportation
         </div>
@@ -334,7 +334,7 @@
             the receiver node.​</p>
         <!-- </div> -->
     </div>
-    <div *ngIf="app_id=='3'" class="container shadow p-4 mb-5 bg-white rounded">
+    <div *ngIf="app_id==3" class="container shadow p-4 mb-5 bg-white rounded">
         <div class="display-4">
             GHZ
         </div>
@@ -434,7 +434,7 @@
             </div>
         </div>
     </div>
-    <div *ngIf="app_id=='5'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+    <div *ngIf="app_id==6" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
         <div class="display-4">
             IP1
         </div>
@@ -446,7 +446,7 @@
                         Sender's (Alice: E1) Input Message
                     </td>
                     <td class="col">
-                        "010101010110"
+                        {{ip1.input_message}}
                     </td>
                 </tr>
             </thead>
@@ -456,19 +456,19 @@
                         Security Checked
                     </td>
                     <td class="col">
-                        Passed
+                        {{ip1.Security_msg}}
                     </td>
                 </tr>
                 <tr class="table-secondary">
                     <td class="col">IdA Authentication</td>
-                    <td class="col">Passed</td>
+                    <td class="col">{{ip1.IdA_msg}}</td>
                 </tr>
                 <tr class="table-secondary">
                     <td class="col">
                         Sender Key
                     </td>
                     <td class="col">
-                        1010
+                        {{ip1.Alice_r}}
                     </td>
                 </tr>
                 <tr class="table-secondary">
@@ -476,12 +476,12 @@
                         Receiver Key
                     </td>
                     <td class="col">
-                        1010
+                        {{ip1.Bobs_r}}
                     </td>
                 </tr>
                 <tr class="table-secondary">
                     <td colspan="2" class="col">
-                        (Display message Receiver's key is same as Sender's key! Authentication procedure passed)​
+                        {{ip1.display_msg}}
                     </td>
                 </tr>
                 <tr class="table-primary">
@@ -489,13 +489,13 @@
                         Receiver's (Bob: E2) Output message
                     </td>
                     <td class="col">
-                        "010101010110"
+                        {{ip1.bob_message}}
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
-    <div *ngIf="app_id=='7'" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+    <div *ngIf="app_id==5" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
         <div class="display-4">
             QSDC1
         </div>
@@ -507,7 +507,7 @@
                         Sender's (Alice: E1) Key Transimitted
                     </td>
                     <td class="col">
-                        "001010101100"
+                        {{qsdc1.key_transmitted}}
                     </td>
                 </tr>
             </thead>
@@ -517,7 +517,7 @@
                         EvesDrop
                     </td>
                     <td class="col">
-                        Detected/NotDetected
+                        {{qsdc1.eavesdrop}}
                     </td>
                 </tr>
                 <tr class="table-secondary">
@@ -525,7 +525,7 @@
                         Bits Used for Eves Detection
                     </td>
                     <td class="col">
-                        [01,00]
+                        {{qsdc1.display_msg}}
                     </td>
                 </tr>
                 <tr class="table-primary">
@@ -533,12 +533,60 @@
                         Received key at Receiver (Bob: E2)
                     </td>
                     <td class="col">
-                        Key after Removed Bits : "00—0101011--"​
+                        Key after Removed Bits : {{qsdc1.key_shared_received}}
                     </td>
                 </tr>
                 <tr class="table-primary">
-                    <td class="col">Final Key  : 000101011</td>
+                    <td class="col">Final Key  : {{qsdc1.final_key}}</td>
                 </tr>
+            </tbody>
+        </table>
+    </div>
+    <div *ngIf="app_id==7" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+        <div class="display-4">
+            PingPong
+        </div>
+        <br>
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <td class="col">
+                        Sender's (Alice: E1) Input message
+                    </td>
+                    <td class="col">
+                        {{pingpong.message_transmitted}}
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="table-secondary">
+                    <td class="col">
+                        EvesDrop
+                    </td>
+                    <td class="col">
+                        {{pingpong.Eve_presence}}
+                    </td>
+                </tr>
+                <tr class="table-secondary">
+                    <td class="col">
+                        Protocol m's Impurities
+                    </td>
+                    <td class="col">
+                        {{pingpong.Impurities_presence}}
+                    </td>
+                </tr>
+                <tr class="table-secondary">
+                    <td colspan="2">(If Impurities present: Then display accuracy of transmission)​</td>
+                </tr>
+                <tr class="table-primary">
+                    <td class="col">
+                        Receiver (Bob: E2) Output message ​
+                    </td>
+                    <td class="col">
+                        {{pingpong.message_received}}
+                    </td>
+                </tr>
+
             </tbody>
         </table>
     </div>

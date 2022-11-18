@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
+import { ConditionsService } from 'src/services/conditions.service';
 @Component({
   selector: 'app-intro',
   templateUrl: './intro.component.html',
@@ -13,13 +14,13 @@ export class IntroComponent implements OnInit {
   app: any
   tel = new Teleportation();
   e2e = new E2E();
-  constructor(private router: Router) { }
+  constructor(private router: Router, private conService: ConditionsService) { }
   goto() {
     this.router.navigate(['/drag2'])
   }
   ngOnInit(): void {
-    this.app = sessionStorage.getItem('app_id')
-    if (this.app == '1') {
+    this.app = this.conService.getapp_id()
+    if (this.app == 1) {
       this.items = [
         {
           label: '', command: () => {
@@ -36,11 +37,9 @@ export class IntroComponent implements OnInit {
             console.log(3)
           }
         }
-        // { separator: true },
-        // { label: 'Setup', icon: 'pi pi-cog', routerLink: ['/setup'] }
       ];
     }
-    if (this.app == '3') {
+    if (this.app == 3) {
       this.items = [
         {
           label: '', command: () => {
@@ -57,11 +56,9 @@ export class IntroComponent implements OnInit {
             console.log(3)
           }
         }
-        // { separator: true },
-        // { label: 'Setup', icon: 'pi pi-cog', routerLink: ['/setup'] }
       ];
     }
-    if (this.app == '2') {
+    if (this.app == 2) {
       this.items = [
         {
           label: '', command: () => {
@@ -78,14 +75,12 @@ export class IntroComponent implements OnInit {
             console.log(3)
           }
         }
-        // { separator: true },
-        // { label: 'Setup', icon: 'pi pi-cog', routerLink: ['/setup'] }
       ];
       this.e2e.e2e1 = 'Request arising & Path finding';
       this.e2e.e2e2 = 'Resource allocation,entanglement generation,purification,Swapping';
       this.e2e.e2e3 = 'End to End entanglement generation'
     }
-    if (this.app == '4') {
+    if (this.app == 4) {
       this.items = [
         {
           label: '​', command: () => {
@@ -102,9 +97,6 @@ export class IntroComponent implements OnInit {
             console.log(3)
           }
         },
-
-        // { separator: true },
-        // { label: 'Setup', icon: 'pi pi-cog', routerLink: ['/setup'] }
       ];
       this.tel.tel1 = 'End to end entanglement between Alice & Bob​'
       this.tel.tel2 = 'Bell-state measurement at Alice end​'

@@ -24,7 +24,7 @@ import { StepsModule } from 'primeng/steps';
 import { FooterComponent } from './utilities/footer/footer.component';
 import { CarouselModule } from 'primeng/carousel';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
-import { ApplicationPageComponent } from './components/application-page/application-page.component';
+// import { ApplicationPageComponent } from './components/application-page/application-page.component';
 import { TableModule } from 'primeng/table';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 // import { DraggableLinkComponent } from './components/draggable-link/draggable-link.component';
@@ -45,9 +45,9 @@ import { BlockUIModule } from 'primeng/blockui';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { IntroComponent } from './components/intro/intro.component';
 import { SplitButtonModule } from 'primeng/splitbutton';
-import { HowtouseComponent } from './components/howtouse/howtouse.component';
+// import { HowtouseComponent } from './components/howtouse/howtouse.component';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { GameComponent } from './components/game/game.component';
+// import { GameComponent } from './components/game/game.component';
 // import { ToastModule } from 'primeng/toast';
 // import { Alert } from '@ng-bootstrap/ng-bootstrap';
 //import { AngularAnimationsLibraryModule } from 'angular-animations-library'
@@ -59,15 +59,14 @@ import { GameComponent } from './components/game/game.component';
     ApplicationsComponent,
     // Index2Component,
     FooterComponent,
-    ApplicationPageComponent,
+
     // DraggableLinkComponent,
     DragComponent,
     ResultsComponent,
     NetworkResultsComponent,
     LogsComponent,
     IntroComponent,
-    HowtouseComponent,
-    GameComponent
+
     //ButtonModule
     //AngularAnimationsLibraryModule
   ],
