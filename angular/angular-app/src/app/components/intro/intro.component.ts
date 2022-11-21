@@ -2,6 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
 import { ConditionsService } from 'src/services/conditions.service';
+
 @Component({
   selector: 'app-intro',
   templateUrl: './intro.component.html',
@@ -19,21 +20,21 @@ export class IntroComponent implements OnInit {
     this.router.navigate(['/drag2'])
   }
   ngOnInit(): void {
-    this.app = this.conService.getapp_id()
+    this.app = localStorage.getItem('app_id')
     if (this.app == 1) {
       this.items = [
         {
-          label: '', command: () => {
+          label: 'Sharing Bell States', command: () => {
             console.log(1)
           }
         },
         {
-          label: '', command: () => {
+          label: 'Measurement', command: () => {
             console.log(2)
           }
         },
         {
-          label: '', command: () => {
+          label: 'Revealing the bases', command: () => {
             console.log(3)
           }
         }
@@ -42,17 +43,17 @@ export class IntroComponent implements OnInit {
     if (this.app == 3) {
       this.items = [
         {
-          label: '', command: () => {
+          label: 'Entanglement establishment', command: () => {
             console.log(1)
           }
         },
         {
-          label: '', command: () => {
+          label: 'Sharing EPR pairs', command: () => {
             console.log(2)
           }
         },
         {
-          label: '​', command: () => {
+          label: 'GHZ measurement​', command: () => {
             console.log(3)
           }
         }
@@ -61,17 +62,17 @@ export class IntroComponent implements OnInit {
     if (this.app == 2) {
       this.items = [
         {
-          label: '', command: () => {
+          label: 'Request and Routing', command: () => {
             console.log(1)
           }
         },
         {
-          label: '', command: () => {
+          label: 'Establishment', command: () => {
             console.log(2)
           }
         },
         {
-          label: '​', command: () => {
+          label: 'E2E generation​', command: () => {
             console.log(3)
           }
         }
@@ -83,16 +84,17 @@ export class IntroComponent implements OnInit {
     if (this.app == 4) {
       this.items = [
         {
-          label: '​', command: () => {
+          label: 'Entanglement between nodes​', command: () => {
             console.log(1)
           }
         },
         {
-          label: "", command: () => {
+          label: "Bell state measurement", command: () => {
             console.log(2)
           }
         },
         {
+          label: 'Unitary operations',
           command: () => {
             console.log(3)
           }
@@ -102,6 +104,47 @@ export class IntroComponent implements OnInit {
       this.tel.tel2 = 'Bell-state measurement at Alice end​'
       this.tel.tel3 = 'Unitary operations based on Alice results'
     }
+    if (this.app == 5) {
+      this.items = [
+        {
+          label: 'Encoding​', command: () => {
+            console.log(1)
+          }
+        },
+        {
+          label: "Transmission", command: () => {
+            console.log(2)
+          }
+        },
+        {
+          label: 'Security Check',
+          command: () => {
+            console.log(3)
+          }
+        }, {
+          label: 'Decoding'
+        },
+      ];
+    }
+    if (this.app == 7) {
+      this.items = [
+        {
+          label: 'Ping​', command: () => {
+            console.log(1)
+          }
+        },
+        {
+          label: "Transformation", command: () => {
+            console.log(2)
+          }
+        },
+        {
+          label: 'Pong',
+          command: () => {
+            console.log(3)
+          }
+        }]
+    }
   }
   previous() {
     this.activeIndex = this.activeIndex - 1
@@ -109,7 +152,12 @@ export class IntroComponent implements OnInit {
   next() {
     this.activeIndex = this.activeIndex + 1
   }
-
+  quant_ph() {
+    window.open("https://arxiv.org/pdf/quant-ph/0012056.pdf", "_blank");
+  }
+  quant_ph1() {
+    window.open("https://arxiv.org/pdf/quant-ph/0209040.pdf", "_blank")
+  }
 }
 export class Teleportation {
   tel1: string;
@@ -120,4 +168,10 @@ export class E2E {
   e2e1: string;
   e2e2: string;
   e2e3: string;
+}
+export class qsdc1 {
+  qsdc1_1: string;
+  qsdc1_2: string;
+  qsdc1_3: string;
+  qsdc1_4: string;
 }

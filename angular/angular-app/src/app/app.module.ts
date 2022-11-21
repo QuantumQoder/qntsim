@@ -47,6 +47,8 @@ import { IntroComponent } from './components/intro/intro.component';
 import { SplitButtonModule } from 'primeng/splitbutton';
 // import { HowtouseComponent } from './components/howtouse/howtouse.component';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+import { RerouteComponent } from './components/reroute/reroute.component';
+import { CtrlClickDirective } from './directives/ctrl-click';
 // import { GameComponent } from './components/game/game.component';
 // import { ToastModule } from 'primeng/toast';
 // import { Alert } from '@ng-bootstrap/ng-bootstrap';
@@ -66,6 +68,8 @@ import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
     NetworkResultsComponent,
     LogsComponent,
     IntroComponent,
+    RerouteComponent,
+    CtrlClickDirective
 
     //ButtonModule
     //AngularAnimationsLibraryModule

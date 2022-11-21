@@ -15,13 +15,9 @@ export class ApplicationsComponent implements OnInit {
   items: MenuItem[] = [
     { label: 'Home', routerLink: ['/'] },
     { label: 'Application', routerLink: ['applications'] },
-
   ];
-
   constructor(private conService: ConditionsService, private _router: Router, private apiService: ApiServiceService) { }
-
   ngOnInit(): void {
-
     var data = {
       "username": 'admin',
       "password": 'qwerty'
@@ -31,13 +27,25 @@ export class ApplicationsComponent implements OnInit {
       localStorage.setItem('access', this.token.access)
     })
     this.conService.currentSection = 'applications'
-
   }
-  app(app_id: number, app: string) {
+  app(app_id: any, app: string) {
+
     this.conService.setapp_id(app_id);
+    localStorage.setItem('app_id', app_id)
     this.conService.setApp(app)
+    localStorage.setItem('app', app)
     this._router.navigate(['/intro'])
+
   }
+  app1(app_id: any, app: string) {
 
-
+    this.conService.setapp_id(app_id);
+    localStorage.setItem('app_id', app_id)
+    this.conService.setApp(app)
+    localStorage.setItem('app', app)
+    var currenturl = this._router.url
+    var introurl = currenturl.replace('applications', 'intro')
+    console.log(introurl)
+    window.open(introurl, "_blank")
+  }
 }

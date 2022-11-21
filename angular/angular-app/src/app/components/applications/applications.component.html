@@ -21,7 +21,8 @@
                                 of
                                 the
                                 card's content.</p> -->
-                            <a class="btn mr-2" (click)="app(2,'e2e')"> Visit Site</a>
+                            <a class="btn mr-2" (click)="app(2,'e2e')"><span (ctrl-click)="app1(2,'e2e')">Visit
+                                    Site</span></a>
                             <!-- <a class="btn "><i class="fab fa-github"></i> Github</a> -->
                         </div>
                     </div>
@@ -37,7 +38,8 @@
                                 of
                                 the
                                 card's content.</p> -->
-                            <a class="btn  mr-2" (click)="app(1,'e91')"> Visit Site</a>
+                            <a class="btn  mr-2" (click)="app(1,'e91')"><span (ctrl-click)="app1(1,'e91')">Visit
+                                    Site</span></a>
                             <!-- <a href="#" class="btn"><i class="fab fa-github"></i> Github</a> -->
                         </div>
                     </div>
@@ -55,8 +57,9 @@
                                 of
                                 the
                                 card's content.</p> -->
-                            <a class="btn mr-2" (click)="app(4,'tel')"><i class="fas fa-link"></i> Visit
-                                Site</a>
+                            <a class="btn mr-2" [routerLink]="['/intro']" (click)="app(4,'tel')"><i
+                                    class="fas fa-link"></i><span (ctrl-click)="app1(4,'tel')">Visit
+                                    Site</span></a>
                             <!-- <a href="#" class="btn "><i class="fab fa-github"></i> Github</a> -->
                         </div>
                     </div>
@@ -74,7 +77,9 @@
                                 of
                                 the
                                 card's content.</p> -->
-                            <a class="btn mr-2" (click)="app(3,'ghz')"><i class="fas fa-link"></i> Visit Site</a>
+                            <a class="btn mr-2" [routerLink]="['/intro']" (click)="app(3,'ghz')"><i
+                                    class="fas fa-link"></i><span (ctrl-click)="app1(3,'ghz')">Visit
+                                    Site</span></a>
 
                             <!-- <a href="#" class="btn"><i class="fab fa-github"></i> Github</a> -->
                         </div>
@@ -93,8 +98,9 @@
                                 of
                                 the
                                 card's content.</p> -->
-                            <a class="btn mr-2" (click)="app(5,'qsdc1')">Visit
-                                Site</a>
+                            <a class="btn mr-2" [routerLink]="['/intro']" (click)="app(5,'qsdc1')"><span
+                                    (ctrl-click)="app1(5,'qsdc1')">Visit
+                                    Site</span></a>
                             <!-- <a href="#" class="btn "><i class="fab fa-github"></i> Github</a> -->
                         </div>
                     </div>
@@ -106,9 +112,9 @@
                             <h5 class="card-title">Ping Pong</h5>
                             <h6 class="card-subtitle mb-2 text-muted">Message sharing with security</h6>
 
-                            <a class="btn  mr-2" (click)="app(7,'PP')">Visit
-                                Site</a>
-
+                            <a class="btn  mr-2" (click)="app(7,'PP')">
+                                <span (ctrl-click)="app1(7,'PP')">Visit
+                                    Site</span></a>
                         </div>
                     </div>
                 </div>
@@ -117,11 +123,12 @@
                     <div class="card" style="width: 16rem;height: 25rem;">
                         <img src="assets/images/Crypt4.png" class="card-img-top" alt="..." height="250px">
                         <div class="card-body">
-                            <h5 class="card-title">QSDC</h5>
+                            <h5 class="card-title">IP1</h5>
                             <h6 class="card-subtitle mb-2 text-muted">QSDC with mutual authentication</h6>
 
-                            <a class="btn mr-2" (click)="app(6,'ip1')"><i class="fas fa-link"></i> Visit
-                                Site</a>
+                            <a class="btn mr-2" [routerLink]="['/intro']" (click)="app(6,'ip1')"><i
+                                    class="fa fa-link"></i><span (ctrl-click)="app1(6,'ip1')">Visit
+                                    Site</span></a>
 
                         </div>
                     </div>

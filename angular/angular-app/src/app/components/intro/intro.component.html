@@ -17,7 +17,7 @@
             <br>
             <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>SHARING BELL STATES</small></h3>
             <div *ngIf="activeIndex==0">
-                <img src="assets/images/webassets/e91_1.png" alt="...">
+                <img class="img1" src="assets/images/webassets/e91_1.png" alt="...">
                 <p>Choose the sender and receiver from topology that was setup prior .The sender (Alice)
                     and receiver
                     (Bob)
@@ -27,7 +27,7 @@
             <br>
             <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>MEASURE AND RECORD RESULTS​</small></h3>
             <div *ngIf="activeIndex==1">
-                <img src="assets/images/webassets/e91_2.png" alt="...">
+                <img class="img1" src="assets/images/webassets/e91_2.png" alt="...">
                 <br>
                 <p>Alice makes a measurement with a direction randomly chosen between Horizontal (X
                     observable),Diagonal
@@ -40,7 +40,7 @@
             </div>
             <br>
             <h3 *ngIf="activeIndex==2" class="display-4 text-center">REVEALING THE BASES</h3>
-            <img *ngIf="activeIndex==2" src="assets/images/webassets/E91_Img3.svg" alt="">
+            <img class="img1" *ngIf="activeIndex==2" src="assets/images/webassets/E91_Img3.svg" alt="">
             <p *ngIf="activeIndex==2">Alice and Bob broadcast the measurement basis which they used, through the
                 classical channel .If Alice
                 and Bob have
@@ -74,7 +74,7 @@
             <br>
             <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>{{e2e.e2e1|uppercase}}</small></h3>
             <div *ngIf="activeIndex==0">
-                <div class="text-center"><img src="assets/images/e2e1.png" alt="..." width="1000px"></div>
+                <div class="text-center"><img class="img1" src="assets/images/e2e1.png" alt="..." width="1000px"></div>
 
                 <p>A source node will raise a request to generate n-entangled pair of a target fidelity between a
                     destination node.​
@@ -85,7 +85,7 @@
             <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>{{e2e.e2e2|uppercase}}​</small></h3>
             <div *ngIf="activeIndex==1">
                 <div class="text-center col-10">
-                    <img src="assets/images/e2e2.png" alt="..." width="1000px">
+                    <img class="img1" src="assets/images/e2e2.png" alt="..." width="1000px">
                 </div>
 
 
@@ -95,8 +95,8 @@
             </div>
             <br>
             <h3 *ngIf="activeIndex==2" class="display-4 text-center">{{e2e.e2e3|uppercase}}</h3>
-            <div class="text-center col-10"><img *ngIf="activeIndex==2" src="assets/images/e2e3.png" alt="..."
-                    width="1000px"></div>
+            <div class="text-center col-10"><img class="img1" *ngIf="activeIndex==2" src="assets/images/e2e3.png"
+                    alt="..." width="1000px"></div>
 
             <p *ngIf="activeIndex==2">After entanglement swapping between the intermediate nodes end to end
                 entanglement
@@ -122,7 +122,7 @@
                     NODES</small></h3>
             <div *ngIf="activeIndex==0">
                 <div class="text-center">
-                    <img src="assets/images/ghz1.png" alt="...">
+                    <img class="img1" src="assets/images/ghz1.png" alt="...">
                 </div>
                 <p>Specify the three nodes (one source and two destinations) and one central node ( which is the
                     approximately equidistant
@@ -133,7 +133,7 @@
             <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>TWO PARTY BELL STATES</small></h3>
             <div *ngIf="activeIndex==1">
                 <div class="text-center">
-                    <img src="assets/images/ghz-2.png" alt="...">
+                    <img class="img1" src="assets/images/ghz-2.png" alt="...">
                 </div>
                 <p>Three end to end 2 party entanglements are shared between central node and other three nodes. ​​
                 </p>
@@ -141,7 +141,7 @@
             <h3 *ngIf="activeIndex==2" class="display-4 text-center"><small>GHZ MEASUREMENT</small></h3>
             <div *ngIf="activeIndex==2">
                 <div class="text-center">
-                    <img src="assets/images/ghz3.png" alt="...">
+                    <img class="img1" src="assets/images/ghz3.png" alt="..." height="100px" width="100px">
                 </div>
                 <p>Now Central node performs the GHZ measurement and send the results over classical communication
                     channel to the other
@@ -169,7 +169,7 @@
             <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>{{tel.tel1|uppercase}}</small></h3>
             <div *ngIf="activeIndex==0">
                 <div class="text-center">
-                    <img src="assets/images/tel1.png" alt="..." width="1000px">
+                    <img class="img1" src="assets/images/tel1.png" alt="..." width="1000px">
                 </div>
                 <p>The sender (Alice) wants to send quantum information (qubit state |ψ⟩=α|0⟩+β|1⟩) to receiver
                     (Bob).
@@ -184,7 +184,7 @@
             <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>{{tel.tel2|uppercase}}​</small></h3>
             <div *ngIf="activeIndex==1">
                 <div class="text-center">
-                    <img src="assets/images/tel2.png" alt="..." width="1000px">
+                    <img class="img1" src="assets/images/tel2.png" alt="..." width="1000px">
                 </div>
                 <p>Alice then performs a Hadamard operation followed by a CNOT gate between a qubit it wants to
                     send/teleport and the
@@ -197,7 +197,7 @@
             <h3 *ngIf="activeIndex==2" class="display-4 text-center"><small>{{tel.tel3|uppercase}}</small></h3>
             <div *ngIf="activeIndex==2">
                 <div class="text-center">
-                    <img src="assets/images/tel3.png" alt="..." width="1000px">
+                    <img class="img1" src="assets/images/tel3.png" alt="..." width="1000px">
                 </div>
                 <p>After Bob receives the message and he applies a corrective unitary operations (based on the
                     results
@@ -208,18 +208,102 @@
                     anymore.​
                     ​​</p>
                 <br>
-                <!-- <div class="text-center"><img src="assets/images/tel1.png" alt="..." width="1000px"> -->
+                <!-- <div class="text-center"><img class="img1" src="assets/images/tel1.png" alt="..." width="1000px"> -->
+            </div>
+        </div>
+        <div *ngIf="app=='7'" class="col-10">
+            <h1 class="display-1">QSDC1</h1>
+            <p>A QKD scheme using EPR pairs with each EPR pair carrying two bits of key code. This protocol is the
+                seminal work on QSDC by G.L. Long and X.S. Liu <a href=""
+                    (click)="quant_ph1()">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​</p>
+            <br>
+            <div class="row">
+                <div class="col-10">
+                    <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
+                </div>
+            </div>
+            <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small></small></h3>
+            <div *ngIf="activeIndex==0">
+                <div class="text-center">
+                    <img class="img1" src="assets/images/pp1.png" alt="...">
+                </div>
+                <p>Bob prepares entangled qubits in |ψ+> state. He then makes two sequences separating one qubit out of
+                    each EPR pair created. Bob sends one sequence to Alice.​​</p>
+            </div>
+            <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small></small></h3>
+            <div *ngIf="activeIndex==1">
+                <div class="text-center">
+                    <img class="img1" src="assets/images/pp2.png" alt="...">
+                </div>
+                <p>Alice now adopts the transformation rule above and encodes the classical message bits into the qubits
+                    applying the respective transformations. She gets the transformed qubits.​ ​​
+                </p>
+            </div>
+            <h3 *ngIf="activeIndex==2" class="display-4 text-center"><small></small></h3>
+            <div *ngIf="activeIndex==2">
+                <div class="text-center">
+                    <img class="img1" src="assets/images/pp3.png" alt="..." height="100px" width="100px">
+                </div>
+                <p>Alice sends the transformed qubits to Bob. Bob now along with his qubits form pairs with the
+                    transformed qubits and performs Bell state measurement. Based on the result, Bob decodes the message
+                    encoded by Alice. ​​​</p>
+                <!-- <div class="text-center"><img src="assets/images/ghz_3-1.png" alt="..."> -->
             </div>
         </div>
 
+        <div *ngIf="app=='5'" class="col-10">
+            <h1 class="display-1">QSDC1</h1>
+            <p>A QKD scheme using EPR pairs with each EPR pair carrying two bits of key code. This protocol is the
+                seminal work on QSDC by G.L. Long and X.S. Liu <a href=""
+                    (click)="quant_ph()">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​</p>
+            <br>
+            <div class="row">
+                <div class="col-10">
+                    <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
+                </div>
+            </div>
+            <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small></small></h3>
+            <div *ngIf="activeIndex==0">
+                <div class="text-center">
+                    <img class="img1" src="assets/images/ghz1.png" alt="...">
+                </div>
+                <p>Specify the three nodes (one source and two destinations) and one central node ( which is the
+                    approximately equidistant
+                    from three nodes and enough resources to get high fidelity entanglement) from the topology that
+                    was
+                    setup prior.​</p>
+            </div>
+            <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>TWO PARTY BELL STATES</small></h3>
+            <div *ngIf="activeIndex==1">
+                <div class="text-center">
+                    <img class="img1" src="assets/images/ghz-2.png" alt="...">
+                </div>
+                <p>Three end to end 2 party entanglements are shared between central node and other three nodes. ​​
+                </p>
+            </div>
+            <h3 *ngIf="activeIndex==2" class="display-4 text-center"><small>GHZ MEASUREMENT</small></h3>
+            <div *ngIf="activeIndex==2">
+                <div class="text-center">
+                    <img class="img1" src="assets/images/ghz3.png" alt="..." height="100px" width="100px">
+                </div>
+                <p>Now Central node performs the GHZ measurement and send the results over classical communication
+                    channel to the other
+                    three nodes involved. Based on received results all three parties perform Local corrective Pauli
+                    Operations and thus
+                    share GHZ state between them .​​</p>
+                <div class="text-center"><img src="assets/images/ghz_3-1.png" alt="...">
+                </div>
+            </div>
+        </div>
         <!-- </div> -->
+
         <button type="button" *ngIf="activeIndex==1 || activeIndex==2" class="btn btn-primary btn-custom"
             (click)="previous()">Previous</button>
         <button type="button" *ngIf="activeIndex==0 || activeIndex==1" class="btn btn-primary btn-custom"
             (click)="next()">Next</button>
         <button type="button" *ngIf="activeIndex==2" class="btn btn-primary btn-custom" (click)="goto()">Go To
             Application</button>
-        <br>
 
+        <br>
     </div>
 </div>

@@ -13,6 +13,7 @@ import { ConditionsService } from 'src/services/conditions.service';
 })
 export class ResultsComponent implements OnInit, AfterViewInit {
   match: any = []
+  alice_r: any
   app_id: any
   items: MenuItem[];
   activeItem: MenuItem;
@@ -92,6 +93,8 @@ export class ResultsComponent implements OnInit, AfterViewInit {
         var ip1 = this.api.getip1()
         console.log("ip1")
         this.ip1 = this.con.getResult();
+        var alice = "Alice_r" + " "
+        this.alice_r = this.ip1[alice]
         break
       case 7:
         this.pingpong = this.con.getResult();
@@ -101,7 +104,6 @@ export class ResultsComponent implements OnInit, AfterViewInit {
     this.keyGen = false
     this.keyBits = true
   }
-
   info_1() {
     this.info2 = false;
     this.info1 = true;

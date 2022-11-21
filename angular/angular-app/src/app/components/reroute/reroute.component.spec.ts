@@ -1,0 +1,23 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { RerouteComponent } from './reroute.component';
+
+describe('RerouteComponent', () => {
+  let component: RerouteComponent;
+  let fixture: ComponentFixture<RerouteComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [ RerouteComponent ]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(RerouteComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

@@ -10,6 +10,7 @@ import { NetworkResultsComponent } from './components/network-results/network-re
 import { ResultsComponent } from './components/results/results.component';
 import { DragComponent } from './components/drag/drag.component';
 import { IntroComponent } from './components/intro/intro.component';
+import { RerouteComponent } from './components/reroute/reroute.component';
 // import { HowtouseComponent } from './components/howtouse/howtouse.component';
 //import { HomeComponent } from './components/home/home.component';
 
@@ -23,7 +24,7 @@ const routes: Routes = [
   { path: 'network-results', component: NetworkResultsComponent },
   { path: 'logs', component: LogsComponent },
   { path: 'intro', component: IntroComponent },
-
+  { path: 'route', component: RerouteComponent }
 ];
 
 @NgModule({

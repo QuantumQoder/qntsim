@@ -81,7 +81,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     nodeDataArray: [{ figure: "Ellipse", fill: "#00AD5F", key: -1, loc: "790 230", text: "node1", __gohashid: 1282 },
     { figure: "Circle", fill: "#CE0620", key: -2, loc: "390 100", text: "node2", __gohashid: 2055 },
     { figure: "Circle", fill: "#CE0620", key: -3, loc: "1160 100", text: "node3", __gohashid: 3087 },
-    { figure: "Circle", fill: "#CE0620", key: -4, loc: "800 460", text: "node4", __gohashid: 4088 }],
+    { figure: "Circle", fill: "#CE0620", key: -4, loc: "790 460", text: "node4", __gohashid: 4088 }],
     linkDataArray: [{
       "points": {
         "__gohashid": 4712,
@@ -171,7 +171,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     ]
   }
   links: any = [];
-  application: string;
+  application: any;
   constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private _route: Router, private modal: NgbModal) { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -490,8 +490,8 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
             // { color: "grey", text: "VC", points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) }
           ])
         });
-    this.app_id = this.con.getapp_id()
-    this.application = this.con.getApp()
+    this.app_id = localStorage.getItem('app_id')
+    this.application = localStorage.getItem('app')
 
     this.e2e = this.fb.group({
       'sender': new FormControl(''),
@@ -558,7 +558,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.link = true
   }
   save() {
-    this.app_id = this.con.getapp_id()
+    this.app_id = localStorage.getItem('app_id')
     //console.log(this.app_id)
     this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
     this.savedModel = this.myDiagram.model;
@@ -639,7 +639,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
         "memory": this.memory
       }
-      sessionStorage.setItem("selected_node", this.selectedNode.key)
+      localStorage.setItem("selected_node", this.selectedNode.key)
       console.log(this.savedModel.nodeDataArray)
       // console.log(this.savedModel.nodeDataArray[indexFromKey].text)
       // console.log(this.toolbox.get('name')?.value)
