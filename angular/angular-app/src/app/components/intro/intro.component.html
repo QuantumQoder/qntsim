@@ -215,7 +215,8 @@
             <h1 class="display-1">QSDC1</h1>
             <p>A QKD scheme using EPR pairs with each EPR pair carrying two bits of key code. This protocol is the
                 seminal work on QSDC by G.L. Long and X.S. Liu <a href=""
-                    (click)="quant_ph1()">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​</p>
+                    (click)="quant_ph('https://arxiv.org/pdf/quant-ph/0012056.pdf')">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​
+            </p>
             <br>
             <div class="row">
                 <div class="col-10">
@@ -255,7 +256,8 @@
             <h1 class="display-1">QSDC1</h1>
             <p>A QKD scheme using EPR pairs with each EPR pair carrying two bits of key code. This protocol is the
                 seminal work on QSDC by G.L. Long and X.S. Liu <a href=""
-                    (click)="quant_ph()">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​</p>
+                    (click)="quant_ph('https://arxiv.org/pdf/quant-ph/0012056.pdf')">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​
+            </p>
             <br>
             <div class="row">
                 <div class="col-10">
@@ -265,44 +267,130 @@
             <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small></small></h3>
             <div *ngIf="activeIndex==0">
                 <div class="text-center">
-                    <img class="img1" src="assets/images/ghz1.png" alt="...">
+                    <img class="img1" src="assets/images/qsdc1_1.png" alt="...">
                 </div>
-                <p>Specify the three nodes (one source and two destinations) and one central node ( which is the
-                    approximately equidistant
-                    from three nodes and enough resources to get high fidelity entanglement) from the topology that
-                    was
-                    setup prior.​</p>
+                <p>Alice converts the classical message in binary string and inserts check bits in even position.​
+
+                    Then she prepares, N EPR pairs and encodes bit-pairs into EPR pairs by the above encoding rule.​
+
+                    Finally, she separates one qubit from each EPR pair and creates two sequences of N qubits.</p>
             </div>
-            <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>TWO PARTY BELL STATES</small></h3>
+            <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small></small></h3>
             <div *ngIf="activeIndex==1">
                 <div class="text-center">
-                    <img class="img1" src="assets/images/ghz-2.png" alt="...">
+                    <img class="img1" src="assets/images/qsdc1_2.png" alt="...">
                 </div>
-                <p>Three end to end 2 party entanglements are shared between central node and other three nodes. ​​
+                <p>Alice sends Sequence 2 to Bob over the Quantum channel and informs Bob about the position of check
+                    bits via classical channel.​
                 </p>
             </div>
-            <h3 *ngIf="activeIndex==2" class="display-4 text-center"><small>GHZ MEASUREMENT</small></h3>
+            <h3 *ngIf="activeIndex==2" class="display-4 text-center"><small></small></h3>
             <div *ngIf="activeIndex==2">
                 <div class="text-center">
-                    <img class="img1" src="assets/images/ghz3.png" alt="..." height="100px" width="100px">
+                    <img class="img1" src="assets/images/qsdc1_3.png" alt="..." height="100px" width="100px">
                 </div>
-                <p>Now Central node performs the GHZ measurement and send the results over classical communication
-                    channel to the other
-                    three nodes involved. Based on received results all three parties perform Local corrective Pauli
-                    Operations and thus
-                    share GHZ state between them .​​</p>
-                <div class="text-center"><img src="assets/images/ghz_3-1.png" alt="...">
+                <p>Bob measure the check bits in computational (or Z) basis and and acknowledges Alice about his
+                    measurement. Alice now after measuring her set of check bits, compares the outcome with Bob and
+                    identifies for any Eavesdropping. ​​</p>
+
+            </div>
+
+            <div *ngIf="activeIndex==3">
+                <div class="text-center">
+                    <img class="img1" src="assets/images/qsdc1_4.png" alt="..." height="100px" width="100px">
                 </div>
+                <p>Upon successful Eavesdropping check, Alice now sends the remaining qubits to Bob via the Quantum
+                    channel.
+                    Bob now undergoes Bell State measurement on the qubit pairs and retrieves the binary string
+                    corresponding to the actual message.​​​​</p>
+
             </div>
         </div>
+        <div *ngIf="app=='6'" class="col-10">
+            <h1 class="display-1">Arbitrary basis QSDC</h1>
+            <p class="text-justify">A secure QSDC protocol using only one orthogonal basis of single-qubit states to
+                encode classical
+                message. This highly secure protocol developed by Goutam Paul and Nayana Das can be used for high
+                security secure direct communication with no information leakage to any Eavesdropper
+
+                ​<a href=""
+                    (click)="quant_ph('https://doi.org/10.1007/s10773-021-04952-4')">https://doi.org/10.1007/s10773-021-04952-4​</a>​
+            </p>
+            <br>
+            <div class="row">
+                <div class="col-10">
+                    <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
+                </div>
+            </div>
+
+            <div *ngIf="activeIndex==0">
+                <div *ngIf="step==1">
+                    <h3 class="display-4 text-center"><small></small></h3>
+                    <div class="text-center">
+                        <img class="img1" src="assets/images/IP1_1_1.png" alt="...">
+                    </div>
+                    <p class="text-justify">Alice converts her classical message into binary bit string and inserts
+                        check bits. Then she encodes the classical bits using the above unitary transformations. ​</p>
+                </div>
+                <div *ngIf="step==2">
+                    <h3 class="display-4 text-center"><small></small></h3>
+                    <div class="text-center">
+                        <img class="img1" src="assets/images/IP1_1_2.png" alt="...">
+                    </div>
+                    <p class="text-justify">Alice now prepares the encoded qubit sequence with Decoy states and Identity
+                        qubits to detect any Eavesdropping while transmission. She then sends the sequence to Bob.​</p>
+                </div>
+            </div>
+            <div *ngIf="activeIndex==1">
+                <div *ngIf="step==1">
+                    <h3 class="display-4 text-center"><small></small></h3>
+                    <div class="text-center">
+                        <img class="img1" src="assets/images/IP1_2_1.png" alt="...">
+                    </div>
+                    <p class="text-justify">Alice now prepares the encoded qubit sequence with Decoy states to identify
+                        Eavesdropping while transmission. She then sends the sequence to Bob.​ ​</p>
+                </div>
+                <div *ngIf="step==2">
+                    <h3 class="display-4 text-center"><small></small></h3>
+                    <div class="text-center">
+                        <img class="img1" src="assets/images/IP1_2_2.png" alt="...">
+                    </div>
+                    <p class="text-justify">Alice and Bob now communicates using a classical channel and checks for
+                        authenticity.They proceed only if the authentication is verified otherwise abort the
+                        protocol.​​</p>
+                </div>
+            </div>
+            <h3 *ngIf="activeIndex==2" class="display-4 text-center"><small></small></h3>
+            <div *ngIf="activeIndex==2">
+                <br>
+                <div class="text-center">
+                    <img class="img1" src="assets/images/IP1_3_1.png" alt="...">
+                </div>
+                <p class="text-justify">Alice compares the measurement result of check bits for checking the integrity
+                    of message. Bob then applies transformations and measurement to retrieve the classical message.​</p>
+            </div>
+        </div>
+        <br>
         <!-- </div> -->
 
-        <button type="button" *ngIf="activeIndex==1 || activeIndex==2" class="btn btn-primary btn-custom"
-            (click)="previous()">Previous</button>
-        <button type="button" *ngIf="activeIndex==0 || activeIndex==1" class="btn btn-primary btn-custom"
+        <button type="button" *ngIf="app!=6 && activeIndex==1 || app!=6 && activeIndex==2"
+            class="btn btn-primary btn-custom" (click)="previous()">Previous</button>
+        <button type="button" *ngIf="app!=6 && activeIndex==0 ||app!=6 && activeIndex==1"
+            class="btn btn-primary btn-custom" (click)="next()">Next</button>
+        <button type="button" *ngIf="app==5 && activeIndex==2" class="btn btn-primary btn-custom"
             (click)="next()">Next</button>
-        <button type="button" *ngIf="activeIndex==2" class="btn btn-primary btn-custom" (click)="goto()">Go To
+        <button type="button" *ngIf="app==5 && activeIndex==3" class="btn btn-primary btn-custom"
+            (click)="previous()">Previous</button>
+        <button type="button" *ngIf="app!=5 && activeIndex==2" class="btn btn-primary btn-custom" (click)="goto()">Go To
             Application</button>
+        <button type="button" *ngIf="app==5 && activeIndex==3" class="btn btn-primary btn-custom" (click)="goto()">Go To
+            Application</button>
+        <button type="button" *ngIf="step==1 && app==6 && activeIndex==0 ||step==1 && app==6 && activeIndex ==1"
+            class="btn btn-primary btn-custom" (click)="nextStep()">Next</button>
+        <button type="button" *ngIf="step==2 && app==6 && activeIndex==0 ||step==2 && app==6 && activeIndex ==1"
+            class="btn btn-primary btn-custom" (click)="previousStep()">Previous</button>
+        <button type="button" *ngIf="step==2 && app==6 && activeIndex==0 ||step==2 && app==6 && activeIndex ==1"
+            class="btn btn-primary btn-custom" (click)="next()">Next</button>
 
         <br>
     </div>

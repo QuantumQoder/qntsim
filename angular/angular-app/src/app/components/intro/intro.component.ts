@@ -13,6 +13,8 @@ export class IntroComponent implements OnInit {
   items: MenuItem[]
   activeIndex: number = 0;
   app: any
+  step: number = 1
+  currentUrl: string
   tel = new Teleportation();
   e2e = new E2E();
   constructor(private router: Router, private conService: ConditionsService) { }
@@ -126,6 +128,23 @@ export class IntroComponent implements OnInit {
         },
       ];
     }
+    if (this.app == 6) {
+      this.items = [
+        {
+          label: 'Encoding', command: () => {
+            this.step = 1
+          }
+        },
+        {
+          label: 'Security and Authenticity check', command: () => {
+            this.step = 1
+          }
+        },
+        {
+          label: 'Decoding'
+        }
+      ]
+    }
     if (this.app == 7) {
       this.items = [
         {
@@ -147,16 +166,40 @@ export class IntroComponent implements OnInit {
     }
   }
   previous() {
-    this.activeIndex = this.activeIndex - 1
+    this.activeIndex = this.activeIndex - 1;
+    this.step = 2;
+    window.scroll({
+      top: 0,
+      behavior: 'smooth'
+    });
   }
   next() {
-    this.activeIndex = this.activeIndex + 1
+    this.activeIndex = this.activeIndex + 1;
+    this.step = 1;
+    window.scroll({
+      top: 0,
+      behavior: 'smooth'
+    });
   }
-  quant_ph() {
-    window.open("https://arxiv.org/pdf/quant-ph/0012056.pdf", "_blank");
+  quant_ph(url: string) {
+    this.currentUrl = this.router.url;
+    window.open(url, "_blank");
+    // this.router.navigate([this.currentUrl])
   }
-  quant_ph1() {
-    window.open("https://arxiv.org/pdf/quant-ph/0209040.pdf", "_blank")
+  nextStep() {
+    this.step = this.step + 1;
+    console.log(this.step)
+    window.scroll({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+  previousStep() {
+    this.step = this.step - 1;
+    window.scroll({
+      top: 0,
+      behavior: 'smooth'
+    });
   }
 }
 export class Teleportation {
