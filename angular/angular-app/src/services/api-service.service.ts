@@ -187,9 +187,9 @@ export class ApiServiceService {
     return this._http.post(environment.apiUrl + 'api/token/', data);
   }
   runApplication(data: any) {
-    var token = localStorage.getItem('access')
-    var httpHeader = new HttpHeaders().set('Authorization', 'Bearer ' + token)
-    return this._http.post(environment.apiUrl + 'run/', data, { headers: httpHeader })
+    // var token = localStorage.getItem('access')
+    // var httpHeader = new HttpHeaders().set('Authorization', 'Bearer ' + token)
+    return this._http.post(environment.apiUrl + 'run/', data)
   }
   ghz1() {
     return this.ghz

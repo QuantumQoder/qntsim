@@ -753,6 +753,9 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   parameters() {
+    this.app_id = this.con.getapp_id()
+    console.log(this.app_id)
+    console.log(typeof (this.app_id))
     this.blocked = true
     this.displayPosition = false
     var token = localStorage.getItem('access')

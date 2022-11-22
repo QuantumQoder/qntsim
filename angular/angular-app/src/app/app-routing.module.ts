@@ -24,7 +24,9 @@ const routes: Routes = [
   { path: 'network-results', component: NetworkResultsComponent },
   { path: 'logs', component: LogsComponent },
   { path: 'intro', component: IntroComponent },
-  { path: 'route', component: RerouteComponent }
+  { path: 'route', component: RerouteComponent },
+
+  { path: '**', redirectTo: '' }
 ];
 
 @NgModule({

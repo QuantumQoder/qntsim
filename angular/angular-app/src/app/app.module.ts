@@ -40,7 +40,7 @@ import { DialogModule } from 'primeng/dialog';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { DropdownModule } from 'primeng/dropdown';
 import { CookieService } from 'ngx-cookie-service';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BlockUIModule } from 'primeng/blockui';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { IntroComponent } from './components/intro/intro.component';
@@ -49,6 +49,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { RerouteComponent } from './components/reroute/reroute.component';
 import { CtrlClickDirective } from './directives/ctrl-click';
+import { JwtInterceptor } from './auth/jwt.interceptor';
 // import { GameComponent } from './components/game/game.component';
 // import { ToastModule } from 'primeng/toast';
 // import { Alert } from '@ng-bootstrap/ng-bootstrap';
@@ -108,7 +109,8 @@ import { CtrlClickDirective } from './directives/ctrl-click';
     StepsModule
     //NgbModule,
   ],
-  providers: [CookieService],
+  providers: [CookieService,
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
