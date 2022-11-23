@@ -903,7 +903,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     // var evt = e.copy();
     // console.log(evt)
     var node = obj.part;
-
     this.selectedNode = node.data
     console.log(this.selectedNode.text)
     console.log(node.data);

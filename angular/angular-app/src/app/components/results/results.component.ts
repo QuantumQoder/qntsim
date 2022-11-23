@@ -1,7 +1,8 @@
-import { ViewEncapsulation } from '@angular/compiler';
+import { ViewEncapsulation } from '@angular/core';
 import { AfterViewInit, Component, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-// import { info } from 'console';
+import { Router } from '@angular/router';
+
 
 import { MenuItem } from 'primeng/api';
 import { ApiServiceService } from 'src/services/api-service.service';
@@ -9,7 +10,8 @@ import { ConditionsService } from 'src/services/conditions.service';
 @Component({
   selector: 'app-results',
   templateUrl: './results.component.html',
-  styleUrls: ['./results.component.less']
+  styleUrls: ['./results.component.less'],
+  encapsulation: ViewEncapsulation.None
 })
 export class ResultsComponent implements OnInit, AfterViewInit {
   match: any = []
@@ -30,7 +32,9 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   qsdc1: any;
   pingpong: any;
   ip1: any;
-  constructor(private _formBuilder: FormBuilder, private con: ConditionsService, public api: ApiServiceService) { }
+  infoqsdc: boolean
+  constructor(private _formBuilder: FormBuilder, private con: ConditionsService, public api: ApiServiceService,
+    private router: Router) { }
   ngAfterViewInit(): void {
     if (this.app_id == '2') {
       // var e2e = this.con.getResult();
@@ -41,6 +45,9 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
 
     this.app_id = this.con.getapp_id()
+    if (!this.app_id) {
+      this.router.navigate(['/applications'])
+    }
 
     switch (this.app_id) {
       case 1:
@@ -104,6 +111,9 @@ export class ResultsComponent implements OnInit, AfterViewInit {
     this.keyGen = false
     this.keyBits = true
   }
+  info() {
+
+  }
   info_1() {
     this.info2 = false;
     this.info1 = true;
@@ -112,7 +122,9 @@ export class ResultsComponent implements OnInit, AfterViewInit {
     this.info1 = false;
     this.info2 = true;
   }
-
+  info_qsdc() {
+    this.infoqsdc = true
+  }
   senderbasis(index: any) {
     var bool = this.match.includes(index)
     return bool ? "table-success" : "";

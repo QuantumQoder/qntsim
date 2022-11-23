@@ -64,6 +64,33 @@
             </li>
         </ul>
     </p-dialog>
+    <p-dialog header="Details" [draggable]="true" [(visible)]="infoqsdc" [modal]="true" [style]="{width: '50vw'}"
+        position="right" [resizable]="true">
+        <ul>
+            <li>
+                <strong>Message:</strong> &nbsp;<small>Sender's message​</small>
+            </li>
+            <li>
+                <strong>Key Transmitted:</strong>&nbsp;<small>Sender's message after converting into binary​</small>
+            </li>
+            <li>
+                <strong>Eavesdrop:</strong>&nbsp;<small>Eavesdropping happened or not​</small>
+            </li>
+            <li>
+                <strong>Checkbit:</strong>&nbsp;<small>Bits used to check security​</small>
+            </li>
+            <li>
+                <strong>message_shared_received:</strong>&nbsp;<small>message received at receiver's end (original
+                    message along with checkbit) ​</small>
+            </li>
+            <li>
+                <strong>message_received:</strong>&nbsp;<small>received message after removing the checkbit ​</small>
+            </li>
+            <li>
+                <strong>Output Message:</strong>&nbsp;<small>Received message as character​</small>
+            </li>
+        </ul>
+    </p-dialog>
     <div *ngIf="app_id==1" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
         <h1 class="display-3">E91</h1>
         <div *ngIf="keyGen" class="row">
@@ -434,9 +461,14 @@
             </div>
         </div>
     </div>
-    <div *ngIf="app_id==6" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
-        <div class="display-4">
+    <div *ngIf="app_id==6" class="container shadow p-4 mb-5 bg-white rounded mx-auto row">
+        <div class="display-4 text-left col-9">
             IP1
+        </div>
+
+        <div class="text-right col-2">
+            <button class="btn btn-outline-primary" (click)="info_qsdc()" style="margin-top: 18px;"><i
+                    class="pi pi-question"></i></button>
         </div>
         <br>
         <table class="table table-bordered">
@@ -496,8 +528,14 @@
         </table>
     </div>
     <div *ngIf="app_id==5" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
-        <div class="display-4">
-            QSDC1
+        <div class="row">
+            <div class="display-4 col-9 text-left">
+                QSDC1
+            </div>
+            <div class="text-right col-2">
+                <button class="btn btn-outline-primary" (click)="info_qsdc()" style="margin-top: 18px;"><i
+                        class="pi pi-question"></i></button>
+            </div>
         </div>
         <br>
         <table class="table table-bordered">
@@ -543,8 +581,14 @@
         </table>
     </div>
     <div *ngIf="app_id==7" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
-        <div class="display-4">
-            PingPong
+        <div class="row">
+            <div class="display-4 text-left col-9">
+                PingPong
+            </div>
+            <div class="text-right col-2">
+                <button class="btn btn-outline-primary" (click)="info_qsdc()" style="margin-top: 18px;"><i
+                        class="pi pi-question"></i></button>
+            </div>
         </div>
         <br>
         <table class="table table-bordered">
