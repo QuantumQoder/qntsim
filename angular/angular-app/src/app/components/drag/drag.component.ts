@@ -685,7 +685,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     }
     if (this.link) {
       let array = []
-
       var from = this.selectedLink.from
       var to = this.selectedLink.to
       if (from == null || to == null)
@@ -714,7 +713,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           cc.push([this.nodes[i].Name, this.nodes[j].Name]);
         }
       }
-
       if (cc.length != 0) {
         var distance
         var delay
@@ -725,7 +723,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           } else {
             distance = 1000;
             delay = 1000000000;
-
           }
           let ccreq = {
             Nodes: cc[i],
@@ -736,7 +733,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         }
       }
     }
-
     this.topology = {
       nodes: this.nodes,
       quantum_connections: this.links,
@@ -751,7 +747,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     // console.log("hi")
     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message Content' });
   }
-
   parameters() {
     this.app_id = this.con.getapp_id()
     console.log(this.app_id)
@@ -941,13 +936,11 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.visibleSideNav = true
     this.nodeParams = true
     this.link = false
-
-
-
   }
   deleteLink(e: any, obj: any) {
-    console.log(obj.part.Yd)
-    var link = obj.part.Yd
+    console.log(obj)
+    console.log(obj.part)
+    var link = obj.part.data
     var link1 = this.myDiagram.findLinkForData(link)
     this.myDiagram.startTransaction("remove link");
     this.myDiagram.remove(link1);
