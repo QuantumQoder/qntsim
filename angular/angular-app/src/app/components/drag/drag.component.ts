@@ -823,13 +823,12 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       "appSettings": this.appSettings
     }
     this.apiService.runApplication(req).subscribe((result: any) => {
-      this.con.setResult(result)
       this.spinner = true;
-      var comp = document.getElementById("comp")!
-      comp.style.display = 'hidden'
+      console.log(this.spinner)
+      this.con.setResult(result)
     }, (error) => {
-      console.error(error)
       this.spinner = false
+      console.error(error)
     }, () => {
       this.spinner = false
       this._route.navigate(['/results'])
@@ -937,6 +936,12 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.nodeParams = true
     this.link = false
   }
+  reload() {
+    this.savedModel = this.savedModel1;
+    this.nodes = []
+    this.links = []
+    this.load();
+  }
   deleteLink(e: any, obj: any) {
     console.log(obj)
     console.log(obj.part)
@@ -959,6 +964,12 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       this.myDiagram.commitTransaction('Removed Node!')
       console.log("Removed!!")
     }
+  }
+  setSpinner(value: boolean) {
+    this.spinner = value
+  }
+  getSpinner() {
+    return this.spinner
   }
 }
 function showToolTip(obj: any, diagram: any, tool: any) {

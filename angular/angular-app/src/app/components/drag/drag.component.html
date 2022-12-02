@@ -88,19 +88,20 @@
                     <h2 class="display-3">{{application|uppercase}}</h2>
                     <!-- <p class="small text-muted">Click a component to change its settings.</p> -->
                 </div>
-                <h3 class="col-md-9 display-4" style="margin-top:30px;padding-left: 4%;"><small>Configure the quantum
+                <h3 class="col-md-9 display-4" style="margin-top:14px;"><small>Configure the quantum
                         network
                         topology</small></h3>
 
-                <div style="padding-right: 2px;" class="btn-group1 col-md-2">
-                    <button pButton pRipple type="button" icon="pi pi-question"
-                        class="p-button-rounded p-button-info p-button-outlined" styleClass="info"
-                        (click)="info_demo()"></button>&nbsp;&nbsp;&nbsp;
-                    <button class="btn btn-primary btn-custom" (click)="save()">Lock Topology</button>
+                <div style="padding-right: 2px;" class="btn-group1 col-md-2 align-items-center">
+                    <button class="btn btn-outline-primary btn-sm" (click)="info_demo()"><i
+                            class="pi pi-question"></i></button>
+                    <button class="btn btn-outline-primary btn-sm" (click)="reload()"><i
+                            class="pi pi-replay"></i></button>
+                    <button class="btn btn-primary btn-custom btn-sm" (click)="save()">Lock Topology</button>
                 </div>
             </div>
         </div>
-
+        <div *ngIf="spinner" class="lds-dual-ring"></div>
         <div id="sample" style="width: 100%;">
             <div style="width: 99%; display: flex">
                 <div id="myPaletteDiv" class="col-4"
