@@ -50,6 +50,8 @@ import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { RerouteComponent } from './components/reroute/reroute.component';
 import { CtrlClickDirective } from './directives/ctrl-click';
 import { JwtInterceptor } from './auth/jwt.interceptor';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+
 // import { GameComponent } from './components/game/game.component';
 // import { ToastModule } from 'primeng/toast';
 // import { Alert } from '@ng-bootstrap/ng-bootstrap';
@@ -84,12 +86,14 @@ import { JwtInterceptor } from './auth/jwt.interceptor';
     SpeedDialModule,
     DialogModule,
     SidebarModule,
+    ConfirmDialogModule,
     ToastModule,
     TabMenuModule,
     ReactiveFormsModule,
     TableModule,
     ScrollPanelModule,
     AccordionModule,
+
     // ComponentsModule,
     CommonModule,
     ScrollToModule.forRoot(),

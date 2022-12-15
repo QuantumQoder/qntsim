@@ -6,7 +6,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 //import { error } from 'console';
 import * as go from 'gojs'
-import { MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, Message, MessageService } from 'primeng/api';
 import { ApiServiceService } from 'src/services/api-service.service';
 //import { Interface } from 'readline';
 import { ConditionsService } from 'src/services/conditions.service';
@@ -15,7 +15,7 @@ import { ConditionsService } from 'src/services/conditions.service';
   selector: 'app-drag',
   templateUrl: './drag.component.html',
   styleUrls: ['./drag.component.less'],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   encapsulation: ViewEncapsulation.None
 })
 export class DragComponent implements OnInit, AfterViewInit, OnChanges {
@@ -25,11 +25,11 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   app_id: any
   nodeParams: boolean
   link: boolean
-
+  tutorial: boolean;
   memory: any = {
     "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93
   }
-  popover2: string = "1.Click on component's name to modify its name." + "2.Click a component to modify its settings."
+  popover2: string = "Click on component's name to modify its name."
   cc: any = []
   nodeWithKey: any
   paramsSet = new Map()
@@ -171,105 +171,14 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     ]
   }
   links: any = [];
+  msgs: Message[] = [];
   application: any;
-  constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private _route: Router, private modal: NgbModal) { }
+  constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private _route: Router, private modal: NgbModal, private confirmationService: ConfirmationService) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log(this.myDiagram.nodes)
   }
   ngAfterViewInit(): void {
-    this.myDiagram.addDiagramListener("ChangedSelection", function (event) {
-      console.log("selection changed")
-    })
-    var nodesarray = this.savedModel.nodeDataArray
-    let linkArray = this.savedModel.linkDataArray
-    var nodereq
-    console.log(nodesarray)
-    var nodelength = nodesarray.length
-    // console.log(linkArray)
-    for (var i = 0; i < nodelength; i++) {
-      var type;
-      if (nodesarray[i].figure == "Ellipse") {
-        type = 'service'
-      } else {
-        type = 'end'
-      }
-      console.log(type)
-      var namevar = {
-        0: 'node1',
-        1: 'node2',
-        2: 'node3',
-        3: 'node4'
-      }
-      nodereq = {
-        "Name": namevar[i],
-        "Type": type,
-        "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
-        "memory": this.memory
-      }
-
-      this.nodes.push(nodereq)
-    }
-    let array = []
-    var linkreq
-    let chunk = 2;
-    for (var i = 0; i < linkArray.length; i++) {
-      var from = linkArray[i].from
-      var to = linkArray[i].to
-      let positiveFromkey = from.toString().substring(1)
-      // console.log(positivekey * 2)
-      let positivetoKey = to.toString().substring(1)
-      var fromKey = positiveFromkey - 1;
-      let toKey = positivetoKey - 1;
-      array.push(this.nodes[fromKey].Name)
-      array.push(this.nodes[toKey].Name)
-      console.log(array)
-      linkreq = {
-        Nodes: array,
-        Attenuation: Number(this.toolbox.get('attenuation')?.value),
-        Distance: Number(this.toolbox.get('distance')?.value),
-      }
-      array = []
-      this.links.push(linkreq)
-    }
-    this.topology = {
-      nodes: this.nodes,
-      quantum_connections: this.links,
-      classical_connections: this.cc,
-    }
-    var cc = []
-    for (var i = 0; i < this.nodes.length; i++) {
-      for (var j = 0; j < this.nodes.length; j++) {
-        cc.push([this.nodes[i].Name, this.nodes[j].Name]);
-      }
-    }
-    if (cc.length != 0) {
-      var distance
-      var delay
-      for (var i = 0; i < cc.length; i++) {
-        if (cc[i][0] == cc[i][1]) {
-          distance = 0;
-          delay = 0;
-        } else {
-          distance = 1000;
-          delay = 1000000000;
-        }
-        let ccreq = {
-          Nodes: cc[i],
-          Delay: delay,
-          Distance: distance
-        }
-        this.cc.push(ccreq)
-      }
-    }
-    console.log(this.links)
-    console.log(this.nodes)
-    this.load()
-  }
-
-  ngOnInit(): void {
-
-    // init for these samples -- you don't need to call this
     var $ = go.GraphObject.make;
     this.myDiagram = this.initDiagram()
 
@@ -338,11 +247,16 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
                 })
             )
         },
-        { locationSpot: go.Spot.Center },
+        {
+          movable: true,
+          copyable: true,
+          deletable: true, locationSpot: go.Spot.Center
+        },
         new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
         { selectable: true, selectionAdornmentTemplate: nodeSelectionAdornmentTemplate },
         { resizable: false, resizeObjectName: "PANEL", resizeAdornmentTemplate: nodeResizeAdornmentTemplate },
         { rotatable: false, rotateAdornmentTemplate: nodeRotateAdornmentTemplate },
+
         new go.Binding("angle").makeTwoWay(),
         // the main object is a Panel that surrounds a TextBlock with a Shape
         $(go.Panel, "Auto",
@@ -490,6 +404,116 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
             // { color: "grey", text: "VC", points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) }
           ])
         });
+    this.myDiagram.addDiagramListener("ChangedSelection", function (event) {
+      console.log("selection changed")
+    })
+    var nodesarray = this.savedModel.nodeDataArray
+    let linkArray = this.savedModel.linkDataArray
+    var nodereq
+    console.log(nodesarray)
+    var nodelength = nodesarray.length
+    // console.log(linkArray)
+    for (var i = 0; i < nodelength; i++) {
+      var type;
+      if (nodesarray[i].figure == "Ellipse") {
+        type = 'service'
+      } else {
+        type = 'end'
+      }
+      console.log(type)
+      var namevar = {
+        0: 'node1',
+        1: 'node2',
+        2: 'node3',
+        3: 'node4'
+      }
+      nodereq = {
+        "Name": namevar[i],
+        "Type": type,
+        "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
+        "memory": this.memory
+      }
+
+      this.nodes.push(nodereq)
+    }
+    let array = []
+    var linkreq
+    let chunk = 2;
+    for (var i = 0; i < linkArray.length; i++) {
+      var from = linkArray[i].from
+      var to = linkArray[i].to
+      let positiveFromkey = from.toString().substring(1)
+      // console.log(positivekey * 2)
+      let positivetoKey = to.toString().substring(1)
+      var fromKey = positiveFromkey - 1;
+      let toKey = positivetoKey - 1;
+      array.push(this.nodes[fromKey].Name)
+      array.push(this.nodes[toKey].Name)
+      console.log(array)
+      linkreq = {
+        Nodes: array,
+        Attenuation: Number(this.toolbox.get('attenuation')?.value),
+        Distance: Number(this.toolbox.get('distance')?.value),
+      }
+      array = []
+      this.links.push(linkreq)
+    }
+    this.topology = {
+      nodes: this.nodes,
+      quantum_connections: this.links,
+      classical_connections: this.cc,
+    }
+    var cc = []
+    for (var i = 0; i < this.nodes.length; i++) {
+      for (var j = 0; j < this.nodes.length; j++) {
+        cc.push([this.nodes[i].Name, this.nodes[j].Name]);
+      }
+    }
+    if (cc.length != 0) {
+      var distance
+      var delay
+      for (var i = 0; i < cc.length; i++) {
+        if (cc[i][0] == cc[i][1]) {
+          distance = 0;
+          delay = 0;
+        } else {
+          distance = 1000;
+          delay = 1000000000;
+        }
+        let ccreq = {
+          Nodes: cc[i],
+          Delay: delay,
+          Distance: distance
+        }
+        this.cc.push(ccreq)
+      }
+    }
+    console.log(this.links)
+    console.log(this.nodes)
+    this.load();
+    // document.getElementById("openModalButton")!.click();
+    // this.confirm();
+  }
+  confirm() {
+    this.confirmationService.confirm({
+      message: 'Do you want to proceed with tutorial?',
+      header: 'Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.tutorial = true;
+        this.msgs = [{ severity: 'info', summary: 'Confirmed', detail: 'You have accepted' }];
+      },
+      reject: () => {
+        this.tutorial = false;
+        this.msgs = [{ severity: 'info', summary: 'Rejected', detail: 'You have rejected' }];
+      }
+
+    });
+  }
+  ngOnInit(): void {
+
+    // init for these samples -- you don't need to call this
+
     this.app_id = localStorage.getItem('app_id')
     this.application = localStorage.getItem('app')
 
@@ -536,7 +560,8 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       'node3': new FormControl(''),
       'middlenode': new FormControl('')
     })
-    this.showBottomCenter()
+    this.showBottomCenter();
+    this.confirm();
     // this.load()
   }
   info_demo() {
@@ -748,6 +773,8 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message Content' });
   }
   parameters() {
+    this.spinner = true;
+    this.displayPosition = false
     this.app_id = this.con.getapp_id()
     console.log(this.app_id)
     console.log(typeof (this.app_id))
