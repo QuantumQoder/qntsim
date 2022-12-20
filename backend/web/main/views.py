@@ -69,7 +69,10 @@ def run(request):
         results = qsdc1(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["sequenceLength"]), appSettings["key"] )
     elif application == "teleportation":
         results = teleportation(topology, appSettings["sender"], appSettings["receiver"], complex(appSettings["amplitude1"]), complex(appSettings["amplitude2"]) )
-
+    elif application == "qsdc_teleportation":
+        results = qsdc_teleportation(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"])
+    elif application == "single_photon_qd":
+        results = single_photon_qd(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"])
     print(results)
     return render(request, f'apps/{application}/results.html', results)
 
