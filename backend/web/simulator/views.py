@@ -42,6 +42,11 @@ class RunApp(APIView):
             results = qsdc1(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["sequenceLength"]), appSettings["key"] )
         elif application == "teleportation":
             results = teleportation(topology, appSettings["sender"], appSettings["receiver"], complex(appSettings["amplitude1"]), complex(appSettings["amplitude2"]) )
+        elif application == "qsdc_teleportation":
+            results = qsdc_teleportation(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"])
+        elif application == "single_photon_qd":
+            print('inside')
+            results = single_photon_qd(topology, appSettings["sender"], appSettings["receiver"], appSettings["message1"],appSettings["message2"],appSettings["num_photons"], appSettings["attack"])
 
         # Add code for results here
         print('results', type(results))
