@@ -237,7 +237,7 @@ def qsdc_teleportation(network_config, sender, receiver, message):
     alice=network_topo.nodes[sender]
     bob = network_topo.nodes[receiver]
     qsdc_tel = QSDCTeleportation()
-    alice,bob,source_node_list=qsdc_tel.roles(alice,bob)
+    alice,bob,source_node_list=qsdc_tel.roles(alice,bob,len(message))
     tl.init()
     tl.run()
     results = qsdc_tel.run(alice,bob,message)

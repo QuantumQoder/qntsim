@@ -6,6 +6,7 @@ Timeline.bk=True
 from qntsim.topology.topology import Topology
 from qntsim.components.circuit import QutipCircuit
 import numpy as np
+import math
 
 
 class QSDCTeleportation():
@@ -21,8 +22,42 @@ class QSDCTeleportation():
         print('sender, receiver',sender.owner.name,receiver.owner.name)    
         return self.request_entanglements(sender,receiver,n)
     
+    def filter_entanglements(self, nodes, correlated=False):
+        print('filter entanglement')
+        for node in nodes[:len(nodes)-1]:
+            node_qm = node.timeline.quantum_manager
+            print("check0")
+            for info in node.resource_manager.memory_manager:
+                print('info', info)
+                try:
+                    index = info.memory.qstate_key
+                    pos = node_qm.get(index)
+                    states = pos.state
+                    qtc = QutipCircuit(2)
+                    if correlated:
+                        print('check1')
+                        if states[0]==states[3]==0:
+                            qtc.x(1)
+                            if states[1]==(2*int(relative_phase)-1)*states[2]:
+                                qtc.z(0)
+                        elif states[0]==(2*int(relative_phase)-1)*states[3]:
+                            qtc.z(0)
+                    else:
+                        print('check2')
+                        if states[1]==states[2]==0:
+                            qtc.x(1)
+                            if states[0]==(2*int(relative_phase)-1)*states[3]:
+                                qtc.z(0)
+                        elif states[1]==(2*int(relative_phase)-1)*states[2]:
+                            qtc.z(0)
+                    node_qm.run_circuit(qtc, pos.keys)
+                except:
+                    print('except')
+                    break
+        
     
-    def teleport(a, message="01001"):
+    
+    def teleport(self, a, message="01001"):
         """
         Method to perform the teleportation protocol based on the Yan-Zhang protocol
         
@@ -77,7 +112,7 @@ class QSDCTeleportation():
     # The function takes the other end node, list of the bell states at the end node and, the list of the x and z measurements for each bit of message and, returns the message that the block has decoded from the inputs it got.
 
 
-    def decode(b, indices, crx, crz):
+    def decode(self,b, indices, crx, crz):
         """
         Method to decode the message at the receiver node
         
@@ -112,6 +147,28 @@ class QSDCTeleportation():
             qtc.h(0)
             qtc.measure(0)
             result = b_qm.run_circuit(qtc, [index])
+            print('decode result', result)
             message = message+str(result.get(index))
         message = ''.join(chr(int(message[i:i+7], 2)) for i in range(0, len(message), 7))
         print("Received: ", message)
+        return message
+        
+        
+    def run(self, alice, bob, message):
+        
+        words = message.split()
+        msg = ''
+        for word in words:
+            msg += ''.join(bin(ord(w))[2:] for w in word)
+            msg += '0'+bin(ord(' '))[2:]
+        print('alice bob', alice, bob)
+        self.filter_entanglements([alice,bob])
+        indices, crx, crz = self.teleport(alice, message=message)
+        print("indices",indices, crx, crz)
+        decoded_msg = self.decode(bob,indices,crx,crz)
+        
+        res = {
+            "input_message":message,
+            "output_message":decoded_msg
+        }
+        return res
