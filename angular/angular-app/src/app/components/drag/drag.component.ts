@@ -1,5 +1,5 @@
 import { HttpHeaders } from '@angular/common/http';
-import { AfterViewInit, Component, OnChanges, OnInit, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnChanges, OnInit, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -29,6 +29,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   memory: any = {
     "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93
   }
+  step: any
   popover2: string = "Click on component's name to modify its name."
   cc: any = []
   nodeWithKey: any
@@ -173,10 +174,16 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   links: any = [];
   msgs: Message[] = [];
   application: any;
+  qtel: any;
+  spqd: any;
   constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private _route: Router, private modal: NgbModal, private confirmationService: ConfirmationService) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log(this.myDiagram.nodes)
+  }
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.step = 0;
   }
   ngAfterViewInit(): void {
     var $ = go.GraphObject.make;
@@ -407,92 +414,93 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.myDiagram.addDiagramListener("ChangedSelection", function (event) {
       console.log("selection changed")
     })
-    var nodesarray = this.savedModel.nodeDataArray
-    let linkArray = this.savedModel.linkDataArray
-    var nodereq
-    console.log(nodesarray)
-    var nodelength = nodesarray.length
-    // console.log(linkArray)
-    for (var i = 0; i < nodelength; i++) {
-      var type;
-      if (nodesarray[i].figure == "Ellipse") {
-        type = 'service'
-      } else {
-        type = 'end'
-      }
-      console.log(type)
-      var namevar = {
-        0: 'node1',
-        1: 'node2',
-        2: 'node3',
-        3: 'node4'
-      }
-      nodereq = {
-        "Name": namevar[i],
-        "Type": type,
-        "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
-        "memory": this.memory
-      }
+    // var nodesarray = this.savedModel.nodeDataArray
+    // let linkArray = this.savedModel.linkDataArray
+    // var nodereq
+    // console.log(nodesarray)
+    // var nodelength = nodesarray.length
+    // // console.log(linkArray)
+    // for (var i = 0; i < nodelength; i++) {
+    //   var type;
+    //   if (nodesarray[i].figure == "Ellipse") {
+    //     type = 'service'
+    //   } else {
+    //     type = 'end'
+    //   }
+    //   console.log(type)
+    //   var namevar = {
+    //     0: 'node1',
+    //     1: 'node2',
+    //     2: 'node3',
+    //     3: 'node4'
+    //   }
+    //   nodereq = {
+    //     "Name": namevar[i],
+    //     "Type": type,
+    //     "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
+    //     "memory": this.memory
+    //   }
 
-      this.nodes.push(nodereq)
-    }
-    let array = []
-    var linkreq
-    let chunk = 2;
-    for (var i = 0; i < linkArray.length; i++) {
-      var from = linkArray[i].from
-      var to = linkArray[i].to
-      let positiveFromkey = from.toString().substring(1)
-      // console.log(positivekey * 2)
-      let positivetoKey = to.toString().substring(1)
-      var fromKey = positiveFromkey - 1;
-      let toKey = positivetoKey - 1;
-      array.push(this.nodes[fromKey].Name)
-      array.push(this.nodes[toKey].Name)
-      console.log(array)
-      linkreq = {
-        Nodes: array,
-        Attenuation: Number(this.toolbox.get('attenuation')?.value),
-        Distance: Number(this.toolbox.get('distance')?.value),
-      }
-      array = []
-      this.links.push(linkreq)
-    }
-    this.topology = {
-      nodes: this.nodes,
-      quantum_connections: this.links,
-      classical_connections: this.cc,
-    }
-    var cc = []
-    for (var i = 0; i < this.nodes.length; i++) {
-      for (var j = 0; j < this.nodes.length; j++) {
-        cc.push([this.nodes[i].Name, this.nodes[j].Name]);
-      }
-    }
-    if (cc.length != 0) {
-      var distance
-      var delay
-      for (var i = 0; i < cc.length; i++) {
-        if (cc[i][0] == cc[i][1]) {
-          distance = 0;
-          delay = 0;
-        } else {
-          distance = 1000;
-          delay = 1000000000;
-        }
-        let ccreq = {
-          Nodes: cc[i],
-          Delay: delay,
-          Distance: distance
-        }
-        this.cc.push(ccreq)
-      }
-    }
-    console.log(this.links)
-    console.log(this.nodes)
-    this.load();
+    //   this.nodes.push(nodereq)
+    // }
+    // let array = []
+    // var linkreq
+    // let chunk = 2;
+    // for (var i = 0; i < linkArray.length; i++) {
+    //   var from = linkArray[i].from
+    //   var to = linkArray[i].to
+    //   let positiveFromkey = from.toString().substring(1)
+    //   // console.log(positivekey * 2)
+    //   let positivetoKey = to.toString().substring(1)
+    //   var fromKey = positiveFromkey - 1;
+    //   let toKey = positivetoKey - 1;
+    //   array.push(this.nodes[fromKey].Name)
+    //   array.push(this.nodes[toKey].Name)
+    //   console.log(array)
+    //   linkreq = {
+    //     Nodes: array,
+    //     Attenuation: Number(this.toolbox.get('attenuation')?.value),
+    //     Distance: Number(this.toolbox.get('distance')?.value),
+    //   }
+    //   array = []
+    //   this.links.push(linkreq)
+    // }
+    // this.topology = {
+    //   nodes: this.nodes,
+    //   quantum_connections: this.links,
+    //   classical_connections: this.cc,
+    // }
+    // var cc = []
+    // for (var i = 0; i < this.nodes.length; i++) {
+    //   for (var j = 0; j < this.nodes.length; j++) {
+    //     cc.push([this.nodes[i].Name, this.nodes[j].Name]);
+    //   }
+    // }
+    // if (cc.length != 0) {
+    //   var distance
+    //   var delay
+    //   for (var i = 0; i < cc.length; i++) {
+    //     if (cc[i][0] == cc[i][1]) {
+    //       distance = 0;
+    //       delay = 0;
+    //     } else {
+    //       distance = 1000;
+    //       delay = 1000000000;
+    //     }
+    //     let ccreq = {
+    //       Nodes: cc[i],
+    //       Delay: delay,
+    //       Distance: distance
+    //     }
+    //     this.cc.push(ccreq)
+    //   }
+    // }
+    // console.log(this.links)
+    // console.log(this.nodes)
+    // this.load();
     // document.getElementById("openModalButton")!.click();
     // this.confirm();
+
   }
   confirm() {
     this.confirmationService.confirm({
@@ -500,7 +508,9 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       header: 'Confirmation',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
+        this.step = 1
         this.tutorial = true;
+        console.log(this.step)
         this.msgs = [{ severity: 'info', summary: 'Confirmed', detail: 'You have accepted' }];
       },
       reject: () => {
@@ -559,10 +569,25 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       'node2': new FormControl(''),
       'node3': new FormControl(''),
       'middlenode': new FormControl('')
-    })
+    });
+    this.spqd = this.fb.group({
+      'sender': new FormControl(''),
+      'receiver': new FormControl(''),
+      'message1': new FormControl(''),
+      'message2': new FormControl(''),
+      'num_photons': new FormControl(''),
+      'attacker': new FormControl('false')
+    });
+
+    this.qtel = this.fb.group({
+      'sender': new FormControl(''),
+      'receiver': new FormControl(''),
+      'message': new FormControl('')
+    });
     this.showBottomCenter();
-    this.confirm();
-    // this.load()
+    // this.confirm();
+    // this.load();
+    // this.step = '2'
   }
   info_demo() {
     this.info = true;
@@ -671,8 +696,8 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       this.savedModel.nodeDataArray[indexFromKey].text = this.toolbox.get('name')?.value
       // console.log(this.savedModel.nodeDataArray[indexFromKey].text)
       var allNodes = this.myDiagram.nodes
-      var nodeLinkStr
-
+      var nodeLinkStr = this.myDiagram.links
+      console.log(nodeLinkStr)
       // while (allNodes.next()) {
       //   var i = 0;
       //   i += 1;
@@ -842,6 +867,23 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           message: this.pingPong.get('message')?.value,
         }
         break;
+      case 8:
+        this.appSettings = {
+          sender: this.spqd.get('sender')?.value,
+          receiver: this.spqd.get('receiver')?.value,
+          message1: this.spqd.get('message1')?.value,
+          message2: this.spqd.get('message2')?.value,
+          num_photons: this.spqd.get('num_photons')?.value,
+          attack: this.spqd.get('attacker')?.value
+        }
+        break;
+      case 9:
+        this.appSettings = {
+          sender: this.qtel.get('sender')?.value,
+          receiver: this.qtel.get('receiver')?.value,
+          message: this.qtel.get('message')?.value,
+        }
+        break;
     }
     console.log(this.appSettings)
     var req = {
@@ -966,7 +1008,9 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   reload() {
     this.savedModel = this.savedModel1;
     this.nodes = []
-    this.links = []
+    this.links = [];
+    this.toolbox.reset();
+    this.toolbox.get('noOfMemories')?.patchValue('500')
     this.load();
   }
   deleteLink(e: any, obj: any) {
@@ -997,6 +1041,19 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   }
   getSpinner() {
     return this.spinner
+  }
+  next(data: any) {
+    this.step = data
+    console.log(this.step)
+    if (data == 2 || data == 3) {
+      var position = document.getElementById('myPaletteDiv')?.getBoundingClientRect()
+      console.log(position?.top);
+      console.log(position?.left);
+      var tutorial = document.getElementById('tutorial2')!
+      // console.log(tutorial.left)
+      console.log(tutorial);
+      // tutorial.style.left = position?.left + '%'
+    }
   }
 }
 function showToolTip(obj: any, diagram: any, tool: any) {

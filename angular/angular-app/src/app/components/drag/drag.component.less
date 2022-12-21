@@ -79,7 +79,7 @@
 
 .btn-group1 {
     display: flex !important;
-    align-items: flex-start;
+    align-items: flex-end !important;
     // align-items: flex-end;
 }
 
@@ -111,6 +111,13 @@ small {
     margin-bottom: 80px;
 }
 
+.palette {
+    position: relative;
+}
+
+.diagram {
+    position: relative;
+}
 
 
 // @keyframes spinner {
@@ -214,6 +221,10 @@ small {
     animation: magenta 1.5s infinite;
 }
 
+#sample {
+    position: relative;
+}
+
 .magenta:after {
     position: absolute;
     content: "";
@@ -306,4 +317,216 @@ small {
     letter-spacing: 0.15em;
     font-weight: 100;
     filter: drop-shadow(2px 2px 15px #ffffff70);
+}
+
+
+
+#tutorial1 {
+    position: absolute;
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    z-index: 100001;
+    height: 150px;
+    width: 200px;
+    background: #3B71CA;
+    border-radius: 10%;
+    left: 12%;
+    bottom: 15%;
+    animation: fadeIn 2s ease-in;
+}
+
+// @media only screen and (min-width:968px) {
+//     #tutorial1 {
+//         bottom: 18% !important;
+//     }
+
+//     #tutorial2 {
+//         left: 12% !important;
+//         top: 26% !important;
+//         width: 20% !important;
+//     }
+
+//     #tutorial3 {
+//         left: 12% !important;
+//         top: 40% !important;
+//         width: 20% !important;
+//     }
+// }
+
+// @media screen and (min-width:900px) {
+//     #tutorial1 {
+//         bottom: 20% !important;
+//     }
+
+//     #tutorial2 {
+//         left: 12% !important;
+//         top: 25% !important;
+//         width: 20% !important;
+//     }
+
+//     #tutorial3 {
+//         left: 12% !important;
+//         top: 39% !important;
+//         width: 20% !important;
+//     }
+// }
+
+// @media screen and (min-width:1080px) {
+//     #tutorial1 {
+//         bottom: 20% !important;
+//     }
+
+//     #tutorial2 {
+//         left: 12% !important;
+//         top: 25% !important;
+//         width: 20% !important;
+//     }
+
+//     #tutorial3 {
+//         left: 12% !important;
+//         top: 39% !important;
+//         width: 20% !important;
+//     }
+// }
+
+#tutorial2 {
+    position: absolute;
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    z-index: 100001;
+    height: 50px;
+    width: 240px;
+    background: #3B71CA;
+    border-radius: 8px;
+    left: 140px !important;
+    top: 7%;
+    animation: fadeIn 2s ease-in;
+}
+
+#tutorial3 {
+    position: absolute;
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    z-index: 100001;
+    height: 50px;
+    width: 240px;
+    background: #3B71CA;
+    border-radius: 8px;
+    left: 140px !important;
+    top: 30%;
+    // bottom: 25%;
+    animation: fadeIn 2s ease-in;
+}
+
+#tutorial4 {
+    position: absolute;
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    z-index: 100001;
+    height: 50px;
+    width: 280px;
+    background: #3B71CA;
+    border-radius: 8px;
+    left: 140px !important;
+    top: 45%;
+    // bottom: 25%;
+    animation: fadeIn 2s ease-in;
+}
+
+#tutorial5 {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+    z-index: 3;
+    height: 450px;
+    width: 800px;
+    background: red;
+    border-radius: 10px;
+}
+
+// .img-container {
+//     height: 35%;
+//     width: 45%;
+// }
+
+#tutorial5 img {
+    position: relative;
+    // top: 10%;
+    left: 6%;
+    height: 350px;
+    width: 700px;
+    aspect-ratio: 18/9;
+    // object-fit: cover;
+    object-position: 80% 80%;
+}
+
+h6 {
+    padding: 10px;
+    color: white;
+}
+
+.btn-custom:hover {
+    color: yellow !important;
+    background-color: #072155 !important;
+}
+
+
+.btn-custom1 {
+    position: absolute;
+    bottom: 10%;
+    right: 10%;
+}
+
+.btn-custom2 {
+    position: absolute;
+    bottom: 23%;
+    // right: 7%;
+}
+
+#tutorial2 {
+    position: absolute;
+
+}
+
+#tutorial2::after {
+    content: '';
+    position: absolute;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 20px solid #3B71CA;
+    z-index: 100002;
+    right: 100%;
+    top: 30%;
+}
+
+#tutorial3::after {
+    content: '';
+    position: absolute;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 20px solid #3B71CA;
+    z-index: 100002;
+    right: 100%;
+    top: 30%;
+}
+
+#tutorial4::after {
+    content: '';
+    position: absolute;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 20px solid #3B71CA;
+    z-index: 100002;
+    right: 100%;
+    top: 30%;
 }

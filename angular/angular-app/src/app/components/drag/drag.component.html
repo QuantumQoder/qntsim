@@ -92,19 +92,19 @@
             </ng-template>
         </p-dialog>
         <div>
-            <div class="row row1" style="padding-left: 3%;">
-                <div class="col-md-1">
+            <div class="row row1">
+                <div style="padding-left: 2%;" class="d-flex align-items-end justify-content-start col-2 ">
                     <!-- <h4 class="toolbox">Toolbox</h4> -->
-                    <h2 class="display-3">{{application|uppercase}}</h2>
+                    <h2 class="display-4 ">{{application|uppercase}}</h2>
                     <!-- <p class="small text-muted">Click a component to change its settings.</p> -->
                 </div>
-                <div class="d-flex align-items-center justify-content-center col-md-9">
-                    <h3 class="display-4"> <small>Configure the quantum
+                <div class="d-flex align-items-center justify-content-center col-8">
+                    <h3 class="display-4"> <small>Configure the
                             network
                             topology</small></h3>
                 </div>
 
-                <div class="d-flex align-items-end justify-content-between btn-group1 col-md-2">
+                <div class="d-flex justify-content-between align-items-end btn-group1 col-2">
                     <button class="btn btn-outline-primary btn-sm" (click)="info_demo()"><i
                             class="pi pi-question"></i></button>
                     <button class="btn btn-outline-primary btn-sm" (click)="reload()"><i
@@ -115,20 +115,56 @@
         </div>
         <!-- <div *ngIf="spinner" class="lds-dual-ring"></div> -->
         <div id="sample" style="width: 100%;">
-            <div *ngIf="!spinner" style="width: 99%; display: flex">
-                <div id="myPaletteDiv" class="col-4"
-                    style="width: 120px; margin: 2px;margin-left: 30px; background-color: white; border: outset 1px black"
-                    ngbPopover="Drag and drop components to create the topology graph." triggers="mouseenter:mouseleave"
-                    popoverTitle="Tips!" [openDelay]="100" popoverClass="popover1" [closeDelay]="200">
+            <div *ngIf="step == 2" id="tutorial2" class="body2 row">
+                <div>
+                    <h6>This is Service Node.
+                    </h6>
                 </div>
-                <div id="myDiagramDiv" class="col-8" style=" flex-grow: 1; height:
-                500px;margin-left: 10px; border: outset 1px black">
+                <div class="d-flex justify-content-end align-items-end btn-custom2">
+                    <button class="btn btn-primary btn-sm btn-custom" (click)="next(3)">Next</button>
+                </div>
+            </div>
+            <div *ngIf="step == 3" id="tutorial3" class="body3 row">
+                <div>
+                    <h6>This is End Node.</h6>
+                </div>
+                <div class="d-flex justify-content-end align-items-end btn-custom2">
+                    <button class="btn btn-primary btn-sm btn-custom" (click)="next(4)">Next</button>
+                </div>
+            </div>
+            <div *ngIf="step == 4" id="tutorial4" class="body4 row">
+                <div>
+                    <h6>This is Virtual Connection.</h6>
+                </div>
+                <div class="d-flex justify-content-end align-items-end btn-custom2">
+                    <button class="btn btn-primary btn-sm btn-custom" (click)="next(5)">Next</button>
+                </div>
+            </div>
+            <div *ngIf="step == 5" id="tutorial5" class="body5 row">
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-primary" (click)="next(7)">X</button>
+                </div>
+                <br>
+                <img src="assets/gifs/tutorial.gif" alt="">
+                <div class="d-flex justify-content-end m-3">
+                    <button class="btn btn-custom">Next</button>
+                </div>
+                <br>
+
+                <!-- <button class="btn-sm btn-outlined-"></button> -->
+            </div>
+            <div *ngIf="!spinner" style="width: 99%; display: flex">
+                <div id="myPaletteDiv" class="col-4" class="palette"
+                    style="width: 120px; background-color: white; border: outset 1px black">
+                </div>
+                <div id="myDiagramDiv" class="col-8 diagram" style=" flex-grow: 1; height:
+                500px; border: outset 1px black">
                 </div>
             </div>
         </div>
         <p-dialog header="Set Application Parameters" [(visible)]="displayPosition" [position]="position" [modal]="true"
             [style]="{width: '80vw'}" [draggable]="true" [resizable]="false">
-            <div *ngIf="app_id==2" [formGroup]="e2e">
+            <div *ngIf="app_id==1" [formGroup]="e2e">
                 <div class="row">
                     <div class="col">
                         <label for="serviceNode">Sender</label>&nbsp;
@@ -181,7 +217,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="app_id==1" class="row" [formGroup]="e91">
+            <div *ngIf="app_id==2" class="row" [formGroup]="e91">
                 <div class="col">
                     <label for="serviceNode">Sender</label>&nbsp;
 
@@ -208,7 +244,7 @@
                 </div>
 
             </div>
-            <div *ngIf="app_id==4" [formGroup]="teleportation">
+            <div *ngIf="app_id==3" [formGroup]="teleportation">
                 <div class="row">
                     <div class="col">
                         <label for="serviceNode">Sender</label>&nbsp;
@@ -240,7 +276,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="app_id==3" [formGroup]="ghz">
+            <div *ngIf="app_id==4" [formGroup]="ghz">
                 <div class="row">
                     <div class="col">
                         <label for="serviceNode">Node 1</label>&nbsp;
@@ -302,7 +338,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="app_id==7" [formGroup]="pingPong">
+            <div *ngIf="app_id==6" [formGroup]="pingPong">
                 <div class="row">
                     <div class="col">
                         <label for="serviceNode">Sender</label>&nbsp;
@@ -330,7 +366,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="app_id==6" class="row" [formGroup]="ip1">
+            <div *ngIf="app_id==7" class="row" [formGroup]="ip1">
                 <div class="col">
                     <label for="serviceNode">Sender</label>&nbsp;
                     <select class="form-control" formControlName="sender">
@@ -347,6 +383,68 @@
                 </div>
                 <div class="col">
                     <label for="endNode">Bit String</label>&nbsp;
+                    <input type="text" class="form-control" formControlName="message">
+                </div>
+
+            </div>
+            <div *ngIf="app_id==8" [formGroup]="spqd">
+                <div class="row">
+                    <div class="col">
+                        <label for="serviceNode">Sender</label>&nbsp;
+                        <select class="form-control" formControlName="sender">
+                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="endNode">Receiver</label>&nbsp;
+                        <select class="form-control" formControlName="receiver">
+                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="endNode">Message 1</label>&nbsp;
+                        <input type="text" class="form-control" formControlName="message1">
+                    </div>
+                    <div class="col">
+                        <label for="endNode">Message 2</label>&nbsp;
+                        <input type="text" class="form-control" formControlName="message2">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="endNode">Num Photons</label>&nbsp;
+                        <input type="number" class="form-control" formControlName="num_photons">
+                    </div>
+                    <div class="col">
+                        <label for="endNode">Attacker</label>&nbsp;
+                        <select class="form-control" formControlName="attacker">
+                            <option value="true">true</option>
+                            <option value="false">false</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="app_id==9" class="row" [formGroup]="qtel">
+                <div class="col">
+                    <label for="serviceNode">Sender</label>&nbsp;
+                    <select class="form-control" formControlName="sender">
+                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="endNode">Receiver</label>&nbsp;
+                    <select class="form-control" formControlName="receiver">
+                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="endNode">Message</label>&nbsp;
                     <input type="text" class="form-control" formControlName="message">
                 </div>
 
@@ -414,7 +512,31 @@
         </p-sidebar>
         <p-confirmDialog [style]="{width: '50vw'}" [baseZIndex]="10000"
             rejectButtonStyleClass="p-button-text"></p-confirmDialog>
-
-
+        <div *ngIf="step == 1" id="tutorial1" class="body1">
+            <div class="d-flex">
+                <h6>You can drag and drop an object to start building topology.
+                </h6>
+            </div>
+            <div class="d-flex justify-content-end align-items-end btn-custom1">
+                <button class="btn btn-primary-sm btn-custom" (click)="next(2)">Next</button>
+            </div>
+        </div>
+        <!-- <div *ngIf="step =='2'" id="tutorial2" class="body2 row">
+            <div>
+                <h6>This is Service Node.
+                </h6>
+            </div>
+            <div class="d-flex justify-content-end align-items-end btn-custom2">
+                <button class="btn btn-primary-sm btn-custom" (click)="next('3')">Next</button>
+            </div>
+        </div>
+        <div *ngIf="step =='3'" id="tutorial3" class="body3 row">
+            <div>
+                <h6>This is End Node.</h6>
+            </div>
+            <div class="d-flex justify-content-end align-items-end btn-custom2">
+                <button class="btn btn-primary-sm btn-custom" (click)="next('3')">Next</button>
+            </div>
+        </div> -->
     </div>
 </div>
