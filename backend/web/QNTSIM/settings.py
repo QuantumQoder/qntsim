@@ -82,10 +82,10 @@ WSGI_APPLICATION = 'QNTSIM.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres1',
-        'USER': 'postgres1',
-        'PASSWORD': 'postgres1',
-        'HOST': 'db1',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
         'PORT': 5432
     }
 }

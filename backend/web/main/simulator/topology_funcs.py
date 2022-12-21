@@ -14,6 +14,8 @@ from main.simulator.app.ip1 import *
 from main.simulator.app.ping_pong import *
 from main.simulator.app.qsdc1 import *
 from main.simulator.app.teleportation import *
+from main.simulator.app.qsdc_teleportation import *
+from main.simulator.app.single_photon_qd import *
 from main.simulator.app.utils import *
 
 def graph_topology(network_config_json):
@@ -223,6 +225,38 @@ def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
     tl.init()
     tl.run()
     results = tel.run(alice,bob,amplitude1,amplitude2)
+    report={}
+    report["application"]=results
+    report=network_graph(network_topo,source_node_list,report)
+    print(report)
+    return report
+
+def qsdc_teleportation(network_config, sender, receiver, message):
+    
+    network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
+    alice=network_topo.nodes[sender]
+    bob = network_topo.nodes[receiver]
+    qsdc_tel = QSDCTeleportation()
+    alice,bob,source_node_list=qsdc_tel.roles(alice,bob)
+    tl.init()
+    tl.run()
+    results = qsdc_tel.run(alice,bob,message)
+    report={}
+    report["application"]=results
+    report=network_graph(network_topo,source_node_list,report)
+    print(report)
+    return report
+
+def single_photon_qd(network_config, sender, receiver, message1, message2, num_photons, attack):
+    
+    network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
+    alice=network_topo.nodes[sender]
+    bob = network_topo.nodes[receiver]
+    spqd = SinglePhotonQD()
+    alice,bob,source_node_list=spqd.roles(alice,bob,n=10)
+    tl.init()
+    tl.run()
+    results = spqd.run(alice,bob,message1, message2, num_photons, attack)
     report={}
     report["application"]=results
     report=network_graph(network_topo,source_node_list,report)

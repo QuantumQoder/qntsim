@@ -10,7 +10,7 @@ def throughput(network_topo,nodelist,t,fc_throughl,pc_throughl,nc_throughl):
     for src in nodelist:
 
         src=src
-        print(t,network_topo.nodes[src].network_manager.requests.items())
+        # print(t,network_topo.nodes[src].network_manager.requests.items())
 
         for ReqId,ResObj in network_topo.nodes[src].network_manager.requests.items():
             if ResObj.start_time>=t*1e12 and ResObj.start_time< (t+1)*1e12 :
@@ -32,11 +32,11 @@ def throughput(network_topo,nodelist,t,fc_throughl,pc_throughl,nc_throughl):
                     elif ResObj.status=='APPROVED':
                         ap +=1
                                         
-                print("through put map , src ",src,network_topo.nodes[src].resource_manager.reservation_id_to_memory_map)
+                # print("through put map , src ",src,network_topo.nodes[src].resource_manager.reservation_id_to_memory_map)
                 
     ctotal1=pc+ap+rj           
-    print("\n")
-    print(f'At {t} secs ctotal:{ctotal} pc:{pc},fc:{ap},nc:{rj}')
+    # print("\n")
+    # print(f'At {t} secs ctotal:{ctotal} pc:{pc},fc:{ap},nc:{rj}')
     
     
     try:
@@ -46,14 +46,14 @@ def throughput(network_topo,nodelist,t,fc_throughl,pc_throughl,nc_throughl):
         nc_throughl.append(nc_through*100)
         fc_through=(ap)/(ctotal)
         fc_throughl.append(fc_through*100)
-        print(f' pc_through:{pc_through*100}%,nc_through:{nc_through*100}%,fc_through:{fc_through*100}%')
+        # print(f' pc_through:{pc_through*100}%,nc_through:{nc_through*100}%,fc_through:{fc_through*100}%')
         return fc_throughl , pc_throughl , nc_throughl 
 
     except ZeroDivisionError:
         fc_throughl.append(0)
         pc_throughl.append(0)
         nc_throughl.append(0)
-        print(f'No Requests at {t} secs') 
+        # print(f'No Requests at {t} secs') 
         return fc_throughl , pc_throughl , nc_throughl         
                 
 
@@ -70,11 +70,11 @@ def throughput_cal(fc_throughl,pc_throughl,nc_throughl):
     plt.title('Throughput')
     for t in range(21):
         fc_through,pc_through,nc_through=0.0,0.0,0.0
-        print("\n")
+        # print("\n")
         throughput(t)
-        print("fc,pc,nc",fc_through,pc_through,nc_through)
+        # print("fc,pc,nc",fc_through,pc_through,nc_through)
         y.append(t)
-    print("values",fc_throughl,pc_throughl,nc_throughl,y)
+    # print("values",fc_throughl,pc_throughl,nc_throughl,y)
     plt.plot(y,fc_throughl,color='g', label = 'full')
     plt.plot(y,pc_throughl,color='b', label = 'partial')
     plt.plot(y,nc_throughl,color='r', label = 'incomplete')   
@@ -108,7 +108,7 @@ def calclatency(network_topo,nodelist,t,latencyl):
                 starttime=ResObj.start_time*1e-12
                 
                 maxtime=0
-                print('Starttime', starttime,ResObj.initiator, ResObj.responder)
+                # print('Starttime', starttime,ResObj.initiator, ResObj.responder)
                 #print('check',network_topo.nodes[src].resource_manager.reservation_id_to_memory_map.keys())
                 if ReqId in network_topo.nodes[src].resource_manager.reservation_id_to_memory_map.keys():
                     #memId=self.nodes[node].resource_manager.reservation_to_memory_map.get(ReqId)
@@ -129,12 +129,12 @@ def calclatency(network_topo,nodelist,t,latencyl):
 
     if len(time)>0:
         avgtime=sum(time)/len(time)
-        print('Average latency',avgtime)
+        # print('Average latency',avgtime)
         latencyl.append(avgtime)
         return latencyl
         
     else:
-        print('Exception error No entanglements')
+        # print('Exception error No entanglements')
         latencyl.append(-1)
         return latencyl
        
@@ -168,7 +168,7 @@ def calcfidelity(network_topo,nodelist,t,fidelityl):
                 if ReqId in network_topo.nodes[src].resource_manager.reservation_id_to_memory_map.keys():
 
                     memId = network_topo.nodes[src].resource_manager.reservation_id_to_memory_map.get(ReqId)
-                    print(memId)
+                    # print(memId)
                     
                     for info in network_topo.nodes[src].resource_manager.memory_manager:
 
@@ -182,10 +182,10 @@ def calcfidelity(network_topo,nodelist,t,fidelityl):
     if len(fid)>0:
 
         avgfid=sum(fid)/len(fid)
-        print("avgfid",avgfid)
+        # print("avgfid",avgfid)
         fidelityl.append(avgfid)
         return fidelityl
     else:
-        print("exception error no entangled states")
+        # print("exception error no entangled states")
         fidelityl.append(-1)
         return fidelityl

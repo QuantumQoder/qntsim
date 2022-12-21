@@ -6,6 +6,8 @@ Timeline.bk=True
 from qntsim.topology.topology import Topology
 from qntsim.components.circuit import QutipCircuit
 import numpy as np
+from numpy.random import randint
+from qiskit import *
 
 
 class SinglePhotonQD():
@@ -23,7 +25,7 @@ class SinglePhotonQD():
         return self.request_entanglements(sender,receiver,n)
     
     
-    def bob_encodes(message="0010", N=5):
+    def bob_encodes(self, message="0010", N=5):
         """
         Method to encode the message into the photons based on the protocol by Ji and Zhang
         
@@ -40,7 +42,7 @@ class SinglePhotonQD():
             List of <QuantumCircuit> objects, each representing the N photons in a
             batch
         """
-        
+        print('Bob encodes')
         initials, circuits = [], []
         msg_len = len(message)
         for i in range(N):
@@ -73,7 +75,7 @@ class SinglePhotonQD():
     # In[3]:
 
 
-    def alice_checks(initials, circuits, device="aer_simulator"):
+    def alice_checks(self,initials, circuits, device="aer_simulator"):
         """
         Method to check for an eavesdropper in the channels
         
@@ -131,7 +133,7 @@ class SinglePhotonQD():
     # In[4]:
 
 
-    def bob_determines(initials, message, bases, counts):
+    def bob_determines(self,initials, message, bases, counts):
         """
         Method to estimate the fidelity of the channels
         
@@ -181,7 +183,7 @@ class SinglePhotonQD():
     # In[5]:
 
 
-    def alice_encodes(initial, circuit, message="0100", device="aer_simulator"):
+    def alice_encodes(self,initial, circuit, message="0100", device="aer_simulator"):
         """
         Method to encode the second message into the photon chosen for
         communication and, also decode the message send by the first party
@@ -239,7 +241,7 @@ class SinglePhotonQD():
     # In[6]:
 
 
-    def bob_decodes(measure, message="0010"):
+    def bob_decodes(self,measure, message="0010"):
         """
         Method to decode the second message from the measurement outcome and the
         first message
@@ -265,4 +267,47 @@ class SinglePhotonQD():
         
         return string
 
+    
+    
+    def run(self, alice, bob, message1, message2, n, attack):
         
+        msg1, msg2 = [],[]
+        for i in message1:
+            msg1.append(bin(ord(i))[2:])
+        for i in message2:
+            msg2.append(bin(ord(i))[2:])
+        
+        string1, string2 = [],[]
+        print('messages', n, msg1,msg2)
+        for i in range(len(msg1)):
+            print('message', msg1[i])
+            initials, circuits = self.bob_encodes(message = msg1[i], N=n)
+            if attack:
+                for circ in circuits:
+                    circ.barrier()
+                    circ.measure(range(circ.num_qubits), range(circ.num_qubits))
+            initial, circuit, initials, bases, counts = self.alice_checks(initials, circuits)
+            if self.bob_determines(initials, msg1[i], bases, counts):
+                measure, str1 = self.alice_encodes(initial=initial, circuit=circuit, message=msg2[i])
+                str2 = self.bob_decodes(measure, message=msg1[i])
+            else:
+                print("Transmission compromised")
+                break
+            string1.append(str1)
+            string2.append(str2)
+            #print(str1, str2)
+        string1 = ''.join(chr(int(string, 2)) for string in string1)
+        string2 = ''.join(chr(int(string, 2)) for string in string2)
+        print("Receiver decodes: ", string1)
+        print("Sender decodes: ", string2)
+        
+        res ={
+            "senders_msg": message1,
+            "receivers_msg" : message2,
+            "attack" : attack,
+            "receiver_decodes" : string1,
+            "sender_decodes" : string2
+                
+        }
+        print("result",res)
+        return res

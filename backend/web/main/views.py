@@ -51,8 +51,8 @@ def run(request):
     application = request.POST['application']
     appSettings = json.loads(request.POST['appSettings'])
     
-    print(f"Running applications: {application}")
-    
+    # print(f"Running applications: {application}")
+    # print("hhhh")
     results = {}
 
     if application == "e91":
@@ -72,8 +72,9 @@ def run(request):
     elif application == "qsdc_teleportation":
         results = qsdc_teleportation(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"])
     elif application == "single_photon_qd":
-        results = single_photon_qd(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"])
-    print(results)
+        print('inside')
+        results = single_photon_qd(topology, appSettings["sender"], appSettings["receiver"], appSettings["message1"],appSettings["message2"],appSettings["num_photons"])
+    print("results = ",results)
     return render(request, f'apps/{application}/results.html', results)
 
 @csrf_exempt
