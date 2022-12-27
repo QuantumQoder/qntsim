@@ -32,7 +32,8 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   qsdc1: any;
   pingpong: any;
   ip1: any;
-  infoqsdc: boolean
+  infoqsdc: boolean;
+  qsdct: boolean;
   constructor(private _formBuilder: FormBuilder, private con: ConditionsService, public api: ApiServiceService,
     private router: Router) { }
   ngAfterViewInit(): void {
@@ -50,7 +51,7 @@ export class ResultsComponent implements OnInit, AfterViewInit {
     }
 
     switch (this.app_id) {
-      case 1:
+      case 2:
         var e91 = this.con.getResult()
         this.e91 = e91.application
         console.log(this.e91)
@@ -76,34 +77,34 @@ export class ResultsComponent implements OnInit, AfterViewInit {
         this.e91.receiver_keys = receiverKeys.join('')
         this.items = [
           { label: 'Key Bits', icon: 'pi pi-fw pi-home' },
-          { label: 'Statistics', icon: 'pi pi-fw pi-pencil' },
+          // { label: 'Statistics', icon: 'pi pi-fw pi-pencil' },
           { label: 'Key Generation', icon: 'pi pi-fw pi-calendar' }
         ];
         this.activeItem = this.items[0]
         break;
-      case 2:
+      case 1:
         var e2e = this.con.getResult();
         this.e2e = e2e.application;
         break;
-      case 3:
+      case 4:
         var ghz = this.con.getResult();
         this.ghz = ghz.application;
         break;
-      case 4:
+      case 3:
         var tele = this.con.getResult();
         this.tel = tele.application;
         break;
       case 5:
         this.qsdc1 = this.con.getResult();
         break;
-      case 6:
+      case 7:
         var ip1 = this.api.getip1()
         console.log("ip1")
         this.ip1 = this.con.getResult();
         var alice = "Alice_r" + " "
         this.alice_r = this.ip1[alice]
         break
-      case 7:
+      case 6:
         this.pingpong = this.con.getResult();
         break;
     }
@@ -111,8 +112,12 @@ export class ResultsComponent implements OnInit, AfterViewInit {
     this.keyGen = false
     this.keyBits = true
   }
-  info() {
-
+  info(data: string) {
+    switch (data) {
+      case 'qsdct':
+        this.qsdct = true;
+        break;
+    }
   }
   info_1() {
     this.info2 = false;

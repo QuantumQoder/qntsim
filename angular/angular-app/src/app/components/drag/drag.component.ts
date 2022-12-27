@@ -414,90 +414,90 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.myDiagram.addDiagramListener("ChangedSelection", function (event) {
       console.log("selection changed")
     })
-    // var nodesarray = this.savedModel.nodeDataArray
-    // let linkArray = this.savedModel.linkDataArray
-    // var nodereq
-    // console.log(nodesarray)
-    // var nodelength = nodesarray.length
-    // // console.log(linkArray)
-    // for (var i = 0; i < nodelength; i++) {
-    //   var type;
-    //   if (nodesarray[i].figure == "Ellipse") {
-    //     type = 'service'
-    //   } else {
-    //     type = 'end'
-    //   }
-    //   console.log(type)
-    //   var namevar = {
-    //     0: 'node1',
-    //     1: 'node2',
-    //     2: 'node3',
-    //     3: 'node4'
-    //   }
-    //   nodereq = {
-    //     "Name": namevar[i],
-    //     "Type": type,
-    //     "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
-    //     "memory": this.memory
-    //   }
+    var nodesarray = this.savedModel.nodeDataArray
+    let linkArray = this.savedModel.linkDataArray
+    var nodereq
+    console.log(nodesarray)
+    var nodelength = nodesarray.length
+    // console.log(linkArray)
+    for (var i = 0; i < nodelength; i++) {
+      var type;
+      if (nodesarray[i].figure == "Ellipse") {
+        type = 'service'
+      } else {
+        type = 'end'
+      }
+      console.log(type)
+      var namevar = {
+        0: 'node1',
+        1: 'node2',
+        2: 'node3',
+        3: 'node4'
+      }
+      nodereq = {
+        "Name": namevar[i],
+        "Type": type,
+        "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
+        "memory": this.memory
+      }
 
-    //   this.nodes.push(nodereq)
-    // }
-    // let array = []
-    // var linkreq
-    // let chunk = 2;
-    // for (var i = 0; i < linkArray.length; i++) {
-    //   var from = linkArray[i].from
-    //   var to = linkArray[i].to
-    //   let positiveFromkey = from.toString().substring(1)
-    //   // console.log(positivekey * 2)
-    //   let positivetoKey = to.toString().substring(1)
-    //   var fromKey = positiveFromkey - 1;
-    //   let toKey = positivetoKey - 1;
-    //   array.push(this.nodes[fromKey].Name)
-    //   array.push(this.nodes[toKey].Name)
-    //   console.log(array)
-    //   linkreq = {
-    //     Nodes: array,
-    //     Attenuation: Number(this.toolbox.get('attenuation')?.value),
-    //     Distance: Number(this.toolbox.get('distance')?.value),
-    //   }
-    //   array = []
-    //   this.links.push(linkreq)
-    // }
-    // this.topology = {
-    //   nodes: this.nodes,
-    //   quantum_connections: this.links,
-    //   classical_connections: this.cc,
-    // }
-    // var cc = []
-    // for (var i = 0; i < this.nodes.length; i++) {
-    //   for (var j = 0; j < this.nodes.length; j++) {
-    //     cc.push([this.nodes[i].Name, this.nodes[j].Name]);
-    //   }
-    // }
-    // if (cc.length != 0) {
-    //   var distance
-    //   var delay
-    //   for (var i = 0; i < cc.length; i++) {
-    //     if (cc[i][0] == cc[i][1]) {
-    //       distance = 0;
-    //       delay = 0;
-    //     } else {
-    //       distance = 1000;
-    //       delay = 1000000000;
-    //     }
-    //     let ccreq = {
-    //       Nodes: cc[i],
-    //       Delay: delay,
-    //       Distance: distance
-    //     }
-    //     this.cc.push(ccreq)
-    //   }
-    // }
-    // console.log(this.links)
-    // console.log(this.nodes)
-    // this.load();
+      this.nodes.push(nodereq)
+    }
+    let array = []
+    var linkreq
+    let chunk = 2;
+    for (var i = 0; i < linkArray.length; i++) {
+      var from = linkArray[i].from
+      var to = linkArray[i].to
+      let positiveFromkey = from.toString().substring(1)
+      // console.log(positivekey * 2)
+      let positivetoKey = to.toString().substring(1)
+      var fromKey = positiveFromkey - 1;
+      let toKey = positivetoKey - 1;
+      array.push(this.nodes[fromKey].Name)
+      array.push(this.nodes[toKey].Name)
+      console.log(array)
+      linkreq = {
+        Nodes: array,
+        Attenuation: Number(this.toolbox.get('attenuation')?.value),
+        Distance: Number(this.toolbox.get('distance')?.value),
+      }
+      array = []
+      this.links.push(linkreq)
+    }
+    this.topology = {
+      nodes: this.nodes,
+      quantum_connections: this.links,
+      classical_connections: this.cc,
+    }
+    var cc = []
+    for (var i = 0; i < this.nodes.length; i++) {
+      for (var j = 0; j < this.nodes.length; j++) {
+        cc.push([this.nodes[i].Name, this.nodes[j].Name]);
+      }
+    }
+    if (cc.length != 0) {
+      var distance
+      var delay
+      for (var i = 0; i < cc.length; i++) {
+        if (cc[i][0] == cc[i][1]) {
+          distance = 0;
+          delay = 0;
+        } else {
+          distance = 1000;
+          delay = 1000000000;
+        }
+        let ccreq = {
+          Nodes: cc[i],
+          Delay: delay,
+          Distance: distance
+        }
+        this.cc.push(ccreq)
+      }
+    }
+    console.log(this.links)
+    console.log(this.nodes)
+    this.load();
     // document.getElementById("openModalButton")!.click();
     // this.confirm();
 
@@ -813,13 +813,13 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       classical_connections: this.cc,
     }
     switch (this.app_id) {
-      case 1: this.appSettings = {
+      case 2: this.appSettings = {
         sender: this.e91.get('sender')?.value,
         receiver: this.e91.get('receiver')?.value,
         keyLength: Number(this.e91.get('keyLength')?.value)
       }
         break;
-      case 2: this.appSettings = {
+      case 1: this.appSettings = {
         sender: this.e2e.get('sender')?.value,
         receiver: this.e2e.get('receiver')?.value,
         startTime: 1e12,
@@ -829,14 +829,14 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         timeout: this.e2e.get('timeout')?.value + 'e12'
       }
         break;
-      case 3: this.appSettings = {
+      case 4: this.appSettings = {
         endnode1: this.ghz.get('node1')?.value,
         endnode2: this.ghz.get('node2')?.value,
         endnode3: this.ghz.get('node3')?.value,
         middlenode: this.ghz.get('middlenode')?.value,
       }
         break;
-      case 4: this.appSettings = {
+      case 3: this.appSettings = {
         sender: this.teleportation.get('sender')?.value,
         receiver: this.teleportation.get('receiver')?.value,
         amplitude1: this.teleportation.get('amplitude1')?.value,
@@ -851,14 +851,14 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           key: this.firstqsdc.get('key')?.value
         }
         break;
-      case 6:
+      case 7:
         this.appSettings = {
           sender: this.ip1.get('sender')?.value,
           receiver: this.ip1.get('receiver')?.value,
           message: this.ip1.get('message')?.value
         }
         break;
-      case 7:
+      case 6:
         console.log(this.pingPong.get('sender')?.value)
         this.appSettings = {
           sender: this.pingPong.get('sender')?.value,
