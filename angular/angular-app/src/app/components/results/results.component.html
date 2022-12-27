@@ -91,7 +91,7 @@
             </li>
         </ul>
     </p-dialog>
-    <div *ngIf="app_id==1" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+    <div *ngIf="app_id==2" class="container shadow p-4 mb-5 bg-white rounded  ">
         <h1 class="display-3">E91</h1>
         <div *ngIf="keyGen" class="row">
             <p>Basis : Measurement basis /observables chosen by Alice or Bob.
@@ -179,7 +179,7 @@
             </div>
         </div>
     </div>
-    <div *ngIf="app_id==2" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+    <div *ngIf="app_id==1" class="container shadow p-4 mb-5 bg-white rounded  ">
         <div class="display-4">E2E</div>
         <div class="row">
             <h5 class="text-center col-10" style="padding-top:10px ;">Details of the requests raised on the
@@ -270,7 +270,7 @@
             </div>
         </div>
     </div>
-    <div *ngIf="app_id==4" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+    <div *ngIf="app_id==3" class="container shadow p-4 mb-5 bg-white rounded  ">
         <div class="display-4">
             Teleportation
         </div>
@@ -361,7 +361,7 @@
             the receiver node.​</p>
         <!-- </div> -->
     </div>
-    <div *ngIf="app_id==3" class="container shadow p-4 mb-5 bg-white rounded">
+    <div *ngIf="app_id==4" class="container shadow p-4 mb-5 bg-white rounded">
         <div class="display-4">
             GHZ
         </div>
@@ -372,7 +372,7 @@
             three end nodes with a common
             central service node.​</h5>
         <br>
-        <br>
+
         <h5 class="text-center">Quantum state of two-party entanglement at all three end nodes with common central
             node
             who wanted to create GHZ state
@@ -461,7 +461,7 @@
             </div>
         </div>
     </div>
-    <div *ngIf="app_id==6" class="container shadow p-4 mb-5 bg-white rounded mx-auto row">
+    <div *ngIf="app_id==7" class="container shadow p-4 mb-5 bg-white rounded   row">
         <div class="display-4 text-left col-9">
             IP1
         </div>
@@ -527,7 +527,7 @@
             </tbody>
         </table>
     </div>
-    <div *ngIf="app_id==5" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+    <div *ngIf="app_id==5" class="container shadow p-4 mb-5 bg-white rounded  ">
         <div class="row">
             <div class="display-4 col-9 text-left">
                 QSDC1
@@ -580,7 +580,7 @@
             </tbody>
         </table>
     </div>
-    <div *ngIf="app_id==7" class="container shadow p-4 mb-5 bg-white rounded mx-auto">
+    <div *ngIf="app_id==6" class="container shadow p-4 mb-5 bg-white rounded  ">
         <div class="row">
             <div class="display-4 text-left col-9">
                 PingPong
@@ -633,5 +633,16 @@
 
             </tbody>
         </table>
+    </div>
+    <div *ngIf="app_id==9" class="container shadow p-4 mb-5 bg-white rounded  ">
+        <div class="row">
+            <div class="display-4 text-left col-9">
+                QSDC-Teleportation
+            </div>
+            <div class="text-right col-2">
+                <button class="btn btn-outline-primary" (click)="info('qsdct')" style="margin-top: 18px;"><i
+                        class="pi pi-question"></i></button>
+            </div>
+        </div>
     </div>
 </div>
