@@ -187,7 +187,7 @@ class QSDC1():
     def run(self,alice,bob,sequence_length,message):
         #message = "110011001001010101010100"
         #  convert message before run is called
-        message = string_to_binary(message)
+        # message = string_to_binary(message)
         assert len(message)%2 == 0
         entangled_keys,alice_bob_keys_dict  = self.create_entanglement(alice,bob)
         qm_alice = alice.timeline.quantum_manager
