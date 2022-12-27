@@ -29,13 +29,20 @@ export class ApplicationsComponent implements OnInit {
     this.conService.currentSection = 'applications'
   }
   app(app_id: any, app: string) {
-
-    this.conService.setapp_id(app_id);
-    localStorage.setItem('app_id', app_id)
-    this.conService.setApp(app)
-    localStorage.setItem('app', app)
-    this._router.navigate(['/intro'])
-
+    if (app_id != 9 || app_id != 8) {
+      this.conService.setapp_id(app_id);
+      localStorage.setItem('app_id', app_id)
+      this.conService.setApp(app)
+      localStorage.setItem('app', app)
+      this._router.navigate(['/intro'])
+    }
+    if (app_id == 9 || app_id == 8) {
+      this.conService.setapp_id(app_id);
+      localStorage.setItem('app_id', app_id)
+      this.conService.setApp(app)
+      localStorage.setItem('app', app);
+      this._router.navigate(['/drag2']);
+    }
   }
   app1(app_id: any, app: string) {
 
@@ -48,4 +55,14 @@ export class ApplicationsComponent implements OnInit {
     console.log(introurl)
     window.open(introurl, "_blank")
   }
+  drag(app_id: any, app: string) {
+    this.conService.setapp_id(app_id);
+    localStorage.setItem('app_id', app_id)
+    this.conService.setApp(app)
+    localStorage.setItem('app', app)
+    var currenturl = this._router.url
+    var introurl = currenturl.replace('applications', 'drag2');
+    window.open(introurl, "_blank")
+  }
+
 }

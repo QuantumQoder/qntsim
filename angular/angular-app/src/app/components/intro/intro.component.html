@@ -4,10 +4,15 @@
         <div *ngIf="app=='1'" class="col-11">
 
             <h1 class="display-1 text-center">E91 Protocol </h1>
-            <p>Proposed in 1991 by Artur Ekert, E91 protocol is an entanglement-based protocol which uses Bell
-                states
-                shared between
-                Alice and Bob for secure distribution of secret key . ​</p>
+            <div class="row">
+                <p class="col-10">Proposed in 1991 by Artur Ekert, E91 protocol is an entanglement-based protocol which
+                    uses
+                    Bell
+                    states
+                    shared between
+                    Alice and Bob for secure distribution of secret key . ​</p>
+                <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To Application</button>
+            </div>
             <br>
             <div class="row">
                 <div class="col-10">
@@ -107,12 +112,16 @@
             <br>
 
         </div>
-        <div *ngIf="app=='3'" class="col-10">
+        <div *ngIf="app=='3'" class="col-11">
             <h1 class="display-1">GHZ</h1>
-            <p>GHZ (Greenberger–Horne–Zeilinger state )state is a three party non-classically correlated quantum
-                state.
-                This
-                application is related to preparation of a three party entangled pair .​</p>
+            <div class="row">
+                <p class="col-10">GHZ (Greenberger–Horne–Zeilinger state )state is a three party non-classically
+                    correlated quantum
+                    state.
+                    This
+                    application is related to preparation of a three party entangled pair .​</p>
+                <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To Application</button>
+            </div>
             <br>
             <div class="row">
                 <div class="col-10">
@@ -157,11 +166,15 @@
         <div *ngIf="app=='4'" class="col-11">
             <h1 class="display-1">Teleportation Protocol</h1>
             <br>
-            <p>TEL( Teleportation) protocol is regarding sharing an arbitrary quantum state between two parties with
-                the
-                help of
-                entangled pair shared between them.​</p>
-
+            <div class="row">
+                <p class="col-10">TEL( Teleportation) protocol is regarding sharing an arbitrary quantum state between
+                    two parties with
+                    the
+                    help of
+                    entangled pair shared between them.​</p>
+                <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To Application</button>
+            </div>
+            <br>
             <div class="row">
                 <div class="w-99">
                     <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
@@ -213,11 +226,16 @@
             </div>
         </div>
         <div *ngIf="app=='7'" class="col-11">
-            <h1 class="display-1">QSDC1</h1>
-            <p>A QKD scheme using EPR pairs with each EPR pair carrying two bits of key code. This protocol is the
-                seminal work on QSDC by G.L. Long and X.S. Liu <a href=""
-                    (click)="quant_ph('https://arxiv.org/pdf/quant-ph/0012056.pdf')">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​
-            </p>
+            <h1 class="display-1">QSDC PingPong</h1>
+            <br>
+            <div class="row">
+                <p class="col-10">A QKD scheme using EPR pairs with each EPR pair carrying two bits of key code. This
+                    protocol is the
+                    seminal work on QSDC by G.L. Long and X.S. Liu <a href=""
+                        (click)="quant_ph('https://arxiv.org/pdf/quant-ph/0012056.pdf')">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​
+                </p>
+                <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To Application</button>
+            </div>
             <br>
             <div class="row">
                 <div class="col-10">
@@ -258,10 +276,15 @@
 
         <div *ngIf="app=='5'" class="col-11">
             <h1 class="display-1">QSDC1</h1>
-            <p>A QKD scheme using EPR pairs with each EPR pair carrying two bits of key code. This protocol is the
-                seminal work on QSDC by G.L. Long and X.S. Liu <a href=""
-                    (click)="quant_ph('https://arxiv.org/pdf/quant-ph/0012056.pdf')">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​
-            </p>
+            <br>
+            <div class="row">
+                <p class="col-10">A QKD scheme using EPR pairs with each EPR pair carrying two bits of key code. This
+                    protocol is the
+                    seminal work on QSDC by G.L. Long and X.S. Liu <a href=""
+                        (click)="quant_ph('https://arxiv.org/pdf/quant-ph/0012056.pdf')">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​
+                </p>
+                <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To Application</button>
+            </div>
             <br>
             <div class="row">
                 <div class="col-10">
@@ -314,14 +337,18 @@
         </div>
         <div *ngIf="app=='6'" class="col-11">
             <h1 class="display-1">Arbitrary basis QSDC</h1>
-            <p class="text-justify">A secure QSDC protocol using only one orthogonal basis of single-qubit states to
-                encode classical
-                message. This highly secure protocol developed by Goutam Paul and Nayana Das can be used for high
-                security secure direct communication with no information leakage to any Eavesdropper
+            <div class="row">
+                <p class="text-justify col-10">A secure QSDC protocol using only one orthogonal basis of single-qubit
+                    states to
+                    encode classical
+                    message. This highly secure protocol developed by Goutam Paul and Nayana Das can be used for high
+                    security secure direct communication with no information leakage to any Eavesdropper
 
-                ​<a href=""
-                    (click)="quant_ph('https://doi.org/10.1007/s10773-021-04952-4')">https://doi.org/10.1007/s10773-021-04952-4​</a>​
-            </p>
+                    ​<a href=""
+                        (click)="quant_ph('https://doi.org/10.1007/s10773-021-04952-4')">https://doi.org/10.1007/s10773-021-04952-4​</a>​
+                </p>
+                <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To Application</button>
+            </div>
             <br>
             <div class="row">
                 <div class="col-10">
@@ -378,7 +405,7 @@
         </div>
         <br>
         <!-- </div> -->
-        <div class="button-group">
+        <div class="d-flex justify-content-center button-group ">
             <button type="button" *ngIf="app!=6 && activeIndex==1 || app!=6 && activeIndex==2"
                 class="btn btn-primary btn-custom" (click)="previous()">Previous</button>
             <button type="button" *ngIf="app!=6 && activeIndex==0 ||app!=6 && activeIndex==1"

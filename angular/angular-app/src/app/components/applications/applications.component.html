@@ -11,34 +11,26 @@
             <!-- <p-scrollPanel [style]="{width: '100%', height: '400px'}"> -->
             <div class="row">
                 <div class="col-md-3">
-                    <div class="card" style="width: 16rem;height:25rem">
+                    <div class="card" style="width: 17rem;height:25rem">
                         <img src="assets/images/e2e.png" class="card-img-top" alt="..." height="250px">
                         <div class="card-body">
                             <h5 class="card-title">E2E</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">End-to-End Entanglements</h6>
-                            <!-- <p class="card-text">Some quick example text to build on the card title and make up the
-                                bulk
-                                of
-                                the
-                                card's content.</p> -->
-                            <a class="btn mr-2" (click)="app(2,'e2e')"><span (ctrl-click)="app1(2,'e2e')">Visit
+                            <h6 class="card-subtitle   text-muted">End-to-End Entanglements</h6>
+
+                            <a class="btn mr-2" (click)="app(1,'e2e')"><span (ctrl-click)="app1(1,'e2e')">Visit
                                     Site</span></a>
                             <!-- <a class="btn "><i class="fab fa-github"></i> Github</a> -->
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card" style="width: 16rem;height:25rem">
+                    <div class="card" style="width: 17rem;height:25rem">
                         <img src="assets/images/qkd.jpg" class="card-img-top" alt="..." height="250px">
                         <div class="card-body">
                             <h5 class="card-title">E91</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">Quantum Key Distribution</h6>
-                            <!-- <p class="card-text">Some quick example text to build on the card title and make up the
-                                bulk
-                                of
-                                the
-                                card's content.</p> -->
-                            <a class="btn  mr-2" (click)="app(1,'e91')"><span (ctrl-click)="app1(1,'e91')">Visit
+                            <h6 class="card-subtitle   text-muted">Quantum Key Distribution</h6>
+
+                            <a class="btn mr-2" (click)="app(2,'e91')"><span (ctrl-click)="app1(2,'e91')">Visit
                                     Site</span></a>
                             <!-- <a href="#" class="btn"><i class="fab fa-github"></i> Github</a> -->
                         </div>
@@ -46,19 +38,19 @@
                 </div>
 
                 <div class="image-flip col-md-3">
-                    <div class="card" style="width: 16rem;height:25rem">
+                    <div class="card" style="width: 17rem;height:25rem">
                         <img src="assets/images/teleportation1.png" class="card-img-top" alt="..." height="250px">
                         <div class="card-body">
                             <h5 class="card-title">Teleportation</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">Quantum Teleportation from one node to another
+                            <h6 class="card-subtitle   text-muted">Quantum Teleportation from one node to another
                             </h6>
                             <!-- <p class="card-text">Some quick example text to build on the card title and make up the
                                 bulk
                                 of
                                 the
                                 card's content.</p> -->
-                            <a class="btn mr-2" [routerLink]="['/intro']" (click)="app(4,'tel')"><i
-                                    class="fas fa-link"></i><span (ctrl-click)="app1(4,'tel')">Visit
+                            <a class="btn mr-2" [routerLink]="['/intro']" (click)="app(3,'tel')"><i
+                                    class="fas fa-link"></i><span (ctrl-click)="app1(3,'tel')">Visit
                                     Site</span></a>
                             <!-- <a href="#" class="btn "><i class="fab fa-github"></i> Github</a> -->
                         </div>
@@ -67,18 +59,18 @@
                 </div>
 
                 <div class="col-md-3">
-                    <div class="card" style="width: 16rem;height:25rem">
+                    <div class="card" style="width: 17rem;height:25rem">
                         <img src="assets/images/GHZ2.png" class="card-img-top" alt="..." height="250px">
                         <div class="card-body">
                             <h5 class="card-title">GHZ</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">Create GHZ state</h6>
+                            <h6 class="card-subtitle   text-muted">Create GHZ state</h6>
                             <!-- <p class="card-text">Some quick example text to build on the card title and make up the
                                 bulk
                                 of
                                 the
                                 card's content.</p> -->
-                            <a class="btn mr-2" [routerLink]="['/intro']" (click)="app(3,'ghz')"><i
-                                    class="fas fa-link"></i><span (ctrl-click)="app1(3,'ghz')">Visit
+                            <a class="btn align-self-end" [routerLink]="['/intro']" (click)="app(4,'ghz')"><i
+                                    class="fas fa-link"></i><span (ctrl-click)="app1(4,'ghz')">Visit
                                     Site</span></a>
 
                             <!-- <a href="#" class="btn"><i class="fab fa-github"></i> Github</a> -->
@@ -88,11 +80,11 @@
             </div>
             <div class="row">
                 <div class="col-md-3">
-                    <div class="card" style="width: 16rem;height: 25rem;">
+                    <div class="card" style="width: 17rem;height: 25rem;">
                         <img src="assets/images/QSDC.png" class="card-img-top" alt="..." height="250px">
                         <div class="card-body">
                             <h5 class="card-title">Seminal QSDC</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">a high capacity QKD scheme with EPR pairs</h6>
+                            <h6 class="card-subtitle   text-muted">a high capacity QKD scheme with EPR pairs</h6>
 
                             <a class="btn mr-2" [routerLink]="['/intro']" (click)="app(5,'qsdc1')"><span
                                     (ctrl-click)="app1(5,'qsdc1')">Visit
@@ -102,31 +94,57 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card" style="width: 16rem;height: 25rem;">
+                    <div class="card" style="width: 17rem;height: 25rem;">
                         <img src="assets/images/Crypt2.png" class="card-img-top" alt="..." height="250px">
                         <div class="card-body">
                             <h5 class="card-title">QSDC Ping-Pong</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">deterministic secure direct communication using
+                            <h6 class="card-subtitle   text-muted">deterministic secure direct communication using
                                 Entanglement​</h6>
 
-                            <a class="btn  mr-2" (click)="app(7,'PP')">
-                                <span (ctrl-click)="app1(7,'PP')">Visit
+                            <a class="btn  mr-2" (click)="app(6,'PP')">
+                                <span (ctrl-click)="app1(6,'PP')">Visit
                                     Site</span></a>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-md-3">
-                    <div class="card" style="width: 16rem;height: 25rem;">
+                    <div class="card" style="width: 17rem;height: 25rem;">
                         <img src="assets/images/Crypt4.png" class="card-img-top" alt="..." height="250px">
                         <div class="card-body">
                             <h5 class="card-title">Arbitrary basis QSDC</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">An arbitrary basis QSDC scheme with mutual user
+                            <h6 class="card-subtitle   text-muted">An arbitrary basis QSDC scheme with mutual user
                                 authentication</h6>
-                            <a class="btn mr-2" [routerLink]="['/intro']" (click)="app(6,'ip1')"><i
-                                    class="fa fa-link"></i><span (ctrl-click)="app1(6,'ip1')">Visit
+                            <a class="btn align-self-end" [routerLink]="['/intro']" (click)="app(7,'ip1')"><i
+                                    class="fa fa-link"></i><span (ctrl-click)="app1(7,'ip1')">Visit
                                     Site</span></a>
 
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card" style="width: 17rem;height: 25rem;">
+                        <img src="assets/images/Crypt4.png" class="card-img-top" alt="..." height="250px">
+                        <div class="card-body">
+                            <h5 class="card-title">Single Photon-QD</h5>
+                            <h6 class="card-subtitle text-muted"></h6>
+                            <a class="btn" [routerLink]="['/drag2']" (click)="app(8,'spqd')"><i
+                                    class="fa fa-link"></i><span (ctrl-click)="drag(8,'spqd')">Visit
+                                    Site</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card" style="width: 17rem;height: 25rem;">
+                        <img src="assets/images/Crypt4.png" class="card-img-top" alt="..." height="250px">
+                        <div class="card-body">
+                            <h5 class="card-title">QSDC Teleportation</h5>
+                            <h6 class="card-subtitle text-muted"></h6>
+                            <a class="btn" [routerLink]="['/drag2']" (click)="app(9,'qtel')"><i
+                                    class="fa fa-link"></i><span (ctrl-click)="drag(9,'qtel')">Visit
+                                    Site</span></a>
                         </div>
                     </div>
                 </div>
