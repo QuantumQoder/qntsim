@@ -6,6 +6,9 @@ from users.models import CustomUser
 class Applications(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=1000)
+    
+    def __str__(self):
+        return self.name
 
 class Results(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=False)

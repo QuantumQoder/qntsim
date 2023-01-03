@@ -269,7 +269,7 @@ class SinglePhotonQD():
 
     
     
-    def run(self, alice, bob, message1, message2, n, attack):
+    def run(self, alice, bob, message1, message2, attack):
         
         msg1, msg2 = [],[]
         for i in message1:
@@ -278,7 +278,8 @@ class SinglePhotonQD():
             msg2.append(bin(ord(i))[2:])
         
         string1, string2 = [],[]
-        print('messages', n, msg1,msg2)
+        # print('messages', n, msg1,msg2)
+        n=5
         for i in range(len(msg1)):
             print('message', msg1[i])
             initials, circuits = self.bob_encodes(message = msg1[i], N=n)
@@ -300,13 +301,14 @@ class SinglePhotonQD():
         string2 = ''.join(chr(int(string, 2)) for string in string2)
         print("Receiver decodes: ", string1)
         print("Sender decodes: ", string2)
-        
+        error=0
         res ={
-            "senders_msg": message1,
-            "receivers_msg" : message2,
+            "input_message1": message1,
+            "input_message2" : message2,
             "attack" : attack,
-            "receiver_decodes" : string1,
-            "sender_decodes" : string2
+            "output_message1" : string1,
+            "output_message2" : string2,
+            "error" : error
                 
         }
         print("result",res)

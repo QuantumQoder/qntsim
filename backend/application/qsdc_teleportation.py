@@ -154,7 +154,7 @@ class QSDCTeleportation():
         return message
         
         
-    def run(self, alice, bob, message):
+    def run(self, alice, bob, message, attack):
         
         words = message.split()
         msg = ''
@@ -166,9 +166,11 @@ class QSDCTeleportation():
         indices, crx, crz = self.teleport(alice, message=message)
         print("indices",indices, crx, crz)
         decoded_msg = self.decode(bob,indices,crx,crz)
-        
+        error =0
         res = {
             "input_message":message,
-            "output_message":decoded_msg
+            "output_message":decoded_msg,
+            "attack":"DoS",
+            "error" : error 
         }
         return res

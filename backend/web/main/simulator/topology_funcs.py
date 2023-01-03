@@ -1,3 +1,4 @@
+
 from contextlib import nullcontext
 from pyvis.network import Network
 from tokenize import String
@@ -16,7 +17,10 @@ from main.simulator.app.qsdc1 import *
 from main.simulator.app.teleportation import *
 from main.simulator.app.qsdc_teleportation import *
 from main.simulator.app.single_photon_qd import *
+from main.simulator.app.mdi_qsdc import * 
+from main.simulator.app.ip2 import *
 from main.simulator.app.utils import *
+
 
 def graph_topology(network_config_json):
     
@@ -231,7 +235,8 @@ def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
     print(report)
     return report
 
-def qsdc_teleportation(network_config, sender, receiver, message):
+def qsdc_teleportation(network_config, sender, receiver, message, attack):
+    
     
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
     alice=network_topo.nodes[sender]
@@ -240,14 +245,14 @@ def qsdc_teleportation(network_config, sender, receiver, message):
     alice,bob,source_node_list=qsdc_tel.roles(alice,bob,len(message))
     tl.init()
     tl.run()
-    results = qsdc_tel.run(alice,bob,message)
+    results = qsdc_tel.run(alice,bob,message, attack)
     report={}
     report["application"]=results
     report=network_graph(network_topo,source_node_list,report)
     print(report)
     return report
 
-def single_photon_qd(network_config, sender, receiver, message1, message2, num_photons, attack):
+def single_photon_qd(network_config, sender, receiver, message1, message2, attack):
     
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
     alice=network_topo.nodes[sender]
@@ -256,9 +261,26 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, num_p
     alice,bob,source_node_list=spqd.roles(alice,bob,n=10)
     tl.init()
     tl.run()
-    results = spqd.run(alice,bob,message1, message2, num_photons, attack)
+    results = spqd.run(alice,bob,message1, message2, attack)
     report={}
     report["application"]=results
     report=network_graph(network_topo,source_node_list,report)
     print(report)
+    return report
+
+
+def mdi_qsdc(network_config, sender, receiver, message, attack):
+    
+    mdi_qsdc = MdiQSDC()
+    results = mdi_qsdc.run(message,attack)
+    print(results)
+    
+
+def ip2(network_config, sender, receiver, message):
+    
+    report = {}
+    ip2 = IP2()
+    results = ip2.run(message)
+    report["application"] = results
+    
     return report
