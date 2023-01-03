@@ -8,7 +8,7 @@ setup(
     # packages = find_packages('src'),
     packages=['qntsim', 'qntsim.kernel', 'qntsim.components',
               'qntsim.network_management', 'qntsim.entanglement_management',
-              'qntsim.resource_management','qntsim.transport_layer' , 'qntsim.topology', 'qntsim.utils'],
+              'qntsim.resource_management','qntsim.transport_layer' , 'qntsim.topology', 'qntsim.utils', "qntsim.library"],
     package_dir={'qntsim': 'src'},
     install_requires=[
         'numpy',
