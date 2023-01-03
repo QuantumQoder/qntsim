@@ -18,6 +18,7 @@ from main.simulator.app.teleportation import *
 from main.simulator.app.qsdc_teleportation import *
 from main.simulator.app.single_photon_qd import *
 from main.simulator.app.mdi_qsdc import * 
+from main.simulator.app.ip2 import *
 from main.simulator.app.utils import *
 
 
@@ -277,7 +278,7 @@ def mdi_qsdc(network_config, sender, receiver, message, attack):
 
 def ip2(network_config, sender, receiver, message):
     
-    
+    report = {}
     ip2 = IP2()
     results = ip2.run(message)
     report["application"] = results
