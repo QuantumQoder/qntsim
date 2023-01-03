@@ -49,6 +49,8 @@ class RunApp(APIView):
             results = single_photon_qd(topology, appSettings["sender"], appSettings["receiver"], appSettings["message1"],appSettings["message2"], appSettings["attack"])
         elif application == "mdi_qsdc":
             results = mdi_qsdc(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"], appSettings["attack"])
+        elif application == "ip2":
+            results = ip2(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"])
         # Add code for results here
         print('results', type(results))
         graphs = results.get('graph')
