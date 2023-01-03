@@ -185,9 +185,7 @@
             <h5 class="text-center col-10" style="padding-top:10px ;">Details of the requests raised on the
                 constructed network topology</h5>
             <div class="text-right col-2">
-                <button pButton pRipple type="button" icon="pi pi-question"
-                    class="p-button-rounded p-button-info p-button-outlined" styleClass="info" (click)="info_1()">
-                </button>
+                <button class="btn btn-outline-primary" (click)="info_1()"><i class="pi pi-question"></i></button>
             </div>
         </div>
         <div class="col">
@@ -223,9 +221,7 @@
                     entanglement
                     between them</h5>
                 <div class="text-right col-2">
-                    <button pButton pRipple type="button" icon="pi pi-question"
-                        class="p-button-rounded p-button-info p-button-outlined" styleClass="info" (click)="info_2()">
-                    </button>
+                    <button class="btn btn-outline-primary" (click)="info_2()"><i class="pi pi-question"></i></button>
                 </div>
             </div>
             <div class="row">
@@ -634,6 +630,73 @@
             </tbody>
         </table>
     </div>
+    <div *ngIf="app_id==8" class="container shadow p-4 mb-5 bg-white rounded  ">
+        <div class="row">
+            <div class="display-4 text-left col-9">
+                Single Photon QD
+            </div>
+            <div class="text-right col-2">
+                <button class="btn btn-outline-primary" (click)="info('spqd')" style="margin-top: 18px;"><i
+                        class="pi pi-question"></i></button>
+            </div>
+        </div>
+        <br>
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <td class="col">
+                        Input Message 1
+                    </td>
+                    <td class="col">
+                        {{spqd.input_message1}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col">
+                        Input Message 2
+                    </td>
+                    <td class="col">
+                        {{spqd.input_message2}}
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="table-secondary">
+                    <td class="col">
+                        Attack
+                    </td>
+                    <td class="col">
+                        {{spqd.attack}}
+                    </td>
+                </tr>
+                <tr class="table-secondary">
+                    <td class="col">
+                        Error
+                    </td>
+                    <td class="col">
+                        {{spqd.error}}
+                    </td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td class="col">
+                        Output Message 1
+                    </td>
+                    <td class="col">
+                        {{spqd.output_message1}}
+                    </td>
+                </tr>
+                <tr class="table-primary">
+                    <td class="col">
+                        Output Message 2
+                    </td>
+                    <td class="col">
+                        {{spqd.output_message2}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     <div *ngIf="app_id==9" class="container shadow p-4 mb-5 bg-white rounded  ">
         <div class="row">
             <div class="display-4 text-left col-9">
@@ -644,5 +707,111 @@
                         class="pi pi-question"></i></button>
             </div>
         </div>
+        <br>
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <td class="col">
+                        Input Message
+                    </td>
+                    <td class="col">
+                        {{qsdct.input_message}}
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="table-secondary">
+                    <td class="col">
+                        Attack
+                    </td>
+                    <td class="col">
+                        {{qsdct.attack}}
+                    </td>
+                </tr>
+                <tr class="table-secondary">
+                    <td class="col">
+                        Error
+                    </td>
+                    <td class="col">
+                        {{qsdct.error}}
+                    </td>
+                </tr>
+
+                <tr class="table-primary">
+                    <td class="col">
+                        Output Message
+                    </td>
+                    <td class="col">
+                        {{qsdct.output_message}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+    <div *ngIf="app_id==10" class="container shadow p-4 mb-5 bg-white rounded row">
+        <div class="display-4 text-left col-9">
+            IP1
+        </div>
+
+        <div class="text-right col-2">
+            <button class="btn btn-outline-primary" (click)="info_qsdc()" style="margin-top: 18px;"><i
+                    class="pi pi-question"></i></button>
+        </div>
+        <br>
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <td class="col">
+                        Sender's Input Message
+                    </td>
+                    <td class="col">
+                        {{ip2.input_message}}
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="table-secondary">
+                    <td class="col">
+                        Security Checked
+                    </td>
+                    <td class="col">
+                        {{ip2.security_check}}
+                    </td>
+                </tr>
+                <tr class="table-secondary">
+                    <td class="col">Alice's IdA Authentication</td>
+                    <td class="col">{{ip2.alice_ida_auth}}</td>
+                </tr>
+                <tr class="table-secondary">
+                    <td class="col">Bob's IdA Authentication</td>
+                    <td class="col">{{ip2.bob_ida_auth}}</td>
+                </tr>
+                <tr class="table-secondary">
+                    <td class="col">
+                        Sender Key
+                    </td>
+                    <td class="col">
+                        {{ip2.sender_key}}
+                    </td>
+                </tr>
+                <tr class="table-secondary">
+                    <td class="col">
+                        Receiver Key
+                    </td>
+                    <td class="col">
+                        {{ip2.receiver_key}}
+                    </td>
+                </tr>
+                <tr class="table-primary">
+                    <td class="col">
+                        Receiver's Output message
+                    </td>
+                    <td class="col">
+                        {{ip2.output_message}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>

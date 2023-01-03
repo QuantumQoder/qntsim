@@ -366,7 +366,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="app_id==7" class="row" [formGroup]="ip1">
+            <div *ngIf="app_id==7 || app_id==10" class="row" [formGroup]="ip1">
                 <div class="col">
                     <label for="serviceNode">Sender</label>&nbsp;
                     <select class="form-control" formControlName="sender">
@@ -422,32 +422,47 @@
                     <div class="col">
                         <label for="endNode">Attacker</label>&nbsp;
                         <select class="form-control" formControlName="attacker">
-                            <option value="true">true</option>
-                            <option value="false">false</option>
+                            <option value="None">None</option>
+                            <option value="DoS">DoS</option>
+                            <option value="EM">EM</option>
+                            <option value="IR">IR</option>
                         </select>
                     </div>
                 </div>
             </div>
-            <div *ngIf="app_id==9" class="row" [formGroup]="qtel">
-                <div class="col">
-                    <label for="serviceNode">Sender</label>&nbsp;
-                    <select class="form-control" formControlName="sender">
-                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
-                        </option>
-                    </select>
-                </div>
-                <div class="col">
-                    <label for="endNode">Receiver</label>&nbsp;
-                    <select class="form-control" formControlName="receiver">
-                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
-                        </option>
-                    </select>
-                </div>
-                <div class="col">
-                    <label for="endNode">Message</label>&nbsp;
-                    <input type="text" class="form-control" formControlName="message">
+            <div *ngIf="app_id==9" [formGroup]="qtel">
+                <div class="row">
+                    <div class="col">
+                        <label for="serviceNode">Sender</label>&nbsp;
+                        <select class="form-control" formControlName="sender">
+                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="endNode">Receiver</label>&nbsp;
+                        <select class="form-control" formControlName="receiver">
+                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                            </option>
+                        </select>
+                    </div>
                 </div>
 
+                <div class="row">
+                    <div class="col">
+                        <label for="endNode">Message</label>&nbsp;
+                        <input type="text" class="form-control" formControlName="message">
+                    </div>
+                    <div class="col">
+                        <label for="endNode">Attack</label>&nbsp;
+                        <select class="form-control" formControlName="attack">
+                            <option value="None">None</option>
+                            <option value="DoS">DoS</option>
+                            <option value="EM">EM</option>
+                            <option value="IR">IR</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <ng-template pTemplate="footer">

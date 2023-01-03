@@ -10,6 +10,18 @@
     margin-bottom: 8.7%;
 }
 
+.bg-network {
+    min-height: 70vh;
+    background-image: url(https://ik.imagekit.io/qulabs/earth-3537401.jpg?ik-sdk-version=javascript-1.4.3&updatedAt=1672645182610);
+    background-size: cover;
+    background-position-x: 20vw;
+    // background-repeat: repeat-x;
+    // background-repeat-y: no-repeat; 
+    background-position-y: top;
+    background-clip: padding-box;
+    // image-rendering: pixelated;
+}
+
 .jumbotron {
     margin-top: 104px;
     // padding: 104px;
@@ -22,11 +34,45 @@
 //     padding-bottom: 7rem;
 // }
 
-p {
-    justify-content: center;
-    margin-right: 11%;
-    margin-left: 11%;
-    font-size: large;
+// p {
+//     justify-content: center;
+//     margin-right: 11%;
+//     margin-left: 11%;
+//     font-size: large;
+// }
+.text-custom {
+    color: whitesmoke;
+    position: relative;
+}
+
+.text-custom::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 75px;
+    border: #072155 solid 5px;
+    border-radius: 5px;
+    // color: red;
+    // width: 100px;
+    animation-name: barOut;
+    animation-duration: 0.8s;
+    animation-fill-mode: forwards;
+}
+
+.home:hover .text-custom::after {
+    // width: 500px;
+    animation-name: barIn;
+    animation-duration: 0.8s;
+    animation-fill-mode: forwards;
+}
+
+.home {
+    min-height: 70vh;
+}
+
+.image-home {
+    max-height: 25%;
+    object-fit: cover;
 }
 
 a {
@@ -45,3 +91,23 @@ a {
 // .my-5 {
 //     padding: 1000px;
 // }
+
+@keyframes barIn {
+    0% {
+        width: 200px;
+    }
+
+    100% {
+        width: 500px;
+    }
+}
+
+@keyframes barOut {
+    from {
+        width: 500px;
+    }
+
+    to {
+        width: 200px;
+    }
+}

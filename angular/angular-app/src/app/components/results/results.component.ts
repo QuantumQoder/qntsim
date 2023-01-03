@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { ApiServiceService } from 'src/services/api-service.service';
 import { ConditionsService } from 'src/services/conditions.service';
+import { HoldingDataService } from 'src/services/holding-data.service';
 @Component({
   selector: 'app-results',
   templateUrl: './results.component.html',
@@ -33,11 +34,13 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   pingpong: any;
   ip1: any;
   infoqsdc: boolean;
-  qsdct: boolean;
-  constructor(private _formBuilder: FormBuilder, private con: ConditionsService, public api: ApiServiceService,
+  qsdct: any;
+  spqd: any;
+  ip2: any;
+  constructor(private _formBuilder: FormBuilder, private con: ConditionsService, public api: ApiServiceService, private holdingData: HoldingDataService,
     private router: Router) { }
   ngAfterViewInit(): void {
-    if (this.app_id == '2') {
+    if (this.app_id == 1) {
       // var e2e = this.con.getResult();
       this.createTableforE2E()
     }
@@ -46,6 +49,7 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
 
     this.app_id = this.con.getapp_id()
+    // this.app_id = 8
     if (!this.app_id) {
       this.router.navigate(['/applications'])
     }
@@ -86,16 +90,19 @@ export class ResultsComponent implements OnInit, AfterViewInit {
         var e2e = this.con.getResult();
         this.e2e = e2e.application;
         break;
-      case 4:
-        var ghz = this.con.getResult();
-        this.ghz = ghz.application;
-        break;
       case 3:
         var tele = this.con.getResult();
         this.tel = tele.application;
         break;
+      case 4:
+        var ghz = this.con.getResult();
+        this.ghz = ghz.application;
+        break;
       case 5:
         this.qsdc1 = this.con.getResult();
+        break;
+      case 6:
+        this.pingpong = this.con.getResult();
         break;
       case 7:
         var ip1 = this.api.getip1()
@@ -103,9 +110,18 @@ export class ResultsComponent implements OnInit, AfterViewInit {
         this.ip1 = this.con.getResult();
         var alice = "Alice_r" + " "
         this.alice_r = this.ip1[alice]
-        break
-      case 6:
-        this.pingpong = this.con.getResult();
+        break;
+      case 8:
+        this.spqd = this.con.getResult().application;
+        console.log(this.spqd)
+        break;
+      case 9:
+        this.qsdct = this.con.getResult().application;
+        console.log(this.qsdct)
+        break;
+      case 10:
+        this.ip2 = this.con.getResult().application;
+        console.log(this.ip2);
         break;
     }
     // this.data = ['Alice', 'Bob', 'Eve']
