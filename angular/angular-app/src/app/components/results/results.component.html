@@ -115,727 +115,731 @@
             </li>
         </ul>
     </p-dialog>
-    <div *ngIf="app_id==2" class="container shadow p-4 mb-5 bg-white rounded  ">
-        <h1 class="display-3">E91</h1>
-        <div *ngIf="keyGen" class="row">
-            <p>Basis : Measurement basis /observables chosen by Alice or Bob.
+    <div class="container shadow p-4 mb-5 bg-white rounded">
+        <div *ngIf="app_id==2">
+            <h1 class="display-3">E91</h1>
+            <div *ngIf="keyGen" class="row">
+                <p>Basis : Measurement basis /observables chosen by Alice or Bob.
+                    <br>
+                    Value: Measurement result obtained from the observables at Alice or Bob
+                </p>
                 <br>
-                Value: Measurement result obtained from the observables at Alice or Bob
-            </p>
-            <br>
-            <div class="tabel">
-                <h5><u>Sender</u></h5>
-                <table class="table table-bordered">
-                    <thead class="thead-light">
+                <div class="tabel">
+                    <h5><u>Sender</u></h5>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
 
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="col">Basis</td>
-                            <td class="col" [ngClass]="senderbasis(i)"
-                                *ngFor="let app of e91.sender_basis_list;let i=index">
-                                {{app}}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="col">Value</td>
-                            <td class="col" [ngClass]="senderbasis(i)"
-                                *ngFor="let app of e91.sender_meas_list;let i=index">{{app}}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col">Basis</td>
+                                <td class="col" [ngClass]="senderbasis(i)"
+                                    *ngFor="let app of e91.sender_basis_list;let i=index">
+                                    {{app}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col">Value</td>
+                                <td class="col" [ngClass]="senderbasis(i)"
+                                    *ngFor="let app of e91.sender_meas_list;let i=index">{{app}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-        <div *ngIf="keyGen" class="row">
-            <p>Shifted Key [The final key] is obtained at Alice and Bob from Measurement results obtained from Matching
-                basis (that are
-                indicated in green above)</p>
-
-            <div class="tabel">
-                <h5><u>Receiver</u></h5>
-                <table class="table table-bordered">
-                    <thead class="thead-light">
-
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="col">Basis</td>
-                            <td class="col" [ngClass]="senderbasis(i)"
-                                *ngFor="let app of e91.receiver_basis_list;let i=index">{{app}}</td>
-                        </tr>
-                        <tr>
-                            <td class="col">Value</td>
-                            <td class="col" [ngClass]="senderbasis(i)"
-                                *ngFor="let app of e91.receiver_meas_list;let i=index">{{app}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div *ngIf="keyBits" class="row">
-            <div class="col">
-                <p>E91 protocols has been executed and key of the demanded length has been shared between sender &
-                    receiver.​
-
-                    At the end of the execution of protocol, the sifted key between the source and destination is
-                    given
-                    below​</p>
-                <br>
+            <div *ngIf="keyGen" class="row">
                 <p>Shifted Key [The final key] is obtained at Alice and Bob from Measurement results obtained from
                     Matching
                     basis (that are
                     indicated in green above)</p>
-                <table class="table table-bordered align-middle">
-                    <thead class="thead-light">
-                        <tr>
-                            <th class="col">Sender</th>
-                            <th class="col">Receiver</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="col">{{e91.sender_keys}}</td>
-                            <td class="col">{{e91.receiver_keys}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div *ngIf="app_id==1" class="container shadow p-4 mb-5 bg-white rounded  ">
-        <div class="display-4">E2E</div>
-        <div class="row">
-            <h5 class="text-center col-10" style="padding-top:10px ;">Details of the requests raised on the
-                constructed network topology</h5>
-            <div class="text-right col-2">
-                <button class="btn btn-outline-primary" (click)="info_1()"><i class="pi pi-question"></i></button>
-            </div>
-        </div>
-        <div class="col">
-            <div class="row">
-                <table class="table table-bordered">
-                    <thead class="thead-light">
-                        <tr>
-                            <th class="col">Request Id</th>
-                            <th class="col">Source</th>
-                            <th class="col">Destination</th>
-                            <th class="col">Demand Size</th>
-                            <th class="col">Start Time</th>
-                            <th class="col">End Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="col">1</td>
-                            <td class="col">e1</td>
-                            <td class="col">e2</td>
-                            <td class="col">2</td>
-                            <td class="col">1s</td>
-                            <td class="col">6s</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <br>
 
-            <br>
-            <div class="row">
-                <h5 class="text-center col-10" style="padding-top:10px ;">Details of the memories of end nodes and
-                    entanglement
-                    between them</h5>
-                <div class="text-right col-2">
-                    <button class="btn btn-outline-primary" (click)="info_2()"><i class="pi pi-question"></i></button>
+                <div class="tabel">
+                    <h5><u>Receiver</u></h5>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col">Basis</td>
+                                <td class="col" [ngClass]="senderbasis(i)"
+                                    *ngFor="let app of e91.receiver_basis_list;let i=index">{{app}}</td>
+                            </tr>
+                            <tr>
+                                <td class="col">Value</td>
+                                <td class="col" [ngClass]="senderbasis(i)"
+                                    *ngFor="let app of e91.receiver_meas_list;let i=index">{{app}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
+            <div *ngIf="keyBits" class="row">
+                <div class="col">
+                    <p>E91 protocols has been executed and key of the demanded length has been shared between sender &
+                        receiver.​
+
+                        At the end of the execution of protocol, the sifted key between the source and destination is
+                        given
+                        below​</p>
+                    <br>
+                    <p>Shifted Key [The final key] is obtained at Alice and Bob from Measurement results obtained from
+                        Matching
+                        basis (that are
+                        indicated in green above)</p>
+                    <table class="table table-bordered align-middle">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="col">Sender</th>
+                                <th class="col">Receiver</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col">{{e91.sender_keys}}</td>
+                                <td class="col">{{e91.receiver_keys}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="app_id==1">
+            <div class="display-4">E2E</div>
             <div class="row">
-                <table id="table1" class="table table-bordered">
-                    <thead>
-                        <h5>Node:E1</h5>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th class="col" placement="top" ngbTooltip="Tooltip on top">
-                                Memory Index
-                            </th>
-                            <th class="col">Current Node</th>
-                            <th class="col">Entangled Node</th>
-                            <th class="col">Fidelity</th>
-                            <th class="col">Entangled Time</th>
-                            <th class="col">Expiry Time</th>
-                            <th class="col">State</th>
-                        </tr>
-
-                    </tbody>
-                </table>
+                <h5 class="text-center col-10" style="padding-top:10px ;">Details of the requests raised on the
+                    constructed network topology</h5>
+                <div class="text-right col-2">
+                    <button class="btn btn-outline-primary" (click)="info_1()"><i class="pi pi-question"></i></button>
+                </div>
             </div>
+            <div class="col">
+                <div class="row">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="col">Request Id</th>
+                                <th class="col">Source</th>
+                                <th class="col">Destination</th>
+                                <th class="col">Demand Size</th>
+                                <th class="col">Start Time</th>
+                                <th class="col">End Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col">1</td>
+                                <td class="col">e1</td>
+                                <td class="col">e2</td>
+                                <td class="col">2</td>
+                                <td class="col">1s</td>
+                                <td class="col">6s</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+
+                <br>
+                <div class="row">
+                    <h5 class="text-center col-10" style="padding-top:10px ;">Details of the memories of end nodes and
+                        entanglement
+                        between them</h5>
+                    <div class="text-right col-2">
+                        <button class="btn btn-outline-primary" (click)="info_2()"><i
+                                class="pi pi-question"></i></button>
+                    </div>
+                </div>
+                <div class="row">
+                    <table id="table1" class="table table-bordered">
+                        <thead>
+                            <h5>Node:E1</h5>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th class="col" placement="top" ngbTooltip="Tooltip on top">
+                                    Memory Index
+                                </th>
+                                <th class="col">Current Node</th>
+                                <th class="col">Entangled Node</th>
+                                <th class="col">Fidelity</th>
+                                <th class="col">Entangled Time</th>
+                                <th class="col">Expiry Time</th>
+                                <th class="col">State</th>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <table id="table2" class="table table-bordered">
+                        <thead>
+                            <h5>Node:E2</h5>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th class="col">Memory Index</th>
+                                <th class="col">Current Node</th>
+                                <th class="col">Entangled Node</th>
+                                <th class="col">Fidelity</th>
+                                <th class="col">Entangled Time</th>
+                                <th class="col">Expiry Time</th>
+                                <th class="col">State</th>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="app_id==3">
+            <div class="display-4">
+                Teleportation
+            </div>
+            <br>
+            <h5 class="text-center">
+                <p class="text-center">Entanglement shared between two parties​</p>
+                <p class="text-center">Two party Quantum State</p>
+            </h5>
+            <!-- <div class="row"> -->
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <td class="col">
+                            AliceBobEntanglement ​
+                        </td>
+                        <td class="col">
+                            State : {{tel.alice_bob_entanglement}}​
+                        </td>
+                    </tr>
+                </thead>
+            </table>
+            <h5 class="text-center">
+                <p class="text-center">Quantum State of the qubit (at the sender node) that should be teleported between
+                    two
+                    parties.​</p>
+            </h5>
+            <br>
+            <h6><u>At Sender</u></h6>
+            <br>
+
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <th class="col">
+                            Qubit to teleport
+                        </th>
+                        <th class="col">
+                            {{tel.random_qubit}}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="2" class="col">
+                            Classical Measurement results​
+                            (At sender)
+                        </td>
+                        <td class="col">(meas_res at sending qubit) meas_rq: {{tel.meas_rq}}</td>
+                    </tr>
+                    <tr>
+
+                        <td class="col">(meas_res at sending qubit) meas_rq:{{tel.meas_alice}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <h5 class="text-center">
+                <p class="text-center">Quantum State of the qubit (at the receiver node) that should be teleported
+                    between
+                    two parties.​</p>​
+            </h5>
+            <h6><u>At Receiver</u></h6>
+            <br>
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <th class="col">
+                            State​
+                            (after measurement at alice ,before corrective operations)​
+                        </th>
+                        <th class="col">{{tel.bob_initial_state}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="col">Corrective Unitary Transformations​
+                            (At receiver)​</td>
+                        <td>(gates applied on bob's entangled qubit ) : {{tel.Corrective_operation}}​</td>
+                    </tr>
+                    <tr>
+                        <td class="col">Qubit Received</td>
+                        <td class="col">{{tel.bob_final_state}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="text-center">After getting the measurement result from sender, unitary operation will be applied
+                at
+                the receiver node.​</p>
+            <!-- </div> -->
+        </div>
+        <div *ngIf="app_id==4">
+            <div class="display-4">
+                GHZ
+            </div>
+            <br>
+
+            <h5 class="text-center">Three party GHZ state has been prepared with the help of three two party
+                entanglement of
+                three end nodes with a common
+                central service node.​</h5>
+            <br>
+
+            <h5 class="text-center">Quantum state of two-party entanglement at all three end nodes with common central
+                node
+                who wanted to create GHZ state
+                between each other.</h5>
             <div class="row">
-                <table id="table2" class="table table-bordered">
-                    <thead>
-                        <h5>Node:E2</h5>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th class="col">Memory Index</th>
-                            <th class="col">Current Node</th>
-                            <th class="col">Entangled Node</th>
-                            <th class="col">Fidelity</th>
-                            <th class="col">Entangled Time</th>
-                            <th class="col">Expiry Time</th>
-                            <th class="col">State</th>
-                        </tr>
-
-                    </tbody>
-                </table>
+                <div class="col">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr class="table-primary">
+                                <th class="col">
+                                    Node 1
+                                </th>
+                                <th class="col">E1</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="2" class="col">
+                                    Initial Entanglement state (2party)​
+                                </td>
+                                <td>State: {{ghz.initial_alice_state}}</td>
+                            </tr>
+                            <tr>
+                                <td>Entangled State:{{ghz.alice_state}}</td>
+                            </tr>
+                            <tr>
+                                <td>Final Entangled State</td>
+                                <td>{{ghz.final_alice_state}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr class="table-primary">
+                                <th class="col">
+                                    Node 2
+                                </th>
+                                <th class="col">E2</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="2" class="col">
+                                    Initial Entanglement state (2party)​
+                                </td>
+                                <td>State: {{ghz.initial_bob_state}}</td>
+                            </tr>
+                            <tr>
+                                <td>Entangled State:{{ghz.bob_state}}</td>
+                            </tr>
+                            <tr>
+                                <td>Final Entangled State</td>
+                                <td>{{ghz.final_bob_state}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr class="table-primary">
+                                <th class="col">
+                                    Node 3
+                                </th>
+                                <th class="col">E3</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="2" class="col">
+                                    Initial Entanglement state (2party)​
+                                </td>
+                                <td>State: {{ghz.initial_charlie_state}}</td>
+                            </tr>
+                            <tr>
+                                <td>Entangled State:{{ghz.charlie_state}}</td>
+                            </tr>
+                            <tr>
+                                <td>Final Entangled State</td>
+                                <td>{{ghz.final_charlie_state}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
-    <div *ngIf="app_id==3" class="container shadow p-4 mb-5 bg-white rounded  ">
-        <div class="display-4">
-            Teleportation
-        </div>
-        <br>
-        <h5 class="text-center">
-            <p class="text-center">Entanglement shared between two parties​</p>
-            <p class="text-center">Two party Quantum State</p>
-        </h5>
-        <!-- <div class="row"> -->
-        <table class="table table-bordered">
-            <thead class="table-primary">
-                <tr>
-                    <td class="col">
-                        AliceBobEntanglement ​
-                    </td>
-                    <td class="col">
-                        State : {{tel.alice_bob_entanglement}}​
-                    </td>
-                </tr>
-            </thead>
-        </table>
-        <h5 class="text-center">
-            <p class="text-center">Quantum State of the qubit (at the sender node) that should be teleported between
-                two
-                parties.​</p>
-        </h5>
-        <br>
-        <h6><u>At Sender</u></h6>
-        <br>
-
-        <table class="table table-bordered">
-            <thead class="table-primary">
-                <tr>
-                    <th class="col">
-                        Qubit to teleport
-                    </th>
-                    <th class="col">
-                        {{tel.random_qubit}}
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td rowspan="2" class="col">
-                        Classical Measurement results​
-                        (At sender)
-                    </td>
-                    <td class="col">(meas_res at sending qubit) meas_rq: {{tel.meas_rq}}</td>
-                </tr>
-                <tr>
-
-                    <td class="col">(meas_res at sending qubit) meas_rq:{{tel.meas_alice}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <br>
-        <h5 class="text-center">
-            <p class="text-center">Quantum State of the qubit (at the receiver node) that should be teleported
-                between
-                two parties.​</p>​
-        </h5>
-        <h6><u>At Receiver</u></h6>
-        <br>
-        <table class="table table-bordered">
-            <thead class="table-primary">
-                <tr>
-                    <th class="col">
-                        State​
-                        (after measurement at alice ,before corrective operations)​
-                    </th>
-                    <th class="col">{{tel.bob_initial_state}}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="col">Corrective Unitary Transformations​
-                        (At receiver)​</td>
-                    <td>(gates applied on bob's entangled qubit ) : {{tel.Corrective_operation}}​</td>
-                </tr>
-                <tr>
-                    <td class="col">Qubit Received</td>
-                    <td class="col">{{tel.bob_final_state}}</td>
-                </tr>
-            </tbody>
-        </table>
-        <p class="text-center">After getting the measurement result from sender, unitary operation will be applied
-            at
-            the receiver node.​</p>
-        <!-- </div> -->
-    </div>
-    <div *ngIf="app_id==4" class="container shadow p-4 mb-5 bg-white rounded">
-        <div class="display-4">
-            GHZ
-        </div>
-        <br>
-
-        <h5 class="text-center">Three party GHZ state has been prepared with the help of three two party
-            entanglement of
-            three end nodes with a common
-            central service node.​</h5>
-        <br>
-
-        <h5 class="text-center">Quantum state of two-party entanglement at all three end nodes with common central
-            node
-            who wanted to create GHZ state
-            between each other.</h5>
-        <div class="row">
-            <div class="col">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr class="table-primary">
-                            <th class="col">
-                                Node 1
-                            </th>
-                            <th class="col">E1</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td rowspan="2" class="col">
-                                Initial Entanglement state (2party)​
-                            </td>
-                            <td>State: {{ghz.initial_alice_state}}</td>
-                        </tr>
-                        <tr>
-                            <td>Entangled State:{{ghz.alice_state}}</td>
-                        </tr>
-                        <tr>
-                            <td>Final Entangled State</td>
-                            <td>{{ghz.final_alice_state}}</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div *ngIf="app_id==7">
+            <div class="display-4 text-left col-9">
+                IP1
             </div>
-            <div class="col">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr class="table-primary">
-                            <th class="col">
-                                Node 2
-                            </th>
-                            <th class="col">E2</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td rowspan="2" class="col">
-                                Initial Entanglement state (2party)​
-                            </td>
-                            <td>State: {{ghz.initial_bob_state}}</td>
-                        </tr>
-                        <tr>
-                            <td>Entangled State:{{ghz.bob_state}}</td>
-                        </tr>
-                        <tr>
-                            <td>Final Entangled State</td>
-                            <td>{{ghz.final_bob_state}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="col">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr class="table-primary">
-                            <th class="col">
-                                Node 3
-                            </th>
-                            <th class="col">E3</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td rowspan="2" class="col">
-                                Initial Entanglement state (2party)​
-                            </td>
-                            <td>State: {{ghz.initial_charlie_state}}</td>
-                        </tr>
-                        <tr>
-                            <td>Entangled State:{{ghz.charlie_state}}</td>
-                        </tr>
-                        <tr>
-                            <td>Final Entangled State</td>
-                            <td>{{ghz.final_charlie_state}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div *ngIf="app_id==7" class="container shadow p-4 mb-5 bg-white rounded   row">
-        <div class="display-4 text-left col-9">
-            IP1
-        </div>
 
-        <div class="text-right col-2">
-            <button class="btn btn-outline-primary" (click)="info_qsdc()" style="margin-top: 18px;"><i
-                    class="pi pi-question"></i></button>
-        </div>
-        <br>
-        <table class="table table-bordered">
-            <thead class="table-primary">
-                <tr>
-                    <td class="col">
-                        Sender's (Alice: E1) Input Message
-                    </td>
-                    <td class="col">
-                        {{ip1.input_message}}
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="table-secondary">
-                    <td class="col">
-                        Security Checked
-                    </td>
-                    <td class="col">
-                        {{ip1.Security_msg}}
-                    </td>
-                </tr>
-                <tr class="table-secondary">
-                    <td class="col">IdA Authentication</td>
-                    <td class="col">{{ip1.IdA_msg}}</td>
-                </tr>
-                <tr class="table-secondary">
-                    <td class="col">
-                        Sender Key
-                    </td>
-                    <td class="col">
-                        {{alice_r}}
-                    </td>
-                </tr>
-                <tr class="table-secondary">
-                    <td class="col">
-                        Receiver Key
-                    </td>
-                    <td class="col">
-                        {{ip1.Bobs_r}}
-                    </td>
-                </tr>
-                <tr class="table-secondary">
-                    <td colspan="2" class="col">
-                        {{ip1.display_msg}}
-                    </td>
-                </tr>
-                <tr class="table-primary">
-                    <td class="col">
-                        Receiver's (Bob: E2) Output message
-                    </td>
-                    <td class="col">
-                        {{ip1.bob_message}}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div *ngIf="app_id==5" class="container shadow p-4 mb-5 bg-white rounded  ">
-        <div class="row">
-            <div class="display-4 col-9 text-left">
-                QSDC1
-            </div>
             <div class="text-right col-2">
                 <button class="btn btn-outline-primary" (click)="info_qsdc()" style="margin-top: 18px;"><i
                         class="pi pi-question"></i></button>
             </div>
+            <br>
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <td class="col">
+                            Sender's (Alice: E1) Input Message
+                        </td>
+                        <td class="col">
+                            {{ip1.input_message}}
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            Security Checked
+                        </td>
+                        <td class="col">
+                            {{ip1.Security_msg}}
+                        </td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td class="col">IdA Authentication</td>
+                        <td class="col">{{ip1.IdA_msg}}</td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            Sender Key
+                        </td>
+                        <td class="col">
+                            {{alice_r}}
+                        </td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            Receiver Key
+                        </td>
+                        <td class="col">
+                            {{ip1.Bobs_r}}
+                        </td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td colspan="2" class="col">
+                            {{ip1.display_msg}}
+                        </td>
+                    </tr>
+                    <tr class="table-primary">
+                        <td class="col">
+                            Receiver's (Bob: E2) Output message
+                        </td>
+                        <td class="col">
+                            {{ip1.bob_message}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <br>
-        <table class="table table-bordered">
-            <thead class="table-primary">
-                <tr>
-                    <td class="col">
-                        Sender's (Alice: E1) Key Transimitted
-                    </td>
-                    <td class="col">
-                        {{qsdc1.key_transmitted}}
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="table-secondary">
-                    <td class="col">
-                        EvesDrop
-                    </td>
-                    <td class="col">
-                        {{qsdc1.eavesdrop}}
-                    </td>
-                </tr>
-                <tr class="table-secondary">
-                    <td class="col">
-                        Bits Used for Eves Detection
-                    </td>
-                    <td class="col">
-                        {{qsdc1.display_msg}}
-                    </td>
-                </tr>
-                <tr class="table-primary">
-                    <td rowspan="2" class="col">
-                        Received key at Receiver (Bob: E2)
-                    </td>
-                    <td class="col">
-                        Key after Removed Bits : {{qsdc1.key_shared_received}}
-                    </td>
-                </tr>
-                <tr class="table-primary">
-                    <td class="col">Final Key  : {{qsdc1.final_key}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div *ngIf="app_id==6" class="container shadow p-4 mb-5 bg-white rounded  ">
-        <div class="row">
-            <div class="display-4 text-left col-9">
-                PingPong
+        <div *ngIf="app_id==5">
+            <div class="row">
+                <div class="display-4 col-9 text-left">
+                    QSDC1
+                </div>
+                <div class="text-right col-2">
+                    <button class="btn btn-outline-primary" (click)="info_qsdc()" style="margin-top: 18px;"><i
+                            class="pi pi-question"></i></button>
+                </div>
             </div>
+            <br>
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <td class="col">
+                            Sender's (Alice: E1) Key Transimitted
+                        </td>
+                        <td class="col">
+                            {{qsdc1.key_transmitted}}
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            EvesDrop
+                        </td>
+                        <td class="col">
+                            {{qsdc1.eavesdrop}}
+                        </td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            Bits Used for Eves Detection
+                        </td>
+                        <td class="col">
+                            {{qsdc1.display_msg}}
+                        </td>
+                    </tr>
+                    <tr class="table-primary">
+                        <td rowspan="2" class="col">
+                            Received key at Receiver (Bob: E2)
+                        </td>
+                        <td class="col">
+                            Key after Removed Bits : {{qsdc1.key_shared_received}}
+                        </td>
+                    </tr>
+                    <tr class="table-primary">
+                        <td class="col">Final Key  : {{qsdc1.final_key}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div *ngIf="app_id==6">
+            <div class="row">
+                <div class="display-4 text-left col-9">
+                    PingPong
+                </div>
+                <div class="text-right col-2">
+                    <button class="btn btn-outline-primary" (click)="info_qsdc()" style="margin-top: 18px;"><i
+                            class="pi pi-question"></i></button>
+                </div>
+            </div>
+            <br>
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <td class="col">
+                            Sender's (Alice: E1) Input message
+                        </td>
+                        <td class="col">
+                            {{pingpong.message_transmitted}}
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            EvesDrop
+                        </td>
+                        <td class="col">
+                            {{pingpong.Eve_presence}}
+                        </td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            Protocol m's Impurities
+                        </td>
+                        <td class="col">
+                            {{pingpong.Impurities_presence}}
+                        </td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td colspan="2">(If Impurities present: Then display accuracy of transmission)​</td>
+                    </tr>
+                    <tr class="table-primary">
+                        <td class="col">
+                            Receiver (Bob: E2) Output message ​
+                        </td>
+                        <td class="col">
+                            {{pingpong.message_received}}
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+        <div *ngIf="app_id==8">
+            <div class="row">
+                <div class="display-4 text-left col-9">
+                    Single Photon QD
+                </div>
+                <div class="text-right col-2">
+                    <button class="btn btn-outline-primary" (click)="info('spqd')" style="margin-top: 18px;"><i
+                            class="pi pi-question"></i></button>
+                </div>
+            </div>
+            <br>
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <td class="col">
+                            Input Message 1
+                        </td>
+                        <td class="col">
+                            {{spqd.input_message1}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col">
+                            Input Message 2
+                        </td>
+                        <td class="col">
+                            {{spqd.input_message2}}
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            Attack
+                        </td>
+                        <td class="col">
+                            {{spqd.attack}}
+                        </td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            Error
+                        </td>
+                        <td class="col">
+                            {{spqd.error}}
+                        </td>
+                    </tr>
+
+                    <tr class="table-primary">
+                        <td class="col">
+                            Output Message 1
+                        </td>
+                        <td class="col">
+                            {{spqd.output_message1}}
+                        </td>
+                    </tr>
+                    <tr class="table-primary">
+                        <td class="col">
+                            Output Message 2
+                        </td>
+                        <td class="col">
+                            {{spqd.output_message2}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div *ngIf="app_id==9">
+            <div class="row">
+                <div class="display-4 text-left col-9">
+                    QSDC-Teleportation
+                </div>
+                <div class="text-right col-2">
+                    <button class="btn btn-outline-primary" (click)="info('qsdct')" style="margin-top: 18px;"><i
+                            class="pi pi-question"></i></button>
+                </div>
+            </div>
+            <br>
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <td class="col">
+                            Input Message
+                        </td>
+                        <td class="col">
+                            {{qsdct.input_message}}
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            Attack
+                        </td>
+                        <td class="col">
+                            {{qsdct.attack}}
+                        </td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            Error
+                        </td>
+                        <td class="col">
+                            {{qsdct.error}}
+                        </td>
+                    </tr>
+
+                    <tr class="table-primary">
+                        <td class="col">
+                            Output Message
+                        </td>
+                        <td class="col">
+                            {{qsdct.output_message}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <div *ngIf="app_id==10">
+            <div class="display-4 text-left col-9">
+                IP2
+            </div>
+
             <div class="text-right col-2">
-                <button class="btn btn-outline-primary" (click)="info_qsdc()" style="margin-top: 18px;"><i
+                <button class="btn btn-outline-primary" (click)="info_qsdc_1('ip1')" style="margin-top: 18px;"><i
                         class="pi pi-question"></i></button>
             </div>
+            <br>
+            <table class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <td class="col">
+                            Sender's Input Message
+                        </td>
+                        <td class="col">
+                            {{ip2.input_message}}
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            Security Checked
+                        </td>
+                        <td class="col">
+                            {{ip2.security_check}}
+                        </td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td class="col">Alice's IdA Authentication</td>
+                        <td class="col">{{ip2.alice_ida_auth}}</td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td class="col">Bob's IdA Authentication</td>
+                        <td class="col">{{ip2.bob_ida_auth}}</td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            Sender Key
+                        </td>
+                        <td class="col">
+                            {{ip2.sender_key}}
+                        </td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            Receiver Key
+                        </td>
+                        <td class="col">
+                            {{ip2.receiver_key}}
+                        </td>
+                    </tr>
+                    <tr class="table-primary">
+                        <td class="col">
+                            Receiver's Output message
+                        </td>
+                        <td class="col">
+                            {{ip2.output_message}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <br>
-        <table class="table table-bordered">
-            <thead class="table-primary">
-                <tr>
-                    <td class="col">
-                        Sender's (Alice: E1) Input message
-                    </td>
-                    <td class="col">
-                        {{pingpong.message_transmitted}}
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="table-secondary">
-                    <td class="col">
-                        EvesDrop
-                    </td>
-                    <td class="col">
-                        {{pingpong.Eve_presence}}
-                    </td>
-                </tr>
-                <tr class="table-secondary">
-                    <td class="col">
-                        Protocol m's Impurities
-                    </td>
-                    <td class="col">
-                        {{pingpong.Impurities_presence}}
-                    </td>
-                </tr>
-                <tr class="table-secondary">
-                    <td colspan="2">(If Impurities present: Then display accuracy of transmission)​</td>
-                </tr>
-                <tr class="table-primary">
-                    <td class="col">
-                        Receiver (Bob: E2) Output message ​
-                    </td>
-                    <td class="col">
-                        {{pingpong.message_received}}
-                    </td>
-                </tr>
-
-            </tbody>
-        </table>
-    </div>
-    <div *ngIf="app_id==8" class="container shadow p-4 mb-5 bg-white rounded  ">
-        <div class="row">
-            <div class="display-4 text-left col-9">
-                Single Photon QD
-            </div>
-            <div class="text-right col-2">
-                <button class="btn btn-outline-primary" (click)="info('spqd')" style="margin-top: 18px;"><i
-                        class="pi pi-question"></i></button>
-            </div>
-        </div>
-        <br>
-        <table class="table table-bordered">
-            <thead class="table-primary">
-                <tr>
-                    <td class="col">
-                        Input Message 1
-                    </td>
-                    <td class="col">
-                        {{spqd.input_message1}}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="col">
-                        Input Message 2
-                    </td>
-                    <td class="col">
-                        {{spqd.input_message2}}
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="table-secondary">
-                    <td class="col">
-                        Attack
-                    </td>
-                    <td class="col">
-                        {{spqd.attack}}
-                    </td>
-                </tr>
-                <tr class="table-secondary">
-                    <td class="col">
-                        Error
-                    </td>
-                    <td class="col">
-                        {{spqd.error}}
-                    </td>
-                </tr>
-
-                <tr class="table-primary">
-                    <td class="col">
-                        Output Message 1
-                    </td>
-                    <td class="col">
-                        {{spqd.output_message1}}
-                    </td>
-                </tr>
-                <tr class="table-primary">
-                    <td class="col">
-                        Output Message 2
-                    </td>
-                    <td class="col">
-                        {{spqd.output_message2}}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div *ngIf="app_id==9" class="container shadow p-4 mb-5 bg-white rounded  ">
-        <div class="row">
-            <div class="display-4 text-left col-9">
-                QSDC-Teleportation
-            </div>
-            <div class="text-right col-2">
-                <button class="btn btn-outline-primary" (click)="info('qsdct')" style="margin-top: 18px;"><i
-                        class="pi pi-question"></i></button>
-            </div>
-        </div>
-        <br>
-        <table class="table table-bordered">
-            <thead class="table-primary">
-                <tr>
-                    <td class="col">
-                        Input Message
-                    </td>
-                    <td class="col">
-                        {{qsdct.input_message}}
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="table-secondary">
-                    <td class="col">
-                        Attack
-                    </td>
-                    <td class="col">
-                        {{qsdct.attack}}
-                    </td>
-                </tr>
-                <tr class="table-secondary">
-                    <td class="col">
-                        Error
-                    </td>
-                    <td class="col">
-                        {{qsdct.error}}
-                    </td>
-                </tr>
-
-                <tr class="table-primary">
-                    <td class="col">
-                        Output Message
-                    </td>
-                    <td class="col">
-                        {{qsdct.output_message}}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-    </div>
-    <div *ngIf="app_id==10" class="container shadow p-4 mb-5 bg-white rounded row">
-        <div class="display-4 text-left col-9">
-            IP1
-        </div>
-
-        <div class="text-right col-2">
-            <button class="btn btn-outline-primary" (click)="info_qsdc_1('ip1')" style="margin-top: 18px;"><i
-                    class="pi pi-question"></i></button>
-        </div>
-        <br>
-        <table class="table table-bordered">
-            <thead class="table-primary">
-                <tr>
-                    <td class="col">
-                        Sender's Input Message
-                    </td>
-                    <td class="col">
-                        {{ip2.input_message}}
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="table-secondary">
-                    <td class="col">
-                        Security Checked
-                    </td>
-                    <td class="col">
-                        {{ip2.security_check}}
-                    </td>
-                </tr>
-                <tr class="table-secondary">
-                    <td class="col">Alice's IdA Authentication</td>
-                    <td class="col">{{ip2.alice_ida_auth}}</td>
-                </tr>
-                <tr class="table-secondary">
-                    <td class="col">Bob's IdA Authentication</td>
-                    <td class="col">{{ip2.bob_ida_auth}}</td>
-                </tr>
-                <tr class="table-secondary">
-                    <td class="col">
-                        Sender Key
-                    </td>
-                    <td class="col">
-                        {{ip2.sender_key}}
-                    </td>
-                </tr>
-                <tr class="table-secondary">
-                    <td class="col">
-                        Receiver Key
-                    </td>
-                    <td class="col">
-                        {{ip2.receiver_key}}
-                    </td>
-                </tr>
-                <tr class="table-primary">
-                    <td class="col">
-                        Receiver's Output message
-                    </td>
-                    <td class="col">
-                        {{ip2.output_message}}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 </div>

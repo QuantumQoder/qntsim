@@ -417,14 +417,81 @@
                     of message. Bob then applies transformations and measurement to retrieve the classical message.​</p>
             </div>
         </div>
+        <div *ngIf="app=='8'" class="col-11">
+            <h1 class="display-1">Single Photon Quantum Dialogue</h1>
+            <div class="row">
+                <p class="text-justfify col-11">his changes the state of the photons which results in it carrying the
+                    information to the receiver. The receiver then
+                    encodes their message through their unitary rotation and then, measures out the state of the photon.
+                    The measurement
+                    results,initial states and the initial messages of each party helps them to decode the message of
+                    the other.
+
+                    The implementation refers to the research article:<a href=""
+                        (click)="quant_ph('https://iopscience.iop.org/article/10.1088/1009-1963/15/7/005 ')">https://iopscience.iop.org/article/10.1088/1009-1963/15/7/005</a>
+                </p>
+                <div class="btngroup">
+                    <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To
+                        Application</button>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="row">
+                    <div class="col-10">
+                        <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
+                    </div>
+                </div>
+            </div>
+            <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>ENCODING OF FIRST MESSAGE​</small></h3>
+            <div *ngIf="activeIndex==0">
+                <!-- <img class="img1" src="assets/images/qsdctel/qtel1.svg" alt="..."> -->
+                <p class="text-justify">One of the parties prepares required number of batches of photons, each in
+                    random initial states among |0>, |1>, |+> and
+                    |->. Then, they encode their message into the photons by applying I and Y pauli gates for bit value
+                    '0' and '1',
+                    respectively, and send the photons to the next party.</p>
+            </div>
+            <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>SECURITY CHECK OF THE CHANNELS​</small></h3>
+            <div *ngIf="activeIndex==1">
+                <!-- <img class="img1" src="assets/images/qsdctel/qtel2.svg" alt="..."> -->
+                <br>
+                <p class="text-justify">The receiver would select some random photons in order to measure and verify the
+                    integrity of the channel. They achieve
+                    this measuring random photons and sharing the measurement outcomes with the source of the photons.
+                    The photon source
+                    verifies the measurement result according to the photons' initial state and message encoded and
+                    decides to proceed if
+                    the error values lie with the threshold.</p>
+            </div>
+            <h3 *ngIf="activeIndex==2" class="display-4 text-center">ENCODING OF SECOND MESSAGE AND DECODING</h3>
+            <!-- <img class="img1" *ngIf="activeIndex==2" src="assets/images/qsdctel/qtel3.svg" alt=""> -->
+            <p *ngIf="activeIndex==2">After the verification passes the authenticity check in step 2, the second partner
+                (receiver) would encode their message
+                in the same scheme as in step 1, and then measure out the photons. The receiver shares this measurement
+                outcomes over
+                the public channel with the sender. And, the sender shares the information on the initial state of the
+                photons over the
+                public channel. The sender uses the information of the initial state, their to-be conveyed message and
+                the measurement
+                outcomes to decode the receiver's message. Similarly, the receiver uses the measurement outcomes, their
+                to-be conveyed
+                message and the information on the initial states to decode the sender's message.</p>
+        </div>
         <div *ngIf="app=='9'" class="col-12">
             <h1 class="display-1">QSDC with Controlled Teleportation</h1>
+            <br>
             <div class="row">
-                <p class="text-justify col-11">A secure QSDC protocol using only one orthogonal basis of single-qubit
-                    states to
-                    encode classical
-                    message. This highly secure protocol developed by Goutam Paul and Nayana Das can be used for high
-                    security secure direct communication with no information leakage to any Eavesdrop​
+                <p class="text-justify col-11">Quantum Information of an unknown quantum state of a two-level particle
+                    is communicated from Alice to Bob using
+                    pre-shared entanglements and teleportation in presence of a supervisor Charlie. Alice encodes the
+                    secret message
+                    directly on her sequence of particle states and transmits them to Bob. The protocol developed by T.
+                    Gao, F L Yan and Z X
+                    Wang has a unique feature where communication between two sides depends on the agreement of a third
+                    side.
+                    <a href=""
+                        (click)="quant_ph('https://iopscience.iop.org/article/10.1088/1009-1963/14/5/006/meta')">https://iopscience.iop.org/article/10.1088/1009-1963/14/5/006/meta</a>
                 </p>
 
                 <div class="btngroup">
@@ -442,7 +509,8 @@
             <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>PREPARING SHARED EN​TANGLEMENT​</small></h3>
             <div *ngIf="activeIndex==0">
                 <img class="img1" src="assets/images/qsdctel/qtel1.svg" alt="...">
-                <p>The protocol requires 3 parties to come together. For instance say, Charlie share a 3-qubit
+                <p class="text-justify">The protocol requires 3 parties to come together. For instance say, Charlie
+                    share a 3-qubit
                     entanglement with Alice, Bob and himself.​ This entanglement can also be shared by someone like
                     David where he prepares the entanglement and shares the qubits with Alice, Bob and Charlie.</p>
             </div>
@@ -451,7 +519,8 @@
             <div *ngIf="activeIndex==1">
                 <img class="img1" src="assets/images/qsdctel/qtel2.svg" alt="...">
                 <br>
-                <p>The protocol is performed by controlled teleportation meaning there is teleportation happening but in
+                <p class="text-justify">The protocol is performed by controlled teleportation meaning there is
+                    teleportation happening but in
                     a controlled manner which ultimately enables the protocol execution. Alice now encodes the original
                     classical
                     messages with a pre-decided encoding scheme and performs appropriate transformation in her entangled

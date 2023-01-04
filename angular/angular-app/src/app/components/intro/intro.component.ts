@@ -164,6 +164,26 @@ export class IntroComponent implements OnInit {
           }
         }]
     }
+    if (this.app == 8) {
+      this.items = [
+        {
+          label: 'Encoding of first message​', command: () => {
+            console.log(1)
+          }
+        },
+        {
+          label: "Security check of the channels", command: () => {
+            console.log(2)
+          }
+        },
+        {
+          label: 'Encoding of second message and decoding',
+          command: () => {
+            console.log(3)
+          }
+        }
+      ]
+    }
     if (this.app == 9) {
       this.items = [
         {
