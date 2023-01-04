@@ -66,9 +66,9 @@
     </p-dialog>
     <p-dialog header="Details" [draggable]="true" [(visible)]="infoqsdc" [modal]="true" [style]="{width: '50vw'}"
         position="right" [resizable]="true">
-        <ul>
+        <ul *ngIf="app_id!=7 && app_id!=10">
             <li>
-                <strong>Message:</strong> &nbsp;<small>Sender's message​</small>
+                <strong>Input Message:</strong> &nbsp;<small>Sender's message​</small>
             </li>
             <li>
                 <strong>Key Transmitted:</strong>&nbsp;<small>Sender's message after converting into binary​</small>
@@ -85,6 +85,30 @@
             </li>
             <li>
                 <strong>message_received:</strong>&nbsp;<small>received message after removing the checkbit ​</small>
+            </li>
+            <li>
+                <strong>Output Message:</strong>&nbsp;<small>Received message as character​</small>
+            </li>
+        </ul>
+
+        <ul *ngIf="app_id==7 || app_id==10">
+            <li>
+                <strong>Input Message:</strong> &nbsp;<small>Sender's message​</small>
+            </li>
+            <li>
+                <strong>IdA:</strong>&nbsp;<small>Sender's authentication Id</small>
+            </li>
+            <li>
+                <strong>Sender key:</strong>&nbsp;<small>Checkbit added by sender
+                </small>
+            </li>
+            <li>
+                <strong>Receiver key:</strong>&nbsp;<small>Checkbit received by receiver
+                </small>
+            </li>
+            <li>
+                <strong>r:</strong>&nbsp;<small>Constructed using receiver's authentication Id to
+                    authenticate receiver</small>
             </li>
             <li>
                 <strong>Output Message:</strong>&nbsp;<small>Received message as character​</small>
@@ -755,7 +779,7 @@
         </div>
 
         <div class="text-right col-2">
-            <button class="btn btn-outline-primary" (click)="info_qsdc()" style="margin-top: 18px;"><i
+            <button class="btn btn-outline-primary" (click)="info_qsdc_1('ip1')" style="margin-top: 18px;"><i
                     class="pi pi-question"></i></button>
         </div>
         <br>

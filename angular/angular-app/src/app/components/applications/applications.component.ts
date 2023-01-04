@@ -52,7 +52,7 @@ export class ApplicationsComponent implements OnInit {
       localStorage.setItem('app_id', app_id)
       this.conService.setApp(app)
       localStorage.setItem('app', app);
-      this._router.navigate(['/drag2']);
+      this._router.navigate(['/intro']);
     }
   }
   app1(app_id: any, app: string) {
@@ -72,7 +72,7 @@ export class ApplicationsComponent implements OnInit {
     this.conService.setApp(app)
     localStorage.setItem('app', app)
     var currenturl = this._router.url
-    var introurl = currenturl.replace('applications', 'drag2');
+    var introurl = currenturl.replace('applications', 'intro');
     window.open(introurl, "_blank")
   }
   clicked() {

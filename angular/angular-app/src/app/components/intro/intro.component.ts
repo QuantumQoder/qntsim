@@ -164,6 +164,26 @@ export class IntroComponent implements OnInit {
           }
         }]
     }
+    if (this.app == 9) {
+      this.items = [
+        {
+          label: 'Preparing Shared Entanglement​', command: () => {
+            console.log(1)
+          }
+        },
+        {
+          label: "Alice Encodes the message", command: () => {
+            console.log(2)
+          }
+        },
+        {
+          label: 'Measurement and Decoding',
+          command: () => {
+            console.log(3)
+          }
+        }
+      ]
+    }
   }
   previous() {
     this.activeIndex = this.activeIndex - 1;

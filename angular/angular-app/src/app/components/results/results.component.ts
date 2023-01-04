@@ -37,6 +37,7 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   qsdct: any;
   spqd: any;
   ip2: any;
+  app: string;
   constructor(private _formBuilder: FormBuilder, private con: ConditionsService, public api: ApiServiceService, private holdingData: HoldingDataService,
     private router: Router) { }
   ngAfterViewInit(): void {
@@ -145,6 +146,10 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   }
   info_qsdc() {
     this.infoqsdc = true
+  }
+  info_qsdc_1(data: string) {
+    this.infoqsdc = true;
+    this.app = data;
   }
   senderbasis(index: any) {
     var bool = this.match.includes(index)

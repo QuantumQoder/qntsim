@@ -5,13 +5,15 @@
 
             <h1 class="display-1 text-center">E91 Protocol </h1>
             <div class="row">
-                <p class="col-10">Proposed in 1991 by Artur Ekert, E91 protocol is an entanglement-based protocol which
+                <p class="col-11">Proposed in 1991 by Artur Ekert, E91 protocol is an entanglement-based protocol which
                     uses
                     Bell
                     states
                     shared between
                     Alice and Bob for secure distribution of secret key . ​</p>
-                <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To Application</button>
+                <div class="btn-group col-2">
+                    <button class="btn btn-primary btn-custom" routerLink="/drag2">Go To Application</button>
+                </div>
             </div>
             <br>
             <div class="row">
@@ -63,12 +65,14 @@
             <h1 class="display-1">E2E Protocol</h1>
             <br>
             <div class="row">
-                <p class="col-10">E2E (End to End entanglement) application is related to generate n-entangled pair of a
+                <p class="col-11">E2E (End to End entanglement) application is related to generate n-entangled pair of a
                     target
                     fidelity
                     between two
                     nodes, the source and the destination, those can be present anywhere in a given topology.</p>
-                <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To Application</button>
+                <div class="btn-group col-2">
+                    <button class="btn btn-primary btn-custom" routerLink="/drag2">Go To Application</button>
+                </div>
             </div>
             <br>
             <div class="row">
@@ -115,12 +119,14 @@
         <div *ngIf="app=='4'" class="col-11">
             <h1 class="display-1">GHZ</h1>
             <div class="row">
-                <p class="col-10">GHZ (Greenberger–Horne–Zeilinger state )state is a three party non-classically
+                <p class="col-11">GHZ (Greenberger–Horne–Zeilinger state )state is a three party non-classically
                     correlated quantum
                     state.
                     This
                     application is related to preparation of a three party entangled pair .​</p>
-                <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To Application</button>
+                <div class="btn-group col-2">
+                    <button class="btn btn-primary btn-custom" routerLink="/drag2">Go To Application</button>
+                </div>
             </div>
             <br>
             <div class="row">
@@ -167,12 +173,14 @@
             <h1 class="display-1">Teleportation Protocol</h1>
             <br>
             <div class="row">
-                <p class="col-10">TEL( Teleportation) protocol is regarding sharing an arbitrary quantum state between
+                <p class="col-11">TEL( Teleportation) protocol is regarding sharing an arbitrary quantum state between
                     two parties with
                     the
                     help of
                     entangled pair shared between them.​</p>
-                <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To Application</button>
+                <div class="btn-group col-2">
+                    <button class="btn btn-primary btn-custom" routerLink="/drag2">Go To Application</button>
+                </div>
             </div>
             <br>
             <div class="row">
@@ -229,12 +237,14 @@
             <h1 class="display-1">QSDC PingPong</h1>
             <br>
             <div class="row">
-                <p class="col-10">A QKD scheme using EPR pairs with each EPR pair carrying two bits of key code. This
+                <p class="col-11">A QKD scheme using EPR pairs with each EPR pair carrying two bits of key code. This
                     protocol is the
                     seminal work on QSDC by G.L. Long and X.S. Liu <a href=""
                         (click)="quant_ph('https://arxiv.org/pdf/quant-ph/0012056.pdf')">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​
                 </p>
-                <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To Application</button>
+                <div class="btn-group col-2">
+                    <button class="btn btn-primary btn-custom" routerLink="/drag2">Go To Application</button>
+                </div>
             </div>
             <br>
             <div class="row">
@@ -278,12 +288,14 @@
             <h1 class="display-1">QSDC1</h1>
             <br>
             <div class="row">
-                <p class="col-10">A QKD scheme using EPR pairs with each EPR pair carrying two bits of key code. This
+                <p class="col-11">A QKD scheme using EPR pairs with each EPR pair carrying two bits of key code. This
                     protocol is the
                     seminal work on QSDC by G.L. Long and X.S. Liu <a href=""
                         (click)="quant_ph('https://arxiv.org/pdf/quant-ph/0012056.pdf')">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​
                 </p>
-                <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To Application</button>
+                <div class="btn-group col-2">
+                    <button class="btn btn-primary btn-custom" routerLink="/drag2">Go To Application</button>
+                </div>
             </div>
             <br>
             <div class="row">
@@ -338,7 +350,7 @@
         <div *ngIf="app=='7'" class="col-11">
             <h1 class="display-1">Arbitrary basis QSDC</h1>
             <div class="row">
-                <p class="text-justify col-10">A secure QSDC protocol using only one orthogonal basis of single-qubit
+                <p class="text-justify col-11">A secure QSDC protocol using only one orthogonal basis of single-qubit
                     states to
                     encode classical
                     message. This highly secure protocol developed by Goutam Paul and Nayana Das can be used for high
@@ -347,7 +359,9 @@
                     ​<a href=""
                         (click)="quant_ph('https://doi.org/10.1007/s10773-021-04952-4')">https://doi.org/10.1007/s10773-021-04952-4​</a>​
                 </p>
-                <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To Application</button>
+                <div class="btn-group col-2">
+                    <button class="btn btn-primary btn-custom" routerLink="/drag2">Go To Application</button>
+                </div>
             </div>
             <br>
             <div class="row">
@@ -403,6 +417,60 @@
                     of message. Bob then applies transformations and measurement to retrieve the classical message.​</p>
             </div>
         </div>
+        <div *ngIf="app=='9'" class="col-12">
+            <h1 class="display-1">QSDC with Controlled Teleportation</h1>
+            <div class="row">
+                <p class="text-justify col-11">A secure QSDC protocol using only one orthogonal basis of single-qubit
+                    states to
+                    encode classical
+                    message. This highly secure protocol developed by Goutam Paul and Nayana Das can be used for high
+                    security secure direct communication with no information leakage to any Eavesdrop​
+                </p>
+
+                <div class="btngroup">
+                    <button class="btn btn-primary btn-custom col-2" routerLink="/drag2">Go To
+                        Application</button>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-10">
+                    <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
+                </div>
+            </div>
+            <br>
+            <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>PREPARING SHARED EN​TANGLEMENT​</small></h3>
+            <div *ngIf="activeIndex==0">
+                <img class="img1" src="assets/images/qsdctel/qtel1.svg" alt="...">
+                <p>The protocol requires 3 parties to come together. For instance say, Charlie share a 3-qubit
+                    entanglement with Alice, Bob and himself.​ This entanglement can also be shared by someone like
+                    David where he prepares the entanglement and shares the qubits with Alice, Bob and Charlie.</p>
+            </div>
+            <br>
+            <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>ALICE ENCODES THE MESSAGE​</small></h3>
+            <div *ngIf="activeIndex==1">
+                <img class="img1" src="assets/images/qsdctel/qtel2.svg" alt="...">
+                <br>
+                <p>The protocol is performed by controlled teleportation meaning there is teleportation happening but in
+                    a controlled manner which ultimately enables the protocol execution. Alice now encodes the original
+                    classical
+                    messages with a pre-decided encoding scheme and performs appropriate transformation in her entangled
+                    set of qubits. Then she creates message
+                    qubits in accordance to the encoded sequence meaning the message qubit is prepared in |+> state if
+                    the encoded entangled qubit is also in |+> state. </p>
+            </div>
+            <br>
+            <h3 *ngIf="activeIndex==2" class="display-4 text-center">MEASUREMENT AND DECODING</h3>
+            <img class="img1" *ngIf="activeIndex==2" src="assets/images/qsdctel/qtel3.svg" alt="">
+            <p *ngIf="activeIndex==2">Now, once this preparation is completed, Charlie measures her entangled set of
+                qubits in computational basis. He now communicates his result to Alice and Bob via a classical channel.
+                This is the step where trust on Charlie is expected. With Charlie's measurement been done, Alice
+                performs Joint Measurement (or Bell state measurement)​​ on her qubit pairs and communicates her result
+                to Bob via Classical channel. Finally Bob uses this information from Alice and Charlie to perform
+                corrective operations on her qubits to decode the original message that was been sent.
+                ​</p>
+            <br>
+        </div>
         <br>
         <!-- </div> -->
         <div class="d-flex justify-content-center button-group ">
@@ -427,6 +495,8 @@
             <button type="button" *ngIf="step==2 && app==7 && activeIndex==0 ||step==2 && app==7 && activeIndex ==1"
                 class="btn btn-primary btn-custom" (click)="next()">Next</button>
             <br>
+
         </div>
+        <div style="padding: 10px;"></div>
     </div>
 </div>
