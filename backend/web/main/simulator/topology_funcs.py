@@ -22,6 +22,7 @@ from main.simulator.app.ip2 import *
 from main.simulator.app.utils import *
 
 
+
 def graph_topology(network_config_json):
     
     network_config_json,tl,network_topo = load_topology(network_config_json, "Qiskit")
@@ -271,9 +272,14 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
 
 def mdi_qsdc(network_config, sender, receiver, message, attack):
     
+    network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
+    # print('network config json', network_config_json)
     mdi_qsdc = MdiQSDC()
-    results = mdi_qsdc.run(message,attack)
-    print(results)
+    # print("network Config", network_config)
+    topo = json_topo(network_config)
+    print("topo",topo)
+    results = mdi_qsdc.run(topo,message,attack)
+    print('results',results)
     
 
 def ip2(network_config, sender, receiver, message):

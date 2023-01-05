@@ -12,6 +12,7 @@ class ErrorAnalyzer:
     @staticmethod
     def analyse(protocol_obj:Protocol):
         networks = protocol_obj.networks
+        print('networks', networks)
         full_err_list, mean_list, sd_list = [], [], []
         for i, network in enumerate(networks, 1):
             platform = network.platform

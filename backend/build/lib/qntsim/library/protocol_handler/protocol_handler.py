@@ -14,9 +14,9 @@ class Protocol:
     def __init__(self, platform:str, messages_list:List[List[str]], **kwargs) -> None:
         self.backend = kwargs.get('backend')
         assert self.backend, 'Provide backend.'
-        if Network[platform]==Network.qiskit:
-            self.filename = kwargs.get('filename')
-            assert self.filename, 'Provide filename.'
+        # if Network[platform]==Network.qiskit:
+        #     self.filename = kwargs.get('filename')
+        #     assert self.filename, 'Provide filename.'
         networks = []
         attack = kwargs.get('attack')
         # Network = Network[platform]

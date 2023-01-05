@@ -9,70 +9,35 @@ import numpy as np
 import math
 from qntsim.library.components.qntsim_network import Network
 from qntsim.library.protocol_handler.protocol_handler import Protocol
+import json
+import os
+
 
 class MdiQSDC():
     
     
-    def run(self, message, attack):
+    def run(self, json_topo,message, attack):
         
-        topo = {
-            "cchannels_table": {
-                "labels": ["n0", "s0", "n1", "s1", "n2"],
-                "table": [[0, 1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0],
-                        [1000000000.0, 0, 1000000000.0, 1000000000.0, 1000000000.0],
-                        [1000000000.0, 1000000000.0, 0, 1000000000.0, 1000000000.0],
-                        [1000000000.0, 1000000000.0, 1000000000.0, 0, 1000000000.0],
-                        [1000000000.0, 1000000000.0, 1000000000.0, 1000000000.0, 0]],
-                "type": "RT"
-            },
-            "end_node": {
-                "n0": "s0",
-                "n1": "s1",
-                "n2": "s1"
-            },
-            "qconnections": [
-                {
-                    "attenuation": 1e-05,
-                    "distance": 70,
-                    "node1": "n0",
-                    "node2": "s0"
-                },
-                {
-                    "attenuation": 1e-05,
-                    "distance": 70,
-                    "node1": "s0",
-                    "node2": "n1"
-                },
-                {
-                    "attenuation": 1e-05,
-                    "distance": 70,
-                    "node1": "n1",
-                    "node2": "s1"
-                },
-                {
-                    "attenuation": 1e-05,
-                    "distance": 70,
-                    "node1": "s1",
-                    "node2": "n2"
-                }
-            ],
-            "service_node": [
-                "s0",
-                "s1"
-            ]
-        }
-        messages = ['hi', 'mi']
+        # topo = json.dumps(json_topo, indent = 4)
+        # print('json topo', topo,)
+        print('pwd', os.getcwd())
+        with open('network_topo.json','w') as fp:
+            json.dump(json_topo,fp, indent=4)
+        # f = open('/code/web/network_topo.json')
+        topo = '/code/web/network_topo.json'
+        # topo = code/backend/web/network_topo.json
+        print("topo", topo)
         protocol = Protocol(platform='qntsim',
-                    messages_list=[messages],
+                    messages_list=[message],
                     topology=topo,
-                    backend='Qutip', attack='DoS')
+                    backend='Qutip', attack=attack)
         
         print('Received messages:', protocol.recv_msgs)
         print('Error:', mean(protocol.mean_list))
-        network = Network(topology=str(topo),
-                  messages=message,
-                  label='00')
+        # network = Network(topology=json.dumps(json_topo),
+        #           messages=message,
+        #           label='00')
         
-        # print(network.dump())
-        print(network.size)
+        # # print(network.dump())
+        # print(network.size)
         

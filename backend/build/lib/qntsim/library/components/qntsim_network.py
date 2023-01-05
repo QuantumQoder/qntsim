@@ -16,6 +16,7 @@ from qntsim.components.circuit import *
 from qutip import Qobj
 from statistics import mean, stdev
 from IPython.display import clear_output
+import os
 
 
 # %%
@@ -80,6 +81,7 @@ class Network:
     
     def set_parameters(self, parameters:str, network):
 #         network = self.network
+        print('parameters', os.getcwd(),parameters)
         with open(parameters, 'r') as file:
             dict = eval(file.read())
             for key, value in dict.items():
