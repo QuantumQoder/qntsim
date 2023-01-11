@@ -28,6 +28,7 @@ class Network:
         all_binary = all(char=='0' or char=='1' for message in messages for char in message)
         messages = messages if all_binary else string_to_binary(messages)
         self.messages = messages
+        self.recv_mesgs = []
         self.corrections = {}
         self.strings = []
         if callable((size:=kwargs.get('size', len(messages[0])))):
@@ -259,6 +260,7 @@ class Network:
     
     @staticmethod
     def decode(network_objs:list):
+        recv_msgs = []
         for network_obj in network_objs:
             node = network_obj.nodes[0]
             outputs = network_obj.outputs
@@ -278,15 +280,20 @@ class Network:
                 strings = [''.join(str(*output.values()) for output in outputs)]
             network_obj.strings = strings
             print('Received messages!!')
-            for i, string in enumerate(strings, 1):
-                print(f'Received message {i}', ''.join(chr(int(string[j*8:-~j*8], 2)) for j in range(len(string)//8)))
+            recv_msg = {i:''.join(chr(int(string[j*8:-~j*8], 2)) for j in range(len(string)//8)) for i, string in enumerate(strings, 1)}
+            for k, v in recv_msg.items():
+                print(f'Received message {k}: {v}')
+            network_obj.recv_msg = recv_msg
+            recv_msgs.append(recv_msg)
+        
+        return recv_msgs
     
-    def dump(self, info_state='ENTANGLED'):
+    def dump(self, node_name:str=None, info_state:str=None):
         manager = self.manager
-        for node in self.nodes:
+        for node in self.nodes if not node_name else [self.network.nodes[node_name]]:
             print("{}'s memory nodes:".format(node.owner.name))
             for info in node.resource_manager.memory_manager:
-                if info.state==info_state:
+                if not info_state or info.state==info_state:
                     key = info.memory.qstate_key
                     state = manager.get(key)
                     print(state.keys, state.state)
@@ -471,7 +478,6 @@ class ErrorAnalyzer:
         full_err_list = protocol.full_err_list
         mean_list = protocol.mean_list
         sd_list = protocol.sd_list
-        print(mean_list)
         print(f'Error analysis for {attack}')
         full_err_list = np.array(full_err_list)
         plt.figure(figsize=(20, 5))
@@ -500,6 +506,6 @@ class ErrorAnalyzer:
 def string_to_binary(messages):
     print("Converting to binary...")
     strings = [''.join('0'*(8-len(bin(ord(char))[2:]))+bin(ord(char))[2:] for char in message) for message in messages]
-    print("Conversion completed")
+    print("Conversion completed",strings)
     
     return strings

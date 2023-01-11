@@ -25,30 +25,47 @@ def load_topology(network_config_json, backend):
 
     
     return network_config_json,tl,network_topo
+
+
+def get_service_node(nodes):
     
-def get_nodes(nodes):
-    
-    
-    service_node,end_node =[],{}
+    service_node = []
     for node in nodes:
         if node.get("Type") == "service":
             service_node.append(node.get("Name"))
-        else:
-            pass
-    return service_node,end_node
+    
+    return service_node
+            
+    
+def get_end_node(nodes,qconnections):
+    
+    
+    service_node = get_service_node(nodes)
+    end_node = {}
+    for conns in qconnections:
+        nodes = conns.get("Nodes")
+        if bool(set(service_node) & set(nodes)):
+            end_node[nodes[0]] = nodes[1]
+    
+    
+    return end_node
 
 
 def get_qconnections(quantum_connections):
     
-    conn, qconnections = {},[]
+    qconnections = []
+    print('quantun conn',quantum_connections)
     for connections in quantum_connections:
-        for nodes in connections.get("Nodes"):
-            conn["nodes1"] = nodes[0]
-            conn["nodes2"] = nodes[1]
-            conn["attenuation"] = conn.get("Attenuation")
-            conn["distance"] = conn.get("Distance")
+        # for nodes in connections.get("Nodes"):
+        conn = {}
+        print('connections', connections,connections.get("Nodes")[0])
+        conn["node1"] = connections.get("Nodes")[0]
+        conn["node2"] = connections.get("Nodes")[1]
+        conn["attenuation"] = connections.get("Attenuation")
+        conn["distance"] = connections.get("Distance")
         qconnections.append(conn)
     
+    print('qconnectios', qconnections)
     return qconnections
             
 def to_matrix(l, n):
@@ -61,9 +78,14 @@ def get_cconnections(classical_connections):
     nodes = []
     for conn in classical_connections:
         for node in conn.get("Nodes"):
-            nodes.append(*node)
+            # print('inside node', node)
+            nodes.append(node)
+            # for nod in node:
+            #     nodes.append(nod)
             
+    # print('nodes',nodes)
     nodes = list(set(nodes))
+    # print('nodes',nodes)
     cchannels_table["labels"] = nodes
     table = []
     for node1 in nodes:
@@ -78,16 +100,21 @@ def get_cconnections(classical_connections):
     return cchannels_table
  
             
-def refactor_topo(topology):
+def json_topo(topology):
     
     nodes = topology.get("nodes")
     quantum_connections = topology.get("quantum_connections")
     classical_connections = topology.get("classical_connections")
     
     network_json = {}
-    service_node,end_node = get_nodes(nodes)
+    service_node = get_service_node(nodes)
+    end_node = get_end_node(nodes,quantum_connections)
     
     network_json["service_node"] = service_node
     network_json["end_node"] = end_node
-    network_json["qconnections"] = qconnections
-    network_json["cchannels_table"] = service_node
+    network_json["qconnections"] = get_qconnections(quantum_connections)
+    network_json["cchannels_table"] = get_cconnections(classical_connections)
+    
+    return network_json
+    
+    

@@ -3,8 +3,8 @@ from qutip import Qobj
 
 from qntsim.components.circuit import x_gate, y_gate, z_gate
 
-from ..components.network import Network
-from ..attacks.attacks import Attack
+from qntsim.library.components.network import Network
+from qntsim.library.attacks.attacks import Attack
 
 class Channel:
     def __init__(self, parameter, network:Network, attack:Attack):

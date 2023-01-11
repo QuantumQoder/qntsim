@@ -500,6 +500,6 @@ class ErrorAnalyzer:
 def string_to_binary(messages):
     print("Converting to binary...")
     strings = [''.join('0'*(8-len(bin(ord(char))[2:]))+bin(ord(char))[2:] for char in message) for message in messages]
-    print("Conversion completed")
+    print("Conversion completed",strings)
     
     return strings
