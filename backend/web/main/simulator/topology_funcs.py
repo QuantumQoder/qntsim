@@ -258,20 +258,32 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     with open('network_topo.json','w') as fp:
         json.dump(topology,fp, indent=4)
     # f = open('/code/web/network_topo.json')
-    topo = '/code/web/1node.json'
-    print('message', type(message),type([message]),attack)
-    # message = ['hi']
-
+    topo = '/code/web/3node.json'
+    # print('message', [message], type(message),type([message]),attack)
+    # message = ['hello']
+    message = [message]
+    # print('message', message, type(message),type([message]),attack)
     protocol = Protocol(platform='qntsim',
                         messages_list=[message],
                         topology=topo,
                         backend='Qutip',
-                        label='00' 
+                        label='00',
+                        attack = attack
                         )
 
     # This should be on results page
     print('Received messages:', protocol.recv_msgs)
     print('Error:', mean(protocol.mean_list))
+    error = mean(protocol.mean_list)
+    res ={}
+    res["input_message"] = message
+    res["output_message"] = protocol.recv_msgs[0][1]
+    res["attack"] = attack
+    res["error"] = error
+    report = {}
+    report["application"] = res
+    
+    return report
 
 def single_photon_qd(network_config, sender, receiver, message1, message2, attack):
     
