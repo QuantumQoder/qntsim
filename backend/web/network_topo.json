@@ -30,10 +30,10 @@
     "cchannels_table": {
         "type": "RT",
         "labels": [
-            "n4",
+            "n3",
             "n2",
             "n1",
-            "n3"
+            "n4"
         ],
         "table": [
             [
