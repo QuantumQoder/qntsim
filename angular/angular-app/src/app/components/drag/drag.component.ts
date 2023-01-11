@@ -576,13 +576,14 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       'message1': new FormControl(''),
       'message2': new FormControl(''),
       'num_photons': new FormControl(''),
-      'attacker': new FormControl('false')
+      'attacker': new FormControl('None')
     });
 
     this.qtel = this.fb.group({
       'sender': new FormControl(''),
       'receiver': new FormControl(''),
-      'message': new FormControl('')
+      'message': new FormControl(''),
+      'attack': new FormControl('')
     });
     this.showBottomCenter();
     // this.confirm();
@@ -882,6 +883,14 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           sender: this.qtel.get('sender')?.value,
           receiver: this.qtel.get('receiver')?.value,
           message: this.qtel.get('message')?.value,
+          attack: this.qtel.get('attack')?.value
+        }
+        break;
+      case 10:
+        this.appSettings = {
+          sender: this.ip1.get('sender')?.value,
+          receiver: this.ip1.get('receiver')?.value,
+          message: this.ip1.get('message')?.value
         }
         break;
     }

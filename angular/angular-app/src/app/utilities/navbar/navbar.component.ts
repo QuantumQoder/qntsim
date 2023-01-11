@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConditionsService } from 'src/services/conditions.service';
 
@@ -7,10 +7,23 @@ import { ConditionsService } from 'src/services/conditions.service';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.less']
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, AfterViewInit {
   // loggedIn: boolean
   currentSection: any = this.conService.currentSection
   constructor(private conService: ConditionsService, private router: Router) { }
+  ngAfterViewInit(): void {
+
+    // const parallax = window.document.getElementById("navbar-parallax")!;
+
+    // // Parallax Effect for DIV 1
+    // window.addEventListener("scroll", function () {
+    //   console.log(parallax);
+    //   let offset = window.pageYOffset;
+    //   parallax.style.top = "-" + offset * 0.01 + "px";
+    //   // DIV 1 background will move slower than other elements on scroll.
+    // })
+  }
+
 
   late = "0px 8px 8px -6px rgba(0, 0, 0, .5)"
   ngOnInit(): void {
