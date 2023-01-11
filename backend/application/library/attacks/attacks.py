@@ -1,6 +1,6 @@
 from enum import Enum
 
-from qntsim.library.attacks import qiskit_attacks, qntsim_attacks
+from ..attacks import qiskit_attacks, qntsim_attacks
 
 class Attack(Enum):
     qiskit = qiskit_attacks.Attack

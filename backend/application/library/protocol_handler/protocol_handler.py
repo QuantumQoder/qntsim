@@ -1,8 +1,8 @@
 from typing import List
 from IPython.display import clear_output
 
-from qntsim.library.components.network import Network
-from qntsim.library.attacks.attacks import Attack
+from ..components.network import Network
+from ..attacks.attacks import Attack
 
 
 def ignore(obj):
@@ -12,7 +12,6 @@ def ignore(obj):
 
 class Protocol:
     def __init__(self, platform:str, messages_list:List[List[str]], **kwargs) -> None:
-        self.platform = platform
         self.backend = kwargs.get('backend')
         assert self.backend, 'Provide backend.'
         if Network[platform]==Network.qiskit:
@@ -56,7 +55,7 @@ class Protocol:
             if 'decode' not in kwargs:
                 network.measure(state=kwargs.get('state'))
             networks.append(network)
-        self.recv_msgs = decode(networks, *decode_args)
+        decode(networks, *decode_args)
         self.networks = networks
         self.messages_list = messages_list
         from ..error_analyzer.error_analyzer import ErrorAnalyzer

@@ -1,6 +1,6 @@
 from enum import Enum
 
-from qntsim.library.components import qntsim_network, qiskit_network
+from ..components import qntsim_network, qiskit_network
 
 class Network(Enum):
     qiskit = qiskit_network.Network
