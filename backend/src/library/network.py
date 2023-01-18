@@ -153,7 +153,7 @@ class Network:
                                 middle_node.resource_manager.memory_manager[size:]):
             keys = [info1.memory.qstate_key, info2.memory.qstate_key]
             qstate = manager.get(keys[1-state])
-            if manager.run_circuit(qtc, keys).get(keys[1-state]): manager.run_circuit(qc, [key for key in qstate.keys if key!=keys[1-state]])
+            if manager.run_circuit(qtc, keys).get(keys[1-state]): manager.run_circuit(qc, list(set(qstate.keys)-set([keys[1-state]])))
     
     @staticmethod
     def encode(network:'Network', msg_index:int, node_index:int=0, *args):
@@ -196,7 +196,7 @@ class Network:
             manager.new()
             new_key = manager.new([alpha, ((-1)**int(bin))*alpha])
             state = manager.get(key)
-            keys = tuple([k for k in state.keys if k!=key])
+            keys = tuple(set(state.keys)-set([key]))
             outputs = manager.run_circuit(bsa, [new_key, key])
             corrections[keys] = [outputs.get(new_key), outputs.get(key)]
         self.corrections = corrections
