@@ -4,6 +4,16 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class HoldingDataService {
+  spqd = {
+    "application": {
+      "input_message1": "Hello",
+      "input_message2": "World",
+      "attack": "None",
+      "output_message1": "x-dln",
+      "output_message2": "g'zle",
+      "error": 0
+    }
+  }
   qsdct = {
     "application": {
       "input_message": "Hello World",
@@ -149,6 +159,9 @@ export class HoldingDataService {
   constructor() { }
   getQSDCT() {
     return this.qsdct;
+  }
+  getSpqd() {
+    return this.spqd;
   }
 
 }

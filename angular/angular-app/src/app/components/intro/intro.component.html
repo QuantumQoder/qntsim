@@ -417,16 +417,18 @@
                     of message. Bob then applies transformations and measurement to retrieve the classical message.​</p>
             </div>
         </div>
-        <div *ngIf="app=='8'" class="col-11">
+        <div *ngIf="app=='8'" class="col-12">
             <h1 class="display-1">Single Photon Quantum Dialogue</h1>
             <div class="row">
-                <p class="text-justfify col-11">his changes the state of the photons which results in it carrying the
+                <p class="text-justify col-12">A Quantum Dialogue protocol using single photons transmitted between the
+                    nodes by encoding messages through unitary
+                    rotations on the photons.This changes the state of the photons which results in it carrying the
                     information to the receiver. The receiver then
                     encodes their message through their unitary rotation and then, measures out the state of the photon.
                     The measurement
                     results,initial states and the initial messages of each party helps them to decode the message of
                     the other.
-
+                    <br>
                     The implementation refers to the research article:<a href=""
                         (click)="quant_ph('https://iopscience.iop.org/article/10.1088/1009-1963/15/7/005 ')">https://iopscience.iop.org/article/10.1088/1009-1963/15/7/005</a>
                 </p>
@@ -438,45 +440,47 @@
             <br>
             <div class="row">
                 <div class="row">
-                    <div class="col-10">
+                    <div class="col-11">
                         <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
                     </div>
                 </div>
             </div>
-            <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>ENCODING OF FIRST MESSAGE​</small></h3>
+            <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>PREPARATION AND MESSAGE ENCODING BY
+                    BOB</small></h3>
             <div *ngIf="activeIndex==0">
-                <!-- <img class="img1" src="assets/images/qsdctel/qtel1.svg" alt="..."> -->
-                <p class="text-justify">One of the parties prepares required number of batches of photons, each in
+                <img class="img1" src="assets/images/spqd/spqd1.svg" alt="...">
+                <p class="text-justify">One of the party's (say Bob) prepares N batches of single photons, each in
                     random initial states among |0>, |1>, |+> and
-                    |->. Then, they encode their message into the photons by applying I and Y pauli gates for bit value
+                    |->. Then, Bob encodes his message (say, massage 1) into the photons by applying I and Y pauli gates
+                    for bit value
                     '0' and '1',
-                    respectively, and send the photons to the next party.</p>
+                    respectively, and keeps a record of the encodings and initial states of photons.</p>
             </div>
-            <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>SECURITY CHECK OF THE CHANNELS​</small></h3>
+            <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>TRANSMISSION AND ALICE ENCODES​</small></h3>
             <div *ngIf="activeIndex==1">
-                <!-- <img class="img1" src="assets/images/qsdctel/qtel2.svg" alt="..."> -->
+                <img class="img1" src="assets/images/spqd/spqd2.svg" alt="...">
                 <br>
-                <p class="text-justify">The receiver would select some random photons in order to measure and verify the
-                    integrity of the channel. They achieve
-                    this measuring random photons and sharing the measurement outcomes with the source of the photons.
-                    The photon source
-                    verifies the measurement result according to the photons' initial state and message encoded and
+                <p class="text-justify">Bob now and sends the photons to the next party (say, Alice). The receiver would
+                    select N-1 random photon batches in order to measure and verify the
+                    integrity of the channel.
+                    Bob and Alice mutually
+                    verifies the measurement and
                     decides to proceed if
-                    the error values lie with the threshold.</p>
+                    the error values lie within acceptance level.
+                    Now the second partner
+                    (here Alice) would encode their message (say message 2)
+                    in the same scheme as in step 1. Bob calls Alice now and informs the initial states of photons to
+                    her in that batch.</p>
             </div>
-            <h3 *ngIf="activeIndex==2" class="display-4 text-center">ENCODING OF SECOND MESSAGE AND DECODING</h3>
-            <!-- <img class="img1" *ngIf="activeIndex==2" src="assets/images/qsdctel/qtel3.svg" alt=""> -->
-            <p *ngIf="activeIndex==2">After the verification passes the authenticity check in step 2, the second partner
-                (receiver) would encode their message
-                in the same scheme as in step 1, and then measure out the photons. The receiver shares this measurement
+            <h3 *ngIf="activeIndex==2" class="display-4 text-center">MEASUREMENT AND DIALOGUE</h3>
+            <img class="img1" *ngIf="activeIndex==2" src="assets/images/spqd/spqd3.svg" alt="">
+            <p *ngIf="activeIndex==2">Alice now measures the photons and
+                shares this measurement
                 outcomes over
-                the public channel with the sender. And, the sender shares the information on the initial state of the
-                photons over the
-                public channel. The sender uses the information of the initial state, their to-be conveyed message and
-                the measurement
-                outcomes to decode the receiver's message. Similarly, the receiver uses the measurement outcomes, their
-                to-be conveyed
-                message and the information on the initial states to decode the sender's message.</p>
+                the public channel with Bob. With the classical information received from Bob and her measurement
+                results, Alice decodes Message 1 sent by Bob. Similarly, Bob uses the information about the measurement
+                outcomes sent by Alice, his encoding and the information on the initial states to decode the
+                Alice's message.</p>
         </div>
         <div *ngIf="app=='9'" class="col-12">
             <h1 class="display-1">QSDC with Controlled Teleportation</h1>
@@ -540,6 +544,88 @@
                 ​</p>
             <br>
         </div>
+        <div *ngIf="app=='10'" class="col-12">
+            <h1 class="display-4">Measurement Device Independent QSDC</h1>
+            <h6 class="display-4 text-center">
+                with User Authentication
+            </h6>
+            <div class="row">
+                <p class="text-justify col-12">This is a new theoretical scheme for measurement device independent
+                    quantum secure direct communication (MDI-QSDC) with
+                    user authentication, where both the sender and the receiver first check the authenticity of the
+                    other party and then
+                    exchange the secret message.
+                    <br>
+                    Link: <a href=""
+                        (click)="quant_ph('https://link.springer.com/article/10.1007/s11128-022-03572-z')">https://link.springer.com/article/10.1007/s11128-022-03572-z</a>
+                    <br>
+
+
+                </p>
+                <div style="margin-bottom: 5vh;">
+                    <button class="btn btn-primary btn-custom" (click)="goto()">Go To
+                        Application</button>
+                </div>
+
+                <p class="text-justify col-12">
+                    Let Alice (Identity IdA = 1011) be the sender and Bob (Identity IdB = 0111) be the receiver of the
+                    secret message.
+
+                </p>
+
+                <br>
+                <div class="row">
+                    <div class="col-11">
+                        <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <div *ngIf="activeIndex == 0">
+                    <br>
+                    <h3 class="display-4 text-center text-uppercase">
+                        Initialisation
+                    </h3>
+                    <br>
+                    <img class="img-fluid" src="assets/images/ip2_pd/IP2_PD1.jpg" alt="...">
+                    <hr>
+                    <img class="img-fluid" src="assets/images/ip2_pd/IP2_PD2.jpg" alt="...">
+                    <br>
+                    <img src="assets/images/ip2_pd/IP2_PD3.jpg" alt="..." class="img-fluid">
+                </div>
+                <div *ngIf="activeIndex == 1">
+                    <br>
+                    <h3 class="display-4 text-center text-uppercase">
+                        Encoding Process
+                    </h3>
+                    <br>
+                    <img src="assets/images/ip2_pd/IP2_PD4.jpg" alt="..." class="img-fluid">
+                </div>
+                <div *ngIf="activeIndex == 2">
+                    <br>
+                    <h3 class="display-4 text-center text-uppercase">
+                        Security Check
+                    </h3>
+                    <br>
+                    <img src="assets/images/ip2_pd/IP2_PD5.jpg" alt="..." class="img-fluid">
+                </div>
+                <div *ngIf="activeIndex == 3">
+                    <br>
+                    <h3 class="display-4 text-center text-uppercase">
+                        Authentication check
+                    </h3>
+                    <img src="assets/images/ip2_pd/IP2_PD6.jpg" alt="..." class="img-fluid">
+                </div>
+                <div *ngIf="activeIndex == 4">
+                    <br>
+                    <h3 class="display-4 text-center text-uppercase">
+                        Decoding Process
+                    </h3>
+                    <br>
+                    <img src="assets/images/ip2_pd/IP2_PD7.jpg" alt="..." class="img-fluid">
+                </div>
+            </div>
+        </div>
         <br>
         <!-- </div> -->
         <div class="d-flex justify-content-center button-group ">
@@ -551,7 +637,7 @@
                 (click)="next()">Next</button>
             <button type="button" *ngIf="app==5 && activeIndex==3" class="btn btn-primary btn-custom"
                 (click)="previous()">Previous</button>
-            <button type="button" *ngIf="app!=5 && activeIndex==2" class="btn btn-primary btn-custom"
+            <button type="button" *ngIf="app!=5 && app!=10 && activeIndex==2" class="btn btn-primary btn-custom"
                 (click)="goto()">Go To
                 Application</button>
             <button type="button" *ngIf="app==5 && activeIndex==3" class="btn btn-primary btn-custom"
@@ -564,8 +650,17 @@
             <button type="button" *ngIf="step==2 && app==7 && activeIndex==0 ||step==2 && app==7 && activeIndex ==1"
                 class="btn btn-primary btn-custom" (click)="next()">Next</button>
             <br>
+            <button type="button" *ngIf=" app==10 && activeIndex==3 || app==10 && activeIndex == 4"
+                class="btn btn-primary btn-custom" (click)="previous()">
+                Previous
+            </button>
+            <button type="button" *ngIf=" app==10 && activeIndex==2 || app==10 && activeIndex ==3"
+                class="btn btn-primary btn-custom" (click)="next()">Next</button>
+            <button type="button" *ngIf=" app==10 && activeIndex==4" class="btn btn-primary btn-custom"
+                (click)="goto()">Go To Application</button>
 
         </div>
-        <div style="padding: 10px;"></div>
+        <div style=" padding: 10px;">
+        </div>
     </div>
 </div>
