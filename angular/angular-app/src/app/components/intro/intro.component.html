@@ -592,6 +592,15 @@
                     <img class="img-fluid" src="assets/images/ip2_pd/IP2_PD2.jpg" alt="...">
                     <br>
                     <img src="assets/images/ip2_pd/IP2_PD3.jpg" alt="..." class="img-fluid">
+                    <br>
+                    <p class="text-justify">
+                        Let the secret message of Alice be “Hello”. In the initialisation phase, Alice converts her
+                        message into binary
+                        bitstring m and inserts some random check bits into m. On the other side Bob prepares EPR pairs
+                        and sends all the first
+                        qubits to Alice along with some decoy qubits.
+                    </p>
+                    <br>
                 </div>
                 <div *ngIf="activeIndex == 1">
                     <br>
@@ -600,6 +609,13 @@
                     </h3>
                     <br>
                     <img src="assets/images/ip2_pd/IP2_PD4.jpg" alt="..." class="img-fluid">
+                    <br>
+                    <p class="text-justify">
+                        Alice encodes the received qubits by applying the Pauli unitary operators. She then sends the
+                        encoded qubit sequence to
+                        the untrusted third party along with some new decoy qubits.
+                    </p>
+                    <br>
                 </div>
                 <div *ngIf="activeIndex == 2">
                     <br>
@@ -608,6 +624,14 @@
                     </h3>
                     <br>
                     <img src="assets/images/ip2_pd/IP2_PD5.jpg" alt="..." class="img-fluid">
+                    <br>
+                    <p class="text-justify">
+                        Alice, Bob and UTP checks the security of the channel between them. If all the quantum channels
+                        between Alice-UTP,
+                        Bob-UTP and Bob-Alice are secure, then they continue the protocol. Otherwise, they abort the
+                        protocol.
+                    </p>
+                    <br>
                 </div>
                 <div *ngIf="activeIndex == 3">
                     <br>
@@ -615,6 +639,13 @@
                         Authentication check
                     </h3>
                     <img src="assets/images/ip2_pd/IP2_PD6.jpg" alt="..." class="img-fluid">
+                    <br>
+                    <p class="text-justify">
+                        UTP measures the qubits corresponding to Alice’s and Bob’s identities and announces the result.
+                        Then Alice and Bob check
+                        the authenticity of each other.
+                    </p>
+                    <br>
                 </div>
                 <div *ngIf="activeIndex == 4">
                     <br>
@@ -623,6 +654,15 @@
                     </h3>
                     <br>
                     <img src="assets/images/ip2_pd/IP2_PD7.jpg" alt="..." class="img-fluid">
+                    <br>
+                    <p class="text-justify">
+                        UTP measures the qubits corresponding to Alice’s message and announces the results. From the
+                        measurement results, Bob
+                        decodes the message bit string. Alice and Bob do the message integrity check by comparing the
+                        check bits. Bob discards
+                        the check bits and from the remaining binary string he gets the exact secret message “Hello”.
+                    </p>
+                    <br>
                 </div>
             </div>
         </div>
