@@ -1,5 +1,5 @@
 import numpy as np
-from typing import List
+from typing import List, Dict
 from IPython.display import clear_output
 from numpy.random import randint
 
@@ -9,9 +9,9 @@ Timeline.DLCZ = False
 from ..topology.topology import Topology
 from ..components.circuit import QutipCircuit
 
-def string_to_binary(messages:List[str]):
+def string_to_binary(messages:Dict[int, str]):
     print('Converting to binary...')
-    strings = [''.join('0'*(8-len(bin(ord(char))[2:]))+bin(ord(char))[2:] for char in message) for message in messages]
+    strings = [''.join('0'*(8-len(bin(ord(char))[2:]))+bin(ord(char))[2:] for char in message) for _, message in messages.items()]
     print('Conversion completed!!')
     
     return strings
@@ -19,7 +19,7 @@ def string_to_binary(messages:List[str]):
 class Network:
     def __init__(self,
                  topology:str,
-                 messages:List[str],
+                 messages:Dict[int, str],
                  backend:str='Qutip',
                  parameters:str='parameters.txt',
                  **kwargs) -> None:
@@ -27,9 +27,9 @@ class Network:
         self.backend = backend
         self.parameters = parameters
         self.messages = messages
-        is_binary = all(char=='0' or char=='1' for message in messages for char in message)
-        messages = messages if is_binary else string_to_binary(messages=messages)
-        if callable((size:=kwargs.get('size', len(messages[0])))): size=size(messages[0])
+        is_binary = all(char=='0' or char=='1' for _, message in messages.items() for char in message)
+        self.bin_msgs = list(messages.values()) if is_binary else string_to_binary(messages=messages)
+        if callable((size:=kwargs.get('size', len(self.bin_msgs[0])))): size=size(len(self.bin_msgs[0]))
         self.size = size
         self.__kwargs__ = kwargs
         self.__initiate__()
@@ -153,15 +153,15 @@ class Network:
                                 middle_node.resource_manager.memory_manager[size:]):
             keys = [info1.memory.qstate_key, info2.memory.qstate_key]
             qstate = manager.get(keys[1-state])
-            if manager.run_circuit(qtc, keys).get(keys[1-state]): manager.run_circuit(qc, [key for key in qstate.keys if key!=keys[1-state]])
+            if manager.run_circuit(qtc, keys).get(keys[1-state]): manager.run_circuit(qc, list(set(qstate.keys)-set([keys[1-state]])))
     
     @staticmethod
     def encode(network:'Network', msg_index:int, node_index:int=0, *args):
         node = network.nodes[node_index]
-        message = network.messages[msg_index]
+        bin_msg = network.bin_msgs[msg_index]
         manager = network.manager
-        for char, info in zip(message, node.resource_manager.memory_manager):
-            if int(char):
+        for bin, info in zip(bin_msg, node.resource_manager.memory_manager):
+            if int(bin):
                 qtc = QutipCircuit(1)
                 qtc.x(0)
                 qtc.z(0)
@@ -171,19 +171,19 @@ class Network:
     @staticmethod
     def superdense_code(network:'Network', msg_index:int, node_index:int=0, *args):
         node = network.nodes[node_index]
-        message = network.messages[msg_index]
+        bin_msg = network.bin_msgs[msg_index]
         manager = network.manager
-        for char1, char2, info in zip(message[::2], message[1::2], node.resource_manager.memory_manager):
+        for bin1, bin2, info in zip(bin_msg[::2], bin_msg[1::2], node.resource_manager.memory_manager):
             qtc = QutipCircuit(1)
-            if int(char2): qtc.x(0)
-            if int(char1): qtc.z(0)
+            if int(bin2): qtc.x(0)
+            if int(bin1): qtc.z(0)
             key = info.memory.qstate_key
             manager.run_circuit(qtc, [key])
     
     def teleport(self, node_index:int=0, msg_index:int=0):
-        alpha = 1/np.sqrt(2)
+        alpha = complex(1/np.sqrt(2))
         node = self.nodes[node_index]
-        message = self.messages[msg_index]
+        bin_msg = self.bin_msgs[msg_index]
         manager = self.manager
         bsa = QutipCircuit(2)
         bsa.cx(0, 1)
@@ -191,11 +191,12 @@ class Network:
         bsa.measure(0)
         bsa.measure(1)
         corrections = {}
-        for char, info in zip(message, node.resource_manager.memory_manager):
+        for bin, info in zip(bin_msg, node.resource_manager.memory_manager):
             key = info.memory.qstate_key
-            new_key = manager.new([alpha, ((-1)**int(char))*alpha])
+            manager.new()
+            new_key = manager.new([alpha, ((-1)**int(bin))*alpha])
             state = manager.get(key)
-            keys = tuple([k for k in state.keys if k!=key])
+            keys = tuple(set(state.keys)-set([key]))
             outputs = manager.run_circuit(bsa, [new_key, key])
             corrections[keys] = [outputs.get(new_key), outputs.get(key)]
         self.corrections = corrections
@@ -240,18 +241,17 @@ class Network:
         recv_msgs_list = []
         for network in networks:
             outputs = network.__outputs__
-            messages = network.messages
+            bin_msgs = network.bin_msgs
             initials = network.__initials__
             strings = []
             if initials:
                 node = network.nodes[0]
-                for message in messages:
+                for bin_msg in bin_msgs:
                     string = ''
-                    for info, initial, output in zip(node.resource_manager.memory_manager,
-                                                    initials, outputs):
-                        char = message[info.index] if len(messages)>1 else '0'
+                    for info, initial, output in zip(node.resource_manager.memory_manager, initials, outputs):
+                        bin = bin_msg[info.index] if len(bin_msgs)>1 else '0'
                         key = info.memory.qstate_key
-                        string+=str(initial%2^output.get(key)^int(char))
+                        string+=str(initial%2^output.get(key)^int(bin))
                     strings.append(string)
             else:
                 strings = [''.join(str(*output.values()) for output in outputs)]
@@ -265,7 +265,7 @@ class Network:
         
         return recv_msgs_list
     
-    def dump(self, node_name:str, info_state:str=''):
+    def dump(self, node_name:str='', info_state:str=''):
         manager = self.manager
         net_topo = self.net_topo
         for node in [net_topo.nodes.get(node_name)] if node_name else self.nodes:
