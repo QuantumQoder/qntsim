@@ -21,7 +21,8 @@ from main.simulator.app.mdi_qsdc import *
 from main.simulator.app.ip2 import ip2_run
 from main.simulator.app.utils import *
 from random import shuffle
-from qntsim.library.protocol_handler.protocol_handler import Protocol
+#from qntsim.library.protocol_handler.protocol_handler import Protocol
+from qntsim.library.protocol import Protocol
 from statistics import mean
 
 def graph_topology(network_config_json):
@@ -437,5 +438,5 @@ def ip2(input_messages,ids,num_check_bits,num_decoy):
     report ={}
     topology = '/code/web/2n_linear.json'
     results=ip2_run(topology,input_messages,ids,num_check_bits,num_decoy)
-    report["application"]={results}
+    report["application"]=results
     return report

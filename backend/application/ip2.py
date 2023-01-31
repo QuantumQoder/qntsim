@@ -173,9 +173,9 @@ def ip2_run(topology,input_messages ,ids,num_check_bits,num_decoy):
    
     messages = insert_check_bits(input_messages.copy(), num_check_bits)
     network = Network(topology=topology, messages=messages, size=lambda x: x//2+len(ids[1]), label='00')
-    (sequence_qb, base_b), ib_pos, (sequence_qa, base_a) = bob_abc(network=network, num_decoy=num_decoy)
+    (sequence_qb, base_b), ib_pos, (sequence_qa, base_a) = bob_abc(network=network, num_decoy=num_decoy,ids=ids)
     
-    decoy_keys, ops, z_basis, c_keys, m_keys = alice_abcd(network=network, ib_pos=ib_pos, sequence_q=sequence_qa)
+    decoy_keys, ops, z_basis, c_keys, m_keys = alice_abcd(network=network, ib_pos=ib_pos, sequence_q=sequence_qa,ids=ids)
 
     if utp_5_7(network=network, decoy_keys=decoy_keys, basis=base_a, ops=ops):
         decoy_keys, base_a = alice_6(network=network, decoy_keys=decoy_keys)
@@ -184,7 +184,7 @@ def ip2_run(topology,input_messages ,ids,num_check_bits,num_decoy):
             auth_9b(network=network, c_keys=c_keys, circuit=bsm_circuit())
 
     results=decode(network=network, m_keys=m_keys, circuit=bsm_circuit(),input_messages=input_messages)
-    return results
+    return {"recv_msg" :results}
 
 def test():
     input_messages = {2:'011010'}
