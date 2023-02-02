@@ -7,8 +7,8 @@ from qntsim.topology.topology import Topology
 from qntsim.components.circuit import QutipCircuit
 import numpy as np
 import math
-from qntsim.library.components.qntsim_network import Network
-from qntsim.library.protocol_handler.protocol_handler import Protocol
+from .library.components.qntsim_network import Network
+from .library.protocol_handler.protocol_handler import Protocol
 import json
 import os
 

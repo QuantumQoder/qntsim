@@ -7,8 +7,8 @@
 from typing import List
 from qiskit import *
 from qiskit.converters import circuit_to_dag
-from qiskit_experiments.framework import BackendData
-from qiskit.providers.ibmq.managed import IBMQJobManager
+# from qiskit_experiments.framework import BackendData
+# from qiskit.providers.ibmq.managed import IBMQJobManager
 from numpy import pi
 from numpy.random import randint, uniform
 from statistics import mean, stdev
