@@ -50,7 +50,9 @@ class RunApp(APIView):
         elif application == "mdi_qsdc":
             results = mdi_qsdc(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"], appSettings["attack"])
         elif application == "ip2":
-            results = ip2(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"])
+            input_messages = {int(k):str(v) for k,v in appSettings["input_messages"].items()}
+            ids = {int(k):str(v) for k,v in appSettings["ids"].items()}
+            results = ip2(input_messages,ids,appSettings["num_check_bits"],appSettings["num_decoy"])
         # Add code for results here
         print('results', type(results))
         graphs = results.get('graph')

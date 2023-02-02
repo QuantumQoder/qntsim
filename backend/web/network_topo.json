@@ -1,28 +1,27 @@
 {
     "service_node": [
-        "n4"
+        "node1"
     ],
     "end_node": {
-        "n1": "n4",
-        "n2": "n4",
-        "n3": "n4"
+        "node2": "node1",
+        "node1": "node3"
     },
     "qconnections": [
         {
-            "node1": "n1",
-            "node2": "n4",
+            "node1": "node2",
+            "node2": "node1",
             "attenuation": 1e-05,
             "distance": 70
         },
         {
-            "node1": "n2",
-            "node2": "n4",
+            "node1": "node1",
+            "node2": "node4",
             "attenuation": 1e-05,
             "distance": 70
         },
         {
-            "node1": "n3",
-            "node2": "n4",
+            "node1": "node1",
+            "node2": "node3",
             "attenuation": 1e-05,
             "distance": 70
         }
@@ -30,10 +29,10 @@
     "cchannels_table": {
         "type": "RT",
         "labels": [
-            "n3",
-            "n2",
-            "n1",
-            "n4"
+            "node3",
+            "node4",
+            "node1",
+            "node2"
         ],
         "table": [
             [
