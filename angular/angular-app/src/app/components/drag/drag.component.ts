@@ -45,7 +45,8 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   pingPong: any
   teleportation: any
   ghz: any
-  firstqsdc: any
+  firstqsdc: any;
+  ip2: any
   game: boolean
   graphModel: any
   nodes: any = []
@@ -585,6 +586,15 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       'message': new FormControl(''),
       'attack': new FormControl('')
     });
+    this.ip2 = this.fb.group({
+      'sender': new FormControl(''),
+      'receiver': new FormControl(''),
+      'senderId': new FormControl(''),
+      'receiverId': new FormControl(''),
+      'numCheckBits': new FormControl(''),
+      'numDecoy': new FormControl(''),
+      'inputMessage': new FormControl('')
+    })
     this.showBottomCenter();
     // this.confirm();
     // this.load();
@@ -639,7 +649,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         this.links.push(linkData)
       }
     }
-
 
     this.position = 'bottom';
     this.displayPosition = true;
@@ -802,6 +811,9 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.spinner = true;
     this.displayPosition = false
     this.app_id = this.con.getapp_id()
+    if (!this.app_id) {
+      this._route.navigate(['/applications'])
+    }
     console.log(this.app_id)
     console.log(typeof (this.app_id))
     this.blocked = true
@@ -874,7 +886,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           receiver: this.spqd.get('receiver')?.value,
           message1: this.spqd.get('message1')?.value,
           message2: this.spqd.get('message2')?.value,
-          num_photons: this.spqd.get('num_photons')?.value,
+          // num_photons: this.spqd.get('num_photons')?.value,
           attack: this.spqd.get('attacker')?.value
         }
         break;
@@ -888,9 +900,17 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         break;
       case 10:
         this.appSettings = {
-          sender: this.ip1.get('sender')?.value,
-          receiver: this.ip1.get('receiver')?.value,
-          message: this.ip1.get('message')?.value
+          sender: this.ip2.get('sender')?.value,
+          receiver: this.ip2.get('receiver')?.value,
+          input_messages: {
+            "2": this.ip2.get('inputMessage')?.value,
+          },
+          ids: {
+            "2": this.ip2.get('senderId')?.value,
+            "1": this.ip2.get('receiverId')?.value
+          },
+          num_check_bits: this.ip2.get('numCheckBits')?.value,
+          num_decoy: this.ip2.get('numDecoy')?.value
         }
         break;
     }

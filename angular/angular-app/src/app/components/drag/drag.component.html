@@ -366,7 +366,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="app_id==7 || app_id==10" class="row" [formGroup]="ip1">
+            <div *ngIf="app_id==7" class="row" [formGroup]="ip1">
                 <div class="col">
                     <label for="serviceNode">Sender</label>&nbsp;
                     <select class="form-control" formControlName="sender">
@@ -415,11 +415,11 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
+                    <!-- <div class="col">
                         <label for="endNode">Num Photons</label>&nbsp;
                         <input type="number" class="form-control" formControlName="num_photons">
-                    </div>
-                    <div class="col">
+                    </div> -->
+                    <div class="col-6">
                         <label for="endNode">Attacker</label>&nbsp;
                         <select class="form-control" formControlName="attacker">
                             <option value="None">None</option>
@@ -464,7 +464,50 @@
                     </div>
                 </div>
             </div>
+            <div *ngIf="app_id==10" [formGroup]="ip2">
+                <div class="row">
+                    <div class="col">
+                        <label for="serviceNode">Sender</label>&nbsp;
+                        <select class="form-control" formControlName="sender">
+                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="endNode">Receiver</label>&nbsp;
+                        <select class="form-control" formControlName="receiver">
+                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="">Number of CheckBits</label>&nbsp;
+                        <input type="number" class="form-control" formControlName="numCheckBits">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="">Sender Id</label>&nbsp;
+                        <input type="text" class="form-control" formControlName="senderId">
+                    </div>
 
+                    <div class="col">
+                        <label for="">Receiver Id</label>&nbsp;
+                        <input type="text" class="form-control" formControlName="receiverId">
+                    </div>
+                    <div class="col">
+                        <label for="">Number of Decoy</label>&nbsp;
+                        <input type="number" class="form-control" formControlName="numDecoy">
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col">
+                        <label for="">Input Message</label>&nbsp;
+                        <input type="text" class="form-control" formControlName="inputMessage">
+                    </div>
+                </div>
+            </div>
             <ng-template pTemplate="footer">
                 <p-button (click)="parameters()" label="Run Application">
                 </p-button>

@@ -106,8 +106,8 @@ export class ResultsComponent implements OnInit, AfterViewInit {
         this.pingpong = this.con.getResult();
         break;
       case 7:
-        var ip1 = this.api.getip1()
-        console.log("ip1")
+        // var ip1 = this.api.getip1()
+        // console.log("ip1")
         this.ip1 = this.con.getResult();
         var alice = "Alice_r" + " "
         this.alice_r = this.ip1[alice]
