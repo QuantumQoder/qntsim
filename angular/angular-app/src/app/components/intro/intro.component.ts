@@ -167,17 +167,17 @@ export class IntroComponent implements OnInit {
     if (this.app == 8) {
       this.items = [
         {
-          label: 'Encoding of first message​', command: () => {
+          label: 'Preparation and message encoding by Bob​', command: () => {
             console.log(1)
           }
         },
         {
-          label: "Security check of the channels", command: () => {
+          label: "Transmission and Alice encodes", command: () => {
             console.log(2)
           }
         },
         {
-          label: 'Encoding of second message and decoding',
+          label: 'Measurement and Dialogue',
           command: () => {
             console.log(3)
           }
@@ -200,6 +200,38 @@ export class IntroComponent implements OnInit {
           label: 'Measurement and Decoding',
           command: () => {
             console.log(3)
+          }
+        }
+      ]
+    }
+    if (this.app == 10) {
+      this.items = [
+        {
+          label: 'Initialisation​', command: () => {
+            console.log(1)
+          }
+        },
+        {
+          label: "Encoding Process", command: () => {
+            console.log(2)
+          }
+        },
+        {
+          label: 'Security Check',
+          command: () => {
+            console.log(3)
+          }
+        },
+        {
+          label: 'Authenication Check',
+          command: () => {
+            console.log(4)
+          }
+        },
+        {
+          label: 'Decoding Process',
+          command: () => {
+            console.log(5)
           }
         }
       ]

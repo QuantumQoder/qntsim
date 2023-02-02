@@ -87,7 +87,7 @@
                 <img src="assets/images/QSDC.png" class="card-img-top" alt="..." height="250px">
                 <div class="card-body">
                     <h5 class="card-title">Seminal QSDC</h5>
-                    <h6 class="card-subtitle  mb-2 text-muted">a high capacity QKD scheme with EPR pairs</h6>
+                    <h6 class="card-subtitle  mb-2 text-muted">A high capacity QKD scheme with EPR pairs</h6>
 
                     <a class="btn mr-2" [routerLink]="['/intro']" (click)="app(5,'qsdc1')"><span
                             (ctrl-click)="app1(5,'qsdc1')">Visit
@@ -101,7 +101,7 @@
                 <img src="assets/images/Crypt2.png" class="card-img-top img-fluid" alt="..." height="250px">
                 <div class="card-body">
                     <h5 class="card-title">QSDC Ping-Pong</h5>
-                    <h6 class="card-subtitle  mb-2 text-muted">deterministic secure direct communication using
+                    <h6 class="card-subtitle  mb-2 text-muted">A Deterministic secure direct communication scheme using
                         Entanglement​</h6>
 
                     <a class="btn  mr-2" (click)="app(6,'PP')">
@@ -112,7 +112,7 @@
             <!-- </div> -->
             <!-- <div class="col-md-3"> -->
             <div class="card" style="width: 17rem;height: 25rem;">
-                <img src="assets/images/Crypt4.png" class="card-img-top" alt="..." height="250px">
+                <img src="assets/images/Crypt4.png" loading="eager" class="card-img-top" alt="..." height="250px">
                 <div class="card-body">
                     <h5 class="card-title">Arbitrary basis QSDC</h5>
                     <h6 class="card-subtitle  mb-2 text-muted">An arbitrary basis QSDC scheme with mutual user
@@ -120,7 +120,6 @@
                     <a class="btn align-self-end" [routerLink]="['/intro']" (click)="app(7,'ip1')"><i
                             class="fa fa-link"></i><span (ctrl-click)="app1(7,'ip1')">Visit
                             Site</span></a>
-
                 </div>
             </div>
             <!-- </div> -->
@@ -131,7 +130,8 @@
                 <img src="assets/images/spqd.jpeg" class="card-img-top" alt="..." height="250px">
                 <div class="card-body">
                     <h5 class="card-title">Single Photon-QD</h5>
-                    <h6 class="card-subtitle mb-2 text-muted"></h6>
+                    <h6 class="card-subtitle text-muted">A node-to-node dialogue protocol using batches
+                        of single photons</h6>
                     <a class="btn" [routerLink]="['/drag2']" (click)="app(8,'spqd')"><i class="fa fa-link"></i><span
                             (ctrl-click)="drag(8,'spqd')">Visit
                             Site</span></a>
@@ -145,12 +145,10 @@
             <!-- <div class="col-md-3"> -->
 
             <div class="card" style="width: 17rem;height: 25rem;">
-                <img src="assets/images/qtel.jpeg" class="card-img-top img-fluid" alt="..." height="250px">
+                <img src="assets/images/qtel.jpeg" class="card-img-top img-fluid" alt="..." height="230px">
                 <div class="card-body">
                     <h5 class="card-title">QSDC with Controlled Teleportation</h5>
-                    <!-- <h6 class="card-subtitle mb-2 text-muted">A Quantum Dialogue protocol using single photons
-                        transmitted between the nodes by encoding messages through unitary
-                        rotations on the photons.</h6> -->
+                    <h6 class="card-subtitle mb-2 text-muted">A controlled teleportation scheme for QSDC</h6>
                     <a class="btn" [routerLink]="['/intro']" (click)="app(9,'qtel')"><i class="fa fa-link"></i><span
                             (ctrl-click)="drag(9,'qtel')">Visit
                             Site</span></a>
@@ -167,11 +165,7 @@
                 </div>
             </div>
         </div>
-        <!-- </div> -->
-        <!-- </div> -->
     </div>
-
-
     <nav aria-label="..." class="d-flex justify-content-center">
         <ul class="pagination">
             <li id="prev" class="page-item">

@@ -374,7 +374,6 @@ class Topology():
         config = json5.load(open(config_file))
         delay_list=[]
         # create nodes
-        print('config', config)
         for params in config["service_node"]:
             # #print('params',params)
             node = ServiceNode(params,self.timeline)
@@ -438,7 +437,6 @@ class Topology():
         # #print('Adding q connection')
         if "qconnections" in config:
             for qchannel_params in config["qconnections"]:
-                # print('qchannel_params', qchannel_params)
                 node1 = qchannel_params.pop("node1")
                 node2 = qchannel_params.pop("node2")
                 # #print('qconnection',node1,node2)

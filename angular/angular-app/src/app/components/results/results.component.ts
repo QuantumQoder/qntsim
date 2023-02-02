@@ -114,6 +114,7 @@ export class ResultsComponent implements OnInit, AfterViewInit {
         break;
       case 8:
         this.spqd = this.con.getResult().application;
+        // this.spqd = this.holdingData.getSpqd().application
         console.log(this.spqd)
         break;
       case 9:

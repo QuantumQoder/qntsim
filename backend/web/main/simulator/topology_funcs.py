@@ -18,10 +18,11 @@ from main.simulator.app.teleportation import *
 from main.simulator.app.qsdc_teleportation import *
 from main.simulator.app.single_photon_qd import *
 from main.simulator.app.mdi_qsdc import * 
-from main.simulator.app.ip2 import *
+from main.simulator.app.ip2 import ip2_run
 from main.simulator.app.utils import *
 from random import shuffle
-from qntsim.library.protocol_handler.protocol_handler import Protocol
+#from qntsim.library.protocol_handler.protocol_handler import Protocol
+from qntsim.library.protocol import Protocol
 from statistics import mean
 
 def graph_topology(network_config_json):
@@ -431,13 +432,11 @@ def mdi_qsdc(network_config, sender, receiver, message, attack):
     # network, err_prct = authenticate_party(network=network)
     network.dump('n1')
     print('network',network,basis)
-    
-    
-def ip2(network_config, sender, receiver, message):
-    
-    report = {}
-    ip2 = IP2()
-    results = ip2.run(message)
-    report["application"] = results
-    
+
+
+def ip2(input_messages,ids,num_check_bits,num_decoy):
+    report ={}
+    topology = '/code/web/2n_linear.json'
+    results=ip2_run(topology,input_messages,ids,num_check_bits,num_decoy)
+    report["application"]=results
     return report
