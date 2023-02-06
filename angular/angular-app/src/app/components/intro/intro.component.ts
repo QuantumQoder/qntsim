@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA, OnInit, ViewEncapsulation } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
 import { ConditionsService } from 'src/services/conditions.service';
@@ -7,7 +7,8 @@ import { ConditionsService } from 'src/services/conditions.service';
   selector: 'app-intro',
   templateUrl: './intro.component.html',
   styleUrls: ['./intro.component.less'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  // schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA]
 })
 export class IntroComponent implements OnInit {
   items: MenuItem[]

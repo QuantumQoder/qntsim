@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ButtonModule } from 'primeng/button'
 import { AppRoutingModule } from './app-routing.module';
@@ -8,7 +8,7 @@ import { ScrollToModule } from '@nicky-lenaers/ngx-scroll-to';
 import { NgxTypedJsModule } from 'ngx-typed-js';
 import { NgParticlesModule } from 'ng-particles';
 import { NavbarComponent } from './utilities/navbar/navbar.component';
-import { ApplicationsComponent } from './components/applications/applications.component';
+
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { CardModule } from 'primeng/card'
 import { StyleClassModule } from 'primeng/styleclass';
@@ -51,26 +51,30 @@ import { RerouteComponent } from './components/reroute/reroute.component';
 import { CtrlClickDirective } from './directives/ctrl-click';
 import { JwtInterceptor } from './auth/jwt.interceptor';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 // import { GameComponent } from './components/game/game.component';
 // import { ToastModule } from 'primeng/toast';
 // import { Alert } from '@ng-bootstrap/ng-bootstrap';
 //import { AngularAnimationsLibraryModule } from 'angular-animations-library'
 @NgModule({
+  schemas: [
+    NO_ERRORS_SCHEMA
+  ],
   declarations: [
     AppComponent,
     HomePageComponent,
     NavbarComponent,
-    ApplicationsComponent,
+
     // Index2Component,
     FooterComponent,
 
     // DraggableLinkComponent,
-    DragComponent,
+    // DragComponent,
     ResultsComponent,
     NetworkResultsComponent,
     LogsComponent,
-    IntroComponent,
+    // IntroComponent,
     RerouteComponent,
     CtrlClickDirective
 
@@ -84,9 +88,9 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     FormsModule,
     DropdownModule,
     SpeedDialModule,
-    DialogModule,
-    SidebarModule,
-    ConfirmDialogModule,
+
+
+
     ToastModule,
     TabMenuModule,
     ReactiveFormsModule,
@@ -109,8 +113,9 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     DividerModule,
     SplitterModule,
     FieldsetModule,
-    BrowserAnimationsModule, NgbPopoverModule,
-    StepsModule
+    BrowserAnimationsModule,
+    NgbPopoverModule,
+
     //NgbModule,
   ],
   providers: [CookieService,
