@@ -1,28 +1,31 @@
 import numpy as np, matplotlib.pyplot as plt
+from concurrent.futures import ProcessPoolExecutor
 from numpy.random import randint
 from statistics import mean, stdev
+
+from .network import Network
 
 class ErrorAnalyzer:
     from .protocol import Protocol
     
     @staticmethod
     def analyse(protocol:Protocol):
-        networks = protocol.networks
-        full_err_list, mean_list, sd_list = [], [], []
-        for i, network in enumerate(networks, 1):
-            messages = network.bin_msgs
-            strings = network.strings[::-1]
+        def _analyse(i:int, network:Network):
+            messages = network.messages
+            strings = network.strings
             err_list = np.zeros(len(messages[0]))
             for message, string in zip(messages, strings):
                 err_list+=np.array([int(m)^int(s) for m, s in zip(message, string)])
             err_list/=len(messages)
             err_prct = mean(err_list)*100
             err_sd = stdev(err_list)
-            full_err_list.append(err_list.tolist())
-            mean_list.append(err_prct)
-            sd_list.append(err_sd)
             print(f'Avg. err. for iter. {i}: {err_prct}')
             print(f'Deviation in err. for iter. {i}: {err_sd}')
+            
+            return err_list.tolist(), err_prct, err_sd
+        networks = protocol.networks
+        results = ProcessPoolExecutor().map(_analyse, enumerate(networks, 1))
+        full_err_list, mean_list, sd_list = tuple(zip(*results))
         
         return full_err_list, mean_list, sd_list
     
@@ -31,7 +34,7 @@ class ErrorAnalyzer:
         from .protocol import Protocol
         
         messages_list = [[''.join(str(ele) for ele in randint(2, size=message_length)) for _ in range(type)] for _ in range(num_iterations)]
-        protocol = Protocol(**kwargs, messages_list=messages_list)
+        protocol = Protocol(*args, **kwargs, messages_list=messages_list)
         full_err_list, mean_list, sd_list = protocol.full_err_list, protocol.mean_list, protocol.sd_list
         attack = kwargs.get('attack', 'no')
         print(f'Error analysis for {attack} attack')
