@@ -1,44 +1,41 @@
+import logging
+from functools import partial
 from typing import List, Dict
 from IPython.display import clear_output
 
 from .network import Network
-from .attacks import Attack
+from .attacks import Attack, ATTACK_TYPE
 
 class Protocol:
-    def __init__(self, messages_list:List[Dict[int, str]], **kwargs) -> None:
-        attack = kwargs.get('attack')
-        networks = []
-        encode = kwargs.get('encode', Network.encode)
-        decode = kwargs.get('decode', Network.decode)
-        encode_args, decode_args = [], []
-        if isinstance(encode, (List, list)):
-            encode_args = encode[1:]
-            encode = encode[0]
-        if isinstance(decode, (List, list)):
-            decode_args = decode[1:]
-            decode = decode[0]
-        for messages in messages_list:
-            network = Network(**kwargs, messages=messages)
-            clear_output()
-            if 'state' in kwargs: network._generate_state_(state=kwargs.get('state'))
-            if 'encode' not in kwargs and 'label' in kwargs: network.teleport()
-            else: encode(*encode_args, network=network, msg_index=0)
-            nodes = range(1, len(network.nodes)) if len(network.nodes)>1 else [0]
-            if attack=='DoS': Attack.denial_of_service(network=network, nodes=nodes)
-            if attack=='EM': Attack.entangle_and_measure(network=network, nodes=nodes)
-            if attack=='IR': Attack.intercept_and_resend(network=network, nodes=nodes)
-            # print('')
-            if 'label' not in kwargs:
-                for i, _ in enumerate(network.bin_msgs[1:], 1):
-                    encode(*encode_args, network=network, msg_index=i)
-            if 'decode' not in kwargs:
-                network.measure()
-            networks.append(network)
-        self.networks = networks
+    def __init__(self, messages_list:List[Dict[int, str]], name:str='protocol', **kwargs) -> None:
+        self._name = name
+        logging.basicConfig(filename=self._name+'.log', filemode='w', level=logging.INFO, format='%(asctime)s %(message)s')
+        encode_params, decode_params = [], []
         self.messages_list = messages_list
-        self.recv_msgs_list = decode(*decode_args, networks=networks)
+        self.functions = kwargs.get('functions', [])
+        if not self.functions:
+            if 'state' in kwargs: self.functions.append(partial(Network._generate_state_, state=kwargs.get('state')))
+            encode = kwargs.get('encode', Network.encode)
+            if isinstance(encode, (List, list)):
+                encode_params = encode[1:]
+                encode = encode[0]
+            self.functions.append(partial(Network.teleport) if 'encode' not in kwargs and 'label' in kwargs else partial(encode, *encode_params, msg_index=0))
+            attack = kwargs.get('attack')
+            if attack is not None:
+                self.functions.append(partial(Attack.implement, attack=ATTACK_TYPE[attack].value))
+            if 'label' not in kwargs: self.functions.extend([partial(encode, *encode_params, msg_index=i) for i in range(1, len(messages_list[0]))])
+            if 'decode' not in kwargs: self.functions.append(partial(Network.measure))
+        Network._functions = [partial(clear_output)]+self.functions
+        self.networks = [Network(**kwargs, messages=messages) for messages in messages_list]
+        Network.execute(networks=self.networks)
+        logging.info('All networks have been executed!!')
+        decode = kwargs.get('decode', Network.decode)
+        if isinstance(decode, (List, list)):
+            decode_params = decode[1:]
+            decode = decode[0]
+        self.recv_msgs_list = decode(*decode_params, networks=self.networks)
         from .error_analyzer import ErrorAnalyzer
-        self.full_err_list, self.mean_list, self.sd_list = ErrorAnalyzer.analyse(protocol=self)
+        self.full_err_list, self.mean_list, self.sd_list = list(zip(*ErrorAnalyzer.analyse(protocol=self)))
     
     @staticmethod
     def execute():
