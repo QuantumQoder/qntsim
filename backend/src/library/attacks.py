@@ -1,23 +1,25 @@
 import numpy as np
+from typing import Any, Callable
 from functools import partial
 from enum import Enum
 from numpy import pi
 from numpy.random import randint, uniform
-from concurrent.futures import ProcessPoolExecutor
+from joblib import Parallel, delayed, wrap_non_picklable_objects
 
 from .network import Network
 from ..components.circuit import QutipCircuit
 from ..kernel.quantum_manager import QuantumManagerDensity
 
-class Attack(Enum):
-    @classmethod
-    def implement(cls, network:Network, *args, attack:str):
-        manager = network.manager
-        nodes = range(1, len(network.nodes)) if len(network.nodes)>1 else [0]
-        ProcessPoolExecutor().map(partial(cls[attack].value, network=network, manager=manager), nodes)
+class Attack:
+    @staticmethod
+    def implement(network:Network, returns:Any, attack:Callable):
+        node_indices = range(1, len(network.nodes)) if len(network.nodes)>1 else [0]
+        Parallel(n_jobs=-1, prefer=None)(attack(i=node, network=network, manager=network.manager) for node in node_indices)
 
     @staticmethod
-    def _denial_of_service_(i:int, network:Network, manager:QuantumManagerDensity):
+    @delayed
+    @wrap_non_picklable_objects
+    def denial_of_service(i:int, network:Network, manager:QuantumManagerDensity):
         node = network.nodes[i]
         for info in node.resource_manager.memory_manager:
             if randint(2):
@@ -29,7 +31,9 @@ class Attack(Enum):
             if info.index>network.size-1: break
     
     @staticmethod
-    def _entangle_and_measure_(i:int, network:Network, manager:QuantumManagerDensity):
+    @delayed
+    @wrap_non_picklable_objects
+    def entangle_and_measure(i:int, network:Network, manager:QuantumManagerDensity):
         qtc = QutipCircuit(2)
         qtc.cx(0, 1)
         qtc.measure(1)
@@ -42,7 +46,9 @@ class Attack(Enum):
             if info.index>network.size-1: break
     
     @staticmethod
-    def _intercept_and_resend_(i:int, network:Network, manager:QuantumManagerDensity):
+    @delayed
+    @wrap_non_picklable_objects
+    def intercept_and_resend(i:int, network:Network, manager:QuantumManagerDensity):
         node = network.nodes[i]
         for info in node.resource_manager.memory_manager:
             key = info.memory.qstate_key
@@ -60,6 +66,7 @@ class Attack(Enum):
                 manager.get(new_key).state = np.ndarray([1, 0])
             if info.index>network.size-1: break
     
-    DoS = _denial_of_service_
-    EM = _entangle_and_measure_
-    IR = _intercept_and_resend_
+class ATTACK_TYPE(Enum):
+    DoS = partial(Attack.denial_of_service)
+    EM = partial(Attack.entangle_and_measure)
+    IR = partial(Attack.intercept_and_resend)

@@ -1,7 +1,8 @@
-import numpy as np
-from concurrent.futures import ProcessPoolExecutor
+import numpy as np, logging
+from pandas import DataFrame
+from joblib import Parallel, wrap_non_picklable_objects, delayed
 from functools import partial, reduce
-from typing import List, Dict
+from typing import Any, List, Dict
 from IPython.display import clear_output
 from numpy.random import randint
 
@@ -12,9 +13,9 @@ from ..topology.topology import Topology
 from ..components.circuit import QutipCircuit
 
 def string_to_binary(messages:Dict[int, str]):
-    print('Converting to binary...')
+    logging.info('Converting to binary...')
     strings = [''.join('0'*(8-len(bin(ord(char))[2:]))+bin(ord(char))[2:] for char in message) for _, message in messages.items()]
-    print('Conversion completed!!')
+    logging.info('Conversion completed!!')
     
     return strings
 
@@ -23,11 +24,12 @@ class Network:
     def __init__(self,
                  topology:str,
                  messages:Dict[int, str],
+                 name:str='network',
                  backend:str='Qutip',
                  parameters:str='parameters.txt',
-                 *args,
                  **kwargs) -> None:
-        self.topology = topology
+        self._name = name
+        self._topology = topology
         self.backend = backend
         self.parameters = parameters
         self.messages = messages
@@ -45,10 +47,10 @@ class Network:
         net_topo = Topology(name=self._kwargs.get('name', 'network'), timeline=timeline)
         net_topo.load_config(self._topology)
         self.timeline = timeline
-        self.net_topo = net_topo
+        self._net_topo = net_topo
         self.__set_parameters__()
         self.nodes = net_topo.get_nodes_by_type('EndNode')
-        self.qchannels = net_topo.qchannelsprint()
+        self.qchannels = net_topo.qchannels
         self.cchannels = net_topo.cchannels
         self.manager = timeline.quantum_manager
         if len(self.nodes)>1:
@@ -58,10 +60,10 @@ class Network:
             timeline.run()
             self.__rectify_entanglements__(label=self._kwargs.get('label', '00'))
             clear_output()
-            print('Entanglement generated!!')
+            logging.info('Entanglement generated!!')
         else:
             self.__initialize_photons__()
-            print('Photons have been randomly initialized.')
+            logging.info('Photons have been randomly initialized.')
     
     def __set_parameters__(self):
         with open(self.parameters, 'r') as file:
@@ -110,7 +112,7 @@ class Network:
     
     def __initialize_photons__(self):
         initials = randint(4, size=self.size)
-        for info, initial in zip(self.node.resource_manager.memory_manager, initials):
+        for info, initial in zip(self.nodes[0].resource_manager.memory_manager, initials):
             key = info.memory.qstate_key
             q, r = divmod(initial, 2)
             qtc = QutipCircuit(1)
@@ -128,7 +130,7 @@ class Network:
                 keys.append(state.keys)
         self.keys = keys
     
-    def _generate_state_(self, *args, state:int=0):
+    def _generate_state_(self, returns:Any, state:int=0):
         middle_node = self.nodes[1]
         qtc = QutipCircuit(2)
         qtc.cx(0, 1)
@@ -144,7 +146,7 @@ class Network:
             if self.manager.run_circuit(qtc, keys).get(keys[1-state]): self.manager.run_circuit(qc, list(set(qstate.keys)-set([keys[1-state]])))
     
     @staticmethod
-    def encode(network:'Network', *args, msg_index:int, node_index:int=0):
+    def encode(network:'Network', returns:Any, msg_index:int, node_index:int=0):
         for bin, info in zip(network.bin_msgs[msg_index], network.nodes[node_index].resource_manager.memory_manager):
             if int(bin):
                 qtc = QutipCircuit(1)
@@ -154,7 +156,7 @@ class Network:
                 network.manager.run_circuit(qtc, [key])
     
     @staticmethod
-    def superdense_code(network:'Network', *args, msg_index:int, node_index:int=0):
+    def superdense_code(network:'Network', returns:Any, msg_index:int, node_index:int=0):
         for bin1, bin2, info in zip(network.bin_msgs[msg_index][::2], network.bin_msgs[msg_index][1::2], network.nodes[node_index].resource_manager.memory_manager):
             qtc = QutipCircuit(1)
             if int(bin2): qtc.x(0)
@@ -162,7 +164,7 @@ class Network:
             key = info.memory.qstate_key
             network.manager.run_circuit(qtc, [key])
     
-    def teleport(self, *args, node_index:int=0, msg_index:int=0):
+    def teleport(self, returns:Any, node_index:int=0, msg_index:int=0):
         alpha = complex(1/np.sqrt(2))
         bsa = QutipCircuit(2)
         bsa.cx(0, 1)
@@ -180,7 +182,7 @@ class Network:
             corrections[keys] = [outputs.get(new_key), outputs.get(key)]
         self.corrections = corrections
     
-    def measure(self, *args):
+    def measure(self, returns:Any):
         outputs = []
         if self._initials:
             node = self.nodes[0]
@@ -214,44 +216,57 @@ class Network:
         self._outputs = outputs
     
     @staticmethod
-    def decode(networks:List['Network'], *args):
-        def _decode(network:'Network'):
-            strings = []
-            if network._initials:
-                node = network.nodes[0]
-                for bin_msg in network.bin_msgs:
-                    string = ''
-                    for info, initial, output in zip(node.resource_manager.memory_manager, network._initials, network._outputs):
-                        bin = bin_msg[info.index] if len(network.bin_msgs)>1 else '0'
-                        key = info.memory.qstate_key
-                        string+=str(initial%2^output.get(key)^int(bin))
-                    strings.append(string)
-            else:
-                strings = [''.join(str(*output.values()) for output in network._outputs)]
-            recv_msgs = {i:''.join(chr(int(string[j*8:-~j*8], 2)) for j in range(len(string)//8)) for i, string in enumerate(strings, 1)}
-            network.strings = strings
-            network.recv_msgs = recv_msgs
-            print('Received messages!!')
-            for k, v in recv_msgs.items():
-                print(f'Received message {k}: {v}')
-            
-            return recv_msgs
-        return ProcessPoolExecutor().map(_decode, networks)
+    @delayed
+    @wrap_non_picklable_objects
+    def _decode(network:'Network', *args):
+        strings = []
+        if network._initials:
+            node = network.nodes[0]
+            for bin_msg in network.bin_msgs:
+                string = ''
+                for info, initial, output in zip(node.resource_manager.memory_manager, network._initials, network._outputs):
+                    bin = bin_msg[info.index] if len(network.bin_msgs)>1 else '0'
+                    key = info.memory.qstate_key
+                    string+=str(initial%2^output.get(key)^int(bin))
+                strings.append(string)
+        else:
+            strings = [''.join(str(*output.values()) for output in network._outputs)]
+        recv_msgs = {i:''.join(chr(int(string[j*8:-~j*8], 2)) for j in range(len(string)//8)) for i, string in enumerate(strings, 1)}
+        network.strings = strings
+        network.recv_msgs = recv_msgs
+        logging.info('Received messages!!')
+        for k, v in recv_msgs.items():
+            logging.info(f'Received message {k}: {v}')
+        
+        return recv_msgs
     
-    def dump(self, *args, node_name:str='', info_state:str=''):
-        for node in [self.net_topo.nodes.get(node_name)] if node_name else self.nodes:
-            print(f'{node.owner.name}\'s memory arrays!!')
+    @classmethod
+    def decode(cls, networks:List['Network'], *args):
+        return Parallel(n_jobs=-1, prefer='threads')(cls._decode(*arg, network=network) for arg, network in zip([args for _ in range(len(networks))], networks))
+    
+    def dump(self, returns:Any, node_name:str='', info_state:str=''):
+        logging.basicConfig(filename=self._name, filemode='w', level=logging.INFO, format='%(message)s')
+        for node in [self._net_topo.nodes.get(node_name)] if node_name else self.nodes:
+            logging.info(f'{node.owner.name}\'s memory arrays!!')
+            keys, states = [], []
             for info in node.resource_manager.memory_manager:
                 if not info_state or info.state==info_state:
                     key = info.memory.qstate_key
                     state = self.manager.get(key)
-                    print(state.keys, state.state)
+                    keys.append(state.keys)
+                    states.append(state.state)
+                dataframe = DataFrame({'keys':keys, 'states':states})
+        logging.info(dataframe.to_string())
     
-    def draw(self, *args):
-        self.net_topo.get_virtual_graph()
+    def draw(self, returns:Any):
+        self._net_topo.get_virtual_graph()
     
     @staticmethod
-    def execute(networks:List['Network']):
-        def _execute(network:'Network'):
-            _ = reduce(lambda x, func:func(network, x), network._functions, [])
-        _ = ProcessPoolExecutor().map(_execute, networks)
+    @delayed
+    @wrap_non_picklable_objects
+    def _execute(network:'Network'):
+        _ = reduce(lambda returns, func:func(network, returns), network._functions, ())
+    
+    @classmethod
+    def execute(cls, networks:List['Network']):
+        _ = Parallel(n_jobs=-1, prefer='threads')(cls._execute(network=network) for network in networks)
