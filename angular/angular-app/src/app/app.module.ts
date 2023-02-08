@@ -70,7 +70,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
     FooterComponent,
 
     // DraggableLinkComponent,
-    // DragComponent,
+    DragComponent,
     ResultsComponent,
     NetworkResultsComponent,
     LogsComponent,
@@ -90,6 +90,12 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
     SpeedDialModule,
 
 
+    SidebarModule,
+    FormsModule,
+    ReactiveFormsModule,
+    DialogModule,
+    StyleClassModule,
+    ConfirmDialogModule,
 
     ToastModule,
     TabMenuModule,

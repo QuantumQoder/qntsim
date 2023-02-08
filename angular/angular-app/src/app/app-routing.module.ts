@@ -18,7 +18,7 @@ const routes: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'applications', loadChildren: () => import('./components/applications/application-modules/application.module').then(m => m.ApplicationModule) },
 
-  { path: 'drag', loadChildren: () => import('./components/drag/drag-modules/drag.module').then(m => m.DragModule) },
+  { path: 'drag', component: DragComponent },
   { path: 'results', component: ResultsComponent },
   { path: 'network-results', component: NetworkResultsComponent },
   { path: 'logs', component: LogsComponent },

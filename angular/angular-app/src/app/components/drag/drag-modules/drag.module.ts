@@ -14,12 +14,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     imports: [
         CommonModule,
         DragRoutingModule,
-        SidebarModule,
-        FormsModule,
-        ReactiveFormsModule,
-        DialogModule,
-        StyleClassModule,
-        ConfirmDialogModule,
+
     ],
     declarations: [DragComponent],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
