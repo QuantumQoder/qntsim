@@ -5,6 +5,7 @@ from IPython.display import clear_output
 
 from .network import Network
 from .attacks import Attack, ATTACK_TYPE
+from .security_checks import insert_check_bits
 
 class Protocol:
     def __init__(self, messages_list:List[Dict[int, str]], name:str='protocol', **kwargs) -> None:
@@ -25,8 +26,9 @@ class Protocol:
                 self.functions.append(partial(Attack.implement, attack=ATTACK_TYPE[attack].value))
             if 'label' not in kwargs: self.functions.extend([partial(encode, *encode_params, msg_index=i) for i in range(1, len(messages_list[0]))])
             if 'decode' not in kwargs: self.functions.append(partial(Network.measure))
-        Network._functions = [partial(clear_output)]+self.functions
+        Network._functions = self.functions
         self.networks = [Network(**kwargs, messages=messages) for messages in messages_list]
+        logging.info('All networks have been generated.')
         Network.execute(networks=self.networks)
         logging.info('All networks have been executed!!')
         decode = kwargs.get('decode', Network.decode)

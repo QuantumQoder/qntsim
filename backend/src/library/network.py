@@ -180,7 +180,7 @@ class Network:
             keys = tuple(set(state.keys)-set([key]))
             outputs = self.manager.run_circuit(bsa, [new_key, key])
             corrections[keys] = [outputs.get(new_key), outputs.get(key)]
-        self.corrections = corrections
+        self._corrections = corrections
     
     def measure(self, returns:Any):
         outputs = []
@@ -193,7 +193,7 @@ class Network:
                 qtc.measure(0)
                 outputs.append(self.manager.run_circuit(qtc, [key]))
         else:
-            corrections = self.corrections
+            corrections = self._corrections
             output = 0
             for keys, value in corrections.items():
                 if len(keys)>1:
