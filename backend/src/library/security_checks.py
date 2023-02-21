@@ -22,11 +22,13 @@ def insert_check_bits(messages:List[str], num_check_bits:int):
     return {tuple((seq:=__insert_seq__(lst=message, seq=randint(2, size=num_check_bits)))[1]):''.join(seq[0]) for message in messages}
 
 def insert_decoy_photons(network:Network, node_index:int, num_decoy_photons:int):
-    photons = iter(randint(4, size=num_decoy_photons))
+    photons = randint(4, size=num_decoy_photons)
+    photon_iterator = iter(photons)
     for info in network.nodes[node_index].resource_manager.memory_manager:
-        if num_decoy_photons and info.state=='RAW':
+        if info.state=='RAW' or info.state=='OCCUPIED':
             key = info.memory.qstate_key
-            try: q, r = divmod(next(photons), 2)
+            if info.state=='OCCUPIED': network.manager.get(key).state = [1, 0]
+            try: q, r = divmod(next(photon_iterator), 2)
             except: break
             qtc = QutipCircuit(1)
             if r: qtc.x(0)
