@@ -24,7 +24,7 @@ class ErrorAnalyzer:
     from .protocol import Protocol    
     @classmethod
     def analyse(cls, protocol:Protocol):
-        return Parallel(n_jobs=-1, prefer='threads') (cls._analyse(i, network) for i, network in enumerate(protocol.networks, 1))
+        return Parallel(n_jobs=-1, prefer='threads') (cls._analyse(i, network) for i, network in enumerate(protocol, 1))
     
     @staticmethod
     def run_full_analysis(type:int, num_iterations:int, message_length:int, **kwargs):
