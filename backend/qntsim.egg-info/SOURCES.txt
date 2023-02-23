@@ -42,9 +42,11 @@ src/kernel/quantum_utils.py
 src/kernel/timeline.py
 src/library/__init__.py
 src/library/attacks.py
+src/library/circuits.py
 src/library/error_analyzer.py
 src/library/network.py
 src/library/protocol.py
+src/library/security_checks.py
 src/network_management/__init__.py
 src/network_management/network_manager.py
 src/network_management/request.py

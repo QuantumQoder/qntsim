@@ -11,16 +11,16 @@ Timeline.bk = True
 Timeline.DLCZ = False
 from ..topology.topology import Topology
 from ..components.circuit import QutipCircuit
+from .circuits import bell_type_state_analyzer
 
 def string_to_binary(messages:Dict[int, str]):
-    logging.info('Converting to binary...')
     strings = [''.join('0'*(8-len(bin(ord(char))[2:]))+bin(ord(char))[2:] for char in message) for _, message in messages.items()]
-    logging.info('Conversion completed!!')
+    logging.info('converted')
     
     return strings
 
 class Network:
-    _functions:List[partial] = []
+    _funcs:List[partial] = []
     def __init__(self,
                  topology:str,
                  messages:Dict[int, str],
@@ -30,7 +30,7 @@ class Network:
                  **kwargs) -> None:
         self._name = name
         self._topology = topology
-        self.backend = backend
+        self._backend = backend
         self.parameters = parameters
         self.messages = messages
         is_binary = all(char=='0' or char=='1' for _, message in messages.items() for char in message)
@@ -38,14 +38,18 @@ class Network:
         if callable((size:=kwargs.get('size', len(self.bin_msgs[0])))): size=size(len(self.bin_msgs[0]))
         self.size = size
         self._kwargs = kwargs
+        stack = inspect.stack()
+        caller = stack[1][0].f_locals.get('self').__class__.__name__
+        from .protocol import Protocol
+        if caller!=Protocol.__name__:
+            print('Configuring logger!')
+            logging.basicConfig(filename=self._name+'.log', filemode='w', level=logging.INFO, format='%(pathname)s %(threadName)s %(module)s %(funcName)s %(message)s')
         self.__initiate__()
         self._get_keys_(node_index=kwargs.get('keys_of', 0), info_state='ENTANGLED')
-        print(inspect.getsourcefile(sys._getframe(1)))
-        print(__name__)
     
     def __initiate__(self):
         stop_time = self._kwargs.get('stop_time', 10e12)
-        timeline = Timeline(stop_time=stop_time, backend=self.backend)
+        timeline = Timeline(stop_time=stop_time, backend=self._backend)
         net_topo = Topology(name=self._kwargs.get('name', 'network'), timeline=timeline)
         net_topo.load_config(self._topology)
         self.timeline = timeline
@@ -60,12 +64,12 @@ class Network:
             self.__request_entanglements__()
             timeline.init()
             timeline.run()
+            self.__identify_states()
             self.__rectify_entanglements__(label=self._kwargs.get('label', '00'))
             clear_output()
-            logging.info('Entanglement generated!!')
+            logging.info('epr pair generation')
         else:
             self.__initialize_photons__()
-            logging.info('Photons have been randomly initialized.')
     
     def __set_parameters__(self):
         with open(self.parameters, 'r') as file:
@@ -98,19 +102,35 @@ class Network:
                                             target_fidelity=target_fidelity,
                                             timeout=timeout)
     
+    def __identify_state__(self):
+        self.bell_pairs = {}
+        for nxt, node in enumerate(self.nodes[:-1], 1):
+            key_pairs = {}
+            for info in node.resource_manager.memory_manager:
+                if info.state!='ENTANGLED': break
+                key = info.memory.qstate_key
+                state = self.manager.get(key).state
+                j = 0 if state[1]==state[2]==0 else 1
+                i = int(state[j]/state[3-j])
+                key_pairs[self.manager.get(key).keys] = (i, j)
+            self.bell_pairs[(node.owner.name, self.nodes[nxt].owner.name)] = key_pairs
+
     def __rectify_entanglements__(self, label:str):
+        for (node, nxt_node), key_pairs in self.bell_pairs.items():
+            self.timeline.
+        self.states = []
         for node in self.nodes[:-1]:
             for info in node.resource_manager.memory_manager:
-                if info.state=='ENTANGLED':
-                    key = info.memory.qstate_key
-                    state = self.manager.get(key)
-                    state = state.state
-                    qtc = QutipCircuit(1)
-                    if state[0+int(label[1])]==state[3-int(label[1])]==0:
-                        if state[1-int(label[1])]==((-1)**-~int(label[0]))*state[2+int(label[1])]: qtc.z(0)
-                        qtc.x(0)
-                    elif state[0+int(label[1])]==((-1)**-~int(label[0]))*state[3-int(label[1])]: qtc.z(0)
-                    self.manager.run_circuit(qtc, [key])
+                if info.state!='ENTANGLED': break
+                key = info.memory.qstate_key
+                state = self.manager.get(key).state
+                j = 0 if state[1]==state[2]==0 else 1
+                i = int(state[j]/state[3-j])
+                self.states[self.manager.get(key).keys] = (i, j)
+                qtc = QutipCircuit(1)
+                if j^int(label[1]): qtc.x(0)
+                if i^int(label[0]): qtc.z(0)
+                self.manager.run_circuit(qtc, [key])
     
     def __initialize_photons__(self):
         initials = randint(4, size=self.size)
@@ -122,6 +142,7 @@ class Network:
             if q: qtc.h(0)
             self.manager.run_circuit(qtc, [key])
         self._initials = initials.tolist()
+        logging.info('for encoding message')
     
     def _get_keys_(self, node_index:int, info_state:str='ENTANGLED'):
         keys = []
@@ -132,7 +153,7 @@ class Network:
                 keys.append(state.keys)
         self.keys = keys
     
-    def _generate_state_(self, returns:Any, state:int=0):
+    def _generate_state_(self, returns:Any, state:int=0, label:str=None):
         middle_node = self.nodes[1]
         qtc = QutipCircuit(2)
         qtc.cx(0, 1)
@@ -146,6 +167,14 @@ class Network:
             keys = [info1.memory.qstate_key, info2.memory.qstate_key]
             qstate = self.manager.get(keys[1-state])
             if self.manager.run_circuit(qtc, keys).get(keys[1-state]): self.manager.run_circuit(qc, list(set(qstate.keys)-set([keys[1-state]])))
+        if label:
+            for info in self.nodes[0].resource_manager.memory_manager:
+                if info.state!='ENTANGLED': break
+                keys = self.manager.get(info.memory.qstate_key).keys
+                for key, (i, lbl) in zip(keys, enumerate(label)):
+                    qtc = QutipCircuit(1)
+                    if int(lbl): _ = qtc.x(0) if i else qtc.z(0)
+                    self.manager.run_circuit(qtc, [key])
     
     @staticmethod
     def encode(network:'Network', returns:Any, msg_index:int, node_index:int=0):
@@ -156,6 +185,7 @@ class Network:
                 qtc.z(0)
                 key = info.memory.qstate_key
                 network.manager.run_circuit(qtc, [key])
+        logging.info('message bits into qubits')
     
     @staticmethod
     def superdense_code(network:'Network', returns:Any, msg_index:int, node_index:int=0):
@@ -165,14 +195,11 @@ class Network:
             if int(bin1): qtc.z(0)
             key = info.memory.qstate_key
             network.manager.run_circuit(qtc, [key])
+        logging.info('message bits into the channel')
     
     def teleport(self, returns:Any, node_index:int=0, msg_index:int=0):
         alpha = complex(1/np.sqrt(2))
-        bsa = QutipCircuit(2)
-        bsa.cx(0, 1)
-        bsa.h(0)
-        bsa.measure(0)
-        bsa.measure(1)
+        bsa = bell_type_state_analyzer(2)
         corrections = {}
         for bin, info in zip(self.bin_msgs[msg_index], self.nodes[node_index].resource_manager.memory_manager):
             key = info.memory.qstate_key
@@ -183,6 +210,7 @@ class Network:
             outputs = self.manager.run_circuit(bsa, [new_key, key])
             corrections[keys] = [outputs.get(new_key), outputs.get(key)]
         self._corrections = corrections
+        logging.info('message states')
     
     def measure(self, returns:Any):
         outputs = []
@@ -236,7 +264,6 @@ class Network:
         recv_msgs = {i:''.join(chr(int(string[j*8:-~j*8], 2)) for j in range(len(string)//8)) for i, string in enumerate(strings, 1)}
         network.strings = strings
         network.recv_msgs = recv_msgs
-        logging.info('Received messages!!')
         for k, v in recv_msgs.items():
             logging.info(f'Received message {k}: {v}')
         
@@ -244,12 +271,13 @@ class Network:
     
     @classmethod
     def decode(cls, networks:List['Network'], *args):
+        logging.info('messages')
         return Parallel(n_jobs=-1, prefer='threads')(cls._decode(*arg, network=network) for arg, network in zip([args for _ in range(len(networks))], networks))
     
     def dump(self, returns:Any, node_name:str='', info_state:str=''):
-        logging.basicConfig(filename=self._name+'.log', filemode='w', level=logging.INFO, format='%(message)s')
+        logging.basicConfig(filename=self._name+'.log', filemode='w', level=logging.INFO, format='%{funcName}s %(message)s')
         for node in [self._net_topo.nodes.get(node_name)] if node_name else self.nodes:
-            logging.info(f'{node.owner.name}\'s memory arrays!!')
+            logging.info(f'{node.owner.name}\'s memory arrays')
             keys, states = [], []
             for info in node.resource_manager.memory_manager:
                 if not info_state or info.state==info_state:
@@ -257,7 +285,6 @@ class Network:
                     state = self.manager.get(key)
                     keys.append(state.keys)
                     states.append(state.state)
-                    
                 dataframe = DataFrame({'keys':keys, 'states':states})
         logging.info(dataframe.to_string())
     
@@ -268,7 +295,10 @@ class Network:
     @delayed
     @wrap_non_picklable_objects
     def _execute(network:'Network'):
-        _ = reduce(lambda returns, func:func(network, returns), network._functions, ())
+        _ = reduce(lambda returns, func:func(network, returns), network._funcs, ())
+    
+    # def __call__(self, *args: Any, **kwds: Any) -> Any:
+    #     _ = Parallel(n_jobs=-1, prefer='threads')(self._execute(network=network) for network in networks)
     
     @classmethod
     def execute(cls, networks:List['Network']):
