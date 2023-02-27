@@ -35,8 +35,6 @@ class Protocol:
         logging.info(f'completed execution within {time_ns()-start_time-mid_time} ns')
         from .error_analyzer import ErrorAnalyzer
         self.full_err_list, self.mean_list, self.sd_list = list(zip(*ErrorAnalyzer.analyse(protocol=self)))
-        
-        return self
     
     def __repr__(self) -> str:
         string = ''

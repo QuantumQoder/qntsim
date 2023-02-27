@@ -121,7 +121,7 @@ class Network:
                 state = self.manager.get(key).state
                 j = 0 if state[1]==state[2]==0 else 1
                 i = (1-int(state[j]/state[3-j]))//2
-                print(tuple(self.manager.get(key).keys), (i, j))
+                # print(tuple(self.manager.get(key).keys), (i, j))
                 self._bell_pairs[tuple(self.manager.get(key).keys)] = (i, j)
 
     def __rectify_entanglements__(self, label:str):
