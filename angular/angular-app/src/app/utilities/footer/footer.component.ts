@@ -6,11 +6,19 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./footer.component.less']
 })
 export class FooterComponent implements OnInit {
+  footerLinks: { header: string; value: string; }[];
 
   constructor() { }
 
   ngOnInit(): void {
+    this.footerLinks = [{
+      header: 'Home', value: '/'
+    },
+    {
+      header: 'Applications', value: '/applications'
+    }]
   }
+
   route(route: string) {
     switch (route) {
       case 'facebook': window.open('https://www.' + route + '.com/people/Qulabs/100076856962480/', "_blank");
@@ -21,5 +29,7 @@ export class FooterComponent implements OnInit {
         break;
     }
   }
-
+  qulabs() {
+    window.open("https://www.qulabs.ai/", "_blank");
+  }
 }
