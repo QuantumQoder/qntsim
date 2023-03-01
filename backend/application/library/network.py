@@ -1,4 +1,4 @@
-import numpy as np, logging
+import numpy as np, logging, inspect, sys
 from pandas import DataFrame
 from joblib import Parallel, wrap_non_picklable_objects, delayed
 from functools import partial, reduce
@@ -40,6 +40,8 @@ class Network:
         self._kwargs = kwargs
         self.__initiate__()
         self._get_keys_(node_index=kwargs.get('keys_of', 0), info_state='ENTANGLED')
+        print(inspect.getsourcefile(sys._getframe(1)))
+        print(__name__)
     
     def __initiate__(self):
         stop_time = self._kwargs.get('stop_time', 10e12)
@@ -180,7 +182,7 @@ class Network:
             keys = tuple(set(state.keys)-set([key]))
             outputs = self.manager.run_circuit(bsa, [new_key, key])
             corrections[keys] = [outputs.get(new_key), outputs.get(key)]
-        self.corrections = corrections
+        self._corrections = corrections
     
     def measure(self, returns:Any):
         outputs = []
@@ -193,7 +195,7 @@ class Network:
                 qtc.measure(0)
                 outputs.append(self.manager.run_circuit(qtc, [key]))
         else:
-            corrections = self.corrections
+            corrections = self._corrections
             output = 0
             for keys, value in corrections.items():
                 if len(keys)>1:
@@ -245,7 +247,7 @@ class Network:
         return Parallel(n_jobs=-1, prefer='threads')(cls._decode(*arg, network=network) for arg, network in zip([args for _ in range(len(networks))], networks))
     
     def dump(self, returns:Any, node_name:str='', info_state:str=''):
-        logging.basicConfig(filename=self._name, filemode='w', level=logging.INFO, format='%(message)s')
+        logging.basicConfig(filename=self._name+'.log', filemode='w', level=logging.INFO, format='%(message)s')
         for node in [self._net_topo.nodes.get(node_name)] if node_name else self.nodes:
             logging.info(f'{node.owner.name}\'s memory arrays!!')
             keys, states = [], []
@@ -255,6 +257,7 @@ class Network:
                     state = self.manager.get(key)
                     keys.append(state.keys)
                     states.append(state.state)
+                    
                 dataframe = DataFrame({'keys':keys, 'states':states})
         logging.info(dataframe.to_string())
     

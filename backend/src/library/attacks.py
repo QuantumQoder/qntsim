@@ -15,6 +15,8 @@ class Attack:
     def implement(network:Network, returns:Any, attack:Callable):
         node_indices = range(1, len(network.nodes)) if len(network.nodes)>1 else [0]
         Parallel(n_jobs=-1, prefer=None)(attack(i=node, network=network, manager=network.manager) for node in node_indices)
+        
+        return returns
 
     @staticmethod
     @delayed

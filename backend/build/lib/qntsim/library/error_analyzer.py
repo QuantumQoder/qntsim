@@ -24,13 +24,13 @@ class ErrorAnalyzer:
     from .protocol import Protocol    
     @classmethod
     def analyse(cls, protocol:Protocol):
-        return Parallel(n_jobs=-1, prefer='threads') (cls._analyse(i, network) for i, network in enumerate(protocol.networks, 1))
+        return Parallel(n_jobs=-1, prefer='threads') (cls._analyse(i, network) for i, network in enumerate(protocol, 1))
     
     @staticmethod
-    def run_full_analysis(type:int, num_iterations:int, message_length:int, **kwargs):
+    def run_full_analysis(type_:int, num_iterations:int, message_length:int, **kwargs):
         from .protocol import Protocol
         
-        messages_list = [{i:''.join(str(ele) for ele in randint(2, size=message_length)) for i in range(type)} for _ in range(num_iterations)]
+        messages_list = [{i:''.join(str(ele) for ele in randint(2, size=message_length)) for i in range(type_)} for _ in range(num_iterations)]
         protocol = Protocol(**kwargs, messages_list=messages_list)
         full_err_list, mean_list, sd_list = protocol.full_err_list, protocol.mean_list, protocol.sd_list
         attack = kwargs.get('attack', 'no')
