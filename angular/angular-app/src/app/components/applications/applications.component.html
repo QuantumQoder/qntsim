@@ -1,189 +1,32 @@
-<div class="content-wrapper shadow p-3 mb-3 bg-white rounded">
+<div class="content-wrapper shadow p-3 mb-3 bg-transparent">
 
-    <h1 class="display-3 text-black text-center">Select an Application</h1>
-    <!-- <p-breadcrumb [model]="items" styleClass="breadcrumb"></p-breadcrumb> -->
-    <br>
-    <br>
-    <br>
+    <h1 class="display-3 text-white text-center">Select an Application</h1>
+    <!-- <div class="d-flex justify-content-center align-items-center col-1">
+        <button class="btn btn-outline-primary btn-lg btn-round my-auto"></button>
+    </div> -->
     <div class="col-12 md:col-4">
+        <p-carousel [value]="data" [numVisible]="4" [numScroll]="1" [circular]="true" contentClass="carousal"
+            [autoplayInterval]="5000" [responsiveOptions]="responsiveOptions">
 
-        <div *ngIf="pageNumber == 1" class="container container-lg container-sm">
-
-            <!-- <p-scrollPanel [style]="{width: '100%', height: '400px'}"> -->
-            <!-- <div class="row"> -->
-            <!-- <div class="col-md-3"> -->
-            <div class="card" style="width: 17rem;height:25rem">
-                <img src="assets/images/e2e.png" class="card-img-top" alt="..." height="250px">
-                <div class="card-body">
-                    <h5 class="card-title">E2E</h5>
-                    <h6 class="card-subtitle  mb-2 text-muted">End-to-End Entanglements</h6>
-
-                    <a class="btn mr-2" (click)="app(1,'e2e')"><span (ctrl-click)="app1(1,'e2e')">Visit
-                            Site</span></a>
-                    <!-- <a class="btn "><i class="fab fa-github"></i> Github</a> -->
+            <ng-template let-data pTemplate="item">
+                <div class="card" (click)="app(data.appId,data.appName)">
+                    <div class="face face1">
+                        <div class="content">
+                            <img class="mx-auto" [src]="data.image">
+                            <h3>{{data.appName}}</h3>
+                        </div>
+                    </div>
+                    <div class="face face2">
+                        <div class="content">
+                            <p>{{data.content}}</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <!-- </div> -->
-            <!-- <div class="col-md-3"> -->
-            <div class="card" style="width: 17rem;height:25rem">
-                <img src="assets/images/qkd.jpg" class="card-img-top" alt="..." height="250px">
-                <div class="card-body">
-                    <h5 class="card-title">E91</h5>
-                    <h6 class="card-subtitle  mb-2 text-muted">Quantum Key Distribution</h6>
 
-                    <a class="btn mr-2" (click)="app(2,'e91')"><span (ctrl-click)="app1(2,'e91')">Visit
-                            Site</span></a>
-                    <!-- <a href="#" class="btn"><i class="fab fa-github"></i> Github</a> -->
-                </div>
-            </div>
-            <!-- </div> -->
+            </ng-template>
 
-            <!-- <div class="image-flip col-md-3"> -->
-            <div class="card" style="width: 17rem;height:25rem">
-                <img src="assets/images/teleportation1.png" class="card-img-top" alt="..." height="250px">
-                <div class="card-body">
-                    <h5 class="card-title">Teleportation</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">Quantum Teleportation from one node to another
-                    </h6>
-                    <!-- <p class="card-text">Some quick example text to build on the card title and make up the
-                                bulk
-                                of
-                                the
-                                card's content.</p> -->
-                    <a class="btn mr-2" [routerLink]="['/intro']" (click)="app(3,'tel')"><i
-                            class="fas fa-link"></i><span (ctrl-click)="app1(3,'tel')">Visit
-                            Site</span></a>
-                    <!-- <a href="#" class="btn "><i class="fab fa-github"></i> Github</a> -->
-                </div>
-            </div>
-
-            <!-- </div> -->
-
-            <!-- <div class="col-md-3"> -->
-            <div class="card" style="width: 17rem;height:25rem">
-                <img src="assets/images/GHZ2.png" class="card-img-top" alt="..." height="250px">
-                <div class="card-body">
-                    <h5 class="card-title">GHZ</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">Create GHZ state</h6>
-                    <!-- <p class="card-text">Some quick example text to build on the card title and make up the
-                                bulk
-                                of
-                                the
-                                card's content.</p> -->
-                    <a class="btn align-self-end" [routerLink]="['/intro']" (click)="app(4,'ghz')"><i
-                            class="fas fa-link"></i><span (ctrl-click)="app1(4,'ghz')">Visit
-                            Site</span></a>
-
-                    <!-- <a href="#" class="btn"><i class="fab fa-github"></i> Github</a> -->
-                </div>
-            </div>
-        </div>
-        <div *ngIf="pageNumber == 2" class="container container-lg container-sm">
-            <!-- </div> -->
-            <!-- </div> -->
-            <!-- <div class="row"> -->
-            <!-- <div class="col-md-3"> -->
-            <div class="card" style="width: 17rem;height: 25rem;">
-                <img src="assets/images/QSDC.png" class="card-img-top" alt="..." height="250px">
-                <div class="card-body">
-                    <h5 class="card-title">Seminal QSDC</h5>
-                    <h6 class="card-subtitle  mb-2 text-muted">A high capacity QKD scheme with EPR pairs</h6>
-
-                    <a class="btn mr-2" [routerLink]="['/intro']" (click)="app(5,'qsdc1')"><span
-                            (ctrl-click)="app1(5,'qsdc1')">Visit
-                            Site</span></a>
-
-                </div>
-            </div>
-            <!-- </div> -->
-            <!-- <div class="col-md-3"> -->
-            <div class="card" style="width: 17rem;height: 25rem;">
-                <img src="assets/images/Crypt2.png" class="card-img-top img-fluid" alt="..." height="250px">
-                <div class="card-body">
-                    <h5 class="card-title">QSDC Ping-Pong</h5>
-                    <h6 class="card-subtitle  mb-2 text-muted">A Deterministic secure direct communication scheme using
-                        Entanglement​</h6>
-
-                    <a class="btn  mr-2" (click)="app(6,'PP')">
-                        <span (ctrl-click)="app1(6,'PP')">Visit
-                            Site</span></a>
-                </div>
-            </div>
-            <!-- </div> -->
-            <!-- <div class="col-md-3"> -->
-            <div class="card" style="width: 17rem;height: 25rem;">
-                <img src="assets/images/Crypt4.png" loading="eager" class="card-img-top" alt="..." height="250px">
-                <div class="card-body">
-                    <h5 class="card-title">Arbitrary basis QSDC</h5>
-                    <h6 class="card-subtitle  mb-2 text-muted">An arbitrary basis QSDC scheme with mutual user
-                        authentication</h6>
-                    <a class="btn align-self-end" [routerLink]="['/intro']" (click)="app(7,'ip1')"><i
-                            class="fa fa-link"></i><span (ctrl-click)="app1(7,'ip1')">Visit
-                            Site</span></a>
-                </div>
-            </div>
-            <!-- </div> -->
-            <!-- <div class="col-md-3"> -->
-
-
-            <div class="card" style="width: 17rem;height: 25rem;">
-                <img src="assets/images/spqd.jpeg" class="card-img-top" alt="..." height="250px">
-                <div class="card-body">
-                    <h5 class="card-title">Single Photon-QD</h5>
-                    <h6 class="card-subtitle text-muted">A node-to-node dialogue protocol using batches
-                        of single photons</h6>
-                    <a class="btn" [routerLink]="['/drag2']" (click)="app(8,'spqd')"><i class="fa fa-link"></i><span
-                            (ctrl-click)="drag(8,'spqd')">Visit
-                            Site</span></a>
-                </div>
-            </div>
-        </div>
-        <div *ngIf="pageNumber == 3" class="container container-lg container-sm">
-            <!-- </div> -->
-            <!-- </div> -->
-            <!-- <div class="row"> -->
-            <!-- <div class="col-md-3"> -->
-
-            <div class="card" style="width: 17rem;height: 25rem;">
-                <img src="assets/images/qtel.jpeg" class="card-img-top img-fluid" alt="..." height="230px">
-                <div class="card-body">
-                    <h5 class="card-title">QSDC with Controlled Teleportation</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">A controlled teleportation scheme for QSDC</h6>
-                    <a class="btn" [routerLink]="['/intro']" (click)="app(9,'qtel')"><i class="fa fa-link"></i><span
-                            (ctrl-click)="drag(9,'qtel')">Visit
-                            Site</span></a>
-                </div>
-            </div>
-            <div class="card" style="width: 17rem;height: 25rem;">
-                <img src="assets/images/Crypt4.png" class="card-img-top" alt="..." height="250px">
-                <div class="card-body">
-                    <h5 class="card-title">IP2</h5>
-                    <h6 class="card-subtitle mb-2 text-muted"></h6>
-                    <a class="btn" [routerLink]="['/intro']" (click)="app(10,'ip2')"><i class="fa fa-link"></i><span
-                            (ctrl-click)="drag(10,'ip2')">Visit
-                            Site</span></a>
-                </div>
-            </div>
-        </div>
+        </p-carousel>
     </div>
-    <nav aria-label="..." class="d-flex justify-content-center">
-        <ul class="pagination">
-            <li id="prev" class="page-item">
-                <a class="page-link" (click)="move('prev')">Previous</a>
-            </li>
-            <li class="page-item">
-                <a id="1" class="page-link" (click)="page(1)">1</a>
-            </li>
-            <li class="page-item">
-                <a id="2" class="page-link" (click)="page(2)">2</a>
-            </li>
-            <li class="page-item">
-                <a id="3" class="page-link" (click)="page(3)">3</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" (click)="move('next')">Next</a>
-            </li>
-        </ul>
-    </nav>
+
 
 </div>

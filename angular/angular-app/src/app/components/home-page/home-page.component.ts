@@ -36,7 +36,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       }) // aim at continental US centroid
       .height(globe.clientHeight / 1.5)
       .width(globe.clientWidth)
-      .backgroundColor('#000')
+      .backgroundColor('rgba(0,0,0,0)')
       .arcLabel((d: any) => `${d.airline}: ${d.srcIata} &#8594; ${d.dstIata}`)
       .arcStartLat((d: any) => +d.srcAirport.lat)
       .arcStartLng((d: any) => +d.srcAirport.lng)

@@ -8,7 +8,6 @@ import { ScrollToModule } from '@nicky-lenaers/ngx-scroll-to';
 import { NgxTypedJsModule } from 'ngx-typed-js';
 import { NgParticlesModule } from 'ng-particles';
 import { NavbarComponent } from './utilities/navbar/navbar.component';
-
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { CardModule } from 'primeng/card'
 import { StyleClassModule } from 'primeng/styleclass';
@@ -17,23 +16,16 @@ import { SplitterModule } from 'primeng/splitter';
 import { FieldsetModule } from 'primeng/fieldset';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AccordionModule } from 'primeng/accordion'
-// import { Index2Component } from './components/index2/index2.component';
 import { CommonModule } from '@angular/common';
 import { StepsModule } from 'primeng/steps';
-// import { ComponentsModule } from './components/module/components.module';
 import { FooterComponent } from './utilities/footer/footer.component';
 import { CarouselModule } from 'primeng/carousel';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
-// import { ApplicationPageComponent } from './components/application-page/application-page.component';
 import { TableModule } from 'primeng/table';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-// import { DraggableLinkComponent } from './components/draggable-link/draggable-link.component';
 import { DragComponent } from './components/drag/drag.component';
 import { TabMenuModule } from 'primeng/tabmenu';
-//import { MenuItem } from 'primeng/api';
 import { ResultsComponent } from './components/results/results.component';
-import { NetworkResultsComponent } from './components/network-results/network-results.component';
-import { LogsComponent } from './components/logs/logs.component';
 import { ToastModule } from 'primeng/toast';
 import { SidebarModule } from 'primeng/sidebar';
 import { DialogModule } from 'primeng/dialog';
@@ -47,7 +39,6 @@ import { IntroComponent } from './components/intro/intro.component';
 import { SplitButtonModule } from 'primeng/splitbutton';
 // import { HowtouseComponent } from './components/howtouse/howtouse.component';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { RerouteComponent } from './components/reroute/reroute.component';
 import { CtrlClickDirective } from './directives/ctrl-click';
 import { JwtInterceptor } from './auth/jwt.interceptor';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -65,21 +56,10 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
     AppComponent,
     HomePageComponent,
     NavbarComponent,
-
-    // Index2Component,
     FooterComponent,
-
-    // DraggableLinkComponent,
     DragComponent,
     ResultsComponent,
-    NetworkResultsComponent,
-    LogsComponent,
-    // IntroComponent,
-    RerouteComponent,
     CtrlClickDirective
-
-    //ButtonModule
-    //AngularAnimationsLibraryModule
   ],
   imports: [SplitButtonModule,
     ProgressSpinnerModule,

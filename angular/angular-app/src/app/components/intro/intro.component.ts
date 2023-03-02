@@ -20,7 +20,7 @@ export class IntroComponent implements OnInit {
   e2e = new E2E();
   constructor(private router: Router, private conService: ConditionsService) { }
   goto() {
-    this.router.navigate(['/drag2'])
+    this.router.navigate(['/drag'])
   }
   ngOnInit(): void {
     this.app = localStorage.getItem('app_id')
