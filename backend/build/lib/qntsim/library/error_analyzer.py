@@ -7,8 +7,8 @@ from .network import Network
 
 class ErrorAnalyzer:
     @staticmethod
-    @delayed
-    @wrap_non_picklable_objects
+    # @delayed
+    # @wrap_non_picklable_objects
     def _analyse(i:int, network:Network):
         err_list = np.zeros(len(network.bin_msgs[0]))
         for bin_msg, string in zip(network.bin_msgs, network.strings[::-1]):
@@ -24,16 +24,18 @@ class ErrorAnalyzer:
     from .protocol import Protocol    
     @classmethod
     def analyse(cls, protocol:Protocol):
-        return Parallel(n_jobs=-1, prefer='threads') (cls._analyse(i, network) for i, network in enumerate(protocol, 1))
+        return [cls._analyse(i, network) for i, network in enumerate(protocol, 1)]
+        # return Parallel(n_jobs=-1, prefer='threads') (cls._analyse(i, network) for i, network in enumerate(protocol, 1))
     
     @staticmethod
-    def run_full_analysis(type_:int, num_iterations:int, message_length:int, **kwargs):
+    def run_full_analysis(type_:int, num_iterations:int, message_length:int, **kwds):
         from .protocol import Protocol
         
         messages_list = [{i:''.join(str(ele) for ele in randint(2, size=message_length)) for i in range(type_)} for _ in range(num_iterations)]
-        protocol = Protocol(**kwargs, messages_list=messages_list)
+        protocol = Protocol(**kwds, messages_list=messages_list)
+        protocol(**kwds)
         full_err_list, mean_list, sd_list = protocol.full_err_list, protocol.mean_list, protocol.sd_list
-        attack = kwargs.get('attack', 'no')
+        attack = kwds.get('attack', 'no')
         print(f'Error analysis for {attack} attack')
         bit_error = sum(full_err_list)
         plt.figure(figsize=(20, 5))

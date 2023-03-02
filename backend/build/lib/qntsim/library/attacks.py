@@ -14,28 +14,29 @@ class Attack:
     @staticmethod
     def implement(network:Network, returns:Any, attack:Callable):
         node_indices = range(1, len(network.nodes)) if len(network.nodes)>1 else [0]
-        Parallel(n_jobs=-1, prefer=None)(attack(i=node, network=network, manager=network.manager) for node in node_indices)
+        _ = [attack(i=node, network=network) for node in node_indices]
+        # Parallel(n_jobs=-1, prefer=None)(attack(i=node, network=network, manager=network.manager) for node in node_indices)
         
         return returns
 
     @staticmethod
-    @delayed
-    @wrap_non_picklable_objects
-    def denial_of_service(i:int, network:Network, manager:QuantumManagerDensity):
+    # @delayed
+    # @wrap_non_picklable_objects
+    def denial_of_service(i:int, network:Network):
         node = network.nodes[i]
         for info in node.resource_manager.memory_manager:
             if randint(2):
+                key = info.memory.qstate_key
                 qtc = QutipCircuit(1)
                 qtc.rx(0, 2*uniform()*pi)
                 qtc.rz(0, 2*uniform()*pi)
-                key = info.memory.qstate_key
-                manager.run_circuit(qtc, [key])
-            if info.index>network.size-1: break
+                network.manager.run_circuit(qtc, [key])
+            # if info.index>network.size-1: break
     
     @staticmethod
-    @delayed
-    @wrap_non_picklable_objects
-    def entangle_and_measure(i:int, network:Network, manager:QuantumManagerDensity):
+    # @delayed
+    # @wrap_non_picklable_objects
+    def entangle_and_measure(i:int, network:Network):
         qtc = QutipCircuit(2)
         qtc.cx(0, 1)
         qtc.measure(1)
@@ -43,14 +44,14 @@ class Attack:
         node = network.nodes[i]
         for info in node.resource_manager.memory_manager:
             key = info.memory.qstate_key
-            new_key = manager.new([1, 0])
-            manager.run_circuit(qtc, [key, new_key])
-            if info.index>network.size-1: break
+            new_key = network.manager.new([1, 0])
+            network.manager.run_circuit(qtc, [key, new_key])
+            # if info.index>network.size-1: break
     
     @staticmethod
-    @delayed
-    @wrap_non_picklable_objects
-    def intercept_and_resend(i:int, network:Network, manager:QuantumManagerDensity):
+    # @delayed
+    # @wrap_non_picklable_objects
+    def intercept_and_resend(i:int, network:Network):
         node = network.nodes[i]
         for info in node.resource_manager.memory_manager:
             key = info.memory.qstate_key
@@ -58,15 +59,15 @@ class Attack:
             qtc = QutipCircuit(1)
             if basis: qtc.h(0)
             qtc.measure(0)
-            result = manager.run_circuit(qtc, [key])
-            new_key = manager.new([1-result.get(key), result.get(key)])
+            result = network.manager.run_circuit(qtc, [key])
+            new_key = network.manager.new([1-result.get(key), result.get(key)])
             if basis:
                 qtc = QutipCircuit(1)
                 qtc.h(0)
-                manager.run_circuit(qtc, [new_key])
-                manager.get(key).state = manager.get(new_key).state
-                manager.get(new_key).state = np.ndarray([1, 0])
-            if info.index>network.size-1: break
+                network.manager.run_circuit(qtc, [new_key])
+                network.manager.get(key).state = network.manager.get(new_key).state
+                network.manager.get(new_key).state = np.ndarray([1, 0])
+            # if info.index>network.size-1: break
     
 class ATTACK_TYPE(Enum):
     DoS = partial(Attack.denial_of_service)

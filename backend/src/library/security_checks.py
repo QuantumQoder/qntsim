@@ -1,9 +1,7 @@
-from collections.abc import Iterable
 from typing import List, Dict
 from random import sample
 from numpy.random import randint
 
-from ..topology.node import Node
 from ..components.circuit import QutipCircuit
 from .network import Network
 
@@ -25,9 +23,9 @@ def insert_decoy_photons(network:Network, node_index:int, num_decoy_photons:int)
     photons = randint(4, size=num_decoy_photons)
     photon_iterator = iter(photons)
     for info in network.nodes[node_index].resource_manager.memory_manager:
-        if info.state=='RAW' or info.state=='OCCUPIED':
+        if info.state=='RAW':
             key = info.memory.qstate_key
-            if info.state=='OCCUPIED': network.manager.get(key).state = [1, 0]
+            # if info.state=='OCCUPIED': network.manager.get(key).state = [1, 0]
             try: q, r = divmod(next(photon_iterator), 2)
             except: break
             qtc = QutipCircuit(1)
