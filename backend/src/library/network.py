@@ -1,8 +1,9 @@
-import numpy as np, logging, inspect, sys
+import numpy as np, logging, inspect, sys, os
 from pandas import DataFrame
 from joblib import Parallel, wrap_non_picklable_objects, delayed
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial, reduce
-from typing import Any, List, Dict
+from typing import Any, List, Dict, Tuple
 from IPython.display import clear_output
 from numpy.random import randint
 
@@ -20,10 +21,10 @@ def string_to_binary(messages:Dict[int, str]):
     return strings
 
 class Network:
-    _funcs:List[partial] = []
+    _flow:List[partial] = []
     def __init__(self,
                  topology:str,
-                 messages:Dict[int, str],
+                 messages:Dict[Tuple, str],
                  name:str='network',
                  backend:str='Qutip',
                  parameters:str='parameters.txt',
@@ -46,11 +47,6 @@ class Network:
             logging.basicConfig(filename=self.__name+'.log', filemode='w', level=logging.INFO, format='%(pathname)s %(threadName)s %(module)s %(funcName)s %(message)s')
         self.__initiate__()
         self._get_keys_(node_index=kwargs.get('keys_of', 0), info_state='ENTANGLED')
-    
-    def __call__(self, id_:int=0):
-        self.__id = id_
-        self.__name+=str(self.__id)
-        return self
     
     def __iter__(self):
         for node in self.nodes:
@@ -104,14 +100,15 @@ class Network:
         priority = self._kwargs.get('priority', 0)
         target_fidelity = self._kwargs.get('target_fidelity', 0.5)
         timeout = self._kwargs.get('timeout', 10e12)
-        for node1, node2 in zip(self[:-1], self[1:]):
-            node1.transport_manager.request(node2.owner.name,
-                                            size=self.size,
-                                            start_time=start_time,
-                                            end_time=end_time,
-                                            priority=priority,
-                                            target_fidelity=target_fidelity,
-                                            timeout=timeout)
+        for keys in self.messages:
+            for k1, k2 in zip(keys[:-1], keys[1:]):
+                self[k1-1].transport_manager.request(self[k2-1].owner.name,
+                                                     size=self.size,
+                                                     start_time=start_time,
+                                                     end_time=end_time,
+                                                     priority=priority,
+                                                     target_fidelity=target_fidelity,
+                                                     timeout=timeout)
     
     def __identify_states__(self):
         for node in self[:-1]:
@@ -153,20 +150,21 @@ class Network:
                 keys.append(state.keys)
         self.keys = keys
     
-    def generate_state(self, returns:Any, state:int=0, label:str=None):
-        middle_node = self[1]
-        qtc = QutipCircuit(2)
-        qtc.cx(0, 1)
-        if state: qtc.h(0)
-        qtc.measure(1-state)
-        qc = QutipCircuit(1)
-        if state: qc.z(0)
-        else: qc.x(0)
-        for info1, info2 in zip(middle_node.resource_manager.memory_manager[:self.size],
-                                middle_node.resource_manager.memory_manager[self.size:]):
-            keys = [info1.memory.qstate_key, info2.memory.qstate_key]
-            qstate = self.manager.get(keys[1-state])
-            if self.manager.run_circuit(qtc, keys).get(keys[1-state]): self.manager.run_circuit(qc, list(set(qstate.keys)-set([keys[1-state]])))
+    def generate_state(self, _, state:int=0, label:str=None):
+        for keys in self.messages:
+            for key in keys[1:-1]:
+                qtc = QutipCircuit(2)
+                qtc.cx(0, 1)
+                if state: qtc.h(0)
+                qtc.measure(1-state)
+                qc = QutipCircuit(1)
+                if state: qc.z(0)
+                else: qc.x(0)
+                for info1, info2 in zip(self[key-1].resource_manager.memory_manager[:self.size],
+                                        self[key-1].resource_manager.memory_manager[self.size:]):
+                    keys = [info1.memory.qstate_key, info2.memory.qstate_key]
+                    qstate = self.manager.get(keys[1-state])
+                    if self.manager.run_circuit(qtc, keys).get(keys[1-state]): self.manager.run_circuit(qc, list(set(qstate.keys)-set([keys[1-state]])))
         if label:
             for info in self[0].resource_manager.memory_manager:
                 if info.state!='ENTANGLED': break
@@ -245,34 +243,37 @@ class Network:
                 outputs.append(self.manager.run_circuit(qtc, [key]))
         self._outputs = outputs
     
-    @staticmethod
-    @delayed
-    @wrap_non_picklable_objects
-    def _decode(network:'Network', *args):
+    # @delayed
+    # @wrap_non_picklable_objects
+    def _decode(self, *args):
         strings = []
-        if network._initials:
-            node = network.nodes[0]
-            for bin_msg in network.bin_msgs:
+        if self._initials:
+            node = self.nodes[0]
+            for bin_msg in self.bin_msgs:
                 string = ''
-                for info, initial, output in zip(node.resource_manager.memory_manager, network._initials, network._outputs):
-                    bin = bin_msg[info.index] if len(network.bin_msgs)>1 else '0'
+                for info, initial, output in zip(node.resource_manager.memory_manager, self._initials, self._outputs):
+                    bin = bin_msg[info.index] if len(self.bin_msgs)>1 else '0'
                     key = info.memory.qstate_key
                     string+=str(initial%2^output.get(key)^int(bin))
                 strings.append(string)
         else:
-            strings = [''.join(str(*output.values()) for output in network._outputs)]
+            strings = [''.join(str(*output.values()) for output in self._outputs)]
         recv_msgs = {i:''.join(chr(int(string[j*8:-~j*8], 2)) for j in range(len(string)//8)) for i, string in enumerate(strings, 1)}
-        network.strings = strings
-        network.recv_msgs = recv_msgs
+        self.strings = strings
+        self.recv_msgs = recv_msgs
         for k, v in recv_msgs.items():
             logging.info(f'Received message {k}: {v}')
         
         return recv_msgs
     
-    @classmethod
-    def decode(cls, networks:List['Network'], *args):
+    @staticmethod
+    def decode(networks:List['Network'], *args):
         logging.info('messages')
-        return Parallel(n_jobs=-1, prefer='threads')(cls._decode(*arg, network=network) for arg, network in zip([args for _ in range(len(networks))], networks))
+        return [network._decode(*args) for network in networks]
+        # executor = ThreadPoolExecutor(max_workers=len(networks))
+        # jobs = [executor.submit(network._decode, network, *args) for network in networks]
+        # return [job.result() for job in  jobs]
+        # return Parallel(n_jobs=-1, prefer='threads')(network._decode(network=network, *args) for network in networks)
     
     def dump(self, returns:Any, node_name:str='', info_state:str=''):
         logging.basicConfig(filename=self.__name+'.log', filemode='w', level=logging.INFO, format='%{funcName}s %(message)s')
@@ -292,14 +293,27 @@ class Network:
         self._net_topo.get_virtual_graph()
     
     @staticmethod
-    @delayed
-    @wrap_non_picklable_objects
-    def _execute(network:'Network'):
-        _ = reduce(lambda returns, func:func(network, returns), network._funcs, ())
+    def execute(networks:List['Network']):
+        return [network._execute(i) for i, network in enumerate(networks, 1)]
+        # executor = ThreadPoolExecutor(max_workers=len(networks))
+        # jobs = [executor.submit(network._execute, network, i) for i, network in enumerate(networks, 1)]
+        # print([job for job in jobs])
+        # return [job.result() for job in  jobs]
+        # return Parallel(n_jobs=-1, prefer='threads')(network._execute(id_=i) for i, network in enumerate(networks, 1))
+    
+    def __call__(self, id_:int=0):
+        return self._execute(id_)
+        # executor = ThreadPoolExecutor(max_workers=1)
+        # jobs = executor.submit(self._execute, self, id_)
+        # return [job.result() for job in  jobs]
+        # return Parallel(n_jobs=-1, prefer='threads')([self._execute(id_=id_)])
+    
+    # @delayed
+    # @wrap_non_picklable_objects
+    def _execute(self, id_:int=0):
+        self._id = id_
+        self.__name+=str(self._id)
+        return reduce(lambda returns, func:func(self, returns), self._flow, ())
     
     # def __call__(self, *args: Any, **kwds: Any) -> Any:
     #     _ = Parallel(n_jobs=-1, prefer='threads')(self._execute(network=network) for network in networks)
-    
-    @classmethod
-    def execute(cls, networks:List['Network']):
-        _ = Parallel(n_jobs=-1, prefer='threads')(cls._execute(network=network) for network in networks)
