@@ -8,7 +8,6 @@ from joblib import Parallel, delayed, wrap_non_picklable_objects
 
 from .network import Network
 from ..components.circuit import QutipCircuit
-from ..kernel.quantum_manager import QuantumManagerDensity
 
 class Attack:
     @staticmethod

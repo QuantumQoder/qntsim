@@ -23,7 +23,7 @@ def string_to_binary(messages:Dict[int, str]):
 class Network:
     _flow:List[partial] = []
     def __init__(self,
-                 topology:str,
+                 topology,
                  messages:Dict[Tuple, str],
                  name:str='network',
                  backend:str='Qutip',
@@ -59,7 +59,8 @@ class Network:
         stop_time = self._kwargs.get('stop_time', 10e12)
         self._timeline = Timeline(stop_time=stop_time, backend=self._backend)
         self._net_topo = Topology(name=self._kwargs.get('name', 'network'), timeline=self._timeline)
-        self._net_topo.load_config(self._topology)
+        if isinstance(self._topology, (Dict, dict)): self._net_topo.load_config_json(config=self._topology)
+        else: self._net_topo.load_config(self._topology)
         self.__set_parameters__()
         self.nodes = self._net_topo.get_nodes_by_type('EndNode')
         self.qchannels = self._net_topo.qchannels
@@ -103,12 +104,12 @@ class Network:
         for keys in self.messages:
             for k1, k2 in zip(keys[:-1], keys[1:]):
                 self[k1-1].transport_manager.request(self[k2-1].owner.name,
-                                                   size=self.size,
-                                                   start_time=start_time,
-                                                   end_time=end_time,
-                                                   priority=priority,
-                                                   target_fidelity=target_fidelity,
-                                                   timeout=timeout)
+                                                     size=self.size,
+                                                     start_time=start_time,
+                                                     end_time=end_time,
+                                                     priority=priority,
+                                                     target_fidelity=target_fidelity,
+                                                     timeout=timeout)
     
     def __identify_states__(self):
         for node in self[:-1]:

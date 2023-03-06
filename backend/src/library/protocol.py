@@ -24,7 +24,7 @@ class Protocol:
         for network in self.networks:
             yield network
     
-    def __call__(self, topology:str, functions:List[partial]=None, *args: Any, **kwds: Any) -> Any:
+    def __call__(self, topology, functions:List[partial]=None, *args: Any, **kwds: Any) -> Any:
         Network._flow = functions if functions else self.__funcs
         start_time = time_ns()
         self.networks = [Network(**kwds, name=self.__name, topology=topology, messages=messages) for messages in self.messages_list]
