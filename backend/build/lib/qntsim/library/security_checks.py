@@ -1,9 +1,7 @@
-from collections.abc import Iterable
 from typing import List, Dict
 from random import sample
 from numpy.random import randint
 
-from ..topology.node import Node
 from ..components.circuit import QutipCircuit
 from .network import Network
 

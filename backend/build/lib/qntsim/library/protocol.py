@@ -17,14 +17,14 @@ class Protocol:
         if 'state' in kwds: self.__funcs.append(partial(Network.generate_state, state=kwds.get('state'), label=kwds.get('label')))
         self.__funcs.append(partial(Network.teleport) if 'encode' not in kwds and 'label' in kwds else partial(kwds.get('encode', Network.encode), msg_index=0))
         if (attack:=kwds.get('attack')) is not None: self.__funcs.append(partial(Attack.implement, attack=ATTACK_TYPE[attack].value))
-        if len(messages_list[0])>1: self.__funcs.extend([partial(kwds.get('encode', Network.encode), msg_index=i) for i in range(1, len(messages_list[0]))])
+        if len(messages_list[0])>1: self.__funcs.extend(partial(kwds.get('encode', Network.encode), msg_index=i) for i in range(1, len(messages_list[0])))
         self.__funcs.append(kwds.get('measure', partial(Network.measure)))
     
     def __iter__(self):
         for network in self.networks:
             yield network
     
-    def __call__(self, topology:str, functions:List[partial]=None, *args: Any, **kwds: Any) -> Any:
+    def __call__(self, topology, functions:List[partial]=None, *args: Any, **kwds: Any) -> Any:
         Network._flow = functions if functions else self.__funcs
         start_time = time_ns()
         self.networks = [Network(**kwds, name=self.__name, topology=topology, messages=messages) for messages in self.messages_list]
