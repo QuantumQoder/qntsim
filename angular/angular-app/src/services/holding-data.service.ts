@@ -20,7 +20,7 @@ export class HoldingDataService {
   }, {
     appId: 7, appName: 'Arbitrary basis QSDC', image: 'assets/images/Crypt4.png', content: 'An arbitrary basis QSDC scheme with mutual user authentication'
   }, {
-    appId: 8, appName: 'Single Photon-QD', image: 'assets/images/spqd.jpeg', content: 'A node-to-node dialogue protocol using batches of single photons'
+    appId: 8, appName: 'Single Photon-QD', image: 'assets/images/single_pd.png', content: 'A node-to-node dialogue protocol using batches of single photons'
   }, {
     appId: 9, appName: 'QSDC with Controlled Teleportation', image: 'assets/images/qtel.jpeg', content: 'A controlled teleportation scheme for QSDC'
   }, {

@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 
@@ -10,7 +11,7 @@ export class ConditionsService {
   currentSection: any;
   public selectedAppResult = new Subject();
   public _result = this.selectedAppResult.asObservable();
-  constructor() { }
+  constructor(private http: HttpClient) { }
   updateNode(value: any) {
     this.selectedAppResult.next(value)
   }
@@ -32,5 +33,14 @@ export class ConditionsService {
   }
   setApp(app: string) {
     this.app = app
+  }
+  jsonUrl(type: any, level: any) {
+    return {
+      url: type.toLowerCase() + '_' + level + '.json',
+      type: type.toLowerCase()
+    }
+  }
+  getJson(url: string, type: any) {
+    return this.http.get('../assets/preload-topologies/' + type + '/' + url)
   }
 }

@@ -1,0 +1,78 @@
+{
+    "nodes": [
+        {
+            "key": "node1",
+            "color": "lightblue"
+        },
+        {
+            "key": "node2",
+            "color": "lightblue"
+        },
+        {
+            "key": "node3",
+            "color": "orange"
+        },
+        {
+            "key": "node4",
+            "color": "orange"
+        },
+        {
+            "key": "node5",
+            "color": "orange"
+        },
+        {
+            "key": "node6",
+            "color": "orange"
+        },
+        {
+            "key": "node7",
+            "color": "lightblue"
+        },
+        {
+            "key": "node8",
+            "color": "lightblue"
+        }
+    ],
+    "links": [
+        {
+            "from": "node1",
+            "to": "node3"
+        },
+        {
+            "from": "node2",
+            "to": "node4"
+        },
+        {
+            "from": "node3",
+            "to": "node4"
+        },
+        {
+            "from": "node4",
+            "to": "node5"
+        },
+        {
+            "from": "node5",
+            "to": "node6"
+        },
+        {
+            "from": "node6",
+            "to": "node4"
+        },
+        {
+            "from": "node6",
+            "to": "node3"
+        },
+        {
+            "from": "node3",
+            "to": "node5"
+        },
+        {
+            "from": "node6",
+            "to": "node8"
+        },
+        {
+            "from": "node5",
+            "to": "node7"
+        }
+    ]
+}

@@ -10,6 +10,7 @@ const routes: Routes = [
   { path: 'drag', component: DragComponent },
   { path: 'results', component: ResultsComponent },
   { path: 'intro', loadChildren: () => import('./components/intro/intro-modules/intro.module').then(m => m.IntroModule) },
+  { path: 'minimal', loadChildren: () => import('./components/minimal/modules/minimal.module').then(m => m.MinimalModule) },
   { path: '**', redirectTo: '' }
 ];
 

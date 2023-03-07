@@ -43,13 +43,14 @@ import { CtrlClickDirective } from './directives/ctrl-click';
 import { JwtInterceptor } from './auth/jwt.interceptor';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { MinimalComponent } from './components/minimal/minimal.component';
 
 // import { GameComponent } from './components/game/game.component';
 // import { ToastModule } from 'primeng/toast';
 // import { Alert } from '@ng-bootstrap/ng-bootstrap';
 //import { AngularAnimationsLibraryModule } from 'angular-animations-library'
 @NgModule({
-  schemas: [
+  schemas: [CUSTOM_ELEMENTS_SCHEMA,
     NO_ERRORS_SCHEMA
   ],
   declarations: [
@@ -59,7 +60,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
     FooterComponent,
     DragComponent,
     ResultsComponent,
-    CtrlClickDirective
+    CtrlClickDirective,
+    // MinimalComponent
   ],
   imports: [SplitButtonModule,
     ProgressSpinnerModule,

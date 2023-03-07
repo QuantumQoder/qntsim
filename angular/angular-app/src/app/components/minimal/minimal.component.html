@@ -1,0 +1,28 @@
+<div class="row" style="height:89vh;">
+    <div class="col-3 p-0 bg-white">
+        <form [formGroup]="minimalform">
+            <h3 class="text-center display-5">Topology
+                <br> Configuration
+            </h3>
+            <div class="mt-4 col-9 mx-auto">
+                <label for="type" class="form-label font-bold">
+                    Type
+                </label>
+                <select class="form-control" formControlName="type">
+                    <option *ngFor="let data of type" [ngValue]="data">{{data}}</option>
+                </select>
+            </div>
+            <br>
+            <div class="mt-4 col-9 mx-auto">
+                <label for="type" class="form-label font-bold mb-4">
+                    Level {{level}}
+                </label>
+                <p-slider formControlName="level" [min]="0" [step]="1" [max]="4" (onChange)="levelChange()"></p-slider>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-9" style="padding-left: 1px;">
+        <div id="topology" style="width:100%;height:100%;background-color:white;"></div>
+    </div>
+</div>

@@ -46,7 +46,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       .arcDashGap(1)
       .arcDashInitialGap(() => Math.random())
       .arcDashAnimateTime(4000)
-      .arcColor((d: any) => [`rgba(255, 255,255, ${OPACITY})`, `rgba(255, 0, 0, ${OPACITY})`])
+      .arcColor((d: any) => [`rgba(255, 255,255, ${OPACITY})`, `rgba(3, 207, 252, ${OPACITY})`])
       .arcsTransitionDuration(0)
       .pointColor(() => 'orange')
       .pointAltitude(0)
