@@ -1,0 +1,44 @@
+{
+    "appList": [
+        {
+            "appName": "E91",
+            "appId": 1
+        },
+        {
+            "appName": "E2E",
+            "appId": 2
+        },
+        {
+            "appName": "Teleportation",
+            "appId": 3
+        },
+        {
+            "appName": "GHZ",
+            "appId": 4
+        },
+        {
+            "appName": "Seminal QSDC",
+            "appId": 5
+        },
+        {
+            "appName": "PingPong",
+            "appId": 6
+        },
+        {
+            "appName": "Arbitary based QSDC",
+            "appId": 7
+        },
+        {
+            "appName": "Single Photon QD",
+            "appId": 8
+        },
+        {
+            "appName": "QSDC Telportation",
+            "appId": 9
+        },
+        {
+            "appName": "IP2",
+            "appId": 10
+        }
+    ]
+}

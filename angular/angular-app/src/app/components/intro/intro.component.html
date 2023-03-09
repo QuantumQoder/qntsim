@@ -671,28 +671,28 @@
         <!-- </div> -->
         <div class="d-flex justify-content-center button-group ">
             <button type="button" *ngIf="app!=7 && activeIndex==1 || app!=7 && activeIndex==2"
-                class="btn btn-primary btn-custom" (click)="previous()">Previous</button>
+                class="btn btn-primary btn-custom mx-2" (click)="previous()">Previous</button>
             <button type="button" *ngIf="app!=7 && activeIndex==0 ||app!=7 && activeIndex==1"
-                class="btn btn-primary btn-custom" (click)="next()">Next</button>
-            <button type="button" *ngIf="app==5 && activeIndex==2" class="btn btn-primary btn-custom"
+                class="btn btn-primary btn-custom mx-2" (click)="next()">Next</button>
+            <button type="button" *ngIf="app==5 && activeIndex==2" class="btn btn-primary btn-custom mx-2"
                 (click)="next()">Next</button>
-            <button type="button" *ngIf="app==5 && activeIndex==3" class="btn btn-primary btn-custom"
+            <button type="button" *ngIf="app==5 && activeIndex==3" class="btn btn-primary btn-custom mx-2"
                 (click)="previous()">Previous</button>
-            <button type="button" *ngIf="app!=5 && app!=10 && activeIndex==2" class="btn btn-primary btn-custom"
+            <button type="button" *ngIf="app!=5 && app!=10 && activeIndex==2" class="btn btn-primary btn-custom mx-2"
                 (click)="goto()">Go To
                 Application</button>
-            <button type="button" *ngIf="app==5 && activeIndex==3" class="btn btn-primary btn-custom"
+            <button type="button" *ngIf="app==5 && activeIndex==3" class="btn btn-primary btn-custom mx-2"
                 (click)="goto()">Go To
                 Application</button>
             <button type="button" *ngIf="step==1 && app==7 && activeIndex==0 ||step==1 && app==7 && activeIndex ==1"
-                class="btn btn-primary btn-custom" (click)="nextStep()">Next</button>
+                class="btn btn-primary btn-custom mx-2" (click)="nextStep()">Next</button>
             <button type="button" *ngIf="step==2 && app==7 && activeIndex==0 ||step==2 && app==7 && activeIndex ==1"
-                class="btn btn-primary btn-custom" (click)="previousStep()">Previous</button>
+                class="btn btn-primary btn-custom mx-2" (click)="previousStep()">Previous</button>
             <button type="button" *ngIf="step==2 && app==7 && activeIndex==0 ||step==2 && app==7 && activeIndex ==1"
-                class="btn btn-primary btn-custom" (click)="next()">Next</button>
+                class="btn btn-primary btn-custom mx-2" (click)="next()">Next</button>
             <br>
             <button type="button" *ngIf=" app==10 && activeIndex==3 || app==10 && activeIndex == 4"
-                class="btn btn-primary btn-custom" (click)="previous()">
+                class="btn btn-primary btn-custom mx-2" (click)="previous()">
                 Previous
             </button>
             <button type="button" *ngIf=" app==10 && activeIndex==2 || app==10 && activeIndex ==3"

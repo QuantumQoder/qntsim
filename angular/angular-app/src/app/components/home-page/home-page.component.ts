@@ -42,7 +42,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       .arcStartLng((d: any) => +d.srcAirport.lng)
       .arcEndLat((d: any) => +d.dstAirport.lat)
       .arcEndLng((d: any) => +d.dstAirport.lng)
-      .arcDashLength(0.25)
+      .arcDashLength(1)
       .arcDashGap(1)
       .arcDashInitialGap(() => Math.random())
       .arcDashAnimateTime(4000)
@@ -50,7 +50,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       .arcsTransitionDuration(0)
       .pointColor(() => 'orange')
       .pointAltitude(0)
-      .pointRadius(0.02)
+      .pointRadius(0.2)
       .pointsMerge(true);
     // myGlobe.position.y = 1000;
     // load data

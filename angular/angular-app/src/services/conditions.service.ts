@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { map, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -42,5 +42,11 @@ export class ConditionsService {
   }
   getJson(url: string, type: any) {
     return this.http.get('../assets/preload-topologies/' + type + '/' + url)
+  }
+  getAppList() {
+    return this.http.get('../assets/app-infos/appList.json')
+  }
+  getAppSetting(app: any) {
+    return this.http.get('../assets/app-infos/appSettings.json')
   }
 }

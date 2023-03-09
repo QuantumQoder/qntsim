@@ -1,6 +1,8 @@
+import { result } from 'underscore';
 import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import * as go from 'gojs'
+import { map } from 'rxjs';
 import { ConditionsService } from 'src/services/conditions.service';
 
 @Component({
@@ -10,11 +12,19 @@ import { ConditionsService } from 'src/services/conditions.service';
 })
 
 export class MinimalComponent implements OnInit, AfterViewInit {
+  fields = []
+  formData =
+    [{
+      "label": "sender"
+    },
+    {
+      "label": "receiver"
+    }]
   topology: any
   topologyData: any
   levelChange() {
-    this.level = this.minimalform.get('level')?.value;
-    let urlData = this.service.jsonUrl(this.minimalform.get('type')?.value.toLowerCase(), this.level);
+    this.level = this.topologyForm.get('level')?.value;
+    let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value.toLowerCase(), this.level);
     this.service.getJson(urlData.url, urlData.type).subscribe((result: any) => {
       this.topologyData = result;
       console.log(this.topologyData)
@@ -24,12 +34,15 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       this.updateDiagram(this.topologyData)
     })
   }
-  minimalform: any
+  topologyForm: any
+  appForm: any
+  applist: any
+  appSettingsForm: any
   type = ['Star', 'Mesh'];
   level: number = 0
   constructor(private fb: FormBuilder, private service: ConditionsService) { }
   ngAfterViewInit(): void {
-    let urlData = this.service.jsonUrl(this.minimalform.get('type')?.value, this.level);
+    let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value, this.level);
     this.service.getJson(urlData.url, urlData.type).subscribe((result) => {
       // console.log(result)
       this.topologyData = result;
@@ -42,12 +55,31 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     }
     )
   }
+  setSettings(formData: any) {
+    let form = {}
+    for (let i = 0; i < formData.length; i++) {
+      form[formData[i].formField] = new FormControl('')
+    }
+    this.appSettingsForm = new FormGroup(form)
+  }
   ngOnInit(): void {
-    this.minimalform = this.fb.group({
+    this.topologyForm = this.fb.group({
       'type': ['Star', Validators.required],
-      'level': [0, Validators.required]
+      'level': [0, Validators.required],
+      'noOfMemories': [100, Validators.required],
+      'distance': [150, Validators.required],
+      'attenuity': [0.98, Validators.required]
     });
+    this.appForm = this.fb.group({
+      'app': ['', Validators.required],
 
+    })
+
+    this.appSettingsForm = this.fb.group({
+      'sender': ['', Validators.required],
+      'receiver': ['', Validators.required]
+    })
+    this.service.getAppList().pipe(map((d: any) => d.appList)).subscribe((result: any) => this.applist = result);
   }
   updateDiagram(data: any) {
     this.topology.model = new go.GraphLinksModel(
@@ -55,7 +87,22 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     )
     console.log(this.topology.model.nodeDataArray);
   }
-
+  get() {
+    console.log(this.appSettingsForm.get('sender')?.value)
+    console.log(this.appSettingsForm.get('receiver')?.value)
+    console.log(this.appSettingsForm.get('keyLength')?.value)
+  }
+  getType($event: any) {
+    let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value.toLowerCase(), this.level);
+    this.service.getJson(urlData.url, urlData.type).subscribe((result: any) => {
+      this.topologyData = result;
+      console.log(this.topologyData)
+    }, (error) => {
+      console.log(error)
+    }, () => {
+      this.updateDiagram(this.topologyData)
+    })
+  }
   init(nodes: any, links: any) {
     var $ = go.GraphObject.make;  // for conciseness in defining templates
     this.topology = $(go.Diagram, "topology",  // create a Diagram for the DIV HTML element
@@ -78,20 +125,22 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       );
     this.topology.linkTemplate =
       $(go.Link,
-        //    {
-        //   routing: go.Link.AvoidsNodes,
-        //   curve: go.Link.JumpOver
-        // },
-        // the whole link panel
         $(go.Shape),
-        // $(go.Shape,   // the "from" end arrowhead
-        //   { fromArrow: "Standard" }),
-        // $(go.Shape,   // the "to" end arrowhead
-        //   { toArrow: "Standard" })  // the link shape, default black stroke
       );
     this.topology.model = new go.GraphLinksModel(
       nodes, links
     )
+  }
+  getApp($event: any) {
+    console.log(this.appForm.get('app')?.value)
+    let app = this.appForm.get('app')?.value
+    this.service.getAppSetting($event.target.value).subscribe((result: any) => {
+
+      console.log(result[app]);
+      this.applist = result[app]
+      console.log(result);
+      this.setSettings(this.applist)
+    })
   }
 }
 
