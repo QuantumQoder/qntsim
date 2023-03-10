@@ -206,4 +206,10 @@ export class ApiServiceService {
   getPingPong() {
     return this.pingpong
   }
+  getCredentials() {
+    return {
+      "username": "admin",
+      "password": "qwerty"
+    }
+  }
 }

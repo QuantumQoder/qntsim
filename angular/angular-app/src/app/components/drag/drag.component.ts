@@ -596,9 +596,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       'inputMessage': new FormControl('')
     })
     this.showBottomCenter();
-    // this.confirm();
-    // this.load();
-    // this.step = '2'
   }
   info_demo() {
     this.info = true;
