@@ -92,13 +92,13 @@ class RunApp(APIView):
             ids = {int(k):str(v) for k,v in appSettings["ids"].items()}
             results = ip2(input_messages,ids,appSettings["num_check_bits"],appSettings["num_decoy"])
         # Add code for results here
-        print('results', results)
+        # print('results', results)
         # graphs = results.get('graph')
         # output = results.get('results')
         output = results
         # print('graphs', graphs)
-        print('output', output)
-        print('request user', request.user)
+        # print('output', output)
+        # print('request user', request.user)
         # res = Results.objects.create(user = request.user, topology = topology, app_name = application, input =appSettings, output = output,graphs = graphs)
         # res.save()
 

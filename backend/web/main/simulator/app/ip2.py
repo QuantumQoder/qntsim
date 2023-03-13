@@ -281,10 +281,12 @@ def ip2_run(topology,input_messages ,ids,num_check_bits,num_decoy):
     num_decoy_photons = 15
     threshold = 0.2 # error threshold
     attack = (None, None) #(attack_type, channel_no.) channel_no. doesn't implement attack. one can say that the channel 1 is secured.
-    print(ip2(topology=topology,
+    res = ip2(topology=topology,
                   alice_attrs=alice_attrs,
                   bob_id=bob_id,
                   num_decoy_photons=num_decoy_photons,
                   threshold=threshold,
-                  attack=attack))
-    print(ip2_run(topology,input_messages,ids,num_check_bits,num_decoy))
+                  attack=attack)
+    return res
+    
+    # print(ip2_run(topology,input_messages,ids,num_check_bits,num_decoy))

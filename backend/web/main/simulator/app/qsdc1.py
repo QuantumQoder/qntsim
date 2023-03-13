@@ -19,8 +19,10 @@ class QSDC1():
     #I need to request Bell entanglemenets \psi_+ , \psi_-
     
     def request_entanglements(self,sender,receiver,n):
+        print("sender,receiver,n",sender.name,receiver.name,n)
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.5,5e12)
         source_node_list=[sender.name]
+        print("sender,receiver,source_node_list",sender,receiver,source_node_list)
         return sender,receiver,source_node_list
 
     def roles(self,alice,bob,n):
@@ -51,7 +53,7 @@ class QSDC1():
         qm_bob=bob.timeline.quantum_manager
         alice_bob_keys_dict = {}
         for info in alice.resource_manager.memory_manager:
-
+            # print('llll')
             key=info.memory.qstate_key
             state=qm_alice.get(key)
 
@@ -61,6 +63,7 @@ class QSDC1():
             #Filtering out wrong states created
             if(not self.check_phi_plus(state.state)):continue
             entangled_keys.append(key)
+        print('entangled keys', entangled_keys)
         for info in bob.resource_manager.memory_manager:
 
             key=info.memory.qstate_key
@@ -78,7 +81,7 @@ class QSDC1():
             if state.keys[1] in entangled_keys :
                 alice_bob_keys_dict[state.keys[1]] = state.keys[0]
 
-
+        print("entangled_keys, alice_bob_keys_dict",entangled_keys, alice_bob_keys_dict)
         return entangled_keys, alice_bob_keys_dict
 
 
@@ -190,6 +193,7 @@ class QSDC1():
         # message = string_to_binary(message)
         assert len(message)%2 == 0
         entangled_keys,alice_bob_keys_dict  = self.create_entanglement(alice,bob)
+        print('entangled_keys,alice_bob_keys_dict',alice, bob,entangled_keys,alice_bob_keys_dict)
         qm_alice = alice.timeline.quantum_manager
 
         protocol_keys = self.generate_QSDC_entanglement(qm_alice, message, entangled_keys,alice_bob_keys_dict )

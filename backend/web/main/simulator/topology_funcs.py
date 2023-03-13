@@ -206,10 +206,13 @@ def qsdc1(network_config, sender, receiver, sequenceLength, key):
         n=int(sequenceLength*len(key))
         alice=network_topo.nodes[sender]
         bob = network_topo.nodes[receiver]
+        print('alice bob', alice,bob,n)
         qsdc1=QSDC1()
         alice,bob,source_node_list=qsdc1.roles(alice,bob,n)
+        print("alice,bob,source_node_list",alice,bob,source_node_list)
         tl.init()
         tl.run()  
+        print('init and run', network_config_json)
         results = qsdc1.run(alice,bob,sequenceLength,key)
         report={}
         report["application"]=results
@@ -479,7 +482,20 @@ def mdi_qsdc(network_config, sender, receiver, message, attack):
 
 def ip2(input_messages,ids,num_check_bits,num_decoy):
     report ={}
+    print("input_messages,ids,num_check_bits,num_decoy",input_messages,ids,num_check_bits,num_decoy)
     topology = '/code/web/configs/2n_linear.json'
     results=ip2_run(topology,input_messages,ids,num_check_bits,num_decoy)
-    report["application"]=results
+    # report["application"]=results
+    # return report
+
+    res={}
+    res["input_message"] = list(input_messages.values())
+    res["ids"] = ids
+    res["check_bits"] = num_check_bits
+    res["num_decoys"] = num_decoy
+    res["output_msg"] = results[0]
+    res["error"] = results[1]
+    # report = {}
+    report["application"] = res
+    print('report',report)
     return report
