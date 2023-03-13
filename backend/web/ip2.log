@@ -1,0 +1,70 @@
+/usr/local/lib/python3.8/site-packages/qntsim/library/network.py Thread-1 network string_to_binary converted
+/usr/local/lib/python3.8/site-packages/django/utils/log.py Thread-1 log log_response Internal Server Error: /run/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/site-packages/django/core/handlers/exception.py", line 47, in inner
+    response = get_response(request)
+  File "/usr/local/lib/python3.8/site-packages/django/core/handlers/base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/usr/local/lib/python3.8/site-packages/django/views/decorators/csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/usr/local/lib/python3.8/site-packages/django/views/generic/base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.8/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.8/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.8/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.8/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/code/web/main/views.py", line 84, in post
+    results = qsdc_teleportation(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"], appSettings["attack"])
+  File "/code/web/main/simulator/topology_funcs.py", line 251, in qsdc_teleportation
+    protocol(topology=topology)
+  File "/usr/local/lib/python3.8/site-packages/qntsim/library/protocol.py", line 30, in __call__
+    self.networks = [Network(**kwds, name=self.__name, topology=topology, messages=messages) for messages in self.messages_list]
+  File "/usr/local/lib/python3.8/site-packages/qntsim/library/protocol.py", line 30, in <listcomp>
+    self.networks = [Network(**kwds, name=self.__name, topology=topology, messages=messages) for messages in self.messages_list]
+  File "/usr/local/lib/python3.8/site-packages/qntsim/library/network.py", line 48, in __init__
+    self.__initiate__()
+  File "/usr/local/lib/python3.8/site-packages/qntsim/library/network.py", line 72, in __initiate__
+    self.__request_entanglements__()
+  File "/usr/local/lib/python3.8/site-packages/qntsim/library/network.py", line 106, in __request_entanglements__
+    self[k1-1].transport_manager.request(self[k2-1].owner.name,
+TypeError: unsupported operand type(s) for -: 'str' and 'int'
+/usr/local/lib/python3.8/site-packages/qntsim/library/network.py Thread-1 network string_to_binary converted
+/usr/local/lib/python3.8/site-packages/django/utils/log.py Thread-1 log log_response Internal Server Error: /run/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/site-packages/django/core/handlers/exception.py", line 47, in inner
+    response = get_response(request)
+  File "/usr/local/lib/python3.8/site-packages/django/core/handlers/base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/usr/local/lib/python3.8/site-packages/django/views/decorators/csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/usr/local/lib/python3.8/site-packages/django/views/generic/base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/usr/local/lib/python3.8/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/usr/local/lib/python3.8/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.8/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.8/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/code/web/main/views.py", line 84, in post
+    results = qsdc_teleportation(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"], appSettings["attack"])
+  File "/code/web/main/simulator/topology_funcs.py", line 251, in qsdc_teleportation
+    protocol(topology=topology)
+  File "/usr/local/lib/python3.8/site-packages/qntsim/library/protocol.py", line 30, in __call__
+    self.networks = [Network(**kwds, name=self.__name, topology=topology, messages=messages) for messages in self.messages_list]
+  File "/usr/local/lib/python3.8/site-packages/qntsim/library/protocol.py", line 30, in <listcomp>
+    self.networks = [Network(**kwds, name=self.__name, topology=topology, messages=messages) for messages in self.messages_list]
+  File "/usr/local/lib/python3.8/site-packages/qntsim/library/network.py", line 48, in __init__
+    self.__initiate__()
+  File "/usr/local/lib/python3.8/site-packages/qntsim/library/network.py", line 72, in __initiate__
+    self.__request_entanglements__()
+  File "/usr/local/lib/python3.8/site-packages/qntsim/library/network.py", line 106, in __request_entanglements__
+    self[k1-1].transport_manager.request(self[k2-1].owner.name,
+  File "/usr/local/lib/python3.8/site-packages/qntsim/library/network.py", line 56, in __getitem__
+    return self.nodes[item]
+IndexError: list index out of range
