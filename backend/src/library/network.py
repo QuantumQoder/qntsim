@@ -219,7 +219,7 @@ class Network:
                  messages:Dict[Tuple, str],
                  name:str='network',
                  backend:str='Qutip',
-                 parameters:str='parameters.txt',
+                 parameters:str='parameters.json',
                  stop_time:int=10e12,
                  start_time:int=5e12,
                  end_time:int=10e12,
