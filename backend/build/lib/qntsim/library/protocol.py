@@ -5,7 +5,7 @@ from time import time_ns, time
 from IPython.display import clear_output
 
 from .network import Network
-from .attacks import Attack, ATTACK_TYPE
+from .attack import Attack, ATTACK_TYPE
 from .security_checks import insert_check_bits
 
 class Protocol:
@@ -260,7 +260,7 @@ class Protocol:
             Any: The result of executing the network flow on the networks.
         """
         # Set the network flow to the provided list of functions, or to the default flow defined in the constructor
-        Network._flow = self.__funcs or functions
+        Network._flow = functions or self.__funcs
         
         # Record the start time
         start_time = time_ns()
@@ -282,7 +282,7 @@ class Protocol:
             self.recv_msgs_list = kwds.get('decode', Network.decode)(networks=self.networks)
         
         # Log the completion time
-        logging.info(f'completed execution within {(time_ns()-start_time-mid_time):.e} ns')
+        logging.info(f'completed execution within {(time_ns()-start_time-mid_time):e} ns')
         
         # Import and use the ErrorAnalyzer class to analyze errors in the network and store the results in the protocol instance
         from .error_analyzer import ErrorAnalyzer

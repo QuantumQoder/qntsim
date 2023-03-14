@@ -43,7 +43,7 @@ src/kernel/timeline.py
 src/library/Error.py
 src/library/NoiseModel.py
 src/library/__init__.py
-src/library/attacks.py
+src/library/attack.py
 src/library/circuits.py
 src/library/error_analyzer.py
 src/library/network.py
