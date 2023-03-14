@@ -28,7 +28,7 @@ def string_to_binary(messages:Dict[Tuple, str]):
         print(string_to_binary(messages={(1, 2):'h'}))
     """
     # strings = [''.join('0'*(8-len(bin(ord(char))[2:]))+bin(ord(char))[2:] for char in message) for _, message in messages.items()]
-    strings = ['{:08b}'.format(ord(char)) for message in messages.values() for char in message]
+    strings = [''.join('{:08b}'.format(ord(char)) for char in message) for message in messages.values()]
     logging.info('converted')
     
     return strings
@@ -239,7 +239,7 @@ class Network:
         self._timeout = timeout
         self.messages = messages
         self._bin_msgs = list(messages.values()) if all(char in '01' for message in messages.values() for char in message) else string_to_binary(messages=messages)
-        self.__dict__.update(kwargs=kwds)
+        self.__dict__.update(**kwds)
         if not hasattr(self, 'size'): self.size = len(self._bin_msgs[0])
         elif callable(self.size): self.size = self.size(len(self._bin_msgs[0]))
         stack = inspect.stack()
