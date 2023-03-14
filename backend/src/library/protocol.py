@@ -197,7 +197,7 @@ class Protocol:
                 print('Error in execution:', mean(protocol.mean_list))
     """
     networks = []
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         """
         Returns the existing instance of the class if it exists, otherwise creates a new instance.
 
