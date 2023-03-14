@@ -556,7 +556,7 @@ class Network:
     # @wrap_non_picklable_objects
     def _decode(self, *args):
         strings = []
-        if self._initials:
+        if hasattr(self, '_initials'):
             node = self.nodes[0]
             for bin_msg in self._bin_msgs:
                 string = ''
