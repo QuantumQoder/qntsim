@@ -52,11 +52,11 @@ export class ResultsComponent implements OnInit, AfterViewInit {
     this.app_id = this.con.getapp_id()
     // this.app_id = 8
     if (!this.app_id) {
-      this.router.navigate(['/applications'])
+      this.router.navigate(['/'])
     }
 
     switch (this.app_id) {
-      case 2:
+      case 1:
         var e91 = this.con.getResult()
         this.e91 = e91.application
         console.log(this.e91)
@@ -87,7 +87,7 @@ export class ResultsComponent implements OnInit, AfterViewInit {
         ];
         this.activeItem = this.items[0]
         break;
-      case 1:
+      case 2:
         var e2e = this.con.getResult();
         this.e2e = e2e.application;
         break;

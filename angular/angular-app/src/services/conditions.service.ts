@@ -46,10 +46,11 @@ export class ConditionsService {
   getAppList() {
     return this.http.get('../assets/app-infos/appList.json')
   }
-  getAppSetting(app: any) {
+  getAppSetting() {
     return this.http.get('../assets/app-infos/appSettings.json')
   }
   getMemory() {
     return { "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93 }
   }
+
 }

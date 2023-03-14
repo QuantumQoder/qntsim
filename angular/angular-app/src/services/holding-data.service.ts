@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -36,148 +35,33 @@ export class HoldingDataService {
       "error": 0
     }
   }
-  qsdct = {
-    "application": {
-      "input_message": "Hello World",
-      "output_message": "F"
+  qsdct: any
+  appDescription: any = [
+    {
+      title: 'Entanglement Generation', description: 'Entanglement is crucial for Quantum Communications and Computing applications. It can be created between two parties using SPDC or between multiple parties using GHZ and other multi- party states.Entanglement is essential for Quantum Teleportation, allowing quantum state transfer regardless of distance.'
     },
-    "graph": {
-      "latency": [
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        0.1265044625099998,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1
-      ],
-      "fidelity": [
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        0.706,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1
-      ],
-      "throughput": {
-        "fully_complete": [
-          0,
-          0,
-          0,
-          0,
-          0,
-          100.0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
-        ],
-        "partially_complete": [
-          0,
-          0,
-          0,
-          0,
-          0,
-          0.0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
-        ],
-        "rejected": [
-          0,
-          0,
-          0,
-          0,
-          0,
-          0.0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
-        ]
-      },
-      "time": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20
-      ]
-    }
-  };
+    {
+      title: 'End-to-End Entanglement Distribution', description: 'Entanglement distribution is a crucial part of Quantum Networks, but it faces challenges due to distance constraints,entanglement fidelity, and quantum data decoherence.However, Entanglement Swapping and Purification offer interesting solutions.Entanglement Swapping involves using pre- shared entanglement between two nodes to establish distant entanglement by swapping immediate neighbors.Purification uses many entangled qubits to create fresh entanglement of higher quality than existing qubits, enabling remote parties to share entanglement.'
+    },
+    {
+      title: 'Quantum Teleportation', description: 'Quantum teleportation transfers the state of a quantum particle across great distances using entanglement, without any physical transfer of the particle.With perfect security, it has the potential to revolutionize information exchange, from secure communications to data transfer.It represents a significant development in quantum mechanics with implications for the future of communication.'
+    },
+    {
+      title: 'Quantum Key Distribution', description: 'BB84 Quantum Key Distribution, proposed by Bennett and Brassard in 1984, is the first quantum cryptographic protocol. It allows remote users to establish a shared secret key based on quantum physics, ensuring security. The key is used to encrypt the message, which is then transmitted through a classical channel. Two transmissions are required in a QKD-based communication.'
+    },
+    {
+      title: 'Quantum Secure Direct Communication', description: "Unlike classical cryptography, some quantum protocols like Quantum Secure Direct Communication (QSDC) don't require any explicit keys for secure message transmission.QSDC allows direct transmission of a secret message from sender to receiver without any classical communication of ciphertext.It combines QKD and classical communication into one quantum communication, and has the potential to revolutionize secure communications and networking."
+    },
+    {
+      title: 'Quantum Secret Sharing', description: "Compared to classical cryptography, quantum cryptography offers stronger security based on the laws of quantum mechanics. Quantum secret sharing, which utilizes quantum entanglement, offers a higher level of security for distributing secret messages among multiple parties than classical methods. With the growing need for secure communication, quantum cryptography and secret sharing are becoming crucial tools for safeguarding sensitive information."
+    },
+    {
+      title: 'Distributed Quantum Computing', description: "Distributed quantum computing is a promising new approach that uses a network of interconnected quantum processors instead of a single large quantum computer. This approach offers advantages such as increased fault tolerance, scalability, and performance, enabling new applications and problem-solving capabilities. Though still in early stages, distributed quantum computing has already shown promising results and has the potential to transform the field in the future. With continued research, we can expect significant advancements and new use cases in quantum computing."
+    },
+  ]
+  getAppDescription() {
+    return this.appDescription
+  }
   constructor() { }
   getQSDCT() {
     return this.qsdct;

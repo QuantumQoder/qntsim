@@ -6,8 +6,9 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import * as go from 'gojs'
 import { map } from 'rxjs';
 import { ConditionsService } from 'src/services/conditions.service';
-import { Request } from './model/request';
-// import { link } from 'fs';
+import { Router } from '@angular/router';
+import { local } from 'd3';
+
 @Component({
   selector: 'app-minimal',
   templateUrl: './minimal.component.html',
@@ -28,7 +29,10 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   type = ['Star', 'Mesh'];
   level: number = 0
   cc: any[] = []
-  constructor(private fb: FormBuilder, private service: ConditionsService, private api: ApiServiceService, private cookie: CookieService) { }
+  appSettingsResult: any
+  appConfig: any;
+
+  constructor(private fb: FormBuilder, private service: ConditionsService, private route: Router, private api: ApiServiceService, private cookie: CookieService) { }
   ngAfterViewInit(): void {
     let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value, this.level);
     this.service.getJson(urlData.url, urlData.type).subscribe((result) => {
@@ -57,7 +61,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       'level': [0, Validators.required],
       'noOfMemories': [100, Validators.required],
       'distance': [150, Validators.required],
-      'attenuity': [0.98, Validators.required]
+      'attenuity': [{ value: 0.00001, disabled: true }, Validators.required]
     });
     this.appForm = this.fb.group({
       'app': ['', Validators.required]
@@ -69,6 +73,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
 
       localStorage.setItem('access', result.access)
     })
+    // this.getAppSettingsResults();
   }
   updateDiagram(data: any) {
     this.topology.model = new go.GraphLinksModel(
@@ -169,15 +174,14 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     var linkRequestArray = []
     let nodeDataArray = this.topologyData.nodes
     let linkDataArray = this.topologyData.links
-    // console.log(linkDataArray)
+    this.service.setapp_id(this.appForm.get('app')?.value)
     for (var i = 0; i < nodeDataArray.length; i++) {
-      // nodeArray = []
       var name = nodeDataArray[i].key;
       var type
       if (nodeDataArray[i].color == 'orange') {
-        type = 'Service'
+        type = 'service'
       } else if (nodeDataArray[i].color == 'lightblue') {
-        type = 'End'
+        type = 'end'
       }
       var memory = this.service.getMemory();
       var noOfMemories = this.topologyForm.get('noOfMemories')?.value
@@ -187,11 +191,9 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         noOfMemory: noOfMemories,
         memory: memory
       }
-
       nodeArray.push(singleNode)
     }
     console.log(nodeArray)
-
     for (var i = 0; i < linkDataArray.length; i++) {
       let from = linkDataArray[i].from
       let to = linkDataArray[i].to
@@ -233,7 +235,29 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         console.log(this.cc)
       }
     }
-    // var application = this.appForm.get('app')?.value;
+    var topology = {
+      nodes: nodeArray,
+      quantum_connections: linkRequestArray,
+      classical_connections: this.cc
+    }
+    this.getAppSetting(this.appForm.get('app')?.value)
+    console.log(this.appConfig)
+    var request = {
+      application: this.appForm.get('app')?.value,
+      topology: topology,
+      appSettings: this.appConfig
+    }
+    this.api.runApplication(request).subscribe((result) => {
+      this.spinner = true;
+      console.log(this.spinner)
+      this.service.setResult(result)
+    }, (error) => {
+      this.spinner = false
+      console.error(error)
+    }, () => {
+      this.spinner = false
+      this.route.navigate(['/results'])
+    })
   }
   buildForm(app: Number) {
     this.appSettingsForm = null;
@@ -275,9 +299,89 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   selectReceiver($event: any) {
     console.log(this.appSettingsForm.get('receiver')?.value)
   }
+  getAppSettingsResults() {
+    this.service.getAppSetting().subscribe((results: any) => {
+      this.appSettingsResult = results
+      console.log("APP SETTINGS:" + this.appSettingsResult)
+    })
+  }
+  getAppSetting(app_id: any) {
+    switch (app_id) {
+      case 2: this.appConfig = {
+        sender: this.appSettingsForm.get('sender')?.value,
+        receiver: this.appSettingsForm.get('receiver')?.value,
+        startTime: 1e12,
+        size: 6,
+        priority: 0,
+        targetFidelity: 0.5,
+        timeout: 2e12
+      }
+        // console.log(this.appConfig)
+        break;
+      case 1: this.appConfig = {
+        sender: this.appSettingsForm.get('sender')?.value,
+        receiver: this.appSettingsForm.get('receiver')?.value,
+        keyLength: String(this.appSettingsForm.get('keyLength')?.value)
+      }
+        break;
+      case 3: this.appConfig = {
+        sender: this.appSettingsForm.get('sender')?.value,
+        receiver: this.appSettingsForm.get('receiver')?.value,
+        amplitude1: '0.70710678118+0j',
+        amplitude2: '0-0.70710678118j'
+      }
+        break;
+      case 4: this.appConfig = {
+        node1: this.appSettingsForm.get('node1')?.value,
+        node2: this.appSettingsForm.get('node2')?.value,
+        node3: this.appSettingsForm.get('node3')?.value,
+        middleNode: this.appSettingsForm.get('middleNode')?.value
+      }
+        break;
+      case 5: this.appConfig = {
+        sender: this.appSettingsForm.get('sender')?.value,
+        receiver: this.appSettingsForm.get('receiver')?.value,
+        sequenceLength: 3,
+        key: this.appSettingsForm.get('key')?.value
+      }
+        break;
+      case 6: this.appConfig = {
+        sender: this.appSettingsForm.get('sender')?.value,
+        receiver: this.appSettingsForm.get('receiver')?.value,
+        sequenceLength: "3",
+        message: this.appSettingsForm.get('message')?.value
+      }
+        break;
+      case 7: this.appConfig = {
+        sender: this.appSettingsForm.get('sender')?.value,
+        receiver: this.appSettingsForm.get('receiver')?.value,
+
+        message: this.appSettingsForm.get('message')?.value
+      }
+        break;
+      case 8: this.appConfig = {
+        sender: this.appSettingsForm.get('sender')?.value,
+        receiver: this.appSettingsForm.get('receiver')?.value,
+        message1: this.appSettingsForm.get('message1')?.value,
+        message2: this.appSettingsForm.get('message2')?.value,
+        num_photons: 5,
+        attack: 'DoS'
+      }
+        break;
+      case 9: this.appConfig = {
+        sender: 1,
+        receiver: 2,
+        message: this.appSettingsForm.get('message')?.value,
+        attack: 'None'
+      }
+        break;
+      case 10:
+        this.appConfig = { "input_messages": { "2": this.appSettingsForm.get('message')?.value, }, "ids": { "2": "1011", "1": "0111" }, "num_check_bits": 4, "num_decoy": 4 }
+        break;
+    }
+  }
+
 }
-
-
 
 
 

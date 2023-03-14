@@ -19,10 +19,13 @@ export class ApplicationsComponent implements OnInit {
     { label: 'Home', routerLink: ['/'] },
     { label: 'Application', routerLink: ['applications'] },
   ];
+  appDescription: any[] = []
   constructor(private conService: ConditionsService, private _router: Router, private apiService: ApiServiceService, private holdingData: HoldingDataService) { }
 
   ngOnInit(): void {
-    this.data = this.holdingData.getHomePageData()
+    this.data = this.holdingData.getHomePageData();
+    this.appDescription = this.holdingData.getAppDescription();
+    console.log(this.appDescription)
     this.responsiveOptions = [
       {
         breakpoint: '1024px',
@@ -88,5 +91,9 @@ export class ApplicationsComponent implements OnInit {
   clicked() {
     console.log('clicked');
   }
-
+  scroll() {
+    document.getElementById('apps')?.scrollIntoView({
+      behavior: 'smooth'
+    });
+  }
 }

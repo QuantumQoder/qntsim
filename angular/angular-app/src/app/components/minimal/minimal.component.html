@@ -26,17 +26,19 @@
 
             <div class="mt-2 col-9 mx-auto">
                 <label for="type" class="form-label font-bold mb-2">
-                    Level {{level}}
+                    Topology Size {{level}}
                 </label>
                 <p-slider formControlName="level" [min]="0" [step]="1" [max]="4"
                     (onSlideEnd)="levelChange()"></p-slider>
             </div>
+            <hr>
             <div class="mt-2 col-9 mx-auto">
                 <label for="type" class="form-label font-bold mb-2">
                     No of Memories
                 </label>
                 <input type="number" formControlName="noOfMemories" class="form-control">
             </div>
+            <hr>
             <div class="mt-2 col-9 mx-auto">
                 <label for="type" class="form-label font-bold mb-2">
                     Distance
@@ -64,7 +66,6 @@
             <h3 class="text-center display-5">Application
                 <br> Configuration
             </h3>
-            <!-- <h5>Select an Application</h5> -->
             <div class="mt-2 col-9 mx-auto">
                 <label for="type" class="form-label font-bold">
                     Application
@@ -102,79 +103,47 @@
                 </label>
                 <input type="number" formControlName="keyLength" class="form-control">
             </div>
-            <!-- <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
-                <label for="type" class="form-label font-bold">
-                    Node 1
-                </label>
-                <select class="form-control" formControlName="node1">
-                    <option *ngFor="let data of nodes" [ngValue]="data.key">{{data.key}}</option>
-                </select>
-            </div>
-            <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
-                <label for="type" class="form-label font-bold">
-                    Node 2
-                </label>
-                <select class="form-control" formControlName="node2">
-                    <option *ngFor="let data of nodes" [ngValue]="data.key">{{data.key}}</option>
-                </select>
-            </div>
-            <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
-                <label for="type" class="form-label font-bold">
-                    Node 3
-                </label>
-                <select class="form-control" formControlName="node3">
-                    <option *ngFor="let data of nodes" [ngValue]="data.key">{{data.key}}</option>
-                </select>
-            </div>
-            <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
-                <label for="type" class="form-label font-bold">
-                    Middle Node
-                </label>
-                <select class="form-control" formControlName="middleNode">
-                    <option *ngFor="let data of nodes" [ngValue]="data.key">{{data.key}}</option>
-                </select>
-            </div> -->
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 5">
                 <label for="type" class="form-label font-bold">
                     Key
                 </label>
-                <input type="number" formControlName="key" class="form-control">
+                <input type="text" formControlName="key" class="form-control">
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 6">
                 <label for="type" class="form-label font-bold">
                     Message
                 </label>
-                <input type="number" formControlName="message" class="form-control">
+                <input type="text" formControlName="message" class="form-control">
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 7">
                 <label for="type" class="form-label font-bold">
                     Message
                 </label>
-                <input type="number" formControlName="message" class="form-control">
+                <input type="text" formControlName="message" class="form-control">
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 8">
                 <label for="type" class="form-label font-bold">
                     Sender's Message
                 </label>
-                <input type="number" formControlName="message1" class="form-control">
+                <input type="text" formControlName="message1" class="form-control">
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 8">
                 <label for="type" class="form-label font-bold">
                     Receiver's Message
                 </label>
-                <input type="number" formControlName="message2" class="form-control">
+                <input type="text" formControlName="message2" class="form-control">
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 9">
                 <label for="type" class="form-label font-bold">
                     Message
                 </label>
-                <input type="number" formControlName="message" class="form-control">
+                <input type="text" formControlName="message" class="form-control">
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 10">
                 <label for="type" class="form-label font-bold">
                     Message
                 </label>
-                <input type="number" formControlName="inputMessage" class="form-control">
+                <input type="text" formControlName="inputMessage" class="form-control">
             </div>
         </form>
     </div>
