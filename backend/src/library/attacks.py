@@ -12,6 +12,16 @@ from ..components.circuit import QutipCircuit
 class Attack:
     @staticmethod
     def implement(network:Network, returns:Any, attack:Callable):
+        """Implements the mentioned attack based on <ATTACK_TYPE> to the 'network'
+
+        Args:
+            network (Network): The network on which the attack is to be applied
+            returns (Any): Returns from the previous function
+            attack (Callable): Attack to be implemented
+        
+        Returns:
+            returns (Any): Returns from the previous function
+        """
         node_indices = range(1, len(network.nodes)) if len(network.nodes)>1 else [0]
         _ = [attack(i=node, network=network) for node in node_indices]
         # Parallel(n_jobs=-1, prefer=None)(attack(i=node, network=network, manager=network.manager) for node in node_indices)
@@ -22,6 +32,12 @@ class Attack:
     # @delayed
     # @wrap_non_picklable_objects
     def denial_of_service(i:int, network:Network):
+        """Denial of Service
+
+        Args:
+            i (int): Index of a node in network
+            network (Network): <Network> object on which the attack is implemented
+        """
         node = network.nodes[i]
         for info in node.resource_manager.memory_manager:
             if randint(2):
@@ -36,29 +52,43 @@ class Attack:
     # @delayed
     # @wrap_non_picklable_objects
     def entangle_and_measure(i:int, network:Network):
+        """Entangle and Measure
+
+        Args:
+            i (int): Index of a node in network
+            network (Network): <Network> object on which the attack is implemented
+        """
         qtc = QutipCircuit(2)
         qtc.cx(0, 1)
         qtc.measure(1)
         
         node = network.nodes[i]
+        network._lk_msg = []
         for info in node.resource_manager.memory_manager:
             key = info.memory.qstate_key
             new_key = network.manager.new([1, 0])
-            network.manager.run_circuit(qtc, [key, new_key])
+            network._lk_msg.append(network.manager.run_circuit(qtc, [key, new_key]))
             # if info.index>network.size-1: break
     
     @staticmethod
     # @delayed
     # @wrap_non_picklable_objects
     def intercept_and_resend(i:int, network:Network):
+        """Intercept and Resend
+
+        Args:
+            i (int): Index of a node in network
+            network (Network): <Network> object on which the attack is implemented
+        """
         node = network.nodes[i]
+        network._lk_msg = []
         for info in node.resource_manager.memory_manager:
             key = info.memory.qstate_key
             basis = randint(2)
             qtc = QutipCircuit(1)
             if basis: qtc.h(0)
             qtc.measure(0)
-            result = network.manager.run_circuit(qtc, [key])
+            network._lk_msg.append((result:=network.manager.run_circuit(qtc, [key])))
             new_key = network.manager.new([1-result.get(key), result.get(key)])
             if basis:
                 qtc = QutipCircuit(1)

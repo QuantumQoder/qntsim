@@ -206,10 +206,13 @@ def qsdc1(network_config, sender, receiver, sequenceLength, key):
         n=int(sequenceLength*len(key))
         alice=network_topo.nodes[sender]
         bob = network_topo.nodes[receiver]
+        print('alice bob', alice,bob,n)
         qsdc1=QSDC1()
         alice,bob,source_node_list=qsdc1.roles(alice,bob,n)
+        print("alice,bob,source_node_list",alice,bob,source_node_list)
         tl.init()
         tl.run()  
+        print('init and run', network_config_json)
         results = qsdc1.run(alice,bob,sequenceLength,key)
         report={}
         report["application"]=results
@@ -223,6 +226,7 @@ def qsdc1(network_config, sender, receiver, sequenceLength, key):
 def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
 
     ##TODO: Integrate Network Graphs 
+    print("teleportation running")
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
     
     alice=network_topo.nodes[sender]
@@ -241,6 +245,25 @@ def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
 def qsdc_teleportation(network_config, sender, receiver, message, attack):
     
     
+    # messages = {(1, 2):'hello world'}
+    # print("sender, receiver, message, attack",sender, receiver, message, attack)
+    messages = {(sender,receiver):message}
+    attack=None
+    topology = '/code/web/configs/2n_linear.json'
+    protocol = Protocol(name='qsdc_tel', messages_list=[messages], label='00', attack=attack)
+    protocol(topology=topology)
+    # return protocol.recv_msgs_list[0], mean(protocol.mean_list)
+    res={}
+    res["input_message"] = message
+    # res["input_message2"] = message2
+    res["output_message"] = protocol.recv_msgs_list[0][1]
+    # res["output_message2"] = protocol.recv_msgs_list[0][2]
+    res["attack"] = attack
+    res["error"] = mean(protocol.mean_list)
+    report = {}
+    report["application"] = res
+    
+    return report
     # network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
     # alice=network_topo.nodes[sender]
     # bob = network_topo.nodes[receiver]
@@ -254,68 +277,91 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     # report=network_graph(network_topo,source_node_list,report)
     # print(report)
     # return report
-    topology = json_topo(network_config)
-    # print('pwd', os.getcwd())
-    with open('network_topo.json','w') as fp:
-        json.dump(topology,fp, indent=4)
-    # f = open('/code/web/network_topo.json')
-    topo = '/code/web/3node.json'
-    # print('message', [message], type(message),type([message]),attack)
-    # message = ['hello']
-    message = [message]
-    # print('message', message, type(message),type([message]),attack)
-    protocol = Protocol(platform='qntsim',
-                        messages_list=[message],
-                        topology=topo,
-                        backend='Qutip',
-                        label='00',
-                        attack = attack
-                        )
+    # topology = json_topo(network_config)
+    # # print('pwd', os.getcwd())
+    # with open('network_topo.json','w') as fp:
+    #     json.dump(topology,fp, indent=4)
+    # # f = open('/code/web/network_topo.json')
+    # topo = '/code/web/3node.json'
+    # # print('message', [message], type(message),type([message]),attack)
+    # # message = ['hello']
+    # message = [message]
+    # # print('message', message, type(message),type([message]),attack)
+    # protocol = Protocol(platform='qntsim',
+    #                     messages_list=[message],
+    #                     topology=topo,
+    #                     backend='Qutip',
+    #                     label='00',
+    #                     attack = attack
+    #                     )
 
-    # This should be on results page
-    print('Received messages:', protocol.recv_msgs)
-    print('Error:', mean(protocol.mean_list))
-    error = mean(protocol.mean_list)
-    res ={}
-    res["input_message"] = message
-    res["output_message"] = protocol.recv_msgs[0][1]
-    res["attack"] = attack
-    res["error"] = error
-    report = {}
-    report["application"] = res
+    # # This should be on results page
+    # print('Received messages:', protocol.recv_msgs)
+    # print('Error:', mean(protocol.mean_list))
+    # error = mean(protocol.mean_list)
+    # res ={}
+    # res["input_message"] = message
+    # res["output_message"] = protocol.recv_msgs[0][1]
+    # res["attack"] = attack
+    # res["error"] = error
+    # report = {}
+    # report["application"] = res
     
-    return report
+    # return report
 
 def single_photon_qd(network_config, sender, receiver, message1, message2, attack):
     
-
-    topology = json_topo(network_config)
-    with open('network_topo.json','w') as fp:
-        json.dump(topology,fp, indent=4)
-    topo = '/code/web/singlenode.json'
-    message = [message1,message2]
-    print('message', message)
-    protocol = Protocol(platform='qntsim',
-                    messages_list=[message],
-                    topology=topo,
-                    backend='Qutip',
-                    attack=attack)
-
-    # This should be on results page
-    print('Received messages:', protocol.recv_msgs[0][1],protocol.recv_msgs[0].keys())
-    print('Error:', mean(protocol.mean_list))
-    error = mean(protocol.mean_list)
-    res ={}
+    
+    print('sender, receiver, message1, message2',sender, receiver, message1, message2,attack)
+    messages = {(sender,receiver):message1,(receiver,sender):message2}
+    # messages = {(1, 2):'hello', (2, 1):'world'}
+    # attack=None
+    topology = '/code/web/configs/singlenode.json'
+    protocol = Protocol(name='qd_sp', messages_list=[messages], attack=attack)
+    protocol(topology=topology)
+    print("protocol.recv_msgs_list",protocol.recv_msgs_list)
+    print("mean(protocol.mean_list)",mean(protocol.mean_list))
+    res={}
     res["input_message1"] = message1
     res["input_message2"] = message2
-    res["output_message1"] = protocol.recv_msgs[0][1]
-    res["output_message2"] = protocol.recv_msgs[0][2]
+    res["output_message1"] = protocol.recv_msgs_list[0][1]
+    res["output_message2"] = protocol.recv_msgs_list[0][2]
     res["attack"] = attack
-    res["error"] = error
+    res["error"] = mean(protocol.mean_list)
     report = {}
     report["application"] = res
     
     return report
+    # return protocol.recv_msgs_list, mean(protocol.mean_list)
+    
+    
+    # topology = json_topo(network_config)
+    # with open('network_topo.json','w') as fp:
+    #     json.dump(topology,fp, indent=4)
+    # topo = '/code/web/singlenode.json'
+    # message = [message1,message2]
+    # print('message', message)
+    # protocol = Protocol(platform='qntsim',
+    #                 messages_list=[message],
+    #                 topology=topo,
+    #                 backend='Qutip',
+    #                 attack=attack)
+
+    # # This should be on results page
+    # print('Received messages:', protocol.recv_msgs[0][1],protocol.recv_msgs[0].keys())
+    # print('Error:', mean(protocol.mean_list))
+    # error = mean(protocol.mean_list)
+    # res ={}
+    # res["input_message1"] = message1
+    # res["input_message2"] = message2
+    # res["output_message1"] = protocol.recv_msgs[0][1]
+    # res["output_message2"] = protocol.recv_msgs[0][2]
+    # res["attack"] = attack
+    # res["error"] = error
+    # report = {}
+    # report["application"] = res
+    
+    # return report
 
 
 def random_encode_photons(network:Network):
@@ -436,7 +482,20 @@ def mdi_qsdc(network_config, sender, receiver, message, attack):
 
 def ip2(input_messages,ids,num_check_bits,num_decoy):
     report ={}
-    topology = '/code/web/2n_linear.json'
+    print("input_messages,ids,num_check_bits,num_decoy",input_messages,ids,num_check_bits,num_decoy)
+    topology = '/code/web/configs/2n_linear.json'
     results=ip2_run(topology,input_messages,ids,num_check_bits,num_decoy)
-    report["application"]=results
+    # report["application"]=results
+    # return report
+
+    res={}
+    res["input_message"] = list(input_messages.values())
+    res["ids"] = ids
+    res["check_bits"] = num_check_bits
+    res["num_decoys"] = num_decoy
+    res["output_msg"] = results[0]
+    res["error"] = results[1]
+    # report = {}
+    report["application"] = res
+    print('report',report)
     return report
