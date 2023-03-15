@@ -5,7 +5,7 @@ from pandas import DataFrame
 from joblib import Parallel, wrap_non_picklable_objects, delayed
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial, reduce
-from typing import Any, List, Dict, Tuple
+from typing import Any, Callable, List, Dict, Tuple
 from IPython.display import clear_output
 from numpy.random import randint
 
@@ -15,6 +15,8 @@ Timeline.DLCZ = False
 from ..topology.topology import Topology
 from ..components.circuit import QutipCircuit
 from .circuits import bell_type_state_analyzer
+from .noise import ReadoutError, ResetError
+from .NoiseModel import noise_model
 
 def string_to_binary(messages:Dict[Tuple, str]):
     """Converts any character string to their binary equivalent.
@@ -394,8 +396,17 @@ class Network:
             qtc = QutipCircuit(1)
             if bell_pair_index_j^int(label[1]): qtc.x(0)
             if bell_pair_index_i^int(label[0]): qtc.z(0)
+            # rst_err = ResetError(5, 6)
+            # model = noise_model()
+            # model.add_reset_error
             self.manager.run_circuit(qtc, [key1])
             self._bell_pairs[(key1, key2)] = (int(label[0]), int(label[1]))
+    
+    # def _add_noise(self, qtc:QutipCircuit, err_cls:Callable, probs:List[float]):
+    #     model = noise_model()
+    #     err_obj = err_cls(*probs)
+    #     model.add_readout_error(err_obj) if isinstance(err_obj, ReadoutError) else model.add_reset_error(err_obj)
+    #     return model.apply(qc=qtc)
     
     def _initialize_photons(self):
         """
@@ -469,6 +480,7 @@ class Network:
             msg_index (int): Index of the message to be encoded.
             node_index (int, optional): Index of the node encoding the message. Defaults to 0.
         """
+        print(self._bin_msgs, self[node_index])
         for bin, info in zip(self._bin_msgs[msg_index], self.nodes[node_index].resource_manager.memory_manager):
             if int(bin):
                 qtc = QutipCircuit(1)
@@ -505,6 +517,7 @@ class Network:
         alpha = complex(1/np.sqrt(2))
         bsa = bell_type_state_analyzer(2)
         corrections = {}
+        print(self._bin_msgs, self[node_index])
         for bin, info in zip(self._bin_msgs[msg_index], self[node_index].resource_manager.memory_manager):
             key = info.memory.qstate_key
             self.manager.new()
@@ -514,6 +527,7 @@ class Network:
             outputs = self.manager.run_circuit(bsa, [new_key, key])
             corrections[keys] = [outputs.get(new_key), outputs.get(key)]
         self._corrections = corrections
+        print(corrections)
         logging.info('message states')
     
     def measure(self, returns:Any):

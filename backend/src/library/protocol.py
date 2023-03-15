@@ -197,14 +197,14 @@ class Protocol:
                 print('Error in execution:', mean(protocol.mean_list))
     """
     networks = []
-    def __new__(cls, *args, **kwargs):
-        """
-        Returns the existing instance of the class if it exists, otherwise creates a new instance.
+    # def __new__(cls, *args, **kwargs):
+    #     """
+    #     Returns the existing instance of the class if it exists, otherwise creates a new instance.
 
-        """
-        if not hasattr(cls, '_instance'):
-            cls._instance = super().__new__(cls)
-        return cls._instance
+    #     """
+    #     if not hasattr(cls, '_instance'):
+    #         cls._instance = super().__new__(cls)
+    #     return cls._instance
 
     def __init__(self, messages_list:List[Dict[Tuple, str]], name:str='protocol', **kwds) -> None:
         """
