@@ -516,6 +516,7 @@ class Network:
         alpha = complex(1/np.sqrt(2))
         bsa = bell_type_state_analyzer(2)
         corrections = {}
+        print(self._bin_msgs, self[node_index])
         for bin, info in zip(self._bin_msgs[msg_index], self[node_index].resource_manager.memory_manager):
             key = info.memory.qstate_key
             self.manager.new()
