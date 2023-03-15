@@ -3,7 +3,7 @@ import { ConditionsService } from 'src/services/conditions.service';
 import Globe from 'globe.gl';
 import * as D3 from 'd3';
 import * as _ from 'underscore';
-import { any } from 'underscore';
+
 @Component({
   selector: 'app-home-page',
   templateUrl: './home-page.component.html',

@@ -1,21 +1,93 @@
-// .display-1 {
-//     margin-left: 12%
-// }
 #globeViz {
     width: 100%;
     // height: 80%;
 }
 
-.p-button-outlined {
-    position: relative;
-    top: 15px;
-    right: 250px;
-    margin-left: 0%;
-    margin-bottom: 8.7%;
-}
-
 .h-90 {
     min-height: 90vh;
+}
+
+.btn {
+    position: relative;
+    display: inline-block;
+    padding: 10px 20px;
+    color: #97DEFF;
+    font-size: 16px;
+    text-decoration: none;
+    text-transform: uppercase;
+    overflow: hidden;
+    transition: .5s;
+    font-weight: bold;
+    // margin-top: 40px;
+    letter-spacing: 4px;
+}
+
+
+
+.btn:hover,
+.btn:focus {
+    background: #97DEFF;
+    color: #000;
+    border-radius: 5px;
+    font-weight: bold;
+    box-shadow: 0 0 5px #97DEFF,
+        0 0 25px #97DEFF,
+        0 0 50px #97DEFF,
+        0 0 100px #97DEFF;
+}
+
+span {
+    position: absolute;
+    display: block;
+}
+
+button span:nth-child(1) {
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #97DEFF);
+    animation: btn-anim1 2s linear infinite;
+    // animation-duration: 2s;
+}
+
+
+
+button span:nth-child(2) {
+    top: -100%;
+    right: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, #97DEFF);
+    animation: btn-anim2 2s linear infinite;
+    animation-delay: .5s;
+
+}
+
+
+
+button span:nth-child(3) {
+    bottom: 0;
+    right: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(270deg, transparent, #97DEFF);
+    animation: btn-anim3 2s linear infinite;
+    animation-delay: 1s;
+    // animation-duration: 2s;
+}
+
+
+
+button span:nth-child(4) {
+    bottom: -100%;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(360deg, transparent, #97DEFF);
+    animation: btn-anim4 2s linear infinite;
+    animation-delay: 1.5s;
+
 }
 
 .bg-network {

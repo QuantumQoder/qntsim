@@ -6,6 +6,16 @@ import { AfterViewChecked, AfterViewInit, Component, HostListener } from '@angul
   styleUrls: ['./app.component.less']
 })
 export class AppComponent implements AfterViewInit {
+  navBarList: any[] = [{
+    header: 'Home',
+    link: '/'
+  }, {
+    header: 'Get Started',
+    link: '/minimal/'
+  }, {
+    header: 'Applications',
+    link: '/applications'
+  }]
   ngAfterViewInit(): void {
     var img = document.body.getElementsByTagName('img');
     console.log(img);
@@ -16,13 +26,10 @@ export class AppComponent implements AfterViewInit {
   title = 'QNTSim';
   width: any;
   height: any;
-
   onActivate($event: any) {
     window.scroll({
       top: 0,
       behavior: 'smooth'
     });
-
   }
-
 }

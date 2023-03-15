@@ -41,10 +41,6 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   constructor(private _formBuilder: FormBuilder, private con: ConditionsService, public api: ApiServiceService, private holdingData: HoldingDataService,
     private router: Router) { }
   ngAfterViewInit(): void {
-    if (this.app_id == 1) {
-      // var e2e = this.con.getResult();
-      this.createTableforE2E()
-    }
   }
   @ViewChild('menuItems') menu: MenuItem[];
   ngOnInit(): void {
@@ -156,32 +152,7 @@ export class ResultsComponent implements OnInit, AfterViewInit {
     var bool = this.match.includes(index)
     return bool ? "table-success" : "";
   }
-  createTableforE2E() {
-    var table1 = document.getElementById("table1")!;
-    var tbody = document.createElement("tbody");
-    this.e2e.sender.forEach(function (items: any) {
-      var row = document.createElement("tr");
-      items.forEach(function (item: any) {
-        var cell = document.createElement("td");
-        cell.textContent = item;
-        row.appendChild(cell);
-      });
-      tbody.appendChild(row);
-      table1.appendChild(tbody)
-    });
-    var table2 = document.getElementById("table2")!;  // set this to your table
-    var tbody = document.createElement("tbody");
-    this.e2e.receiver.forEach(function (items: any) {
-      var row = document.createElement("tr");
-      items.forEach(function (item: any) {
-        var cell = document.createElement("td");
-        cell.textContent = item;
-        row.appendChild(cell);
-      });
-      tbody.appendChild(row);
-      table2.appendChild(tbody)
-    });
-  }
+
   activateMenu() {
     this.activeItem = this.menu['activeItem'];
     if (this.activeItem.label == 'Key Generation') {

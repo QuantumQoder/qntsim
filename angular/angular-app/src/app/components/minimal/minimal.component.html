@@ -12,9 +12,13 @@
             </div>
         </p-dialog>
         <form [formGroup]="topologyForm">
-            <h3 class="text-center display-5">Topology
-                <br> Configuration
+            <h3 class="text-center display-5">
+                Configuration
             </h3>
+            <div class="d-flex justify-content-center">
+                <h5 class="mx-auto">Topology</h5>
+            </div>
+
             <div class="mt-2 col-9 mx-auto">
                 <label for="type" class="form-label font-bold">
                     Type
@@ -26,12 +30,16 @@
 
             <div class="mt-2 col-9 mx-auto">
                 <label for="type" class="form-label font-bold mb-2">
-                    Topology Size {{level}}
+                    Size {{level}}
                 </label>
                 <p-slider formControlName="level" [min]="0" [step]="1" [max]="4"
                     (onSlideEnd)="levelChange()"></p-slider>
             </div>
             <hr>
+            <div class="d-flex justify-content-center">
+                <h5 class="mx-auto">Node</h5>
+            </div>
+
             <div class="mt-2 col-9 mx-auto">
                 <label for="type" class="form-label font-bold mb-2">
                     No of Memories
@@ -39,6 +47,9 @@
                 <input type="number" formControlName="noOfMemories" class="form-control">
             </div>
             <hr>
+            <div class="d-flex justify-content-center">
+                <h5 class="mx-auto">Quantum Connections</h5>
+            </div>
             <div class="mt-2 col-9 mx-auto">
                 <label for="type" class="form-label font-bold mb-2">
                     Distance
@@ -76,6 +87,7 @@
             </div>
         </form>
         <form [formGroup]="appSettingsForm">
+
             <div *ngIf="appForm.get('app')?.value != '' ">
                 <h5 class="text-center mt-1">Application Settings</h5>
                 <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value != 4">
@@ -97,11 +109,39 @@
                     </select>
                 </div>
             </div>
+            <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 3">
+                <label for="type" class="form-label font-bold">
+                    Amplitude
+                </label>
+                <div *ngFor="let category of equation" class="field-checkbox">
+                    <p-radioButton [inputId]="category.value" [value]="category.value"
+                        formControlName="amplitude"></p-radioButton>
+                    <label [for]="category.value">
+                        <ng-katex [equation]="category.equation" [options]="options"></ng-katex>
+                    </label>
+                </div>
+            </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 1">
                 <label for="type" class="form-label font-bold">
                     Key Length
                 </label>
                 <input type="number" formControlName="keyLength" class="form-control">
+            </div>
+            <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 2">
+                <label for="type" class="form-label font-bold">
+                    Target Fidelity:{{e2e.targetFidelity}}
+                </label>
+                <br>
+                <p-slider formControlName="targetFidelity" [min]="0" [step]="0.05" [max]="1"
+                    (onSlideEnd)="e2eChange('target')"></p-slider>
+            </div>
+            <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 2">
+                <label for="type" class="form-label font-bold">
+                    Demand:{{e2e.size}}
+                </label>
+                <br>
+                <p-slider formControlName="size" [min]="0" [step]="1" [max]="6"
+                    (onSlideEnd)="e2eChange('size')"></p-slider>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 5">
                 <label for="type" class="form-label font-bold">
