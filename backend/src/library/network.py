@@ -360,8 +360,8 @@ class Network:
             # Loop through each consecutive pair of keys in the sequence
             for source_key, dest_key in itertools.pairwise(key_sequence):
                 # Get the source and destination nodes for the entanglement request
-                source_node = self[source_key - 1]
-                dest_node = self[dest_key - 1]
+                source_node = self._net_topo.nodes[source_key]
+                dest_node = self._net_topo.nodes[dest_key]
                 
                 # Get the transport manager for the source node and send the entanglement request
                 transport_manager = source_node.transport_manager

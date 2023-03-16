@@ -302,7 +302,7 @@ class Protocol:
                     # Get the state from the network's manager using the qstate_key
                     # Use a try-except block to handle cases where the state has been deleted
                     # before this method is called
-                    if (state := network.manager.get(info.memory.qstate_key, None)) is not None])
+                    if (state := network.manager.get(info.memory.qstate_key)) is not None])
             for network in self
             for node in network
         ])

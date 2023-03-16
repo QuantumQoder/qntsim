@@ -154,7 +154,7 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     execution_time = end_time-start_time
    
     report=network_graph(network_topo,source_node_list,report)
-    report["performance"]["execution_time"] = execution_time
+    report["performance"]["execution_time"] = "{:.2f}".format(execution_time)
     print(report)
     return report
     #graph = network_topo.get_virtual_graph()
@@ -304,8 +304,8 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     report = {}
     end_time = time.time()
     execution_time = end_time-start_time
-    report=network_graph(network_topo,source_node_list,report)
-    report["performance"]["execution_time"] = execution_time
+    # report=network_graph(network_topo,source_node_list,report)
+    # report["performance"]["execution_time"] = execution_time
     report["application"] = res
     
     return report
@@ -376,7 +376,7 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     report = {}
     end_time = time.time()
     execution_time = end_time-start_time
-    report["performance"]["execution_time"] = execution_time
+    # report["performance"]["execution_time"] = execution_time
     report["application"] = res
     
     return report
