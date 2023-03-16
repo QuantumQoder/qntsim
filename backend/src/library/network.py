@@ -480,6 +480,7 @@ class Network:
             msg_index (int): Index of the message to be encoded.
             node_index (int, optional): Index of the node encoding the message. Defaults to 0.
         """
+        print(self._bin_msgs, self[node_index])
         for bin, info in zip(self._bin_msgs[msg_index], self.nodes[node_index].resource_manager.memory_manager):
             if int(bin):
                 qtc = QutipCircuit(1)

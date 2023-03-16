@@ -240,7 +240,6 @@
                     </table>
                 </div>
                 <br>
-
                 <br>
                 <div class="row">
                     <h5 class="text-center col-10" style="padding-top:10px ;">Details of the memories of end nodes and
@@ -251,12 +250,10 @@
                                 class="pi pi-question"></i></button>
                     </div>
                 </div>
+                <h5>Node:E1</h5>
                 <div class="row">
                     <table id="table1" class="table table-bordered">
                         <thead>
-                            <h5>Node:E1</h5>
-                        </thead>
-                        <tbody>
                             <tr>
                                 <th class="col" placement="top" ngbTooltip="Tooltip on top">
                                     Memory Index
@@ -268,16 +265,18 @@
                                 <th class="col">Expiry Time</th>
                                 <th class="col">State</th>
                             </tr>
-
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of e2e.sender">
+                                <th *ngFor="let item of item">{{item}}</th>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
+                <h5>Node:E2</h5>
                 <div class="row">
                     <table id="table2" class="table table-bordered">
                         <thead>
-                            <h5>Node:E2</h5>
-                        </thead>
-                        <tbody>
                             <tr>
                                 <th class="col">Memory Index</th>
                                 <th class="col">Current Node</th>
@@ -286,6 +285,11 @@
                                 <th class="col">Entangled Time</th>
                                 <th class="col">Expiry Time</th>
                                 <th class="col">State</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of e2e.receiver">
+                                <th *ngFor="let item of item">{{item}}</th>
                             </tr>
                         </tbody>
                     </table>

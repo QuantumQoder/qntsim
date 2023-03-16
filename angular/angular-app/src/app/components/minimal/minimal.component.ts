@@ -7,7 +7,7 @@ import * as go from 'gojs'
 import { map } from 'rxjs';
 import { ConditionsService } from 'src/services/conditions.service';
 import { Router } from '@angular/router';
-import { local } from 'd3';
+import { KatexOptions } from 'ng-katex';
 
 @Component({
   selector: 'app-minimal',
@@ -16,7 +16,26 @@ import { local } from 'd3';
 })
 
 export class MinimalComponent implements OnInit, AfterViewInit {
-
+  equation: any = [{
+    header: '|1\\rangle', value: 1,
+  },
+  {
+    header: '\\frac{|0\\rangle + |1\\rangle}{\\sqrt{2}}', value: 2,
+  },
+  {
+    header: '\\frac{|0\\rangle - |1\\rangle}{\\sqrt{2}}', value: 3,
+  },
+  {
+    header: '|0\\rangle', value: 4,
+  }];
+  options: KatexOptions = {
+    displayMode: true,
+  };
+  amplitude: any
+  e2e = {
+    targetFidelity: 0.5,
+    size: 6
+  }
   topology: any
   topologyData: any
   request: Request
@@ -66,19 +85,23 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.appForm = this.fb.group({
       'app': ['', Validators.required]
     });
+    this.appSettingsForm = this.fb.group({
+      'sender': [''],
+      'receiver': [''],
+      'targetFidelity': [0.5],
+      'size': [6],
+      'amplitude': ['']
+    })
     // this.appSettingsForm
     this.service.getAppList().pipe(map((d: any) => d.appList)).subscribe((result: any) => this.applist = result);
     var data = this.api.getCredentials()
     this.api.accessToken(data).subscribe((result: any) => {
-
       localStorage.setItem('access', result.access)
     })
-    // this.getAppSettingsResults();
+    this.getAppSettingsResults();
   }
   updateDiagram(data: any) {
-    this.topology.model = new go.GraphLinksModel(
-      data.nodes, data.links
-    )
+    this.topology.model = new go.GraphLinksModel(data.nodes, data.links)
     console.log(this.topology.model.nodeDataArray);
   }
   updateNodes() {
@@ -94,7 +117,6 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       console.log(error)
     }, () => {
       this.updateDiagram(this.topologyData);
-
     })
   }
   levelChange() {
@@ -102,13 +124,23 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value.toLowerCase(), this.level);
     this.service.getJson(urlData.url, urlData.type).subscribe((result: any) => {
       this.topologyData = result;
-
       console.log(this.topologyData)
     }, (error) => {
       console.log(error)
     }, () => {
       this.updateDiagram(this.topologyData)
     })
+  }
+  selectAmplitude($event: any) {
+
+  }
+  e2eChange(data: string) {
+    if (data == 'target') {
+      this.e2e.targetFidelity = this.appSettingsForm.get('targetFidelity')?.value
+    }
+    else if (data == 'size') {
+      this.e2e.size = this.appSettingsForm.get('size')?.value
+    }
   }
   init(nodes: any, links: any) {
     var $ = go.GraphObject.make;  // for conciseness in defining templates
@@ -260,15 +292,8 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     })
   }
   buildForm(app: Number) {
-    this.appSettingsForm = null;
-    this.appSettingsForm = this.fb.group({
-      'sender': [''],
-      'receiver': [''],
-      'node1': [''],
-      'node2': [''],
-      'node3': [''],
-      'middleNode': [''],
-    })
+    // this.appSettingsForm = null;
+
     switch (app) {
       case 1: this.appSettingsForm.addControl('keyLength', new FormControl());
         break;
@@ -302,7 +327,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   getAppSettingsResults() {
     this.service.getAppSetting().subscribe((results: any) => {
       this.appSettingsResult = results
-      console.log("APP SETTINGS:" + this.appSettingsResult)
+      // console.log("APP SETTINGS:" + this.appSettingsResult)
     })
   }
   getAppSetting(app_id: any) {
@@ -355,7 +380,6 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       case 7: this.appConfig = {
         sender: this.appSettingsForm.get('sender')?.value,
         receiver: this.appSettingsForm.get('receiver')?.value,
-
         message: this.appSettingsForm.get('message')?.value
       }
         break;

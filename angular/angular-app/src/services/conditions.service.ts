@@ -6,7 +6,7 @@ import { map, Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class ConditionsService {
-  public app_id: number
+  public app_id: number = 2
   public app: string
   currentSection: any;
   public selectedAppResult = new Subject();
