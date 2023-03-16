@@ -15,6 +15,7 @@ import { HoldingDataService } from 'src/services/holding-data.service';
   encapsulation: ViewEncapsulation.None
 })
 export class ResultsComponent implements OnInit, AfterViewInit {
+  performance: any
   match: any = []
   alice_r: any
   app_id: any
@@ -42,15 +43,15 @@ export class ResultsComponent implements OnInit, AfterViewInit {
     private router: Router) { }
   ngAfterViewInit(): void {
   }
-  @ViewChild('menuItems') menu: MenuItem[];
+  // @ViewChild('menuItems') menu: MenuItem[];
   ngOnInit(): void {
-
     this.app_id = this.con.getapp_id()
+    // this.app_id = 2
     // this.app_id = 8
     if (!this.app_id) {
       this.router.navigate(['/'])
     }
-
+    this.performance = this.con.getResult().performance
     switch (this.app_id) {
       case 1:
         var e91 = this.con.getResult()
@@ -85,6 +86,7 @@ export class ResultsComponent implements OnInit, AfterViewInit {
         break;
       case 2:
         var e2e = this.con.getResult();
+        this.performance = e2e.performance
         this.e2e = e2e.application;
         break;
       case 3:
@@ -96,10 +98,10 @@ export class ResultsComponent implements OnInit, AfterViewInit {
         this.ghz = ghz.application;
         break;
       case 5:
-        this.qsdc1 = this.con.getResult();
+        this.qsdc1 = this.con.getResult().application;
         break;
       case 6:
-        this.pingpong = this.con.getResult();
+        this.pingpong = this.con.getResult().application;
         break;
       case 7:
         // var ip1 = this.api.getip1()
@@ -153,15 +155,15 @@ export class ResultsComponent implements OnInit, AfterViewInit {
     return bool ? "table-success" : "";
   }
 
-  activateMenu() {
-    this.activeItem = this.menu['activeItem'];
-    if (this.activeItem.label == 'Key Generation') {
-      this.keyGen = true
-      this.keyBits = false
-    }
-    if (this.activeItem.label == 'Key Bits') {
-      this.keyBits = true;
-      this.keyGen = false
-    }
-  }
+  // activateMenu() {
+  //   this.activeItem = this.menu['activeItem'];
+  //   if (this.activeItem.label == 'Key Generation') {
+  //     this.keyGen = true
+  //     this.keyBits = false
+  //   }
+  //   if (this.activeItem.label == 'Key Bits') {
+  //     this.keyBits = true;
+  //     this.keyGen = false
+  //   }
+  // }
 }

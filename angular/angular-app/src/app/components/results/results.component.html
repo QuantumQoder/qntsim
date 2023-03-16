@@ -1,5 +1,5 @@
 <div class="main">
-    <p-tabMenu #menuItems [model]="items" [activeItem]="activeItem" (click)="activateMenu()"></p-tabMenu>
+    <!-- <p-tabMenu #menuItems [model]="items" [activeItem]="activeItem" (click)="activateMenu()"></p-tabMenu> -->
     <br>
     <p-dialog header="Details" [draggable]="true" [(visible)]="info1" [modal]="true" [style]="{width: '50vw'}"
         position="right" [resizable]="true">
@@ -117,11 +117,47 @@
     </p-dialog>
     <div class="container shadow p-4 mb-5 bg-white rounded">
         <div *ngIf="app_id==1">
-            <h1 class="display-3">E91</h1>
-            <div *ngIf="keyGen" class="row">
-                <p>Basis : Measurement basis /observables chosen by Alice or Bob.
+            <h1 class="display-3">Ekert 91 QKD </h1>
+
+            <br>
+            <div class="row">
+                <h5 class="text-center col-12">Performance parameters of the
+                    constructed network topology</h5>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+
+                                <th class="col table-secondary text-center">Source</th>
+                                <th class="col table-secondary text-center">Destination</th>
+                                <th class="col table-secondary text-center">Demand Size</th>
+                                <th class="col table-secondary text-center">Execution Time</th>
+                                <th class="col table-secondary text-center">Fidelity</th>
+                                <th class="col table-secondary text-center">Success Rate</th>
+                                <th class="col table-secondary text-center">Latency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+
+                                <td class="col text-center">e1</td>
+                                <td class="col text-center">e2</td>
+                                <td class="col text-center">2</td>
+                                <td class="col text-center">{{performance.execution_time}}&nbsp;secs</td>
+                                <td class="col text-center">{{performance.fidelity}}</td>
+                                <td class="col text-center">{{performance.throughput}}</td>
+                                <td class="col text-center">{{performance.latency}}&nbsp;secs</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <p>Basis : Measurement basis chosen by Sender or Receiver.
                     <br>
-                    Value: Measurement result obtained from the observables at Alice or Bob
+                    Value: Measurement results obtained from the observations by Sender or Receiver
                 </p>
                 <br>
                 <div class="tabel">
@@ -148,11 +184,9 @@
                     </table>
                 </div>
             </div>
-            <div *ngIf="keyGen" class="row">
-                <p>Shifted Key [The final key] is obtained at Alice and Bob from Measurement results obtained from
-                    Matching
-                    basis (that are
-                    indicated in green above)</p>
+            <div class="row">
+                <p>Sifted Key [The final key] is obtained at Sender and Receiver from measurement results obtained by
+                    basis matching (indicated in green above)</p>
 
                 <div class="tabel">
                     <h5><u>Receiver</u></h5>
@@ -175,19 +209,19 @@
                     </table>
                 </div>
             </div>
-            <div *ngIf="keyBits" class="row">
+            <div class="row">
                 <div class="col">
-                    <p>E91 protocols has been executed and key of the demanded length has been shared between sender &
+                    <p>The protocol has been executed and key of the requested length has been shared between sender &
                         receiver.​
 
                         At the end of the execution of protocol, the sifted key between the source and destination is
                         given
                         below​</p>
                     <br>
-                    <p>Shifted Key [The final key] is obtained at Alice and Bob from Measurement results obtained from
+                    <!-- <p>Shifted Key [The final key] is obtained at Alice and Bob from Measurement results obtained from
                         Matching
                         basis (that are
-                        indicated in green above)</p>
+                        indicated in green above)</p> -->
                     <table class="table table-bordered align-middle">
                         <thead class="thead-light">
                             <tr>
@@ -197,8 +231,8 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="col">{{e91.sender_keys}}</td>
-                                <td class="col">{{e91.receiver_keys}}</td>
+                                <td class="col">Key: {{e91.sender_keys}}</td>
+                                <td class="col">Key: {{e91.receiver_keys}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -206,35 +240,41 @@
             </div>
         </div>
         <div *ngIf="app_id==2">
-            <div class="display-4">E2E</div>
+            <div class="display-5">End-to-End Entanglement Generation</div>
+            <br>
+            <br>
             <div class="row">
-                <h5 class="text-center col-10" style="padding-top:10px ;">Details of the requests raised on the
+                <h5 class="text-center col-12">Performance parameters of the
                     constructed network topology</h5>
-                <div class="text-right col-2">
+                <!-- <div class="text-right col-2">
                     <button class="btn btn-outline-primary" (click)="info_1()"><i class="pi pi-question"></i></button>
-                </div>
+                </div> -->
             </div>
             <div class="col">
                 <div class="row">
                     <table class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
-                                <th class="col">Request Id</th>
-                                <th class="col">Source</th>
-                                <th class="col">Destination</th>
-                                <th class="col">Demand Size</th>
-                                <th class="col">Start Time</th>
-                                <th class="col">End Time</th>
+
+                                <th class="col table-secondary text-center">Source</th>
+                                <th class="col table-secondary text-center">Destination</th>
+                                <th class="col table-secondary text-center">Demand Size</th>
+                                <th class="col table-secondary text-center">Execution Time</th>
+                                <th class="col table-secondary text-center">Fidelity</th>
+                                <th class="col table-secondary text-center">Success Rate</th>
+                                <th class="col table-secondary text-center">Latency</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="col">1</td>
-                                <td class="col">e1</td>
-                                <td class="col">e2</td>
-                                <td class="col">2</td>
-                                <td class="col">1s</td>
-                                <td class="col">6s</td>
+
+                                <td class="col text-center">e1</td>
+                                <td class="col text-center">e2</td>
+                                <td class="col text-center">2</td>
+                                <td class="col text-center">{{performance.execution_time}}&nbsp;secs</td>
+                                <td class="col text-center">{{performance.fidelity}}</td>
+                                <td class="col text-center">{{performance.throughput}}</td>
+                                <td class="col text-center">{{performance.latency}}&nbsp;secs</td>
                             </tr>
                         </tbody>
                     </table>
@@ -242,38 +282,37 @@
                 <br>
                 <br>
                 <div class="row">
-                    <h5 class="text-center col-10" style="padding-top:10px ;">Details of the memories of end nodes and
-                        entanglement
-                        between them</h5>
+                    <h5 class="text-center col-10" style="padding-top:10px ;">Execution details of entanglement
+                        generation on the end nodes</h5>
                     <div class="text-right col-2">
                         <button class="btn btn-outline-primary" (click)="info_2()"><i
                                 class="pi pi-question"></i></button>
                     </div>
                 </div>
-                <h5>Node:E1</h5>
+                <!-- <h5>Node: Sender</h5> -->
                 <div class="row">
                     <table id="table1" class="table table-bordered">
                         <thead>
                             <tr>
-                                <th class="col" placement="top" ngbTooltip="Tooltip on top">
+                                <th class="col table-secondary text-center" placement="top" ngbTooltip="Tooltip on top">
                                     Memory Index
                                 </th>
-                                <th class="col">Current Node</th>
-                                <th class="col">Entangled Node</th>
-                                <th class="col">Fidelity</th>
-                                <th class="col">Entangled Time</th>
-                                <th class="col">Expiry Time</th>
-                                <th class="col">State</th>
+                                <th class="col table-secondary text-center">End Node 1</th>
+                                <th class="col table-secondary text-center">End Node 2</th>
+                                <th class="col table-secondary text-center">Fidelity</th>
+                                <th class="col table-secondary text-center">Entanglement Time</th>
+                                <th class="col table-secondary text-center">Expiry Time</th>
+                                <th class="col table-secondary text-center">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr *ngFor="let item of e2e.sender">
-                                <th *ngFor="let item of item">{{item}}</th>
+                                <td *ngFor="let item of item" class="text-center">{{item}}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <h5>Node:E2</h5>
+                <!-- <h5>Node: Receiver</h5>
                 <div class="row">
                     <table id="table2" class="table table-bordered">
                         <thead>
@@ -282,9 +321,9 @@
                                 <th class="col">Current Node</th>
                                 <th class="col">Entangled Node</th>
                                 <th class="col">Fidelity</th>
-                                <th class="col">Entangled Time</th>
+                                <th class="col">Entanglement Time</th>
                                 <th class="col">Expiry Time</th>
-                                <th class="col">State</th>
+                                <th class="col">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -293,16 +332,16 @@
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                </div> -->
             </div>
         </div>
         <div *ngIf="app_id==3">
             <div class="display-4">
-                Teleportation
+                Quantum Teleportation
             </div>
             <br>
             <h5 class="text-center">
-                <p class="text-center">Entanglement shared between two parties​</p>
+                <p class="text-center">Entanglement is shared between two parties​</p>
                 <p class="text-center">Two party Quantum State</p>
             </h5>
             <!-- <div class="row"> -->
@@ -310,7 +349,7 @@
                 <thead class="table-primary">
                     <tr>
                         <td class="col">
-                            AliceBobEntanglement ​
+                            End-to-End Entanglement Generated ​
                         </td>
                         <td class="col">
                             State : {{tel.alice_bob_entanglement}}​
@@ -319,19 +358,18 @@
                 </thead>
             </table>
             <h5 class="text-center">
-                <p class="text-center">Quantum State of the qubit (at the sender node) that should be teleported between
-                    two
-                    parties.​</p>
+                <p class="text-center">Quantum State of the qubit (at the Sender node) to be teleported to Receiver node
+                    ​</p>
             </h5>
             <br>
-            <h6><u>At Sender</u></h6>
+            <h6><u>Sender</u></h6>
             <br>
 
             <table class="table table-bordered">
                 <thead class="table-primary">
                     <tr>
                         <th class="col">
-                            Qubit to teleport
+                            Quantum State of Qubit (default)
                         </th>
                         <th class="col">
                             {{tel.random_qubit}}
@@ -342,30 +380,29 @@
                     <tr>
                         <td rowspan="2" class="col">
                             Classical Measurement results​
-                            (At sender)
                         </td>
-                        <td class="col">(meas_res at sending qubit) meas_rq: {{tel.meas_rq}}</td>
+                        <td class="col">Outcome 1: {{tel.meas_rq}}</td>
                     </tr>
                     <tr>
 
-                        <td class="col">(meas_res at sending qubit) meas_rq:{{tel.meas_alice}}</td>
+                        <td class="col">Outcome 2: {{tel.meas_alice}}</td>
                     </tr>
                 </tbody>
             </table>
             <br>
-            <h5 class="text-center">
+            <!-- <h5 class="text-center">
                 <p class="text-center">Quantum State of the qubit (at the receiver node) that should be teleported
                     between
                     two parties.​</p>​
-            </h5>
-            <h6><u>At Receiver</u></h6>
+            </h5> -->
+            <h6><u>Receiver</u></h6>
             <br>
             <table class="table table-bordered">
                 <thead class="table-primary">
                     <tr>
                         <th class="col">
-                            State​
-                            (after measurement at alice ,before corrective operations)​
+                            Quantum state at Receiver Node​
+                            (before corrective operations)​
                         </th>
                         <th class="col">{{tel.bob_initial_state}}</th>
                     </tr>
@@ -373,8 +410,8 @@
                 <tbody>
                     <tr>
                         <td class="col">Corrective Unitary Transformations​
-                            (At receiver)​</td>
-                        <td>(gates applied on bob's entangled qubit ) : {{tel.Corrective_operation}}​</td>
+                            ​</td>
+                        <td>Pauli Corrections: {{tel.Corrective_operation}}​</td>
                     </tr>
                     <tr>
                         <td class="col">Qubit Received</td>
@@ -382,9 +419,9 @@
                     </tr>
                 </tbody>
             </table>
-            <p class="text-center">After getting the measurement result from sender, unitary operation will be applied
+            <!-- <p class="text-center">After getting the measurement result from sender, unitary operation will be applied
                 at
-                the receiver node.​</p>
+                the receiver node.​</p> -->
             <!-- </div> -->
         </div>
         <div *ngIf="app_id==4">
@@ -556,19 +593,54 @@
         <div *ngIf="app_id==5">
             <div class="row">
                 <div class="display-4 col-9 text-left">
-                    QSDC1
+                    Seminal QSDC protocol
                 </div>
                 <div class="text-right col-2">
                     <button class="btn btn-outline-primary" (click)="info_qsdc()" style="margin-top: 18px;"><i
                             class="pi pi-question"></i></button>
                 </div>
             </div>
+
             <br>
+            <br>
+            <div class="row">
+                <h5 class="text-center col-12">Performance parameters of the
+                    constructed network topology</h5>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="col table-secondary text-center">Source</th>
+                                <th class="col table-secondary text-center">Destination</th>
+                                <th class="col table-secondary text-center">Demand Size</th>
+                                <th class="col table-secondary text-center">Execution Time</th>
+                                <th class="col table-secondary text-center">Fidelity</th>
+                                <th class="col table-secondary text-center">Success Rate</th>
+                                <th class="col table-secondary text-center">Latency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col text-center">e1</td>
+                                <td class="col text-center">e2</td>
+                                <td class="col text-center">2</td>
+                                <td class="col text-center">{{performance.execution_time}}&nbsp;secs</td>
+                                <td class="col text-center">{{performance.fidelity}}</td>
+                                <td class="col text-center">{{performance.throughput}}</td>
+                                <td class="col text-center">{{performance.latency}}&nbsp;secs</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div><br>
+            <h6><b>Result</b></h6>
             <table class="table table-bordered">
                 <thead class="table-primary">
                     <tr>
                         <td class="col">
-                            Sender's (Alice: E1) Key Transimitted
+                            Sender's Transmitted Key
                         </td>
                         <td class="col">
                             {{qsdc1.key_transmitted}}
@@ -578,7 +650,7 @@
                 <tbody>
                     <tr class="table-secondary">
                         <td class="col">
-                            EvesDrop
+                            Eavesdropping
                         </td>
                         <td class="col">
                             {{qsdc1.eavesdrop}}
@@ -586,7 +658,7 @@
                     </tr>
                     <tr class="table-secondary">
                         <td class="col">
-                            Bits Used for Eves Detection
+                            Check Bits used for Eve Detection
                         </td>
                         <td class="col">
                             {{qsdc1.display_msg}}
@@ -594,10 +666,10 @@
                     </tr>
                     <tr class="table-primary">
                         <td rowspan="2" class="col">
-                            Received key at Receiver (Bob: E2)
+                            Key Received
                         </td>
                         <td class="col">
-                            Key after Removed Bits : {{qsdc1.key_shared_received}}
+                            Key after removing check bits : {{qsdc1.key_shared_received}}
                         </td>
                     </tr>
                     <tr class="table-primary">
