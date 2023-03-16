@@ -24,6 +24,7 @@ from random import shuffle
 #from qntsim.library.protocol_handler.protocol_handler import Protocol
 from qntsim.library.protocol import Protocol
 from statistics import mean
+import time
 
 def graph_topology(network_config_json):
     
@@ -58,8 +59,8 @@ def network_graph(network_topo,source_node_list,report):
     execution_time = 3
     performance["latency"]    = latency
     performance["fidelity"]   = fidelity
-    performance["throughput"] = through
-    performance["execution_time"] = execution_time
+    # performance["throughput"] = through
+
     # graph["throughput"]["fully_complete"]= fc_throughl  
     # graph["throughput"]["partially_complete"]= pc_throughl
     # graph["throughput"]["rejected"]= nc_throughl        #{fc_throughl,pc_throughl,nc_throughl}
@@ -98,6 +99,7 @@ def eve_e91(network_config, sender, receiver, keyLength):
 
 def e91(network_config, sender, receiver, keyLength):
     print('network config', network_config)
+    start_time = time.time()
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
     print('network topo', network_topo)
     trials=4
@@ -121,7 +123,10 @@ def e91(network_config, sender, receiver, keyLength):
                 results["sifted_keylength"]=keyLength 
             report={}
             report["application"]=results
+            end_time = time.time()
+            execution_time = end_time-start_time
             report=network_graph(network_topo,source_node_list,report)
+            report["performance"]["execution_time"] = execution_time
             print(report)
             return report
         trials=trials-1
@@ -133,7 +138,7 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
 
     ##TODO: Integrate Network Graphs 
     req_pairs=[]
-    
+    start_time = time.time()
     network_config_json,tl,network_topo = load_topology(network_config, "Qiskit")
     tm=network_topo.nodes[sender].transport_manager
     tm.request(receiver, float(startTime),int(size), 20e12 , int(priority) ,float(targetFidelity), float(timeout) )
@@ -145,7 +150,11 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     results ,source_node_list = get_res(network_topo,req_pairs)
     report={}
     report["application"]=results
+    end_time = time.time()
+    execution_time = end_time-start_time
+   
     report=network_graph(network_topo,source_node_list,report)
+    report["performance"]["execution_time"] = execution_time
     print(report)
     return report
     #graph = network_topo.get_virtual_graph()
@@ -159,6 +168,7 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
 
 def ghz(network_config, endnode1, endnode2, endnode3, middlenode):
 
+    start_time = time.time()
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
     alice=network_topo.nodes[endnode1]
     bob = network_topo.nodes[endnode2]
@@ -171,11 +181,15 @@ def ghz(network_config, endnode1, endnode2, endnode3, middlenode):
     results = ghz.run(alice,bob,charlie,middlenode)
     report={}
     report["application"]=results
+    end_time = time.time()
+    execution_time = end_time-start_time
     report=network_graph(network_topo,source_node_list,report)
+    report["performance"]["execution_time"] = execution_time
     print(report)
     return report
 
 def ip1(network_config, sender, receiver, message):
+    start_time = time.time()
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
     alice=network_topo.nodes[sender]
     bob = network_topo.nodes[receiver]
@@ -186,11 +200,15 @@ def ip1(network_config, sender, receiver, message):
     results = ip1.run(alice,bob,message)
     report={}
     report["application"]=results
+    end_time = time.time()
+    execution_time = end_time-start_time
     report=network_graph(network_topo,source_node_list,report)
+    report["performance"]["execution_time"] = execution_time
     print(report)
-    return results
+    return report
     
 def ping_pong(network_config, sender, receiver, sequenceLength, message):
+    start_time = time.time()
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
     if len(message)<=9:
         n=int(sequenceLength*len(message))
@@ -204,7 +222,10 @@ def ping_pong(network_config, sender, receiver, sequenceLength, message):
         results = pp.run(sequenceLength,message)
         report={}
         report["application"]=results
+        end_time = time.time()
+        execution_time = end_time-start_time
         report=network_graph(network_topo,source_node_list,report)
+        report["performance"]["execution_time"] = execution_time
         print(report)
         return report
     else:
@@ -212,6 +233,7 @@ def ping_pong(network_config, sender, receiver, sequenceLength, message):
         return None
     
 def qsdc1(network_config, sender, receiver, sequenceLength, key):
+    start_time = time.time()
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
     if (len(key)%2==0):
         
@@ -228,15 +250,18 @@ def qsdc1(network_config, sender, receiver, sequenceLength, key):
         results = qsdc1.run(alice,bob,sequenceLength,key)
         report={}
         report["application"]=results
+        end_time = time.time()
+        execution_time = end_time-start_time
         report=network_graph(network_topo,source_node_list,report)
+        report["performance"]["execution_time"] = execution_time
         print(report)
-        return results
+        return report
     else:
         print("key should have even no of digits")
         return None
     
 def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
-
+    start_time = time.time()
     ##TODO: Integrate Network Graphs 
     print("teleportation running")
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
@@ -250,13 +275,16 @@ def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
     results = tel.run(alice,bob,amplitude1,amplitude2)
     report={}
     report["application"]=results
+    end_time = time.time()
+    execution_time = end_time-start_time
     report=network_graph(network_topo,source_node_list,report)
+    report["performance"]["execution_time"] = execution_time
     print(report)
     return report
 
 def qsdc_teleportation(network_config, sender, receiver, message, attack):
     
-    
+    start_time = time.time()
     # messages = {(1, 2):'hello world'}
     # print("sender, receiver, message, attack",sender, receiver, message, attack)
     messages = {(sender,receiver):message}
@@ -274,6 +302,10 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     res["attack"] = attack
     res["error"] = mean(protocol.mean_list)
     report = {}
+    end_time = time.time()
+    execution_time = end_time-start_time
+    report=network_graph(network_topo,source_node_list,report)
+    report["performance"]["execution_time"] = execution_time
     report["application"] = res
     
     return report
@@ -324,7 +356,7 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
 
 def single_photon_qd(network_config, sender, receiver, message1, message2, attack):
     
-    
+    start_time = time.time()
     print('sender, receiver, message1, message2',sender, receiver, message1, message2,attack)
     messages = {(sender,receiver):message1,(receiver,sender):message2}
     # messages = {(1, 2):'hello', (2, 1):'world'}
@@ -342,6 +374,9 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     res["attack"] = attack
     res["error"] = protocol.mean_list[-1]
     report = {}
+    end_time = time.time()
+    execution_time = end_time-start_time
+    report["performance"]["execution_time"] = execution_time
     report["application"] = res
     
     return report
@@ -510,5 +545,8 @@ def ip2(input_messages,ids,num_check_bits,num_decoy):
     res["error"] = results[1]
     # report = {}
     report["application"] = res
+    end_time = time.time()
+    execution_time = end_time-start_time
+    report["performance"]["execution_time"] = execution_time
     print('report',report)
     return report
