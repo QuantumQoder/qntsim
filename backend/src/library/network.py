@@ -116,7 +116,7 @@ class Network:
             from functools import partial
             from typing import Any, Dict, List, Tuple
             from qntsim.library import insert_check_bits, insert_decoy_photons, bell_type_state_analyzer, Protocol
-            from qntsim.library.attacks import Attack, ATTACK_TYPE
+            from qntsim.library.attack import Attack, ATTACK_TYPE
 
             class Party:
                 input_messages:Dict[Tuple, str] = None
