@@ -35,7 +35,7 @@ def graph_topology(network_config_json):
 
 def network_graph(network_topo,source_node_list,report):
     
-    graph={}
+    performance={}
     t=0
     timel ,fidelityl,latencyl,fc_throughl,pc_throughl,nc_throughl=[],[],[],[],[],[]
 
@@ -46,15 +46,25 @@ def network_graph(network_topo,source_node_list,report):
         fc_throughl,pc_throughl,nc_throughl= throughput(network_topo,source_node_list,t,fc_throughl,pc_throughl,nc_throughl)
         t=t+1
         timel.append(t)
-    
-    graph["latency"]    = latencyl
-    graph["fidelity"]   = fidelityl
-    graph["throughput"] = {}
-    graph["throughput"]["fully_complete"]= fc_throughl  
-    graph["throughput"]["partially_complete"]= pc_throughl
-    graph["throughput"]["rejected"]= nc_throughl        #{fc_throughl,pc_throughl,nc_throughl}
-    graph["time"] = timel
-    report["graph"] =graph
+    for i in latencyl:
+        if i>0:
+            latency = i
+    for i in fidelityl:
+         if i>0:
+            fidelity = i
+    for i in fc_throughl:
+        if i>0:
+            through = i
+    execution_time = 3
+    performance["latency"]    = latency
+    performance["fidelity"]   = fidelity
+    performance["throughput"] = through
+    performance["execution_time"] = execution_time
+    # graph["throughput"]["fully_complete"]= fc_throughl  
+    # graph["throughput"]["partially_complete"]= pc_throughl
+    # graph["throughput"]["rejected"]= nc_throughl        #{fc_throughl,pc_throughl,nc_throughl}
+    # graph["time"] = timel
+    report["performance"] = performance
     print(report)
     return report
 
@@ -87,7 +97,9 @@ def eve_e91(network_config, sender, receiver, keyLength):
     return {"Error_Msg":"Couldn't generate required length.Retry Again"}
 
 def e91(network_config, sender, receiver, keyLength):
+    print('network config', network_config)
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
+    print('network topo', network_topo)
     trials=4
     while (trials>0):
         if keyLength<=0 or keyLength>30:
@@ -194,7 +206,7 @@ def ping_pong(network_config, sender, receiver, sequenceLength, message):
         report["application"]=results
         report=network_graph(network_topo,source_node_list,report)
         print(report)
-        return results
+        return report
     else:
         print("message should be less than or equal to 9")
         return None
@@ -252,6 +264,7 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     topology = '/code/web/configs/2n_linear.json'
     protocol = Protocol(name='qsdc_tel', messages_list=[messages], label='00', attack=attack)
     protocol(topology=topology)
+    print(protocol)
     # return protocol.recv_msgs_list[0], mean(protocol.mean_list)
     res={}
     res["input_message"] = message
@@ -324,10 +337,10 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     res={}
     res["input_message1"] = message1
     res["input_message2"] = message2
-    res["output_message1"] = protocol.recv_msgs_list[0][1]
-    res["output_message2"] = protocol.recv_msgs_list[0][2]
+    res["output_message1"] = protocol.recv_msgs_list[-1][1]
+    res["output_message2"] = protocol.recv_msgs_list[-1][2]
     res["attack"] = attack
-    res["error"] = mean(protocol.mean_list)
+    res["error"] = protocol.mean_list[-1]
     report = {}
     report["application"] = res
     

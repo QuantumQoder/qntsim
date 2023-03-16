@@ -5,10 +5,10 @@ from numpy.random import randint
 from random import sample
 from typing import Any, Dict, List, Tuple
 from qntsim.library import Network, insert_check_bits, insert_decoy_photons, bell_type_state_analyzer, Protocol
-from qntsim.library.attacks import Attack, ATTACK_TYPE
+from qntsim.library.attack import Attack, ATTACK_TYPE
 from qntsim.components.circuit import QutipCircuit
 
-logging.basicConfig(filename='ip2.log', filemode='w', level=logging.INFO, format='%(pathname)s %(threadName)s %(module)s %(funcName)s %(message)s')
+# logging.basicConfig(filename='ip2.log', filemode='w', level=logging.INFO, format='%(pathname)s %(threadName)s %(module)s %(funcName)s %(message)s')
 
 class Party:
     input_messages:Dict[Tuple, str] = None
