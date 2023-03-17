@@ -37,7 +37,7 @@ class MemoryArray(Entity):
     """
 
     def __init__(self, name: str, timeline: "Timeline", num_memories=10,
-                 fidelity=0.85, frequency=80e6, efficiency=1, coherence_time=-1, wavelength=500):
+                 fidelity=0.99, frequency=80e6, efficiency=1, coherence_time=-1, wavelength=500):
         """Constructor for the Memory Array class.
         Args:
             name (str): name of the memory array instance.

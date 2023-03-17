@@ -285,13 +285,23 @@ def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
 def qsdc_teleportation(network_config, sender, receiver, message, attack):
     
     start_time = time.time()
+    
     # messages = {(1, 2):'hello world'}
     # print("sender, receiver, message, attack",sender, receiver, message, attack)
+    network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
+    tl.init()
+    topo_json = json_topo(network_config_json)
+    print('network config json', network_topo)
+    with open("topology.json", "w") as outfile:
+        json.dump(topo_json, outfile)
     messages = {(sender,receiver):message}
     attack=None
-    topology = '/code/web/configs/2n_linear.json'
+    topology = '/code/web/topology.json'
+    print('topology', topology)
     protocol = Protocol(name='qsdc_tel', messages_list=[messages], label='00', attack=attack)
     protocol(topology=topology)
+    tl.init()
+    
     print(protocol)
     # return protocol.recv_msgs_list[0], mean(protocol.mean_list)
     res={}
@@ -359,9 +369,16 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     start_time = time.time()
     print('sender, receiver, message1, message2',sender, receiver, message1, message2,attack)
     messages = {(sender,receiver):message1,(receiver,sender):message2}
+    network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
+    tl.init()
+    topo_json = json_topo(network_config_json)
+    print('network config json', network_topo)
+    with open("topology.json", "w") as outfile:
+        json.dump(topo_json, outfile)
     # messages = {(1, 2):'hello', (2, 1):'world'}
     # attack=None
-    topology = '/code/web/configs/singlenode.json'
+    topology = '/code/topology.json'
+    print('topology', topology)
     protocol = Protocol(name='qd_sp', messages_list=[messages], attack=attack)
     protocol(topology=topology)
     print("protocol.recv_msgs_list",protocol.recv_msgs_list)
@@ -528,11 +545,31 @@ def mdi_qsdc(network_config, sender, receiver, message, attack):
     print('network',network,basis)
 
 
-def ip2(input_messages,ids,num_check_bits,num_decoy):
+def ip2(network_config,input_messages,ids,num_check_bits,num_decoy):
     report ={}
     print("input_messages,ids,num_check_bits,num_decoy",input_messages,ids,num_check_bits,num_decoy)
+    
+    # network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
+    # tl.init()
+    # topo_json = json_topo(network_config_json)
+    # print('network config json', network_topo)
+    # with open("topology.json", "w") as outfile:
+    #     json.dump(topo_json, outfile)
+    alice_attrs = {'message':{(1, 2):'011010'},
+                   'id':'1011',
+                   'check_bits':4}
+    bob_id = '0111'
+    num_decoy_photons = 4
+    threshold = 0.2 # error threshold
+    attack = (None, None)
     topology = '/code/web/configs/2n_linear.json'
-    results=ip2_run(topology,input_messages,ids,num_check_bits,num_decoy)
+    results = ip2_run(topology=topology,
+                  alice_attrs=alice_attrs,
+                  bob_id=bob_id,
+                  num_decoy_photons=num_decoy_photons,
+                  threshold=threshold,
+                  attack=attack)
+    # results=ip2_run(topology,input_messages,ids,num_check_bits,num_decoy,attack)
     # report["application"]=results
     # return report
 

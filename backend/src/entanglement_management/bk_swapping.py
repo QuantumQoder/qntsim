@@ -114,7 +114,7 @@ class EntanglementSwappingA(EntanglementProtocol):
     #circuit.measure(1)
 
     def __init__(self, own: "Node", name: str, left_memo: "Memory", right_memo: "Memory", success_prob=1,
-                 degradation=0.95):
+                 degradation=0.99):
         """Constructor for entanglement swapping A protocol.
         Args:
             own (Node): node that protocol is attached to.

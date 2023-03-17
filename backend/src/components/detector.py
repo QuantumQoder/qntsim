@@ -40,7 +40,7 @@ class Detector(Entity):
         photon_counter (int): counts number of detection events.
     """
 
-    def __init__(self, name: str, timeline: "Timeline", efficiency=0.9, dark_count=0, count_rate=int(25e6),
+    def __init__(self, name: str, timeline: "Timeline", efficiency=0.99, dark_count=0, count_rate=int(25e6),
                  time_resolution=150):
         Entity.__init__(self, name, timeline)  # Detector is part of the QSDetector, and does not have its own name
         self.efficiency = efficiency
