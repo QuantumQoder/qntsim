@@ -384,10 +384,10 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       }
         break;
       case 4: this.appConfig = {
-        node1: this.appSettingsForm.get('node1')?.value,
-        node2: this.appSettingsForm.get('node2')?.value,
-        node3: this.appSettingsForm.get('node3')?.value,
-        middleNode: this.appSettingsForm.get('middleNode')?.value
+        endnode1: this.appSettingsForm.get('endnode1')?.value,
+        endnode2: this.appSettingsForm.get('endnode2')?.value,
+        endnode3: this.appSettingsForm.get('endnode3')?.value,
+        middlenode: this.appSettingsForm.get('middleNode')?.value
       }
         break;
       case 5: this.appConfig = {

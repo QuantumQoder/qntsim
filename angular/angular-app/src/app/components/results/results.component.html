@@ -170,14 +170,14 @@
                             <tr>
                                 <td class="col">Basis</td>
                                 <td class="col" [ngClass]="senderbasis(i)"
-                                    *ngFor="let app of e91.sender_basis_list;let i=index">
+                                    *ngFor="let app of data.sender_basis_list;let i=index">
                                     {{app}}
                                 </td>
                             </tr>
                             <tr>
                                 <td class="col">Value</td>
                                 <td class="col" [ngClass]="senderbasis(i)"
-                                    *ngFor="let app of e91.sender_meas_list;let i=index">{{app}}
+                                    *ngFor="let app of data.sender_meas_list;let i=index">{{app}}
                                 </td>
                             </tr>
                         </tbody>
@@ -198,12 +198,12 @@
                             <tr>
                                 <td class="col">Basis</td>
                                 <td class="col" [ngClass]="senderbasis(i)"
-                                    *ngFor="let app of e91.receiver_basis_list;let i=index">{{app}}</td>
+                                    *ngFor="let app of data.receiver_basis_list;let i=index">{{app}}</td>
                             </tr>
                             <tr>
                                 <td class="col">Value</td>
                                 <td class="col" [ngClass]="senderbasis(i)"
-                                    *ngFor="let app of e91.receiver_meas_list;let i=index">{{app}}</td>
+                                    *ngFor="let app of data.receiver_meas_list;let i=index">{{app}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -231,8 +231,8 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="col">Key: {{e91.sender_keys}}</td>
-                                <td class="col">Key: {{e91.receiver_keys}}</td>
+                                <td class="col">Key: {{data.sender_keys}}</td>
+                                <td class="col">Key: {{data.receiver_keys}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -306,7 +306,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let item of e2e.sender">
+                            <tr *ngFor="let item of data.sender">
                                 <td *ngFor="let item of item" class="text-center">{{item}}</td>
                             </tr>
                         </tbody>
@@ -327,7 +327,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let item of e2e.receiver">
+                            <tr *ngFor="let item of data.receiver">
                                 <th *ngFor="let item of item">{{item}}</th>
                             </tr>
                         </tbody>
@@ -352,7 +352,7 @@
                             End-to-End Entanglement Generated ​
                         </td>
                         <td class="col">
-                            State : {{tel.alice_bob_entanglement}}​
+                            State : {{data.alice_bob_entanglement}}​
                         </td>
                     </tr>
                 </thead>
@@ -372,7 +372,7 @@
                             Quantum State of Qubit (default)
                         </th>
                         <th class="col">
-                            {{tel.random_qubit}}
+                            {{data.random_qubit}}
                         </th>
                     </tr>
                 </thead>
@@ -381,11 +381,11 @@
                         <td rowspan="2" class="col">
                             Classical Measurement results​
                         </td>
-                        <td class="col">Outcome 1: {{tel.meas_rq}}</td>
+                        <td class="col">Outcome 1: {{data.meas_rq}}</td>
                     </tr>
                     <tr>
 
-                        <td class="col">Outcome 2: {{tel.meas_alice}}</td>
+                        <td class="col">Outcome 2: {{data.meas_alice}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -404,18 +404,18 @@
                             Quantum state at Receiver Node​
                             (before corrective operations)​
                         </th>
-                        <th class="col">{{tel.bob_initial_state}}</th>
+                        <th class="col">{{data.bob_initial_state}}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td class="col">Corrective Unitary Transformations​
                             ​</td>
-                        <td>Pauli Corrections: {{tel.Corrective_operation}}​</td>
+                        <td>Pauli Corrections: {{data.Corrective_operation}}​</td>
                     </tr>
                     <tr>
                         <td class="col">Qubit Received</td>
-                        <td class="col">{{tel.bob_final_state}}</td>
+                        <td class="col">{{data.bob_final_state}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -426,9 +426,39 @@
         </div>
         <div *ngIf="app_id==4">
             <div class="display-4">
-                GHZ
+                End-to-End GHZ protocol
             </div>
             <br>
+            <div class="col">
+                <div class="row">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+
+                                <th class="col table-secondary text-center">Source</th>
+                                <th class="col table-secondary text-center">Destination</th>
+                                <th class="col table-secondary text-center">Demand Size</th>
+                                <th class="col table-secondary text-center">Execution Time</th>
+                                <th class="col table-secondary text-center">Fidelity</th>
+                                <th class="col table-secondary text-center">Success Rate</th>
+                                <th class="col table-secondary text-center">Latency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+
+                                <td class="col text-center">e1</td>
+                                <td class="col text-center">e2</td>
+                                <td class="col text-center">2</td>
+                                <td class="col text-center">{{performance.execution_time}}&nbsp;secs</td>
+                                <td class="col text-center">{{performance.fidelity}}</td>
+                                <td class="col text-center">{{performance.throughput}}</td>
+                                <td class="col text-center">{{performance.latency}}&nbsp;secs</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
             <h5 class="text-center">Three party GHZ state has been prepared with the help of three two party
                 entanglement of
@@ -456,14 +486,14 @@
                                 <td rowspan="2" class="col">
                                     Initial Entanglement state (2party)​
                                 </td>
-                                <td>State: {{ghz.initial_alice_state}}</td>
+                                <td>State: {{data.initial_alice_state}}</td>
                             </tr>
                             <tr>
-                                <td>Entangled State:{{ghz.alice_state}}</td>
+                                <td>Entangled State:{{data.alice_state}}</td>
                             </tr>
                             <tr>
                                 <td>Final Entangled State</td>
-                                <td>{{ghz.final_alice_state}}</td>
+                                <td>{{data.final_alice_state}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -483,14 +513,14 @@
                                 <td rowspan="2" class="col">
                                     Initial Entanglement state (2party)​
                                 </td>
-                                <td>State: {{ghz.initial_bob_state}}</td>
+                                <td>State: {{data.initial_bob_state}}</td>
                             </tr>
                             <tr>
-                                <td>Entangled State:{{ghz.bob_state}}</td>
+                                <td>Entangled State:{{data.bob_state}}</td>
                             </tr>
                             <tr>
                                 <td>Final Entangled State</td>
-                                <td>{{ghz.final_bob_state}}</td>
+                                <td>{{data.final_bob_state}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -510,14 +540,14 @@
                                 <td rowspan="2" class="col">
                                     Initial Entanglement state (2party)​
                                 </td>
-                                <td>State: {{ghz.initial_charlie_state}}</td>
+                                <td>State: {{data.initial_charlie_state}}</td>
                             </tr>
                             <tr>
-                                <td>Entangled State:{{ghz.charlie_state}}</td>
+                                <td>Entangled State:{{data.charlie_state}}</td>
                             </tr>
                             <tr>
                                 <td>Final Entangled State</td>
-                                <td>{{ghz.final_charlie_state}}</td>
+                                <td>{{data.final_charlie_state}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -541,7 +571,7 @@
                             Sender's (Alice: E1) Input Message
                         </td>
                         <td class="col">
-                            {{ip1.input_message}}
+                            {{data.input_message}}
                         </td>
                     </tr>
                 </thead>
@@ -551,12 +581,12 @@
                             Security Checked
                         </td>
                         <td class="col">
-                            {{ip1.Security_msg}}
+                            {{data.Security_msg}}
                         </td>
                     </tr>
                     <tr class="table-secondary">
                         <td class="col">IdA Authentication</td>
-                        <td class="col">{{ip1.IdA_msg}}</td>
+                        <td class="col">{{data.IdA_msg}}</td>
                     </tr>
                     <tr class="table-secondary">
                         <td class="col">
@@ -571,12 +601,12 @@
                             Receiver Key
                         </td>
                         <td class="col">
-                            {{ip1.Bobs_r}}
+                            {{data.Bobs_r}}
                         </td>
                     </tr>
                     <tr class="table-secondary">
                         <td colspan="2" class="col">
-                            {{ip1.display_msg}}
+                            {{data.display_msg}}
                         </td>
                     </tr>
                     <tr class="table-primary">
@@ -584,7 +614,7 @@
                             Receiver's (Bob: E2) Output message
                         </td>
                         <td class="col">
-                            {{ip1.bob_message}}
+                            {{data.bob_message}}
                         </td>
                     </tr>
                 </tbody>
@@ -643,7 +673,7 @@
                             Sender's Transmitted Key
                         </td>
                         <td class="col">
-                            {{qsdc1.key_transmitted}}
+                            {{data.key_transmitted}}
                         </td>
                     </tr>
                 </thead>
@@ -653,7 +683,7 @@
                             Eavesdropping
                         </td>
                         <td class="col">
-                            {{qsdc1.eavesdrop}}
+                            {{data.eavesdrop}}
                         </td>
                     </tr>
                     <tr class="table-secondary">
@@ -661,7 +691,7 @@
                             Check Bits used for Eve Detection
                         </td>
                         <td class="col">
-                            {{qsdc1.display_msg}}
+                            {{data.display_msg}}
                         </td>
                     </tr>
                     <tr class="table-primary">
@@ -669,11 +699,11 @@
                             Key Received
                         </td>
                         <td class="col">
-                            Key after removing check bits : {{qsdc1.key_shared_received}}
+                            Key after removing check bits : {{data.key_shared_received}}
                         </td>
                     </tr>
                     <tr class="table-primary">
-                        <td class="col">Final Key  : {{qsdc1.final_key}}</td>
+                        <td class="col">Final Key  : {{data.final_key}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -696,7 +726,7 @@
                             Sender's (Alice: E1) Input message
                         </td>
                         <td class="col">
-                            {{pingpong.message_transmitted}}
+                            {{data.message_transmitted}}
                         </td>
                     </tr>
                 </thead>
@@ -706,7 +736,7 @@
                             EvesDrop
                         </td>
                         <td class="col">
-                            {{pingpong.Eve_presence}}
+                            {{data.Eve_presence}}
                         </td>
                     </tr>
                     <tr class="table-secondary">
@@ -714,7 +744,7 @@
                             Protocol m's Impurities
                         </td>
                         <td class="col">
-                            {{pingpong.Impurities_presence}}
+                            {{data.Impurities_presence}}
                         </td>
                     </tr>
                     <tr class="table-secondary">
@@ -725,7 +755,7 @@
                             Receiver (Bob: E2) Output message ​
                         </td>
                         <td class="col">
-                            {{pingpong.message_received}}
+                            {{data.message_received}}
                         </td>
                     </tr>
 
@@ -759,10 +789,10 @@
                     </tr>
                     <tr>
                         <td class="col">
-                            {{spqd.input_message1}}
+                            {{data.input_message1}}
                         </td>
                         <td class="col">
-                            {{spqd.input_message2}}
+                            {{data.input_message2}}
                         </td>
                     </tr>
                 </thead>
@@ -785,10 +815,10 @@
                     </tr>
                     <tr>
                         <td class="col">
-                            {{spqd.attack}}
+                            {{data.attack}}
                         </td>
                         <td class="col">
-                            {{spqd.error}}
+                            {{data.error}}
                         </td>
                     </tr>
                 </tbody>
@@ -810,10 +840,10 @@
                     </tr>
                     <tr>
                         <td class="col">
-                            {{spqd.output_message1}}
+                            {{data.output_message1}}
                         </td>
                         <td class="col">
-                            {{spqd.output_message2}}
+                            {{data.output_message2}}
                         </td>
                     </tr>
                 </thead>
@@ -837,7 +867,7 @@
                             Input Message
                         </td>
                         <td class="col">
-                            {{qsdct.input_message}}
+                            {{data.input_message}}
                         </td>
                     </tr>
                 </thead>
@@ -847,7 +877,7 @@
                             Attack
                         </td>
                         <td class="col">
-                            {{qsdct.attack}}
+                            {{data.attack}}
                         </td>
                     </tr>
                     <tr class="table-secondary">
@@ -855,7 +885,7 @@
                             Error
                         </td>
                         <td class="col">
-                            {{qsdct.error}}
+                            {{data.error}}
                         </td>
                     </tr>
 
@@ -864,7 +894,7 @@
                             Output Message
                         </td>
                         <td class="col">
-                            {{qsdct.output_message}}
+                            {{data.output_message}}
                         </td>
                     </tr>
                 </tbody>
@@ -888,7 +918,7 @@
                             Sender's Input Message
                         </td>
                         <td class="col">
-                            {{ip2.recv_msg}}
+                            {{data.recv_msg}}
                         </td>
                     </tr>
                 </thead>
@@ -898,23 +928,23 @@
                             Security Checked
                         </td>
                         <td class="col">
-                            {{ip2.security_check}}
+                            {{data.security_check}}
                         </td>
                     </tr>
                     <tr class="table-secondary">
                         <td class="col">Alice's IdA Authentication</td>
-                        <td class="col">{{ip2.alice_ida_auth}}</td>
+                        <td class="col">{{data.alice_ida_auth}}</td>
                     </tr>
                     <tr class="table-secondary">
                         <td class="col">Bob's IdA Authentication</td>
-                        <td class="col">{{ip2.bob_ida_auth}}</td>
+                        <td class="col">{{data.bob_ida_auth}}</td>
                     </tr>
                     <tr class="table-secondary">
                         <td class="col">
                             Sender Key
                         </td>
                         <td class="col">
-                            {{ip2.sender_key}}
+                            {{data.sender_key}}
                         </td>
                     </tr>
                     <tr class="table-secondary">
@@ -922,7 +952,7 @@
                             Receiver Key
                         </td>
                         <td class="col">
-                            {{ip2.receiver_key}}
+                            {{data.receiver_key}}
                         </td>
                     </tr>
                     <tr class="table-primary">
@@ -930,7 +960,7 @@
                             Receiver's Output message
                         </td>
                         <td class="col">
-                            {{ip2.output_message}}
+                            {{data.output_message}}
                         </td>
                     </tr>
                 </tbody>

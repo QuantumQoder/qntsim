@@ -123,6 +123,7 @@
                     <img [src]="category.header" alt="...">
                 </label>
             </div> -->
+
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 1">
                 <label for="type" class="form-label font-bold">
                     Key Length
@@ -145,6 +146,42 @@
                 <br>
                 <p-slider formControlName="size" [min]="0" [step]="1" [max]="6"
                     (onSlideEnd)="e2eChange('size')"></p-slider>
+            </div>
+            <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
+                <label for="type" class="form-label font-bold">
+                    End Node 1
+                </label>
+                <select class="form-control" formControlName="endnode1" (click)="updateNodes()"
+                    (change)="selectReceiver($event)">
+                    <option *ngFor="let data of nodes" [ngValue]="data.key">{{data.key}}</option>
+                </select>
+            </div>
+            <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
+                <label for="type" class="form-label font-bold">
+                    End Node 2
+                </label>
+                <select class="form-control" formControlName="endnode2" (click)="updateNodes()"
+                    (change)="selectReceiver($event)">
+                    <option *ngFor="let data of nodes" [ngValue]="data.key">{{data.key}}</option>
+                </select>
+            </div>
+            <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
+                <label for="type" class="form-label font-bold">
+                    End Node 3
+                </label>
+                <select class="form-control" formControlName="endnode3" (click)="updateNodes()"
+                    (change)="selectReceiver($event)">
+                    <option *ngFor="let data of nodes" [ngValue]="data.key">{{data.key}}</option>
+                </select>
+            </div>
+            <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
+                <label for="type" class="form-label font-bold">
+                    middleNode
+                </label>
+                <select class="form-control" formControlName="middleNode" (click)="updateNodes()"
+                    (change)="selectReceiver($event)">
+                    <option *ngFor="let data of nodes" [ngValue]="data.key">{{data.key}}</option>
+                </select>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 5">
                 <label for="type" class="form-label font-bold">
