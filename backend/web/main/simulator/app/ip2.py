@@ -4,11 +4,11 @@ from functools import partial
 from numpy.random import randint
 from random import sample
 from typing import Any, Dict, List, Tuple
-from qntsim.library import Network, insert_check_bits, insert_decoy_photons, bell_type_state_analyzer, Protocol
+from qntsim.library import Network, insert_check_bits, insert_decoy_photons, bell_type_state_analyzer, Protocol, ErrorAnalyzer
 from qntsim.library.attack import Attack, ATTACK_TYPE
 from qntsim.components.circuit import QutipCircuit
 
-# logging.basicConfig(filename='ip2.log', filemode='w', level=logging.INFO, format='%(pathname)s %(threadName)s %(module)s %(funcName)s %(message)s')
+logging.basicConfig(filename='ip2.log', filemode='w', level=logging.INFO, format='%(pathname)s %(threadName)s %(module)s %(funcName)s %(message)s')
 
 class Party:
     input_messages:Dict[Tuple, str] = None
@@ -98,7 +98,7 @@ class Bob(Party):
             i_a (List):
             cls.d_a: 
         """
-        seq_a, seq_b = list(zip(*[network.manager.get(key=info.memory.qstate_key).keys for info in network.nodes[1].resource_manager.memory_manager if info.state=='ENTANGLED']))
+        seq_a, seq_b = list(zip(*[sorted(network.manager.get(key=info.memory.qstate_key).keys) for info in network.nodes[1].resource_manager.memory_manager if info.state=='ENTANGLED']))
         cls.i_b = list(seq_b[-len(cls.id)//2:])
         cls.s_b = [ele for ele in seq_b if ele not in cls.i_b]
         for k, i1, i2 in zip(cls.i_b, cls.id[::2], cls.id[1::2]):
@@ -109,7 +109,7 @@ class Bob(Party):
         cls.d_a, cls.photons_a = insert_decoy_photons(network=network, node_index=1, num_decoy_photons=num_decoy_photons)
         cls.d_b, cls.photons_b = insert_decoy_photons(network=network, node_index=1, num_decoy_photons=num_decoy_photons)
         logging.info(f'keys for epr pairs and decoy photons by {cls.__name__}')
-        cls.d_b = list(set(cls.d_b)-set(cls.d_a))
+        cls.d_b = sorted(list(set(cls.d_b)-set(cls.d_a)))
         
         return seq_a, list(seq_a[-len(cls.id)//2:]), cls.d_a
     
@@ -135,7 +135,7 @@ class Bob(Party):
             threshold (float): _description_
         """
         cls.received_msgs = ''.join(char for i, char in enumerate(returns) if i not in cls1.chk_bts_insrt_lctns)
-        network.strings = cls.received_msgs
+        network._strings = cls.received_msgs
         err = [int(returns[pos])^int(cls1.input_messages.get(1)[pos]) for pos in cls1.chk_bts_insrt_lctns]
         if (err_prct:=sum(err)/len(err))>threshold:
             logging.info('failed, err=', 1-err_prct)
@@ -229,7 +229,7 @@ class UTP:
 def pass_(network:Network, returns:Any):
     return returns
 
-def ip2(topology, alice_attrs, bob_id, num_decoy_photons, threshold, attack):
+def ip2_run(topology, alice_attrs, bob_id, num_decoy_photons, threshold, attack):
     Alice.input_messages = alice_attrs.get('message')
     Alice.id = alice_attrs.get('id')
     Alice.num_check_bits = alice_attrs.get('check_bits')
@@ -237,56 +237,28 @@ def ip2(topology, alice_attrs, bob_id, num_decoy_photons, threshold, attack):
     threshold = threshold
     attack, chnnl = attack
     chnnl = [1 if i==chnnl else 0 for i in range(3)]
-    Network._funcs = [partial(Alice.input_check_bits),
-                      partial(Bob.setup, num_decoy_photons=num_decoy_photons),
-                      partial(Alice.encode),
-                      partial(Attack.implement, attack=ATTACK_TYPE[attack].value) if attack and chnnl[0] else partial(pass_),
-                      partial(UTP.check_channel_security, cls1=Alice, cls2=Bob, threshold=threshold),
-                      partial(Alice.insert_new_decoy_photons, num_decoy_photons=num_decoy_photons),
-                    #   partial(Attack.implement, attack=ATTACK_TYPE[attack].value) if attack and chnnl[1] else partial(pass_),
-                      partial(UTP.check_channel_security, cls1=UTP, cls2=Alice, threshold=threshold),
-                      partial(Attack.implement, attack=ATTACK_TYPE[attack].value) if attack and chnnl[2] else partial(pass_),
-                      partial(UTP.check_channel_security, cls1=UTP, cls2=Bob, threshold=threshold),
-                      partial(UTP.authenticate, cls1=Alice, cls2=Bob, circuit=bell_type_state_analyzer(2)),
-                      partial(UTP.measure, circuit=bell_type_state_analyzer(2), cls=Alice),
-                      partial(Bob.decode),
-                      partial(Bob.check_integrity, cls1=Alice, threshold=threshold)]
-    # network = Network(topology='2n_linear.json', messages=Alice.input_messages, name='ip2', size=lambda x:(x+Alice.num_check_bits+len(Alice.id)+len(Bob.id))//2, label='00')
-    # print(network())
+    Network._flow = [partial(Alice.input_check_bits),
+                     partial(Bob.setup, num_decoy_photons=num_decoy_photons),
+                     partial(Alice.encode),
+                     partial(Attack.implement, attack=ATTACK_TYPE[attack].value) if attack and chnnl[0] else partial(pass_),
+                     partial(UTP.check_channel_security, cls1=Alice, cls2=Bob, threshold=threshold),
+                     partial(Alice.insert_new_decoy_photons, num_decoy_photons=num_decoy_photons),
+                    #  partial(Attack.implement, attack=ATTACK_TYPE[attack].value) if attack and chnnl[1] else partial(pass_),
+                     partial(UTP.check_channel_security, cls1=UTP, cls2=Alice, threshold=threshold),
+                     partial(Attack.implement, attack=ATTACK_TYPE[attack].value) if attack and chnnl[2] else partial(pass_),
+                     partial(UTP.check_channel_security, cls1=UTP, cls2=Bob, threshold=threshold),
+                     partial(UTP.authenticate, cls1=Alice, cls2=Bob, circuit=bell_type_state_analyzer(2)),
+                     partial(UTP.measure, circuit=bell_type_state_analyzer(2), cls=Alice),
+                     partial(Bob.decode),
+                     partial(Bob.check_integrity, cls1=Alice, threshold=threshold)]
+    network = Network(topology=topology, messages=Alice.input_messages, name='ip2', size=lambda x:(x+Alice.num_check_bits+len(Alice.id)+len(Bob.id))//2, label='00')
+    network()
+    return_tuple = ErrorAnalyzer._analyse(network=network)
+    print(f'Average error in network:{return_tuple[2]}')
+    print(f'Standard deviation in error in network:{return_tuple[3]}')
+    print(f'Information leaked to the attacker:{return_tuple[4]}')
+    print(f'Fidelity of the message:{return_tuple[5]}')
     # Network.execute(networks=[network])
     # print('Received messages:', Bob.received_msgs)
-
-    protocol = Protocol(messages_list=[Alice.input_messages], name='ip2')
-    protocol(functions=Network._funcs,
-             topology=topology,
-             size=lambda x:(x+Alice.num_check_bits+len(Alice.id)+len(Bob.id))//2,
-             label='00')
-    return Bob.received_msgs, sum(protocol.mean_list)/len(protocol.mean_list)
-
-
     
-
-##test()
-
-
-
-
-def ip2_run(topology,input_messages ,ids,num_check_bits,num_decoy):
-   
-    # topology = '2n_linear.json'
-    alice_attrs = {'message':{(1, 2):'011010'},
-                   'id':'1011',
-                   'check_bits':4}
-    bob_id = '0111'
-    num_decoy_photons = 15
-    threshold = 0.2 # error threshold
-    attack = (None, None) #(attack_type, channel_no.) channel_no. doesn't implement attack. one can say that the channel 1 is secured.
-    res = ip2(topology=topology,
-                  alice_attrs=alice_attrs,
-                  bob_id=bob_id,
-                  num_decoy_photons=num_decoy_photons,
-                  threshold=threshold,
-                  attack=attack)
-    return res
-    
-    # print(ip2_run(topology,input_messages,ids,num_check_bits,num_decoy))
+    return Bob.received_msgs, return_tuple[2:]

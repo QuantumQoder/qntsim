@@ -106,7 +106,7 @@ class ResourceReservationProtocol(StackProtocol):
         super().__init__(own, name)
         self.timecards = [MemoryTimeCard(i) for i in range(len(own.memory_array))]
         self.es_succ_prob = 1
-        self.es_degradation = 0.95
+        self.es_degradation = 0.99
         self.accepted_reservation = []
 
     def push(self, responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float, isvirtual:bool, priority:int):
