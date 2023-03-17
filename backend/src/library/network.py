@@ -360,8 +360,8 @@ class Network:
             # Loop through each consecutive pair of keys in the sequence
             for source_key, dest_key in itertools.pairwise(key_sequence):
                 # Get the source and destination nodes for the entanglement request
-                source_node = self[source_key - 1]
-                dest_node = self[dest_key - 1]
+                source_node = self._net_topo.nodes[source_key]
+                dest_node = self._net_topo.nodes[dest_key]
                 
                 # Get the transport manager for the source node and send the entanglement request
                 transport_manager = source_node.transport_manager
@@ -516,8 +516,7 @@ class Network:
         """
         alpha = complex(1/np.sqrt(2))
         bsa = bell_type_state_analyzer(2)
-        corrections = {}
-        print(self._bin_msgs, self[node_index])
+        self._corrections = {}
         for bin, info in zip(self._bin_msgs[msg_index], self[node_index].resource_manager.memory_manager):
             key = info.memory.qstate_key
             self.manager.new()
@@ -525,9 +524,7 @@ class Network:
             state = self.manager.get(key)
             keys = tuple(set(state.keys)-set([key]))
             outputs = self.manager.run_circuit(bsa, [new_key, key])
-            corrections[keys] = [outputs.get(new_key), outputs.get(key)]
-        self._corrections = corrections
-        print(corrections)
+            self._corrections[keys] = [outputs.get(new_key), outputs.get(key)]
         logging.info('message states')
     
     def measure(self, returns:Any):
@@ -569,7 +566,7 @@ class Network:
     # @delayed
     # @wrap_non_picklable_objects
     def _decode(self, *args):
-        strings = []
+        self._strings = []
         if hasattr(self, '_initials'):
             node = self.nodes[0]
             for bin_msg in self._bin_msgs:
@@ -578,16 +575,14 @@ class Network:
                     bin = bin_msg[info.index] if len(self._bin_msgs)>1 else '0'
                     key = info.memory.qstate_key
                     string+=str(initial%2^output.get(key)^int(bin))
-                strings.append(string)
+                self._strings.append(string)
         else:
-            strings = [''.join(str(*output.values()) for output in self._outputs)]
-        recv_msgs = {i:''.join(chr(int(string[j*8:-~j*8], 2)) for j in range(len(string)//8)) for i, string in enumerate(strings, 1)}
-        self._strings = strings
-        self.recv_msgs = recv_msgs
-        for k, v in recv_msgs.items():
+            self._strings = [''.join(str(*output.values()) for output in self._outputs)]
+        self.recv_msgs = {rec[1:]:''.join(chr(int(string[j*8:-~j*8], 2)) for j in range(len(string)//8)) for rec, string in zip(list(self.messages)[::-1], self._strings)}
+        for k, v in self.recv_msgs.items():
             logging.info(f'Received message {k}: {v}')
         
-        return recv_msgs
+        return self.recv_msgs
     
     @staticmethod
     def decode(networks:List['Network'], *args):

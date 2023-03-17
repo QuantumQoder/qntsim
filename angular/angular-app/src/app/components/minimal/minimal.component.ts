@@ -55,6 +55,8 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     targetFidelity: 0.5,
     size: 6
   }
+  serviceNodes: any[] = []
+  endNodes: any[] = []
   topology: any
   topologyData: any
   request: Request
@@ -76,11 +78,13 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.service.getJson(urlData.url, urlData.type).subscribe((result) => {
       // console.log(result)
       this.topologyData = result;
+      this.updateNodes()
       // console.log(this.topologyData.nodes)
     }, (error) => {
       console.log(error)
     }, () => {
       // console.log(this.topologyData.nodes)
+
       this.init(this.topologyData.nodes, this.topologyData.links)
     }
     )
@@ -97,7 +101,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.topologyForm = this.fb.group({
       'type': ['Star', Validators.required],
       'level': [0, Validators.required],
-      'noOfMemories': [100, Validators.required],
+      'noOfMemories': [500, Validators.required],
       'distance': [150, [Validators.required, Validators.max(150)]],
       'attenuity': [{ value: 0.00001, disabled: true }, Validators.required]
     });
@@ -127,14 +131,29 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.topology.model = new go.GraphLinksModel(data.nodes, data.links)
     console.log(this.topology.model.nodeDataArray);
   }
+  allowBitsInput($event: any) {
+    if ($event.key.match(/[0-1]*/)['0']) { }
+    else {
+      $event.preventDefault();
+    }
+  }
   updateNodes() {
-    this.nodes = this.topologyData.nodes
+    this.serviceNodes = [];
+    this.endNodes = []
+    for (let i = 0; i < this.topologyData.nodes.length; i++) {
+      if (this.topologyData.nodes[i].color == 'lightblue') {
+        this.endNodes.push(this.topologyData.nodes[i])
+      } else if (this.topologyData.nodes[i].color == 'orange') {
+        this.serviceNodes.push(this.topologyData.nodes[i])
+      }
+    }
   }
   getType($event: any) {
     const { url, type } = this.service.jsonUrl(this.topologyForm.get('type')?.value.toLowerCase(), this.level);
     this.service.getJson(url, type).subscribe(
       (result: any) => {
         this.topologyData = result;
+        this.updateNodes()
       },
       (error) => {
         console.log(error);
@@ -150,6 +169,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.service.getJson(urlData.url, urlData.type).subscribe((result: any) => {
       this.topologyData = result;
       console.log(this.topologyData)
+      this.updateNodes()
     }, (error) => {
       console.log(error)
     }, () => {
@@ -173,7 +193,12 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.topology = $(go.Diagram, "topology",  // create a Diagram for the DIV HTML element
       {
         initialContentAlignment: go.Spot.Center,  // center the content
-        "undoManager.isEnabled": true  // enable undo & redo
+        "undoManager.isEnabled": true,  // enable undo & redo
+        "panningTool.isEnabled": false
+        // "ViewportBoundsChanged": function (e: any) {
+        //   e.diagram.toolManager.panningTool.isEnabled =
+        //     !e.diagram.viewportBounds.containsRect(e.diagram.documentBounds);
+        // },
       });
     // define a simple Node template
     this.topology.nodeTemplate =
@@ -222,7 +247,14 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.appSettingsForm.get(data)?.patchValue(node)
   }
   getApp($event: any) {
+
     this.nodes = this.topologyData.nodes
+    if (this.appForm.get('app')?.value == 4) {
+      this.topologyForm.get('level').patchValue(2);
+      this.level = 2;
+      this.levelChange()
+    }
+    this.updateNodes()
     this.buildForm(this.appForm.get('app')?.value)
   }
   runApp() {
@@ -368,7 +400,6 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         targetFidelity: this.appSettingsForm.get('targetFidelity')?.value,
         timeout: 2e12
       }
-        // console.log(this.appConfig)
         break;
       case 1: this.appConfig = {
         sender: this.appSettingsForm.get('sender')?.value,
@@ -400,7 +431,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       case 6: this.appConfig = {
         sender: this.appSettingsForm.get('sender')?.value,
         receiver: this.appSettingsForm.get('receiver')?.value,
-        sequenceLength: 2,
+        sequenceLength: "2",
         message: this.appSettingsForm.get('message')?.value
       }
         break;
@@ -427,7 +458,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       }
         break;
       case 10:
-        this.appConfig = { "input_messages": { "2": this.appSettingsForm.get('message')?.value, }, "ids": { "2": "1011", "1": "0111" }, "num_check_bits": 4, "num_decoy": 4 }
+        this.appConfig = { "input_messages": { 2: this.appSettingsForm.get('message')?.value }, "ids": { "2": "1011", "1": "0111" }, "num_check_bits": 4, "num_decoy": 4 }
         break;
     }
   }
