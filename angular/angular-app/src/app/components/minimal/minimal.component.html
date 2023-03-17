@@ -32,7 +32,7 @@
                 <label for="type" class="form-label font-bold mb-2">
                     Size {{level}}
                 </label>
-                <p-slider formControlName="level" [min]="0" [step]="1" [max]="4"
+                <p-slider formControlName="level" (onChange)="levelChange()" [min]="0" [step]="1" [max]="4"
                     (onSlideEnd)="levelChange()"></p-slider>
             </div>
             <hr>
@@ -87,23 +87,23 @@
         </form>
         <form [formGroup]="appSettingsForm">
             <div *ngIf="appForm.get('app')?.value != '' ">
+                <br>
                 <h5 class="text-center mt-1">Application Settings</h5>
                 <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value != 4">
                     <label for="type" class="form-label font-bold">
                         Sender
                     </label>
-                    <select class="form-control" formControlName="sender" (click)="updateNodes()"
-                        (change)="selectSender($event)">
-                        <option *ngFor="let data of nodes" [ngValue]="data.key">{{data.key}}</option>
+                    <select class="form-control" formControlName="sender" (change)="selectSender($event)">
+                        <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                     </select>
                 </div>
+
                 <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value != 4">
                     <label for="type" class="form-label font-bold">
                         Receiver
                     </label>
-                    <select class="form-control" formControlName="receiver" (click)="updateNodes()"
-                        (change)="selectReceiver($event)">
-                        <option *ngFor="let data of nodes" [ngValue]="data.key">{{data.key}}</option>
+                    <select class="form-control" formControlName="receiver" (change)="selectReceiver($event)">
+                        <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                     </select>
                 </div>
             </div>
@@ -151,55 +151,51 @@
                 <label for="type" class="form-label font-bold">
                     End Node 1
                 </label>
-                <select class="form-control" formControlName="endnode1" (click)="updateNodes()"
-                    (change)="selectReceiver($event)">
-                    <option *ngFor="let data of nodes" [ngValue]="data.key">{{data.key}}</option>
+                <select class="form-control" formControlName="endnode1" (change)="selectReceiver($event)">
+                    <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
                 <label for="type" class="form-label font-bold">
                     End Node 2
                 </label>
-                <select class="form-control" formControlName="endnode2" (click)="updateNodes()"
-                    (change)="selectReceiver($event)">
-                    <option *ngFor="let data of nodes" [ngValue]="data.key">{{data.key}}</option>
+                <select class="form-control" formControlName="endnode2" (change)="selectReceiver($event)">
+                    <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
                 <label for="type" class="form-label font-bold">
                     End Node 3
                 </label>
-                <select class="form-control" formControlName="endnode3" (click)="updateNodes()"
-                    (change)="selectReceiver($event)">
-                    <option *ngFor="let data of nodes" [ngValue]="data.key">{{data.key}}</option>
+                <select class="form-control" formControlName="endnode3" (change)="selectReceiver($event)">
+                    <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
                 <label for="type" class="form-label font-bold">
-                    middleNode
+                    Central Node
                 </label>
-                <select class="form-control" formControlName="middleNode" (click)="updateNodes()"
-                    (change)="selectReceiver($event)">
-                    <option *ngFor="let data of nodes" [ngValue]="data.key">{{data.key}}</option>
+                <select class="form-control" formControlName="middleNode" (change)="selectReceiver($event)">
+                    <option *ngFor="let data of serviceNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 5">
                 <label for="type" class="form-label font-bold">
                     Binary message (only even)
                 </label>
-                <input type="text" formControlName="key" class="form-control">
+                <input type="text" (keypress)="allowBitsInput($event)" formControlName="key" class="form-control">
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 6">
                 <label for="type" class="form-label font-bold">
                     Message
                 </label>
-                <input type="text" formControlName="message" class="form-control">
+                <input type="text" (keypress)="allowBitsInput($event)" formControlName="message" class="form-control">
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 7">
                 <label for="type" class="form-label font-bold">
-                    Message
+                    Message (only binary)
                 </label>
-                <input type="text" formControlName="message" class="form-control">
+                <input type="text" (keypress)="allowBitsInput($event)" formControlName="message" class="form-control">
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 8">
                 <label for="type" class="form-label font-bold">
