@@ -16,7 +16,23 @@ import { KatexOptions } from 'ng-katex';
 })
 
 export class MinimalComponent implements OnInit, AfterViewInit {
+  data: string = '|1\\rangle'
   equation: any = [{
+    header: '/assets/images/amplitude/1.jpg', value: 1,
+  },
+  {
+    header: '/assets/images/amplitude/2.jpg', value: 2,
+  },
+  {
+    header: '/assets/images/amplitude/3.jpg', value: 3,
+  },
+  {
+    header: '/assets/images/amplitude/4.jpg', value: 4,
+  }];
+  options: KatexOptions = {
+    displayMode: true,
+  };
+  equation1: any = [{
     header: '|1\\rangle', value: 1,
   },
   {
@@ -28,9 +44,12 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   {
     header: '|0\\rangle', value: 4,
   }];
-  options: KatexOptions = {
-    displayMode: true,
-  };
+  radio = {
+    1: true,
+    2: false,
+    3: false,
+    4: false
+  }
   amplitude: any
   e2e = {
     targetFidelity: 0.5,
@@ -79,7 +98,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       'type': ['Star', Validators.required],
       'level': [0, Validators.required],
       'noOfMemories': [100, Validators.required],
-      'distance': [150, Validators.required],
+      'distance': [150, [Validators.required, Validators.max(150)]],
       'attenuity': [{ value: 0.00001, disabled: true }, Validators.required]
     });
     this.appForm = this.fb.group({
@@ -90,7 +109,11 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       'receiver': [''],
       'targetFidelity': [0.5],
       'size': [6],
-      'amplitude': ['']
+      'amplitude': [''],
+      'endnode1': [''],
+      'endnode2': [''],
+      'endnode3': [''],
+      'middleNode': ['']
     })
     // this.appSettingsForm
     this.service.getAppList().pipe(map((d: any) => d.appList)).subscribe((result: any) => this.applist = result);
@@ -108,16 +131,18 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.nodes = this.topologyData.nodes
   }
   getType($event: any) {
-    let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value.toLowerCase(), this.level);
-    this.service.getJson(urlData.url, urlData.type).subscribe((result: any) => {
-      this.topologyData = result;
-      // this.nodes = this.topologyData.nodes
-      console.log(this.topologyData)
-    }, (error) => {
-      console.log(error)
-    }, () => {
-      this.updateDiagram(this.topologyData);
-    })
+    const { url, type } = this.service.jsonUrl(this.topologyForm.get('type')?.value.toLowerCase(), this.level);
+    this.service.getJson(url, type).subscribe(
+      (result: any) => {
+        this.topologyData = result;
+      },
+      (error) => {
+        console.log(error);
+      },
+      () => {
+        this.updateDiagram(this.topologyData);
+      }
+    );
   }
   levelChange() {
     this.level = this.topologyForm.get('level')?.value;
@@ -134,6 +159,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   selectAmplitude($event: any) {
 
   }
+
   e2eChange(data: string) {
     if (data == 'target') {
       this.e2e.targetFidelity = this.appSettingsForm.get('targetFidelity')?.value
@@ -331,14 +357,15 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     })
   }
   getAppSetting(app_id: any) {
+
     switch (app_id) {
       case 2: this.appConfig = {
         sender: this.appSettingsForm.get('sender')?.value,
         receiver: this.appSettingsForm.get('receiver')?.value,
         startTime: 1e12,
-        size: 6,
+        size: this.appSettingsForm.get('size')?.value,
         priority: 0,
-        targetFidelity: 0.5,
+        targetFidelity: this.appSettingsForm.get('targetFidelity')?.value,
         timeout: 2e12
       }
         // console.log(this.appConfig)
@@ -357,10 +384,10 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       }
         break;
       case 4: this.appConfig = {
-        node1: this.appSettingsForm.get('node1')?.value,
-        node2: this.appSettingsForm.get('node2')?.value,
-        node3: this.appSettingsForm.get('node3')?.value,
-        middleNode: this.appSettingsForm.get('middleNode')?.value
+        endnode1: this.appSettingsForm.get('endnode1')?.value,
+        endnode2: this.appSettingsForm.get('endnode2')?.value,
+        endnode3: this.appSettingsForm.get('endnode3')?.value,
+        middlenode: this.appSettingsForm.get('middleNode')?.value
       }
         break;
       case 5: this.appConfig = {
@@ -373,7 +400,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       case 6: this.appConfig = {
         sender: this.appSettingsForm.get('sender')?.value,
         receiver: this.appSettingsForm.get('receiver')?.value,
-        sequenceLength: "3",
+        sequenceLength: 2,
         message: this.appSettingsForm.get('message')?.value
       }
         break;

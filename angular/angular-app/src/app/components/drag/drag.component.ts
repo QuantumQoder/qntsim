@@ -201,6 +201,12 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         if (idx >= 0) document.title = document.title.slice(0, idx);
       }
     });
+    this.myDiagram.addDiagramListener("SelectionMoved", e => {
+      console.log(this.myDiagram.selection)
+    })
+    this.myDiagram.addDiagramListener("PartCreated", e => {
+      console.log(this.myDiagram.selection)
+    })
 
     function makePort(name: any, spot: any, output: any, input: any) {
       // the port is basically just a small transparent square
@@ -997,14 +1003,10 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     console.log(node.data);
     this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
     this.savedModel = this.myDiagram.model;
-    // if (node.data.text == 'Service' || node.data.text == 'End') {
-    //   alert("Configure your Node Name inorder to modify its settings.")
-    // }
-    // else {
-    // this.saveDiagramProperties();
+
     this.graphModel = this.myDiagram.model.nodeDataArray
     console.log(this.savedModel.linkDataArray)
-
+    console.log(this.graphModel)
     console.log(this.selectedNode);
     var key = this.selectedNode.key
     if (this.nodes.length != 0) {
@@ -1051,16 +1053,30 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   showProperties(e: any, obj: any) {  // executed by ContextMenuButton
     console.log(obj)
     var node = obj.part.adornedPart;
-    // console.log(obj.part.adornedPart)
-    // console.log(node)
     var selectedNode = this.myDiagram.findNodeForKey(node.data.key)
-    console.log(selectedNode)
+    console.log(selectedNode.key)
     if (selectedNode != null) {
       this.myDiagram.startTransaction();
       this.myDiagram.remove(selectedNode);
       this.myDiagram.commitTransaction('Removed Node!')
       console.log("Removed!!")
     }
+    if (this.myDiagram.model.nodeDataArray.length != this.nodes.length) {
+      console.log(this.myDiagram.model.nodeDataArray);
+      console.log(this.nodes);
+
+      console.log('not same');
+
+      for (var i = 0; i < this.myDiagram.model.nodeDataArray.length; i++) {
+        for (var j = -1; j > -(this.myDiagram.model.nodeDataArray.length); j--) {
+          if ((this.myDiagram.model.nodeDataArray[i] as any).key != j) {
+            console.log("key not same")
+          }
+        }
+      }
+    }
+    else
+      console.log('same')
   }
   setSpinner(value: boolean) {
     this.spinner = value

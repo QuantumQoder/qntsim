@@ -4,26 +4,26 @@ import { Injectable } from '@angular/core';
 })
 export class HoldingDataService {
   homepageData = [{
-    appId: 1, appName: 'E91', image: 'assets/images/qkd.jpg', content: 'Quantum Key Distribution'
+    appId: 1, appName: 'E91 QKD', image: 'assets/images/apps/e91.png', content: 'Entanglement-based Quantum Key Distribution'
   },
   {
-    appId: 2, appName: 'E2E', image: 'assets/images/e2e.png', content: 'End-to-End Entanglements'
+    appId: 2, appName: 'End-to-End EPR Pairs', image: 'assets/images/apps/e2e.png', content: 'End-to-End two party entanglement generation'
   }, {
-    appId: 3, appName: 'Teleportation', image: 'assets/images/teleportation1.png', content: 'Quantum Teleportation from one node to another'
+    appId: 3, appName: 'Quantum Teleportation', image: 'assets/images/apps/Teleportation.svg', content: 'Quantum Teleportation from one node to another'
   }, {
-    appId: 4, appName: 'GHZ', image: 'assets/images/GHZ2.png', content: 'Create GHZ state'
+    appId: 4, appName: 'End-to-end GHZ', image: 'assets/images/apps/GHZ.svg', content: 'End-to-End three party entanglement generation'
   }, {
-    appId: 5, appName: 'Seminal QSDC', image: 'assets/images/QSDC.png', content: 'A high capacity QKD scheme with EPR pairs'
+    appId: 5, appName: 'Seminal QSDC', image: 'assets/images/apps/SeminalQSDC.svg', content: 'A high capacity QKD scheme with EPR pairs'
   }, {
-    appId: 6, appName: 'QSDC Ping-Pong', image: 'assets/images/Crypt2.png', content: 'A Deterministic secure direct communication scheme using Entanglement'
+    appId: 6, appName: 'Ping-Pong QSDC', image: 'assets/images/apps/pingpong.svg', content: 'A deterministic secure direct communication scheme using EPR pairs'
   }, {
-    appId: 7, appName: 'Arbitrary basis QSDC', image: 'assets/images/Crypt4.png', content: 'An arbitrary basis QSDC scheme with mutual user authentication'
+    appId: 7, appName: 'QSDC with user authentication', image: 'assets/images/apps/QSDCauthentication.svg', content: 'An arbitrary basis QSDC scheme with mutual user authentication'
   }, {
-    appId: 8, appName: 'Single Photon-QD', image: 'assets/images/single_pd.png', content: 'A node-to-node dialogue protocol using batches of single photons'
+    appId: 8, appName: 'Quantum Dialogue', image: 'assets/images/apps/SinglephotonQD.svg', content: 'A node-to-node quantum dialogue protocol using batches of single photons'
   }, {
-    appId: 9, appName: 'QSDC with Controlled Teleportation', image: 'assets/images/qtel.jpeg', content: 'A controlled teleportation scheme for QSDC'
+    appId: 9, appName: 'QSDC with Teleportation', image: 'assets/images/apps/QSDCwithCTel.svg', content: 'A teleportation scheme for QSDC'
   }, {
-    appId: 10, appName: 'IP2', image: 'assets/images/Crypt4.png', content: ''
+    appId: 10, appName: 'MDI-QSDC with user authentication', image: 'assets/images/apps/MDIQSDCauthentication.svg', content: 'AN MDI-QSDC scheme with mutual user authentication and message integrity check'
   },]
   spqd = {
     "application": {

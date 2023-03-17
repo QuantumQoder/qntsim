@@ -1,27 +1,31 @@
 {
     "appList": [
         {
-            "appName": "E91",
-            "appId": 1
-        },
-        {
-            "appName": "E2E",
+            "appName": "End to end Bell Pairs",
             "appId": 2
         },
         {
-            "appName": "Teleportation",
+            "appName": "End to end GHZ",
+            "appId": 4
+        },
+        {
+            "appName": "Quantum Teleportation",
             "appId": 3
+        },
+        {
+            "appName": "E91 QKD",
+            "appId": 1
         },
         {
             "appName": "Seminal QSDC",
             "appId": 5
         },
         {
-            "appName": "PingPong",
+            "appName": "PingPong QSDC",
             "appId": 6
         },
         {
-            "appName": "Arbitary based QSDC",
+            "appName": "Arbitrary basis QSDC",
             "appId": 7
         },
         {
@@ -29,11 +33,11 @@
             "appId": 8
         },
         {
-            "appName": "QSDC Telportation",
+            "appName": "QSDC with Telportation",
             "appId": 9
         },
         {
-            "appName": "IP2",
+            "appName": "MDI-QSDC with user authentication",
             "appId": 10
         }
     ]
