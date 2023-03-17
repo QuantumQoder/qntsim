@@ -578,7 +578,7 @@ class Network:
                 self._strings.append(string)
         else:
             self._strings = [''.join(str(*output.values()) for output in self._outputs)]
-        self.recv_msgs = {rec[1:]:''.join(chr(int(string[j*8:-~j*8], 2)) for j in range(len(string)//8)) for rec, string in zip(list(self.messages)[::-1], self._strings[::-1])}
+        self.recv_msgs = {rec[1:]:''.join(chr(int(string[j*8:-~j*8], 2)) for j in range(len(string)//8)) for rec, string in zip(list(self.messages)[::-1], self._strings)}
         for k, v in self.recv_msgs.items():
             logging.info(f'Received message {k}: {v}')
         

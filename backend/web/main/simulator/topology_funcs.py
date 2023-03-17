@@ -59,7 +59,7 @@ def network_graph(network_topo,source_node_list,report):
     execution_time = 3
     performance["latency"]    = latency
     performance["fidelity"]   = fidelity
-    # performance["throughput"] = through
+    performance["throughput"] = through
 
     # graph["throughput"]["fully_complete"]= fc_throughl  
     # graph["throughput"]["partially_complete"]= pc_throughl
@@ -270,6 +270,7 @@ def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
     bob = network_topo.nodes[receiver]
     tel= Teleportation()
     alice,bob,source_node_list=tel.roles(alice,bob)
+    print('source node', source_node_list)
     tl.init()
     tl.run()
     results = tel.run(alice,bob,amplitude1,amplitude2)
@@ -307,7 +308,9 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     res={}
     res["input_message"] = message
     # res["input_message2"] = message2
-    res["output_message"] = protocol.recv_msgs_list[0][1]
+    print("protocol.recv_msgs_list",protocol.recv_msgs_list)
+    result = list(protocol.recv_msgs_list[0].values())
+    res["output_message"] = result[0]
     # res["output_message2"] = protocol.recv_msgs_list[0][2]
     res["attack"] = attack
     res["error"] = mean(protocol.mean_list)
@@ -371,28 +374,33 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     messages = {(sender,receiver):message1,(receiver,sender):message2}
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
     tl.init()
-    topo_json = json_topo(network_config_json)
-    print('network config json', network_topo)
-    with open("topology.json", "w") as outfile:
-        json.dump(topo_json, outfile)
+    # topo_json = json_topo(network_config_json)
+    # print('network config json', network_topo)
+    # with open("topology.json", "w") as outfile:
+    #     json.dump(topo_json, outfile)
     # messages = {(1, 2):'hello', (2, 1):'world'}
     # attack=None
-    topology = '/code/topology.json'
+    topology = '/code/web/configs/singlenode.json'
     print('topology', topology)
     protocol = Protocol(name='qd_sp', messages_list=[messages], attack=attack)
     protocol(topology=topology)
-    print("protocol.recv_msgs_list",protocol.recv_msgs_list)
+    print("protocol.recv_msgs_list",list(protocol.recv_msgs_list[0].values()))
     print("mean(protocol.mean_list)",mean(protocol.mean_list))
     res={}
+    result = list(protocol.recv_msgs_list[0].values())
     res["input_message1"] = message1
     res["input_message2"] = message2
-    res["output_message1"] = protocol.recv_msgs_list[-1][1]
-    res["output_message2"] = protocol.recv_msgs_list[-1][2]
+    res["output_message1"] = result[0]
+    res["output_message2"] = result[1]
     res["attack"] = attack
     res["error"] = protocol.mean_list[-1]
     report = {}
     end_time = time.time()
     execution_time = end_time-start_time
+    source_node_list = [sender]
+    # report=network_graph(network_topo,source_node_list,report)
+    # report["performance"]["execution_time"] = execution_time
+   
     # report["performance"]["execution_time"] = execution_time
     report["application"] = res
     
@@ -545,24 +553,34 @@ def mdi_qsdc(network_config, sender, receiver, message, attack):
     print('network',network,basis)
 
 
-def ip2(network_config,input_messages,ids,num_check_bits,num_decoy):
+def ip2(network_config, alice_attrs,bob_id,threshold,num_decoy):
     report ={}
-    print("input_messages,ids,num_check_bits,num_decoy",input_messages,ids,num_check_bits,num_decoy)
-    
+    # print("input_messages,ids,num_check_bits,num_decoy",input_messages,ids,num_check_bits,num_decoy)
+    network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
+    tl.init()
+    topo_json = json_topo(network_config_json)
+    print('network config json', network_topo)
+    with open("topology.json", "w") as outfile:
+        json.dump(topo_json, outfile)
+    topology = '/code/web/topology.json'
+    sender = alice_attrs["sender"]
+    receiver = alice_attrs["receiver"]
+    input_message = alice_attrs["message"]
+    print('sender, receievre', sender, receiver)
     # network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
     # tl.init()
     # topo_json = json_topo(network_config_json)
     # print('network config json', network_topo)
     # with open("topology.json", "w") as outfile:
     #     json.dump(topo_json, outfile)
-    alice_attrs = {'message':{(1, 2):'011010'},
+    alice_attrs = {'message':{(sender, receiver):'011010'},
                    'id':'1011',
                    'check_bits':4}
     bob_id = '0111'
     num_decoy_photons = 4
     threshold = 0.2 # error threshold
     attack = (None, None)
-    topology = '/code/web/configs/2n_linear.json'
+    # topology = '/code/web/configs/2n_linear.json'
     results = ip2_run(topology=topology,
                   alice_attrs=alice_attrs,
                   bob_id=bob_id,
@@ -572,18 +590,23 @@ def ip2(network_config,input_messages,ids,num_check_bits,num_decoy):
     # results=ip2_run(topology,input_messages,ids,num_check_bits,num_decoy,attack)
     # report["application"]=results
     # return report
-
+    print('results', results[1][0])
     res={}
-    res["input_message"] = list(input_messages.values())
-    res["ids"] = ids
-    res["check_bits"] = num_check_bits
-    res["num_decoys"] = num_decoy
+    res["input_message"] = input_message
+    res["alice_id"] = alice_attrs["id"]
+    res["alice_check_bits"] = alice_attrs["check_bits"]
+    res["bob_id"] = bob_id
+    res["threshold"] = threshold
+    res["num_decoy"] = num_decoy
     res["output_msg"] = results[0]
-    res["error"] = results[1]
+    res["avg_error"] = results[1][0]
+    res["standard_deviation"] = results[1][1]
+    res["info_leaked"] = results[1][2]
+    res["msg_fidelity"] = results[1][3]
     # report = {}
     report["application"] = res
     end_time = time.time()
-    execution_time = end_time-start_time
-    report["performance"]["execution_time"] = execution_time
+    # execution_time = end_time-start_time
+    # report["performance"]["execution_time"] = execution_time
     print('report',report)
     return report
