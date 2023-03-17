@@ -35,6 +35,7 @@
     "gojs": "^1.8.27",
     "gojs-angular": "^2.0.6",
     "jquery": "^3.6.1",
+    "katex": "^0.16.4",
     "material-icons": "^1.12.0",
     "ng-katex": "^2.0.3",
     "ng-particles": "^3.3.3",
