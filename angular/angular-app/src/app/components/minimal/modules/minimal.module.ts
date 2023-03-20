@@ -8,7 +8,6 @@ import { DialogModule } from 'primeng/dialog';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { MinimalComponent } from '../minimal.component';
 import { SliderModule } from 'primeng/slider';
-import { KatexModule } from 'ng-katex';
 @NgModule({
     imports: [
         CommonModule,
@@ -16,7 +15,7 @@ import { KatexModule } from 'ng-katex';
         SliderModule,
         ReactiveFormsModule,
         DialogModule,
-        KatexModule,
+
         RadioButtonModule
     ],
     declarations: [MinimalComponent],

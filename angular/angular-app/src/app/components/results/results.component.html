@@ -312,27 +312,6 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- <h5>Node: Receiver</h5>
-                <div class="row">
-                    <table id="table2" class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th class="col">Memory Index</th>
-                                <th class="col">Current Node</th>
-                                <th class="col">Entangled Node</th>
-                                <th class="col">Fidelity</th>
-                                <th class="col">Entanglement Time</th>
-                                <th class="col">Expiry Time</th>
-                                <th class="col">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let item of data.receiver">
-                                <th *ngFor="let item of item">{{item}}</th>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div> -->
             </div>
         </div>
         <div *ngIf="app_id==3">
@@ -429,15 +408,16 @@
                 End-to-End GHZ protocol
             </div>
             <br>
+            <div class="row">
+                <h5 class="text-center col-12">Performance parameters of the
+                    constructed network topology</h5>
+            </div>
+            <br>
             <div class="col">
                 <div class="row">
                     <table class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
-
-                                <th class="col table-secondary text-center">Source</th>
-                                <th class="col table-secondary text-center">Destination</th>
-                                <th class="col table-secondary text-center">Demand Size</th>
                                 <th class="col table-secondary text-center">Execution Time</th>
                                 <th class="col table-secondary text-center">Fidelity</th>
                                 <th class="col table-secondary text-center">Success Rate</th>
@@ -446,10 +426,6 @@
                         </thead>
                         <tbody>
                             <tr>
-
-                                <td class="col text-center">e1</td>
-                                <td class="col text-center">e2</td>
-                                <td class="col text-center">2</td>
                                 <td class="col text-center">{{performance.execution_time}}&nbsp;secs</td>
                                 <td class="col text-center">{{performance.fidelity}}</td>
                                 <td class="col text-center">{{performance.throughput}}</td>
@@ -459,17 +435,14 @@
                     </table>
                 </div>
             </div>
-
-            <h5 class="text-center">Three party GHZ state has been prepared with the help of three two party
-                entanglement of
-                three end nodes with a common
-                central service node.​</h5>
+            <br>
+            <h5 class="text-center">A three-party GHZ state is prepared by utilizing three two-party entanglements of
+                three end nodes with a
+                shared central service node.</h5>
             <br>
 
-            <h5 class="text-center">Quantum state of two-party entanglement at all three end nodes with common central
-                node
-                who wanted to create GHZ state
-                between each other.</h5>
+            <h5 class="text-center">The three end nodes, aiming to create a GHZ state among themselves, achieve a
+                quantum state of two-party entanglement facilitated by common central node as shown below.</h5>
             <div class="row">
                 <div class="col">
                     <table class="table table-bordered">
@@ -478,13 +451,13 @@
                                 <th class="col">
                                     Node 1
                                 </th>
-                                <th class="col">E1</th>
+                                <th class="col">Quantum State</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td rowspan="2" class="col">
-                                    Initial Entanglement state (2party)​
+                                    Initial Entanglement state (2 party)​
                                 </td>
                                 <td>State: {{data.initial_alice_state}}</td>
                             </tr>
@@ -505,13 +478,13 @@
                                 <th class="col">
                                     Node 2
                                 </th>
-                                <th class="col">E2</th>
+                                <th class="col">Quantum State</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td rowspan="2" class="col">
-                                    Initial Entanglement state (2party)​
+                                    Initial Entanglement state (2 party)​
                                 </td>
                                 <td>State: {{data.initial_bob_state}}</td>
                             </tr>
@@ -532,13 +505,13 @@
                                 <th class="col">
                                     Node 3
                                 </th>
-                                <th class="col">E3</th>
+                                <th class="col">Quantum State</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td rowspan="2" class="col">
-                                    Initial Entanglement state (2party)​
+                                    Initial Entanglement state (2 party)​
                                 </td>
                                 <td>State: {{data.initial_charlie_state}}</td>
                             </tr>
@@ -556,9 +529,41 @@
         </div>
         <div *ngIf="app_id==7">
             <div class="display-4 text-left col-9">
-                IP1
+                Arbitrary basis QSDC with mutual user authentication
             </div>
-
+            <div class="row">
+                <h5 class="text-center col-12">Performance parameters of the
+                    constructed network topology</h5>
+                <!-- <div class="text-right col-2">
+                                <button class="btn btn-outline-primary" (click)="info_1()"><i class="pi pi-question"></i></button>
+                            </div> -->
+            </div>
+            <div class="row">
+                <table class="table table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col table-secondary text-center">Source</th>
+                            <th class="col table-secondary text-center">Destination</th>
+                            <th class="col table-secondary text-center">Demand Size</th>
+                            <th class="col table-secondary text-center">Execution Time</th>
+                            <th class="col table-secondary text-center">Fidelity</th>
+                            <th class="col table-secondary text-center">Success Rate</th>
+                            <th class="col table-secondary text-center">Latency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="col text-center">e1</td>
+                            <td class="col text-center">e2</td>
+                            <td class="col text-center">2</td>
+                            <td class="col text-center">{{performance.execution_time}}&nbsp;secs</td>
+                            <td class="col text-center">{{performance.fidelity}}</td>
+                            <td class="col text-center">{{performance.throughput}}</td>
+                            <td class="col text-center">{{performance.latency}}&nbsp;secs</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             <div class="text-right col-2">
                 <button class="btn btn-outline-primary" (click)="info_qsdc()" style="margin-top: 18px;"><i
                         class="pi pi-question"></i></button>
@@ -568,7 +573,7 @@
                 <thead class="table-primary">
                     <tr>
                         <td class="col">
-                            Sender's (Alice: E1) Input Message
+                            Sender's Input Message
                         </td>
                         <td class="col">
                             {{data.input_message}}
@@ -578,14 +583,14 @@
                 <tbody>
                     <tr class="table-secondary">
                         <td class="col">
-                            Security Checked
+                            Security Check
                         </td>
                         <td class="col">
                             {{data.Security_msg}}
                         </td>
                     </tr>
                     <tr class="table-secondary">
-                        <td class="col">IdA Authentication</td>
+                        <td class="col">Identity Authentication (IdA)</td>
                         <td class="col">{{data.IdA_msg}}</td>
                     </tr>
                     <tr class="table-secondary">
@@ -605,13 +610,16 @@
                         </td>
                     </tr>
                     <tr class="table-secondary">
-                        <td colspan="2" class="col">
+                        <td class="col">
+                            Identity Authentication Check
+                        </td>
+                        <td class="col">
                             {{data.display_msg}}
                         </td>
                     </tr>
                     <tr class="table-primary">
                         <td class="col">
-                            Receiver's (Bob: E2) Output message
+                            Received message
                         </td>
                         <td class="col">
                             {{data.bob_message}}
@@ -711,19 +719,51 @@
         <div *ngIf="app_id==6">
             <div class="row">
                 <div class="display-4 text-left col-9">
-                    PingPong
+                    Ping-Pong QSDC protocol
                 </div>
                 <div class="text-right col-2">
                     <button class="btn btn-outline-primary" (click)="info_qsdc()" style="margin-top: 18px;"><i
                             class="pi pi-question"></i></button>
                 </div>
             </div>
+            <div class="row">
+                <h5 class="text-center col-12">Performance parameters of the
+                    constructed network topology</h5>
+            </div>
+            <div class="row">
+                <table class="table table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col table-secondary text-center">Source</th>
+                            <th class="col table-secondary text-center">Destination</th>
+                            <th class="col table-secondary text-center">Demand Size</th>
+                            <th class="col table-secondary text-center">Execution Time</th>
+                            <th class="col table-secondary text-center">Fidelity</th>
+                            <th class="col table-secondary text-center">Success Rate</th>
+                            <th class="col table-secondary text-center">Latency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="col text-center">e1</td>
+                            <td class="col text-center">e2</td>
+                            <td class="col text-center">2</td>
+                            <td class="col text-center">{{performance.execution_time}}&nbsp;secs</td>
+                            <td class="col text-center">{{performance.fidelity}}</td>
+                            <td class="col text-center">{{performance.throughput}}</td>
+                            <td class="col text-center">{{performance.latency}}&nbsp;secs</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <br>
+            <h5>Execution Outputs:<u></u></h5>
             <br>
             <table class="table table-bordered">
                 <thead class="table-primary">
                     <tr>
                         <td class="col">
-                            Sender's (Alice: E1) Input message
+                            Sender message
                         </td>
                         <td class="col">
                             {{data.message_transmitted}}
@@ -733,7 +773,7 @@
                 <tbody>
                     <tr class="table-secondary">
                         <td class="col">
-                            EvesDrop
+                            Eavesdropping check
                         </td>
                         <td class="col">
                             {{data.Eve_presence}}
@@ -752,7 +792,7 @@
                     </tr>
                     <tr class="table-primary">
                         <td class="col">
-                            Receiver (Bob: E2) Output message ​
+                            Received message ​
                         </td>
                         <td class="col">
                             {{data.message_received}}
@@ -773,6 +813,33 @@
                 </div>
             </div>
             <br>
+            <div class="row">
+                <table class="table table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col table-secondary text-center">Source</th>
+                            <th class="col table-secondary text-center">Destination</th>
+                            <th class="col table-secondary text-center">Demand Size</th>
+                            <th class="col table-secondary text-center">Execution Time</th>
+                            <th class="col table-secondary text-center">Fidelity</th>
+                            <th class="col table-secondary text-center">Success Rate</th>
+                            <th class="col table-secondary text-center">Latency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="col text-center">e1</td>
+                            <td class="col text-center">e2</td>
+                            <td class="col text-center">2</td>
+                            <td class="col text-center">{{performance.execution_time}}&nbsp;secs</td>
+                            <td class="col text-center">{{performance.fidelity}}</td>
+                            <td class="col text-center">{{performance.throughput}}</td>
+                            <td class="col text-center">{{performance.latency}}&nbsp;secs</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <br>
             <div class="lead">
                 <strong>Sender Messages</strong>
             </div>
@@ -781,10 +848,10 @@
                 <thead>
                     <tr class="table-primary">
                         <td class="col">
-                            Party 1 Message
+                            Participant 1: Sent message
                         </td>
                         <td class="col">
-                            Party 2 Message
+                            Participant 2: Sent message
                         </td>
                     </tr>
                     <tr>
@@ -832,10 +899,10 @@
                 <thead>
                     <tr class="table-primary">
                         <td class="col">
-                            Party 1 Received Message
+                            Participant 1: Received Message
                         </td>
                         <td class="col">
-                            Party 2 Received Message
+                            Participant 2: Received Message
                         </td>
                     </tr>
                     <tr>
@@ -858,6 +925,37 @@
                     <button class="btn btn-outline-primary" (click)="info('qsdct')" style="margin-top: 18px;"><i
                             class="pi pi-question"></i></button>
                 </div>
+            </div>
+            <br>
+            <div class="row">
+                <h5 class="text-center col-12">Performance parameters of the
+                    constructed network topology</h5>
+            </div>
+            <div class="row">
+                <table class="table table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col table-secondary text-center">Source</th>
+                            <th class="col table-secondary text-center">Destination</th>
+                            <th class="col table-secondary text-center">Demand Size</th>
+                            <th class="col table-secondary text-center">Execution Time</th>
+                            <th class="col table-secondary text-center">Fidelity</th>
+                            <th class="col table-secondary text-center">Success Rate</th>
+                            <th class="col table-secondary text-center">Latency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="col text-center">e1</td>
+                            <td class="col text-center">e2</td>
+                            <td class="col text-center">2</td>
+                            <td class="col text-center">{{performance.execution_time}}&nbsp;secs</td>
+                            <td class="col text-center">{{performance.fidelity}}</td>
+                            <td class="col text-center">{{performance.throughput}}</td>
+                            <td class="col text-center">{{performance.latency}}&nbsp;secs</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <br>
             <table class="table table-bordered">
@@ -909,6 +1007,37 @@
             <div class="text-right col-2">
                 <button class="btn btn-outline-primary" (click)="info_qsdc_1('ip1')" style="margin-top: 18px;"><i
                         class="pi pi-question"></i></button>
+            </div>
+            <br>
+            <div class="row">
+                <h5 class="text-center col-12">Performance parameters of the
+                    constructed network topology</h5>
+            </div>
+            <div class="row">
+                <table class="table table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col table-secondary text-center">Source</th>
+                            <th class="col table-secondary text-center">Destination</th>
+                            <th class="col table-secondary text-center">Demand Size</th>
+                            <th class="col table-secondary text-center">Execution Time</th>
+                            <th class="col table-secondary text-center">Fidelity</th>
+                            <th class="col table-secondary text-center">Success Rate</th>
+                            <th class="col table-secondary text-center">Latency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="col text-center">e1</td>
+                            <td class="col text-center">e2</td>
+                            <td class="col text-center">2</td>
+                            <td class="col text-center">{{performance.execution_time}}&nbsp;secs</td>
+                            <td class="col text-center">{{performance.fidelity}}</td>
+                            <td class="col text-center">{{performance.throughput}}</td>
+                            <td class="col text-center">{{performance.latency}}&nbsp;secs</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <br>
             <table class="table table-bordered">
