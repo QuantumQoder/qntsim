@@ -17,6 +17,9 @@ from rest_framework.views import APIView
 from rest_framework import mixins, generics
 from main.serializers import ApplicationSerializer
 from main.models import Applications,Results
+import importlib
+from main.simulator import topology_funcs
+import qntsim
 
 
 def home(request):
@@ -53,7 +56,7 @@ class RunApp(APIView):
 
     def post(self,request):
         
-
+        importlib.reload(qntsim)
         print('request', request.data.get('topology'))
         topology = request.data.get('topology')
         application_id = request.data.get('application')
@@ -96,6 +99,7 @@ class RunApp(APIView):
         # graphs = results.get('graph')
         # output = results.get('results')
         output = results
+       
         # print('graphs', graphs)
         # print('output', output)
         # print('request user', request.user)

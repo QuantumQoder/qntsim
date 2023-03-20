@@ -25,6 +25,46 @@ from random import shuffle
 from qntsim.library.protocol import Protocol
 from statistics import mean
 import time
+import numpy as np
+import importlib
+
+def display_quantum_state(state_vector):
+    """
+    Converts a quantum state vector to Dirac notation and returns it as a string.
+
+    Parameters:
+    state_vector (numpy.ndarray): An array representing a quantum state vector.
+
+    Returns:
+    str: A string representing the input state vector in Dirac notation.
+    """
+
+    # Normalize the state vector to ensure its Euclidean norm is equal to 1.
+    norm = np.linalg.norm(state_vector)
+    if norm < 1e-15:
+        return "Invalid state: zero norm"
+    normalized_state = state_vector / norm
+
+    # Determine the number of qubits required to represent the state vector.
+    dim = len(normalized_state)
+    num_digits = int(np.ceil(np.log2(dim)))
+
+    # Generate a list of all possible basis states and initialize the output string.
+    basis_states = [format(i, f"0{num_digits}b") for i in range(dim)]
+    output_str = ""
+
+    # Iterate over the basis states and add their contribution to the output string.
+    for i in range(dim):
+        coeff = normalized_state[i]
+        if abs(coeff) > 1e-15:  # Ignore small coefficients that round to 0.
+            if abs(coeff.imag) > 1e-15:  # Handle complex coefficients.
+                output_str += (f"({coeff.real:.2f}" if coeff.real > 0 else "(") + ("+" if coeff.real > 0 and coeff.imag > 0 else "") + f"{coeff.imag:.2f}j)|" + basis_states[i] + "> + "
+            else:
+                output_str += f"({coeff.real:.2f})|" + basis_states[i] + "> + "
+    output_str = output_str[:-3]  # Remove the trailing " + " at the end.
+
+    return output_str
+
 
 def graph_topology(network_config_json):
     
@@ -179,6 +219,7 @@ def ghz(network_config, endnode1, endnode2, endnode3, middlenode):
     tl.init()
     tl.run()  
     results = ghz.run(alice,bob,charlie,middlenode)
+    results = {k:display_quantum_state(state) for k, state in results.items()}
     report={}
     report["application"]=results
     end_time = time.time()
@@ -309,7 +350,8 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     res["input_message"] = message
     # res["input_message2"] = message2
     print("protocol.recv_msgs_list",protocol.recv_msgs_list)
-    result = list(protocol.recv_msgs_list[0].values())
+    result = list(protocol.recv_msgs_list[-1].values())
+    print(protocol)
     res["output_message"] = result[0]
     # res["output_message2"] = protocol.recv_msgs_list[0][2]
     res["attack"] = attack
@@ -384,10 +426,11 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     print('topology', topology)
     protocol = Protocol(name='qd_sp', messages_list=[messages], attack=attack)
     protocol(topology=topology)
-    print("protocol.recv_msgs_list",list(protocol.recv_msgs_list[0].values()))
+   
+    print("protocol.recv_msgs_list",protocol.recv_msgs_list[-1])
     print("mean(protocol.mean_list)",mean(protocol.mean_list))
     res={}
-    result = list(protocol.recv_msgs_list[0].values())
+    result = list(protocol.recv_msgs_list[-1].values())
     res["input_message1"] = message1
     res["input_message2"] = message2
     res["output_message1"] = result[0]
@@ -398,6 +441,7 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     end_time = time.time()
     execution_time = end_time-start_time
     source_node_list = [sender]
+
     # report=network_graph(network_topo,source_node_list,report)
     # report["performance"]["execution_time"] = execution_time
    
