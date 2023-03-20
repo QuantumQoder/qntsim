@@ -1,6 +1,6 @@
-import { HttpHeaders } from '@angular/common/http';
-import { AfterViewInit, Component, HostListener, OnChanges, OnInit, SimpleChanges, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, FormControl, Validators } from '@angular/forms';
+
+import { AfterViewInit, Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -8,7 +8,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as go from 'gojs'
 import { ConfirmationService, MenuItem, Message, MessageService } from 'primeng/api';
 import { ApiServiceService } from 'src/services/api-service.service';
-//import { Interface } from 'readline';
+
 import { ConditionsService } from 'src/services/conditions.service';
 // import { GameComponent } from '../game/game.component';
 @Component({
@@ -18,7 +18,7 @@ import { ConditionsService } from 'src/services/conditions.service';
   providers: [MessageService, ConfirmationService],
   encapsulation: ViewEncapsulation.None
 })
-export class DragComponent implements OnInit, AfterViewInit, OnChanges {
+export class DragComponent implements OnInit, AfterViewInit {
   position_popover: string = 'top'
   info: boolean;
   link_array: any = []
@@ -26,6 +26,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   nodeParams: boolean
   link: boolean
   tutorial: boolean;
+  checked: boolean = false;
   memory: any = {
     "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93
   }
@@ -47,7 +48,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   ghz: any
   firstqsdc: any;
   ip2: any
-  game: boolean
   graphModel: any
   nodes: any = []
   selectedNode1: any
@@ -62,6 +62,7 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     'attenuation': new FormControl('0.00001'),
     'distance': new FormControl('70')
   })
+  breadcrumbItems: MenuItem[]
   public selectedNode: any;
   public selectedLink: any
   visibleSideNav: boolean
@@ -76,112 +77,16 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     nodeDataArray: [],
     linkDataArray: []
   }
-  public savedModel: any = {
-    class: "go.GraphLinksModel",
-    linkFromPortIdProperty: "fromPort",
-    linkToPortIdProperty: "toPort",
-    nodeDataArray: [{ figure: "Ellipse", fill: "#00AD5F", key: -1, loc: "790 230", text: "node1", __gohashid: 1282 },
-    { figure: "Circle", fill: "#CE0620", key: -2, loc: "390 100", text: "node2", __gohashid: 2055 },
-    { figure: "Circle", fill: "#CE0620", key: -3, loc: "1160 100", text: "node3", __gohashid: 3087 },
-    { figure: "Circle", fill: "#CE0620", key: -4, loc: "790 460", text: "node4", __gohashid: 4088 }],
-    linkDataArray: [{
-      "points": {
-        "__gohashid": 4712,
-        "P": true,
-        "n": [{ "x": 441, "y": 100 }, { "x": 451, "y": 100 }, { "x": 590, "y": 100 }, { "x": 590, "y": 230 }, { "x": 729, "y": 230 }, { "x": 739, "y": 230 }], "F": 8, "Gb": null, "Ti": null
-      },
-      "__gohashid": 4047,
-      "from": -2,
-      "to": -1
-    },
-    {
-      "points": {
-        "__gohashid": 13600,
-        "P": true,
-        "n": [
-          {
-            "x": 790,
-            "y": 281
-          },
-          {
-            "x": 790,
-            "y": 291
-          },
-          {
-            "x": 790,
-            "y": 345
-          },
-          {
-            "x": 800,
-            "y": 345
-          },
-          {
-            "x": 800,
-            "y": 399
-          },
-          {
-            "x": 800,
-            "y": 409
-          }
-        ],
-        "F": 8,
-        "Gb": null,
-        "Ti": null
-      },
-      "__gohashid": 12833,
-      "from": -1,
-      "to": -4
-    },
-    {
-      "points": {
-        "__gohashid": 19084,
-        "P": true,
-        "n": [
-          {
-            "x": 841,
-            "y": 230
-          },
-          {
-            "x": 851,
-            "y": 230
-          },
-          {
-            "x": 975,
-            "y": 230
-          },
-          {
-            "x": 975,
-            "y": 100
-          },
-          {
-            "x": 1099,
-            "y": 100
-          },
-          {
-            "x": 1109,
-            "y": 100
-          }
-        ],
-        "F": 8,
-        "Gb": null,
-        "Ti": null
-      },
-      "__gohashid": 17651,
-      "from": -1,
-      "to": -3
-    }
-    ]
-  }
+  public savedModel: any = this.savedModel1
   links: any = [];
   msgs: Message[] = [];
   application: any;
   qtel: any;
   spqd: any;
+  activeIndex: number;
   constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private _route: Router, private modal: NgbModal, private confirmationService: ConfirmationService) { }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log(this.myDiagram.nodes)
-  }
+
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
     this.step = 0;
@@ -306,8 +211,8 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       makePort("R", go.Spot.Right, true, true),
       makePort("B", go.Spot.Bottom, true, false),
     { // handle mouse enter/leave events to show/hide the ports
-      mouseEnter: function (e: any, node: any) { showSmallPorts(node, true); },
-      mouseLeave: function (e: any, node: any) { showSmallPorts(node, false); }
+      mouseEnter: function (e: any, node: any) { },
+      mouseLeave: function (e: any, node: any) { }
     }
 
     var linkSelectionAdornmentTemplate =
@@ -421,34 +326,25 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     this.myDiagram.addDiagramListener("ChangedSelection", function (event) {
       console.log("selection changed")
     })
-    var nodesarray = this.savedModel.nodeDataArray
-    let linkArray = this.savedModel.linkDataArray
-    var nodereq
-    console.log(nodesarray)
-    var nodelength = nodesarray.length
-    // console.log(linkArray)
-    for (var i = 0; i < nodelength; i++) {
-      var type;
-      if (nodesarray[i].figure == "Ellipse") {
-        type = 'service'
-      } else {
-        type = 'end'
-      }
-      console.log(type)
-      var namevar = {
-        0: 'node1',
-        1: 'node2',
-        2: 'node3',
-        3: 'node4'
-      }
-      nodereq = {
+    const nodesarray = this.savedModel.nodeDataArray;
+    const linkArray = this.savedModel.linkDataArray;
+    const namevar = {
+      0: 'node1',
+      1: 'node2',
+      2: 'node3',
+      3: 'node4'
+    };
+    console.log(nodesarray);
+    for (let i = 0; i < nodesarray.length; i++) {
+      const type = (nodesarray[i].figure === "Ellipse") ? "service" : "end";
+      console.log(type);
+      const nodereq = {
         "Name": namevar[i],
         "Type": type,
         "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
         "memory": this.memory
-      }
-
-      this.nodes.push(nodereq)
+      };
+      this.nodes.push(nodereq);
     }
     let array = []
     var linkreq
@@ -483,31 +379,16 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         cc.push([this.nodes[i].Name, this.nodes[j].Name]);
       }
     }
-    if (cc.length != 0) {
-      var distance
-      var delay
+    if (cc.length) {
       for (var i = 0; i < cc.length; i++) {
-        if (cc[i][0] == cc[i][1]) {
-          distance = 0;
-          delay = 0;
-        } else {
-          distance = 1000;
-          delay = 1000000000;
-        }
-        let ccreq = {
-          Nodes: cc[i],
-          Delay: delay,
-          Distance: distance
-        }
-        this.cc.push(ccreq)
+        var [node1, node2] = cc[i];
+        var [distance, delay] = node1 == node2 ? [0, 0] : [1000, 10000000000];
+        this.cc.push({ Nodes: [node1, node2], Delay: delay, Distance: distance });
       }
     }
     console.log(this.links)
     console.log(this.nodes)
     this.load();
-    // document.getElementById("openModalButton")!.click();
-    // this.confirm();
-
   }
   confirm() {
     this.confirmationService.confirm({
@@ -530,9 +411,26 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   ngOnInit(): void {
 
     // init for these samples -- you don't need to call this
-
+    this.activeIndex = 0
     this.app_id = localStorage.getItem('app_id')
     this.application = localStorage.getItem('app')
+    this.breadcrumbItems = [{
+      label: '1.Setup Topology', command: () => {
+        this.activeIndex = 0;
+        console.log(this.activeIndex)
+      }
+    }, {
+      label: '2.Configure Nodes', command: () => {
+        this.activeIndex = 1
+        console.log(this.activeIndex)
+      }
+    },
+    {
+      label: '3.Application Settings', command: () => {
+        this.activeIndex = 2
+        console.log(this.activeIndex)
+      }
+    }]
 
     this.e2e = this.fb.group({
       'sender': new FormControl(''),
@@ -602,6 +500,16 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       'inputMessage': new FormControl('')
     })
     this.showBottomCenter();
+  }
+  preloadTopology() {
+    if (this.checked == true) {
+      this.apiService.getSavedModel().subscribe((data) => {
+        this.savedModel = data;
+        this.load();
+      })
+    } else if (this.checked == false) {
+      this.savedModel = this.savedModel1
+    }
   }
   info_demo() {
     this.info = true;
@@ -684,17 +592,12 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       console.log(key)
       let positivekey = key.toString().substring(1)
       var indexFromKey = positivekey - 1
-      if (this.selectedNode.figure === "Ellipse") {
-        type = 'service'
-      } else {
-        type = 'end'
-      }
+      type = this.selectedNode.figure === "Ellipse" ? 'service' : 'end'
       var node = this.myDiagram.model.findNodeDataForKey(key)
       this.myDiagram.model.startTransaction('modified property');
       this.myDiagram.model.set(node, "text", this.toolbox.get('name')?.value);
       this.myDiagram.model.commitTransaction('modified property');
-      // this.myDiagram.model.nodeDataArray.splice(indexFromKey, 1, this.savedModel.nodeDataArray[indexFromKey])
-      // this.myDiagram.model = go.Model.fromJson(this.savedModel);
+
       console.log(this.selectedNode.text)
       nodereq = {
         "Name": this.selectedNode.text,
@@ -704,47 +607,14 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       }
       localStorage.setItem("selected_node", this.selectedNode.key)
       console.log(this.savedModel.nodeDataArray)
-      // console.log(this.savedModel.nodeDataArray[indexFromKey].text)
-      // console.log(this.toolbox.get('name')?.value)
       this.savedModel.nodeDataArray[indexFromKey].text = this.toolbox.get('name')?.value
-      // console.log(this.savedModel.nodeDataArray[indexFromKey].text)
-      var allNodes = this.myDiagram.nodes
       var nodeLinkStr = this.myDiagram.links
       console.log(nodeLinkStr)
-      // while (allNodes.next()) {
-      //   var i = 0;
-      //   i += 1;
-      //   var node
-      //   node = allNodes.value
-      //   nodeLinkStr += node.data.text; //node text
-      //   var linkIt = node.findLinksOutOf();
-      //   console.log(i + ":" + linkIt)
-      //   while (linkIt.next()) { // for each link get the link text and toNode text
-      //     var link = linkIt.value;
-      //     nodeLinkStr += link.data.text;
-      //     console.log(nodeLinkStr)
-      //     nodeLinkStr += link.toNode.data.text;
-      //     console.log(nodeLinkStr)
-      //   }
-      // }
       if (this.nodes[indexFromKey] == null)
         this.nodes.splice(indexFromKey, 0, nodereq)
       if (this.nodes[indexFromKey] != null) {
         this.nodes.splice(indexFromKey, 1, nodereq)
       }
-      console.log(this.nodes)
-      console.log(indexFromKey)
-      // this.myDiagram.model = go.Model.fromJson(this.savedModel);
-
-      console.log(this.myDiagram.model)
-      // this.loadDiagramProperties();
-      // console.log("ok");
-
-      // this.myDiagram.model = go.Model.fromJson(this.savedModel);
-
-      // console.log(this.myDiagram.model)
-      // var pos = this.myDiagram.model.modelData.position;
-      // if (pos) this.myDiagram.initialPosition = go.Point.parse(pos);
     }
     if (this.link) {
       let array = []
@@ -941,10 +811,10 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
       $(go.Diagram, "myDiagramDiv",  // must name or refer to the DIV HTML element
         {
           grid: $(go.Panel, "Grid",
-            $(go.Shape, "LineH", { stroke: "lightgray", strokeWidth: 0.5 }),
-            $(go.Shape, "LineH", { stroke: "gray", strokeWidth: 0.5, interval: 10 }),
-            $(go.Shape, "LineV", { stroke: "lightgray", strokeWidth: 0.5 }),
-            $(go.Shape, "LineV", { stroke: "gray", strokeWidth: 0.5, interval: 10 })
+            $(go.Shape, "LineH", { visible: false, stroke: "lightgray", strokeWidth: 0.5 }),
+            $(go.Shape, "LineH", { visible: false, stroke: "gray", strokeWidth: 0.5, interval: 10 }),
+            $(go.Shape, "LineV", { visible: false, stroke: "lightgray", strokeWidth: 0.5 }),
+            $(go.Shape, "LineV", { visible: false, stroke: "gray", strokeWidth: 0.5, interval: 10 })
           ),
           allowDrop: true,  // must be true to accept drops from the Palette
           "draggingTool.dragsLink": true,
@@ -962,27 +832,25 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
           // rotatingTool: go.RotatingTool,  // defined below
           // "rotatingTool.snapAngleMultiple": 15,
           // "rotatingTool.snapAngleEpsilon": 15,
-          // "undoManager.isEnabled": true
+          "InitialLayoutCompleted": function (e: any) { e.diagram.addModelChangedListener(onNodeDataAdded); },
+          "undoManager.isEnabled": true,
           "panningTool.isEnabled": false
         });
     return myDiagram;
   }
   load() {
-    //var savedModel = document.getElementById("mySavedModel") as HTMLInputElement
-    // this.myDiagram.model.nodeDataArray = this.savedModel.nodeDataArray;
+
     this.myDiagram.model = go.Model.fromJson(this.savedModel)
 
-    console.log(this.myDiagram.model)
+
     this.loadDiagramProperties();  // do this after the Model.modelData has been brought into memory
   }
   saveDiagramProperties() {
     this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
-    //console.log(this.myDiagram.model.modelData.position)
+
   }
   showPositionDialog() {
-    //var savedModel = document.getElementById("mySavedModel") as HTMLInputElement
     this.saveDiagramProperties();  // do this first, before writing to JSON
-    //console.log(this.savedModel)
     this.myDiagram.isModified = false;
     this.visibleSideNav = true
     this.messageService.add({
@@ -1028,7 +896,6 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
         this.toolbox.get('noOfMemories')?.patchValue('500')
       }
     }
-
     this.visibleSideNav = true
     this.nodeParams = true
     this.link = false
@@ -1053,37 +920,37 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
   showProperties(e: any, obj: any) {  // executed by ContextMenuButton
     console.log(obj)
     var node = obj.part.adornedPart;
-    var selectedNode = this.myDiagram.findNodeForKey(node.data.key)
-    console.log(selectedNode.key)
+    console.log(node.data)
+    console.log(this.myDiagram.model.nodeDataArray)
+    // this.myDiagram.model.addNodeDataCollection(this.myDiagram.model.nodeDataArray);
+    // let selectedNode = this.myDiagram.findNodeForKey(node.data.key)
+    // console.log(selectedNode)
     if (selectedNode != null) {
       this.myDiagram.startTransaction();
-      this.myDiagram.remove(selectedNode);
+      this.myDiagram.model.removeNodeData(node.data);
       this.myDiagram.commitTransaction('Removed Node!')
       console.log("Removed!!")
     }
+    console.log(this.myDiagram.model.nodeDataArray)
     if (this.myDiagram.model.nodeDataArray.length != this.nodes.length) {
       console.log(this.myDiagram.model.nodeDataArray);
       console.log(this.nodes);
-
-      console.log('not same');
-
       for (var i = 0; i < this.myDiagram.model.nodeDataArray.length; i++) {
-        for (var j = -1; j > -(this.myDiagram.model.nodeDataArray.length); j--) {
-          if ((this.myDiagram.model.nodeDataArray[i] as any).key != j) {
-            console.log("key not same")
-          }
+        if ((this.myDiagram.model.nodeDataArray[i] as any).key == -(i + 1)) {
+        } else {
+          (this.myDiagram.model.nodeDataArray[i] as any).key = -(i + 1)
         }
       }
+
     }
-    else
-      console.log('same')
+    this.nodes = this.myDiagram.model.nodeDataArray.map((node: any) => ({
+      Name: node.text,
+      Type: node.figure == "Ellipse" ? 'service' : 'end',
+      noOfMemory: this.toolbox.get('noOfMemories')?.value,
+      memory: this.con.getMemory()
+    }));
   }
-  setSpinner(value: boolean) {
-    this.spinner = value
-  }
-  getSpinner() {
-    return this.spinner
-  }
+
   next(data: any) {
     this.step = data
     console.log(this.step)
@@ -1098,29 +965,24 @@ export class DragComponent implements OnInit, AfterViewInit, OnChanges {
     }
   }
 }
-function showToolTip(obj: any, diagram: any, tool: any) {
-  console.log(obj.part.data)
-  var toolTipDIV = document.getElementById('toolTipDIV')!;
-  var pt = diagram.lastInput.viewPoint;
-  console.log(pt)
-  toolTipDIV.style.left = (pt.x) - 13 + "px";
-  document.getElementById('toolTipParagraph')!.textContent = "" + obj.part.data.text;
-  toolTipDIV.style.display = "block";
-}
-function hideToolTip(diagram: any, tool: any) {
-  var toolTipDIV = document.getElementById('toolTipDIV')!;
-  toolTipDIV.style.display = "none";
-}
-function showSmallPorts(node: any, show: any) {
-  node.ports.each(function (port: any) {
-    if (port.portId !== "") {  //don't change the default port, which is the big shape
-      port.fill = show ? "rgba(0,0,0,.3)" : null;
-    }
-  });
-}
+
+
 export class selectedNode {
   name: string;
   key: string;
   figure: string;
 }
 
+function onNodeDataAdded(e: any) {
+  if (e.change === go.ChangedEvent.Insert && e.propertyName === "nodeDataArray" &&
+    !e.model.skipsUndoManager) {  // skip any temporary additions, such as during drag-and-drop
+    var data = e.newValue;
+    var cname = data.componentName;
+    if (!cname) cname = "node";
+    var counters = e.model.modelData;
+    var count = counters[cname] || 0;
+    count++;
+    e.model.set(counters, cname, count);
+    e.model.set(data, "text", cname + count);
+  }
+}
