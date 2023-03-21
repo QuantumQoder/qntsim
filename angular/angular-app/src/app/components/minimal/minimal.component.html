@@ -72,7 +72,7 @@
             <div id="content2">
                 <div class="mt-2 col-9 mx-auto">
                     <label for="type" class="form-label font-bold mb-2">
-                        Distance
+                        Link Length
                     </label>
                     <input type="number" formControlName="distance" class="form-control">
                 </div>
@@ -89,12 +89,12 @@
         <div id="topology" style="width:100%;height:80%;background-color:white;border: 1px solid black;"></div>
         <div style=" height:20%;width:100%;background-color: white;border: 1px solid black;"
             class="d-flex justify-content-center align-items-center">
-            <button class="btn btn-primary btn-custom"
-                [disabled]="appForm.invalid || appSettingsForm.invalid || topologyForm.invalid" (click)="runApp()">Run
+            <button class="btn btn-primary btn-custom" [disabled]="appForm.invalid || topologyForm.invalid"
+                (click)="runApp()">Run
                 Application</button>
         </div>
     </div>
-    <div class="col-3 p-0 bg-white">
+    <div class="col-custom-3 p-0 bg-white">
         <form [formGroup]="appForm">
             <h3 class="text-center display-5">Application
                 <br> Configuration
@@ -111,7 +111,16 @@
                         <p class="text-danger">Please select an application.</p>
                     </div>
                 </div>
+
+                <div *ngIf="app.value != null">
+                    <br>
+                    <p class="text-black text-center">
+                        For More Setting,<br>
+                        try <a [routerLink]="['/drag']" routerLinkActive="router-link-active">Advanced Version</a>
+                    </p>
+                </div>
             </div>
+
         </form>
         <form [formGroup]="appSettingsForm">
             <div *ngIf="appForm.get('app')?.value != '' ">
@@ -121,7 +130,7 @@
                     <label for="type" class="form-label font-bold">
                         Sender
                     </label>
-                    <select class="form-control" formControlName="sender" (change)="selectSender($event)">
+                    <select class="form-control" formControlName="sender">
                         <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                     </select>
                     <div *ngIf="sender.touched && sender.invalid">
@@ -135,7 +144,7 @@
                     <label for="type" class="form-label font-bold">
                         Receiver
                     </label>
-                    <select class="form-control" formControlName="receiver" (change)="selectReceiver($event)">
+                    <select class="form-control" formControlName="receiver">
                         <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                     </select>
                     <div *ngIf="receiver.touched && receiver.invalid">
@@ -145,22 +154,7 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 3">
-                <label for="type" class="form-label font-bold">
-                    Amplitude
-                </label>
-                <select class="form-control" formControlName="amplitude" (change)="selectAmplitude($event)">
-                    <option *ngFor="let data of equation" [ngValue]="data.value">
-                        <img [src]="data.header" alt="">
-                    </option>
-                </select>
-            </div> -->
-            <!-- <div *ngFor="let category of equation" class="field-checkbox">
-                <p-radioButton [inputId]="category.value" [value]="category.value" formControlName="amplitude"></p-radioButton>
-                <label [for]="category.value">
-                    <img [src]="category.header" alt="...">
-                </label>
-            </div> -->
+
 
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 1">
                 <label for="type" class="form-label font-bold">
@@ -194,53 +188,53 @@
                 <label for="type" class="form-label font-bold">
                     End Node 1
                 </label>
-                <select class="form-control" formControlName="endnode1" (change)="selectReceiver($event)">
+                <select class="form-control" formControlName="endnode1">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
-                <div *ngIf="node1.touched && node1.invalid">
+                <!-- <div *ngIf="node1.touched && node1.invalid">
                     <div *ngIf="node1.errors.required">
                         <p class="text-danger">Please select End Node 1.</p>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
                 <label for="type" class="form-label font-bold">
                     End Node 2
                 </label>
-                <select class="form-control" formControlName="endnode2" (change)="selectReceiver($event)">
+                <select class="form-control" autocomplete="off" formControlName="endnode2">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
-                <div *ngIf="node2.touched && node2.invalid">
+                <!-- <div *ngIf="appSettingsForm.get('endnode2').touched && node2.invalid">
                     <div *ngIf="node2.errors.required">
                         <p class="text-danger">Please select End Node 2.</p>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
                 <label for="type" class="form-label font-bold">
                     End Node 3
                 </label>
-                <select class="form-control" formControlName="endnode3" (change)="selectReceiver($event)">
+                <select class="form-control" autocomplete="off" formControlName="endnode3">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
-                <div *ngIf="node3.touched && node3.invalid">
+                <!-- <div *ngIf="node3.touched && node3.invalid">
                     <div *ngIf="node3.errors.required">
                         <p class="text-danger">Please select End Node 3.</p>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
                 <label for="type" class="form-label font-bold">
                     Central Node
                 </label>
-                <select class="form-control" formControlName="middleNode" (change)="selectReceiver($event)">
+                <select class="form-control" formControlName="middleNode">
                     <option *ngFor="let data of serviceNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
-                <div *ngIf="middlenode.touched && middlenode.invalid">
+                <!-- <div *ngIf="middlenode.touched && middlenode.invalid">
                     <div *ngIf="middlenode.errors.required">
                         <p class="text-danger">Please select an Central Node.</p>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 5">
                 <label for="type" class="form-label font-bold">

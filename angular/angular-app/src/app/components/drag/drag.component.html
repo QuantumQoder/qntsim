@@ -79,7 +79,6 @@
             <br>
             <hr>
             <ul>
-
                 <li><strong>Service Node:</strong> This is the Quantum Router with quantum circuits and bell state
                     analyzers
                 </li>
@@ -91,500 +90,306 @@
                 <p-button icon="pi pi-check" (click)="info=false" label="Ok" styleClass="p-button-text"></p-button>
             </ng-template>
         </p-dialog>
-        <!-- <div>
-            <div class="row row1">
-                <div style="padding-left: 2%;" class="d-flex align-items-end justify-content-start col-4 ">
-                     <h4 class="toolbox">Toolbox</h4> -->
-        <!-- <h2 class="display-4 ">{{application|uppercase}}</h2> -->
-        <!-- <p class="small text-muted">Click a component to change its settings.</p> -->
-        <!-- </div>
-                <div class="d-flex align-items-center justify-content-center col-6">
-                    <h3 class="display-4"> <small>Configure the
-                            network
-                            topology</small></h3> -->
-        <!-- </div>
 
-                <div class="d-flex justify-content-between align-items-end btn-group1 col-2">
-                    <button class="btn btn-outline-primary btn-sm" (click)="info_demo()"><i
-                            class="pi pi-question"></i></button>
-                    <button class="btn btn-outline-primary btn-sm" (click)="reload()"><i
-                            class="pi pi-replay"></i></button>
-                    <button class="btn btn-primary btn-custom btn-sm" (click)="save()">Lock Topology</button>
-                </div>
-            </div> -->
-        <!-- </div> -->
-        <!-- <div *ngIf="spinner" class="lds-dual-ring"></div> -->
-        <div id="sample" style="width: 100%;">
-            <div *ngIf="step == 2" id="tutorial2" class="body2 row">
-                <div>
-                    <h6>This is Service Node.
-                    </h6>
-                </div>
-                <div class="d-flex justify-content-end align-items-end btn-custom2">
-                    <button class="btn btn-primary btn-sm btn-custom" (click)="next(3)">Next</button>
-                </div>
+        <div *ngIf="!spinner" style="width: 99%; display: flex;gap:3px;">
+            <div id="myPaletteDiv" class="col-4" class="palette"
+                style="width: 120px; background-color: white; border: outset 1px black">
             </div>
-            <div *ngIf="step == 3" id="tutorial3" class="body3 row">
-                <div>
-                    <h6>This is End Node.</h6>
-                </div>
-                <div class="d-flex justify-content-end align-items-end btn-custom2">
-                    <button class="btn btn-primary btn-sm btn-custom" (click)="next(4)">Next</button>
-                </div>
+            <div id="myDiagramDiv" class="col-8 diagram" style=" height:
+                calc(100vh - 100px);width:50vw; border: outset 1px black">
             </div>
-            <div *ngIf="step == 4" id="tutorial4" class="body4 row">
-                <div>
-                    <h6>This is Virtual Connection.</h6>
-                </div>
-                <div class="d-flex justify-content-end align-items-end btn-custom2">
-                    <button class="btn btn-primary btn-sm btn-custom" (click)="next(5)">Next</button>
-                </div>
-            </div>
-            <div *ngIf="step == 5" id="tutorial5" class="body5 row">
-                <div class="d-flex justify-content-end">
-                    <button class="btn btn-primary" (click)="next(7)">X</button>
-                </div>
-                <br>
-                <img src="assets/gifs/tutorial.gif" alt="">
-                <div class="d-flex justify-content-end m-3">
-                    <button class="btn btn-custom">Next</button>
-                </div>
-                <br>
+            <div class="col">
+                <div class="configuration" style="height:100%">
+                    <h4 class="text-dark text-center">Selected Application: {{application}}</h4>
+                    <p-breadcrumb [model]="breadcrumbItems"></p-breadcrumb>
 
-                <!-- <button class="btn-sm btn-outlined-"></button> -->
-            </div>
-            <div *ngIf="!spinner" style="width: 99%; display: flex;gap:3px;">
-                <div id="myPaletteDiv" class="col-4" class="palette"
-                    style="width: 120px; background-color: white; border: outset 1px black">
-                </div>
-                <div id="myDiagramDiv" class="col-8 diagram" style=" height:
-                500px;width:50vw; border: outset 1px black">
-                </div>
-                <div class="col">
-                    <div class="configuration" style="height:100%">
-                        <h4 class="text-dark text-center">Selected Application: {{application}}</h4>
-
-                        <p-breadcrumb [model]="breadcrumbItems"></p-breadcrumb>
-                        <div *ngIf="activeIndex == 0">
-                            <h5>
-                                Step 1: Setup Topology
-                            </h5>
+                    <div *ngIf="activeIndex == 0">
+                        <br>
+                        <h5 style="padding-left: 1rem;">
+                            Step 1: Setup Topology
+                        </h5>
+                        <div class="text-center">
+                            <br>
                             <br>
                             <p-checkbox [(ngModel)]="checked" [binary]="true" (onChange)="preloadTopology()"
-                                inputId="binary"></p-checkbox>&nbsp;<b>Do
-                                you
-                                want to use our preconfigured topology?</b>
+                                inputId="binary"></p-checkbox>&nbsp;<b>Use our preconfigured topology,
+                                <br></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b *ngIf="!checked">or follow the
+                                steps.</b>
+                        </div>
+                        <br>
+                        <div *ngIf="!checked">
+                            <ol style="padding-left: 4rem">
+
+                                <li>
+                                    <p>
+                                        Please drag a component from the palette.
+                                    </p>
+                                </li>
+
+                                <li>
+                                    <p>
+                                        Please drag your pointer from node to node to create a connection.
+                                    </p>
+                                </li>
+                            </ol>
+                        </div>
+                        <br>
+                        <div class="d-flex justify-content-center">
+                            <button class="btn btn-primary" (click)="activeindex('next')">Next</button>
+                        </div>
+
+                    </div>
+                    <div id="step2" *ngIf="activeIndex == 1">
+                        <h5>
+                            Step 2: Configuration
+                        </h5>
+                        <ol>
+                            <li>
+                                Click on Component to configure its settings.
+                            </li>
+                        </ol>
+                        <form [formGroup]="toolbox">
+                            <h6 class="text-center text-black" *ngIf="nodeParams">
+                                <u>Node</u>
+                            </h6>
+                            <div class="form-group col-8 mx-auto" *ngIf="nodeParams">
+                                <label for="name" class="form-label mx-auto">Name</label>
+                                <input type="email" class="form-control mx-auto" id="name" formControlName="name"
+                                    aria-describedby="emailHelp" placeholder="Enter Name">
+                                <!-- <small class="text-muted">Name of the selected node</small> -->
+                            </div>
+                            <div class="form-group col-8 mx-auto" *ngIf="nodeParams">
+                                <label for="noOfMemories" class="form-label mx-auto">No of Memories</label>
+                                <input type="number" class="form-control mx-auto" id="noOfMemories"
+                                    formControlName="noOfMemories" placeholder="No of Memories">
+                                <!-- <small class="text-muted">No of Memories</small> -->
+                            </div>
+                            <br>
+                            <div class="d-flex justify-content-center" *ngIf="nodeParams">
+                                <button class="btn btn-primary" (click)="add()">Save</button>
+                            </div>
+
+                            <h6 class="text-center text-black">
+                                <u>Connections</u>
+                            </h6>
+                            <div class="form-group col-8 mx-auto">
+                                <label for="attenuation" class="form-label mx-auto">Attenuation</label>
+                                <input type="number" class="form-control" formControlName="attenuation" id="attenuation"
+                                    placeholder="Enter in decimals">
+                                <!-- <div class="text-muted">attenuation of Optical channel's fiber (in dB/m).</div> -->
+                            </div>
+                            <div class="form-group col-8 mx-auto">
+                                <label for="distance" class="form-label mx-auto">Link Length</label>
+                                <input type="number" class="form-control mx-auto" id="distance"
+                                    formControlName="distance" placeholder="Enter Distance">
+                                <!-- <div class="text-muted">length of the fiber (in km)</div> -->
+                            </div>
+                            <br>
+                            <div class="d-flex justify-content-center">
+                                <button class="btn btn-primary" (click)="activeindex('next')">Next</button>
+                            </div>
+                            <br>
+                        </form>
+                    </div>
+                    <div *ngIf="activeIndex == 2">
+                        <h5>
+                            Step 3: Application Parameters
+                        </h5>
+                        <form [formGroup]="appSettingsForm">
+                            <h5 class="text-center mt-1">Application Settings</h5>
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id != 4">
+                                <label for="type" class="form-label font-bold">
+                                    Sender
+                                </label>
+                                <select class="form-control" formControlName="sender">
+                                    <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}</option>
+                                </select>
+                                <div *ngIf="endNodes.length ==0">
+                                    <p class="text-danger">
+                                        Please drag a end node and configure it.
+                                    </p>
+                                </div>
+                                <div *ngIf="sender.touched && sender.invalid">
+                                    <div *ngIf="sender.errors.required">
+                                        <p class="text-danger">Please select an Sender.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id != 4">
+                                <label for="type" class="form-label font-bold">
+                                    Receiver
+                                </label>
+                                <select class="form-control" formControlName="receiver">
+                                    <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}</option>
+                                </select>
+                                <div *ngIf="endNodes.length ==0">
+                                    <p class="text-danger">
+                                        Please drag a end node and configure it.
+                                    </p>
+                                </div>
+                                <div *ngIf="receiver.touched && receiver.invalid">
+                                    <div *ngIf="receiver.errors.required">
+                                        <p class="text-danger">Please select an Receiver.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 1">
+                                <label for="type" class="form-label font-bold">
+                                    Key Length
+                                </label>
+                                <input type="number" min="1" oninput="this.value = Math.abs(this.value)"
+                                    formControlName="keyLength" class="form-control">
+                                <div *ngIf="keyLength.touched && keyLength.invalid">
+                                    <div *ngIf="keyLength.errors.required">
+                                        <p class="text-danger">Please enter key length.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 2">
+                                <label for="type" class="form-label font-bold">
+                                    Target Fidelity: {{e2e.targetFidelity}}
+                                </label>
+                                <br>
+                                <p-slider formControlName="targetFidelity" [min]="0" [step]="0.05" [max]="1"
+                                    (onSlideEnd)="e2eChange('target')"></p-slider>
+                            </div>
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 2">
+                                <label class="form-label">
+                                    Demand: {{e2e.size}}
+                                </label>
+                                <br>
+                                <p-slider formControlName="size" [min]="0" [step]="1" [max]="6"
+                                    (onSlideEnd)="e2eChange('size')"></p-slider>
+                            </div>
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 2">
+                                <label for="timeout" class="col-12">TimeOut (e12)</label>
+                                <input type="text" class="form-control col-12"
+                                    aria-label="Amount (to the nearest dollar)" formControlName="timeout">
+                            </div>
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 5 || app_id == 6">
+                                <label for="type" class="form-label font-bold">
+                                    Sequence Length
+                                </label>
+                                <input type="number" min="1" oninput="this.value = Math.abs(this.value)"
+                                    formControlName="sequenceLength" class="form-control">
+                            </div>
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 3">
+                                <label for="endNode">Random Qubit Amplitude 1</label>&nbsp;
+                                <input type="text" class="form-control" formControlName="amplitude1">
+                                <div class="text-muted">Random Single Qubit's amplitude at |0></div>
+                            </div>
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 3">
+                                <label for="endNode">Random Qubit Amplitude 1</label>&nbsp;
+                                <input type="text" class="form-control" formControlName="amplitude2">
+                                <div class="text-muted">Random Single Qubit's amplitude at |0></div>
+                            </div>
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 4">
+                                <label for="type" class="form-label font-bold">
+                                    End Node 1
+                                </label>
+                                <select class="form-control" formControlName="endnode1">
+                                    <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}</option>
+                                </select>
+                                <div *ngIf="node1.touched && node1.invalid">
+                                    <div *ngIf="node1.errors.required">
+                                        <p class="text-danger">Please select End Node 1.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 4">
+                                <label for="type" class="form-label font-bold">
+                                    End Node 2
+                                </label>
+                                <select class="form-control" formControlName="endnode2">
+                                    <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}</option>
+                                </select>
+                                <div *ngIf="node2.touched && node2.invalid">
+                                    <div *ngIf="node2.errors.required">
+                                        <p class="text-danger">Please select End Node 2.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 4">
+                                <label for="type" class="form-label font-bold">
+                                    End Node 3
+                                </label>
+                                <select class="form-control" formControlName="endnode3">
+                                    <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}</option>
+                                </select>
+                                <div *ngIf="node3.touched && node3.invalid">
+                                    <div *ngIf="node3.errors.required">
+                                        <p class="text-danger">Please select End Node 3.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 4">
+                                <label for="type" class="form-label font-bold">
+                                    Central Node
+                                </label>
+                                <select class="form-control" formControlName="middleNode"
+                                    (change)="selectReceiver($event)">
+                                    <option *ngFor="let data of serviceNodes" [ngValue]="data.Name">{{data.Name}}
+                                    </option>
+                                </select>
+                                <div *ngIf="middlenode.touched && middlenode.invalid">
+                                    <div *ngIf="middlenode.errors.required">
+                                        <p class="text-danger">Please select an Central Node.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 6 || app_id == 5 || app_id == 9">
+                                <label for="type" class="form-label font-bold">
+                                    Message
+                                </label>
+                                <input type="text" (keypress)="allowBitsInput($event)" formControlName="message"
+                                    class="form-control">
+                                <div
+                                    *ngIf="appSettingsForm.get('message').touched && appSettingsForm.get('message').invalid">
+                                    <div *ngIf="appSettingsForm.get('message').errors.required">
+                                        <p class="text-danger">Message is required.</p>
+                                    </div>
+                                    <div *ngIf="appSettingsForm.get('message').errors.evenLength">
+                                        <p class="text-danger">Message must have an even number of characters</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 8">
+                                <label for="type" class="form-label font-bold">
+                                    Sender's Message
+                                </label>
+                                <input type="text" formControlName="message1" class="form-control">
+                                <div
+                                    *ngIf="appSettingsForm.get('message1').touched && appSettingsForm.get('message1').invalid">
+                                    <div *ngIf="appSettingsForm.get('message1').errors.required">
+                                        <p class="text-danger">Sender's Message is required.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 8">
+                                <label for="type" class="form-label font-bold">
+                                    Receiver's Message
+                                </label>
+                                <input type="text" formControlName="message2" class="form-control">
+                                <div
+                                    *ngIf="appSettingsForm.get('message2').touched && appSettingsForm.get('message2').invalid">
+                                    <div *ngIf="appSettingsForm.get('message2').errors.required">
+                                        <p class="text-danger">Receiver's Message is required.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <br>
+                        <div class="d-flex justify-content-center">
+                            <button class="btn btn-primary btn-custom btn-sm" (click)="parameters()">Run
+                                Application</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <p-dialog header="Set Application Parameters" [(visible)]="displayPosition" [position]="position" [modal]="true"
-            [style]="{width: '80vw'}" [draggable]="true" [resizable]="false">
-            <div *ngIf="app_id==1" [formGroup]="e2e">
-                <div class="row">
-                    <div class="col">
-                        <label for="serviceNode">Sender</label>&nbsp;
-                        <select class="form-control" formControlName="sender">
-                            <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
-                            </option>
-                        </select>
-                        <div class="text-muted">Name of node to establish entanglement from</div>
-                    </div>
-                    <div class="col">
-                        <label for="endNode">Receiver</label>&nbsp;
-                        <select class="form-control" formControlName="receiver">
-                            <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
-                            </option>
-                        </select>
-                        <div class="text-muted">Name of node to establish entanglement with</div>
-                    </div>
-
-
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <label for="endNode">Size</label>&nbsp;
-                        <input type="text" class="form-control" formControlName="size">
-                        <div class="text-muted">number of entangled memory pairs to create</div>
-                    </div>
-                    <!-- <div class="col">
-                    <label for="endNode">Priority</label>&nbsp;
-                    <input type="text" class="form-control" formControlName="priority">
-                    <div class="text-muted">Priority of the request</div>
-                </div> -->
-                    <div class="col">
-                        <label for="endNode">Target Fidelity</label>&nbsp;
-                        <input type="text" class="form-control" formControlName="targetFidelity">
-                        <div class="text-muted">desired fidelity of entanglement</div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        <div class="input-group">
-                            <label for="timeout" class="col-12">TimeOut</label>&nbsp;
-                            <input type="text" class="form-control col-12" aria-label="Amount (to the nearest dollar)"
-                                formControlName="timeout">
-                            <div class="input-group-append">
-                                <span class="input-group-text">sec</span>
-                            </div>
-                            <div class="text-muted col-12">Time window within which entanglements need to be
-                                generated</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div *ngIf="app_id==2" class="row" [formGroup]="e91">
-                <div class="col">
-                    <label for="serviceNode">Sender</label>&nbsp;
-
-                    <select class="form-control" formControlName="sender">
-                        <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
-                        </option>
-                    </select>
-                    <div class="text-muted">A node in the network Topology.</div>
-                </div>
-                <div class="col">
-                    <label for="endNode">Receiver</label>&nbsp;
-
-                    <select class="form-control" formControlName="receiver">
-                        <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
-                        </option>
-                    </select>
-                    <div class="text-muted">A node in the network Topology.</div>
-                </div>
-                <div class="col">
-                    <label for="endNode">Key Length</label>&nbsp;
-                    <input type="text" class="form-control" formControlName="keyLength">
-                    <div class="text-muted">The length of secret key that has to be shared between sender and receiver.
-                    </div>
-                </div>
-
-            </div>
-            <div *ngIf="app_id==3" [formGroup]="teleportation">
-                <div class="row">
-                    <div class="col">
-                        <label for="serviceNode">Sender</label>&nbsp;
-                        <select class="form-control" formControlName="sender">
-                            <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
-                            </option>
-                        </select>
-                        <div class="text-muted">A node in the network Topology</div>
-                    </div>
-                    <div class="col">
-                        <label for="endNode">Receiver</label>&nbsp;
-                        <select class="form-control" formControlName="receiver">
-                            <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
-                            </option>
-                        </select>
-                        <div class="text-muted">A node in the network Topology</div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <label for="endNode">Random Qubit Amplitude 1</label>&nbsp;
-                        <input type="text" class="form-control" formControlName="amplitude1">
-                        <div class="text-muted">Random Single Qubit's amplitude at |0></div>
-                    </div>
-                    <div class="col">
-                        <label for="endNode">Random Qubit Amplitude 2</label>&nbsp;
-                        <input type="text" class="form-control" formControlName="amplitude2">
-                        <div class="text-muted">Random Single Qubit's amplitude at |1></div>
-                    </div>
-                </div>
-            </div>
-            <div *ngIf="app_id==4" [formGroup]="ghz">
-                <div class="row">
-                    <div class="col">
-                        <label for="serviceNode">Node 1</label>&nbsp;
-                        <select class="form-control" formControlName="node1">
-                            <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label for="endNode">Node 2</label>&nbsp;
-                        <select class="form-control" formControlName="node2">
-                            <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <label for="serviceNode">Node 3</label>&nbsp;
-                        <select class="form-control" formControlName="node3">
-                            <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label for="endNode">Middle Node</label>&nbsp;
-                        <select class="form-control" formControlName="middlenode">
-                            <option *ngFor="let model of nodes" [value]="model.Name">{{model.Name}}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div *ngIf="app_id==5" [formGroup]="firstqsdc">
-                <div class="row">
-                    <div class="col">
-                        <label for="serviceNode">Sender</label>&nbsp;
-                        <select class="form-control" formControlName="sender">
-                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label for="endNode">Receiver</label>&nbsp;
-                        <select class="form-control" formControlName="receiver">
-                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <label for="endNode">Set Sequence Length</label>&nbsp;
-                        <input type="number" class="form-control" formControlName="sequenceLength">
-                    </div>
-                    <div class="col">
-                        <label for="endNode">Bit String</label>&nbsp;
-                        <input type="number" class="form-control" formControlName="key">
-                    </div>
-                </div>
-            </div>
-            <div *ngIf="app_id==6" [formGroup]="pingPong">
-                <div class="row">
-                    <div class="col">
-                        <label for="serviceNode">Sender</label>&nbsp;
-                        <select class="form-control" formControlName="sender">
-                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label for="endNode">Receiver</label>&nbsp;
-                        <select class="form-control" formControlName="receiver">
-                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <label for="endNode">Set Sequence Length</label>&nbsp;
-                        <input type="number" class="form-control" formControlName="sequenceLength">
-                    </div>
-                    <div class="col">
-                        <label for="endNode">Bit String</label>&nbsp;
-                        <input type="text" class="form-control" formControlName="message">
-                    </div>
-                </div>
-            </div>
-            <div *ngIf="app_id==7" class="row" [formGroup]="ip1">
-                <div class="col">
-                    <label for="serviceNode">Sender</label>&nbsp;
-                    <select class="form-control" formControlName="sender">
-                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
-                        </option>
-                    </select>
-                </div>
-                <div class="col">
-                    <label for="endNode">Receiver</label>&nbsp;
-                    <select class="form-control" formControlName="receiver">
-                        <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
-                        </option>
-                    </select>
-                </div>
-                <div class="col">
-                    <label for="endNode">Bit String</label>&nbsp;
-                    <input type="text" class="form-control" formControlName="message">
-                </div>
-
-            </div>
-            <div *ngIf="app_id==8" [formGroup]="spqd">
-                <div class="row">
-                    <div class="col">
-                        <label for="serviceNode">Sender</label>&nbsp;
-                        <select class="form-control" formControlName="sender">
-                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label for="endNode">Receiver</label>&nbsp;
-                        <select class="form-control" formControlName="receiver">
-                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <label for="endNode">Message 1</label>&nbsp;
-                        <input type="text" class="form-control" formControlName="message1">
-                    </div>
-                    <div class="col">
-                        <label for="endNode">Message 2</label>&nbsp;
-                        <input type="text" class="form-control" formControlName="message2">
-                    </div>
-                </div>
-                <div class="row">
-                    <!-- <div class="col">
-                        <label for="endNode">Num Photons</label>&nbsp;
-                        <input type="number" class="form-control" formControlName="num_photons">
-                    </div> -->
-                    <div class="col-6">
-                        <label for="endNode">Attacker</label>&nbsp;
-                        <select class="form-control" formControlName="attacker">
-                            <option value="None">None</option>
-                            <option value="DoS">DoS</option>
-                            <option value="EM">EM</option>
-                            <option value="IR">IR</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div *ngIf="app_id==9" [formGroup]="qtel">
-                <div class="row">
-                    <div class="col">
-                        <label for="serviceNode">Sender</label>&nbsp;
-                        <select class="form-control" formControlName="sender">
-                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label for="endNode">Receiver</label>&nbsp;
-                        <select class="form-control" formControlName="receiver">
-                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col">
-                        <label for="endNode">Message</label>&nbsp;
-                        <input type="text" class="form-control" formControlName="message">
-                    </div>
-                    <div class="col">
-                        <label for="endNode">Attack</label>&nbsp;
-                        <select class="form-control" formControlName="attack">
-                            <option value="None">None</option>
-                            <option value="DoS">DoS</option>
-                            <option value="EM">EM</option>
-                            <option value="IR">IR</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div *ngIf="app_id==10" [formGroup]="ip2">
-                <div class="row">
-                    <div class="col">
-                        <label for="serviceNode">Sender</label>&nbsp;
-                        <select class="form-control" formControlName="sender">
-                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label for="endNode">Receiver</label>&nbsp;
-                        <select class="form-control" formControlName="receiver">
-                            <option *ngFor="let model of graphModel" [value]="model.text">{{model.text}}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label for="">Number of CheckBits</label>&nbsp;
-                        <input type="number" class="form-control" formControlName="numCheckBits">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <label for="">Sender Id</label>&nbsp;
-                        <input type="text" class="form-control" formControlName="senderId">
-                    </div>
-
-                    <div class="col">
-                        <label for="">Receiver Id</label>&nbsp;
-                        <input type="text" class="form-control" formControlName="receiverId">
-                    </div>
-                    <div class="col">
-                        <label for="">Number of Decoy</label>&nbsp;
-                        <input type="number" class="form-control" formControlName="numDecoy">
-                    </div>
-                </div>
-                <div class="row">
-
-                    <div class="col">
-                        <label for="">Input Message</label>&nbsp;
-                        <input type="text" class="form-control" formControlName="inputMessage">
-                    </div>
-                </div>
-            </div>
-            <ng-template pTemplate="footer">
-                <p-button (click)="parameters()" label="Run Application">
-                </p-button>
-            </ng-template>
-        </p-dialog>
-        <p-sidebar [(visible)]="visibleSideNav" position="right" [baseZIndex]="10000" [transitionOptions]="'100ms'"
-            styleClass="sidebar">
-            <div id="toolbox" class="col" [formGroup]="toolbox">
-
-                <br>
-                <div *ngIf="nodeParams">
-                    <div class="display-5">Node Settings</div>
-                    <br>
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="email" class="form-control" id="name" formControlName="name"
-                            aria-describedby="emailHelp" placeholder="Enter Name">
-                        <small class="text-muted">Name of the selected node</small>
-                        <!-- <small id="emailHelp" class="form-text text-muted">Your information is safe with us.</small>  -->
-                    </div>
-                    <br>
-                    <div class="form-group">
-                        <label for="noOfMemories">No of Memories</label>
-                        <input type="number" class="form-control" id="noOfMemories" formControlName="noOfMemories"
-                            placeholder="No of Memories">
-                        <small class="text-muted">No of Memories</small>
-                    </div>
-                    <br>
-                    <!-- <div class="form-group">
-                    <label for="memoryFidelity">Memory Fidelity</label>
-                    <input type="text" class="form-control" id="memoryFidelity" placeholder="Memory Fidelity">
-                </div> -->
-                </div>
-                <div *ngIf="link">
-                    <div class="display-5">Connection Settings</div>
-                    <br>
-                    <div class="form-group">
-                        <label for="attenuation">Attenuation</label>
-                        <input type="number" class="form-control" formControlName="attenuation" id="attenuation"
-                            placeholder="Enter in decimals">
-                        <div class="text-muted">attenuation of Optical channel's fiber (in dB/m).</div>
-                    </div>
-                    <br>
-                    <div class="form-group">
-                        <label for="distance">Distance</label>
-                        <input type="number" class="form-control" id="distance" formControlName="distance"
-                            placeholder="Enter Distance">
-                        <div class="text-muted">length of the fiber (in km)</div>
-                    </div>
-                    <br>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <button type="button" pButton pRipple (click)="add()" label="Save"
-                        class="ui-button-warning"></button>
-                </div>
-            </div>
-
-        </p-sidebar>
         <p-confirmDialog [style]="{width: '50vw'}" [baseZIndex]="10000"
             rejectButtonStyleClass="p-button-text"></p-confirmDialog>
         <div *ngIf="step == 1" id="tutorial1" class="body1">
@@ -596,22 +401,5 @@
                 <button class="btn btn-primary-sm btn-custom" (click)="next(2)">Next</button>
             </div>
         </div>
-        <!-- <div *ngIf="step =='2'" id="tutorial2" class="body2 row">
-            <div>
-                <h6>This is Service Node.
-                </h6>
-            </div>
-            <div class="d-flex justify-content-end align-items-end btn-custom2">
-                <button class="btn btn-primary-sm btn-custom" (click)="next('3')">Next</button>
-            </div>
-        </div>
-        <div *ngIf="step =='3'" id="tutorial3" class="body3 row">
-            <div>
-                <h6>This is End Node.</h6>
-            </div>
-            <div class="d-flex justify-content-end align-items-end btn-custom2">
-                <button class="btn btn-primary-sm btn-custom" (click)="next('3')">Next</button>
-            </div>
-        </div> -->
+
     </div>
-</div>

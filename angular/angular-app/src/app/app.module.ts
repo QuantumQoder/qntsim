@@ -44,7 +44,7 @@ import { JwtInterceptor } from './auth/jwt.interceptor';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CheckboxModule } from 'primeng/checkbox';
-
+import { SliderModule } from 'primeng/slider';
 // import { GameComponent } from './components/game/game.component';
 // import { ToastModule } from 'primeng/toast';
 // import { Alert } from '@ng-bootstrap/ng-bootstrap';
@@ -78,7 +78,7 @@ import { CheckboxModule } from 'primeng/checkbox';
     DialogModule,
     StyleClassModule,
     ConfirmDialogModule,
-
+    SliderModule,
     ToastModule,
     TabMenuModule,
     ReactiveFormsModule,

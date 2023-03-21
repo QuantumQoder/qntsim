@@ -256,6 +256,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       this.levelChange()
     }
     this.updateNodes()
+    localStorage.setItem('app_id', this.appForm.get('app')?.value)
     this.buildForm(this.appForm.get('app')?.value)
   }
   runApp() {
@@ -272,7 +273,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       noOfMemory: this.topologyForm.get('noOfMemories')?.value,
       memory: this.service.getMemory()
     }));
-    this.service.setapp_id(app_id);
+    localStorage.setItem('app_id', app_id);
     console.log(nodeArray)
     for (const link of linkDataArray) {
       const linkData = {
@@ -333,13 +334,14 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         break;
       case 4:
         if (!this.appSettingsForm.controls['endnode1'])
-          this.appSettingsForm.addControl('endnode1', ['', Validators.required])
+          this.appSettingsForm.addControl('endnode1', new FormControl('node1', Validators.required))
         if (!this.appSettingsForm.controls['endnode2'])
-          this.appSettingsForm.addControl('endnode2', ['', Validators.required])
+          this.appSettingsForm.addControl('endnode2', new FormControl('node3', Validators.required))
         if (!this.appSettingsForm.controls['endnode3'])
-          this.appSettingsForm.addControl('endnode3', ['', Validators.required])
+          this.appSettingsForm.addControl('endnode3', new FormControl('node4', Validators.required))
         if (!this.appSettingsForm.controls['middleNode'])
-          this.appSettingsForm.addControl('middleNode', ['', Validators.required])
+          this.appSettingsForm.addControl('middleNode', new FormControl('node2', Validators.required))
+        console.log(this.appSettingsForm)
         break;
       case 5:
         if (!this.appSettingsForm.controls['key'])
@@ -368,14 +370,10 @@ export class MinimalComponent implements OnInit, AfterViewInit {
           this.appSettingsForm.addControl('inputMessage', new FormControl('', Validators.required));
         break;
     }
+    console.log(this.appSettingsForm)
 
   }
-  selectSender($event: any) {
-    console.log(this.appSettingsForm.get('sender')?.value);
-  }
-  selectReceiver($event: any) {
-    console.log(this.appSettingsForm.get('receiver')?.value)
-  }
+
   getAppSettingsResults() {
     this.service.getAppSetting().subscribe((results: any) => {
       this.appSettingsResult = results

@@ -30,7 +30,7 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
   }
   ngOnInit(): void {
-    this.app_id = this.con.getapp_id()
+    this.app_id = localStorage.getItem('app_id')
     if (!this.app_id) {
       this.router.navigate(['/'])
     }

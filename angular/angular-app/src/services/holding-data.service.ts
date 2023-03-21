@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class HoldingDataService {
+  diagramData: any
   homepageData = [{
     appId: 1, appName: 'E91 QKD', image: 'assets/images/apps/e91.png', content: 'Entanglement-based Quantum Key Distribution'
   },
@@ -74,6 +75,12 @@ export class HoldingDataService {
   }
   getHomePageData() {
     return this.homepageData
+  }
+  getDiagramData() {
+    return this.diagramData
+  }
+  setDiagramData(data: any) {
+    this.diagramData = data
   }
 
 }
