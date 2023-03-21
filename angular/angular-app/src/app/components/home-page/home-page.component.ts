@@ -119,7 +119,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       // myGlobe.position.y = -1000
       myGlobe
         .polygonsData(cuntData)
-        .polygonCapColor((feat: any) => feat.properties.NAME == COUNTRY ? "#FFFBEB" : "#FAEAB1")
+        .polygonCapColor((feat: any) => feat.properties.NAME == COUNTRY ? "#5D9C59" : "#6B7B8C")
         .polygonSideColor(() => 'rgba(0, 100, 0, 0.15)')
         .polygonStrokeColor(() => '#111')
         // .htmlElementsData(gData)
