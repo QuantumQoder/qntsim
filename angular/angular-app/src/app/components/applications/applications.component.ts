@@ -25,7 +25,7 @@ export class ApplicationsComponent implements OnInit {
   ngOnInit(): void {
     this.data = this.holdingData.getHomePageData();
     this.appDescription = this.holdingData.getAppDescription();
-    console.log(this.appDescription)
+    // console.log(this.appDescription)
     this.responsiveOptions = [
       {
         breakpoint: '1024px',

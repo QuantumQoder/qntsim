@@ -36,31 +36,52 @@
                     (onSlideEnd)="levelChange()"></p-slider>
             </div>
             <hr>
-            <div class="d-flex justify-content-center">
+            <div class="d-flex justify-content-end mx-2">
+                <div (click)="toggle(1)" id="toggle-button1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-caret-up-fill" viewBox="0 0 16 16">
+                        <path
+                            d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center settingTitle">
                 <h5 class="mx-auto">Node</h5>
             </div>
-
-            <div class="mt-2 col-9 mx-auto">
-                <label for="type" class="form-label font-bold mb-2">
-                    Number of Memories
-                </label>
-                <input type="number" formControlName="noOfMemories" class="form-control">
+            <div id="content1">
+                <div class="mt-2 col-9 mx-auto">
+                    <label for="type" class="form-label font-bold mb-2">
+                        Number of Memories
+                    </label>
+                    <input type="number" formControlName="noOfMemories" class="form-control">
+                </div>
             </div>
             <hr>
+            <div class="d-flex justify-content-end mx-2">
+                <div (click)="toggle(2)" id="toggle-button2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-caret-up-fill" viewBox="0 0 16 16">
+                        <path
+                            d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z" />
+                    </svg>
+                </div>
+            </div>
             <div class="d-flex justify-content-center">
                 <h5 class="mx-auto">Quantum Connections</h5>
             </div>
-            <div class="mt-2 col-9 mx-auto">
-                <label for="type" class="form-label font-bold mb-2">
-                    Distance
-                </label>
-                <input type="number" formControlName="distance" class="form-control">
-            </div>
-            <div class="mt-2 col-9 mx-auto">
-                <label for="type" class="form-label font-bold mb-2">
-                    Attenuation
-                </label>
-                <input type="number" formControlName="attenuity" class="form-control">
+            <div id="content2">
+                <div class="mt-2 col-9 mx-auto">
+                    <label for="type" class="form-label font-bold mb-2">
+                        Distance
+                    </label>
+                    <input type="number" formControlName="distance" class="form-control">
+                </div>
+                <div class="mt-2 col-9 mx-auto">
+                    <label for="type" class="form-label font-bold mb-2">
+                        Attenuation
+                    </label>
+                    <input type="number" formControlName="attenuity" class="form-control">
+                </div>
             </div>
         </form>
     </div>
@@ -68,7 +89,9 @@
         <div id="topology" style="width:100%;height:80%;background-color:white;border: 1px solid black;"></div>
         <div style=" height:20%;width:100%;background-color: white;border: 1px solid black;"
             class="d-flex justify-content-center align-items-center">
-            <button class="btn btn-primary btn-custom" (click)="runApp()">Run Application</button>
+            <button class="btn btn-primary btn-custom"
+                [disabled]="appForm.invalid || appSettingsForm.invalid || topologyForm.invalid" (click)="runApp()">Run
+                Application</button>
         </div>
     </div>
     <div class="col-3 p-0 bg-white">
@@ -83,6 +106,11 @@
                 <select class="form-control" formControlName="app" (change)="getApp($event)">
                     <option *ngFor="let data of applist" [ngValue]="data.appId">{{data.appName}}</option>
                 </select>
+                <div *ngIf="app.touched && app.invalid">
+                    <div *ngIf="app.errors.required">
+                        <p class="text-danger">Please select an application.</p>
+                    </div>
+                </div>
             </div>
         </form>
         <form [formGroup]="appSettingsForm">
@@ -96,6 +124,11 @@
                     <select class="form-control" formControlName="sender" (change)="selectSender($event)">
                         <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                     </select>
+                    <div *ngIf="sender.touched && sender.invalid">
+                        <div *ngIf="sender.errors.required">
+                            <p class="text-danger">Please select an Sender.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value != 4">
@@ -105,6 +138,11 @@
                     <select class="form-control" formControlName="receiver" (change)="selectReceiver($event)">
                         <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                     </select>
+                    <div *ngIf="receiver.touched && receiver.invalid">
+                        <div *ngIf="receiver.errors.required">
+                            <p class="text-danger">Please select an Receiver.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 3">
@@ -130,6 +168,11 @@
                 </label>
                 <input type="number" min="1" oninput="this.value = Math.abs(this.value)" formControlName="keyLength"
                     class="form-control">
+                <div *ngIf="keyLength.touched && keyLength.invalid">
+                    <div *ngIf="keyLength.errors.required">
+                        <p class="text-danger">Please enter key length.</p>
+                    </div>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 2">
                 <label for="type" class="form-label font-bold">
@@ -154,6 +197,11 @@
                 <select class="form-control" formControlName="endnode1" (change)="selectReceiver($event)">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
+                <div *ngIf="node1.touched && node1.invalid">
+                    <div *ngIf="node1.errors.required">
+                        <p class="text-danger">Please select End Node 1.</p>
+                    </div>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
                 <label for="type" class="form-label font-bold">
@@ -162,6 +210,11 @@
                 <select class="form-control" formControlName="endnode2" (change)="selectReceiver($event)">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
+                <div *ngIf="node2.touched && node2.invalid">
+                    <div *ngIf="node2.errors.required">
+                        <p class="text-danger">Please select End Node 2.</p>
+                    </div>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
                 <label for="type" class="form-label font-bold">
@@ -170,6 +223,11 @@
                 <select class="form-control" formControlName="endnode3" (change)="selectReceiver($event)">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
+                <div *ngIf="node3.touched && node3.invalid">
+                    <div *ngIf="node3.errors.required">
+                        <p class="text-danger">Please select End Node 3.</p>
+                    </div>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
                 <label for="type" class="form-label font-bold">
@@ -178,48 +236,97 @@
                 <select class="form-control" formControlName="middleNode" (change)="selectReceiver($event)">
                     <option *ngFor="let data of serviceNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
+                <div *ngIf="middlenode.touched && middlenode.invalid">
+                    <div *ngIf="middlenode.errors.required">
+                        <p class="text-danger">Please select an Central Node.</p>
+                    </div>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 5">
                 <label for="type" class="form-label font-bold">
                     Binary message (only even)
                 </label>
                 <input type="text" (keypress)="allowBitsInput($event)" formControlName="key" class="form-control">
+                <div *ngIf="appSettingsForm.get('key').touched && appSettingsForm.get('key').invalid">
+                    <div *ngIf="appSettingsForm.get('key').errors.required">
+                        <p class="text-danger">Key is required.</p>
+                    </div>
+                    <div *ngIf="appSettingsForm.get('key').errors.evenLength">
+                        <p class="text-danger">Key must have an even number of characters</p>
+                    </div>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 6">
                 <label for="type" class="form-label font-bold">
                     Message
                 </label>
                 <input type="text" (keypress)="allowBitsInput($event)" formControlName="message" class="form-control">
+                <div *ngIf="appSettingsForm.get('message').touched && appSettingsForm.get('message').invalid">
+                    <div *ngIf="appSettingsForm.get('message').errors.required">
+                        <p class="text-danger">Message is required.</p>
+                    </div>
+                    <div *ngIf="appSettingsForm.get('message').errors.evenLength">
+                        <p class="text-danger">Message must have an even number of characters</p>
+                    </div>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 7">
                 <label for="type" class="form-label font-bold">
                     Message (only binary)
                 </label>
                 <input type="text" (keypress)="allowBitsInput($event)" formControlName="message" class="form-control">
+                <div *ngIf="appSettingsForm.get('message').touched && appSettingsForm.get('message').invalid">
+                    <div *ngIf="appSettingsForm.get('message').errors.required">
+                        <p class="text-danger">Message is required.</p>
+                    </div>
+                    <div *ngIf="appSettingsForm.get('message').errors.evenLength">
+                        <p class="text-danger">Message must have an even number of characters</p>
+                    </div>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 8">
                 <label for="type" class="form-label font-bold">
                     Sender's Message
                 </label>
                 <input type="text" formControlName="message1" class="form-control">
+                <div *ngIf="appSettingsForm.get('message1').touched && appSettingsForm.get('message1').invalid">
+                    <div *ngIf="appSettingsForm.get('message1').errors.required">
+                        <p class="text-danger">Sender's Message is required.</p>
+                    </div>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 8">
                 <label for="type" class="form-label font-bold">
                     Receiver's Message
                 </label>
                 <input type="text" formControlName="message2" class="form-control">
+                <div *ngIf="appSettingsForm.get('message2').touched && appSettingsForm.get('message2').invalid">
+                    <div *ngIf="appSettingsForm.get('message2').errors.required">
+                        <p class="text-danger">Receiver's Message is required.</p>
+                    </div>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 9">
                 <label for="type" class="form-label font-bold">
                     Message
                 </label>
                 <input type="text" formControlName="message" class="form-control">
+                <div *ngIf="appSettingsForm.get('message').touched && appSettingsForm.get('message').invalid">
+                    <div *ngIf="appSettingsForm.get('message').errors.required">
+                        <p class="text-danger">Message is required.</p>
+                    </div>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 10">
                 <label for="type" class="form-label font-bold">
                     Message
                 </label>
                 <input type="text" formControlName="inputMessage" class="form-control">
+                <div *ngIf="appSettingsForm.get('inputMessage').touched && appSettingsForm.get('inputMessage').invalid">
+                    <div *ngIf="appSettingsForm.get('inputMessage').errors.required">
+                        <p class="text-danger">Message is required.</p>
+                    </div>
+                </div>
             </div>
         </form>
     </div>

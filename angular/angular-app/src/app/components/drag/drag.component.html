@@ -91,18 +91,18 @@
                 <p-button icon="pi pi-check" (click)="info=false" label="Ok" styleClass="p-button-text"></p-button>
             </ng-template>
         </p-dialog>
-        <div>
+        <!-- <div>
             <div class="row row1">
                 <div style="padding-left: 2%;" class="d-flex align-items-end justify-content-start col-4 ">
-                    <!-- <h4 class="toolbox">Toolbox</h4> -->
-                    <h2 class="display-4 ">{{application|uppercase}}</h2>
-                    <!-- <p class="small text-muted">Click a component to change its settings.</p> -->
-                </div>
+                     <h4 class="toolbox">Toolbox</h4> -->
+        <!-- <h2 class="display-4 ">{{application|uppercase}}</h2> -->
+        <!-- <p class="small text-muted">Click a component to change its settings.</p> -->
+        <!-- </div>
                 <div class="d-flex align-items-center justify-content-center col-6">
                     <h3 class="display-4"> <small>Configure the
                             network
-                            topology</small></h3>
-                </div>
+                            topology</small></h3> -->
+        <!-- </div>
 
                 <div class="d-flex justify-content-between align-items-end btn-group1 col-2">
                     <button class="btn btn-outline-primary btn-sm" (click)="info_demo()"><i
@@ -111,8 +111,8 @@
                             class="pi pi-replay"></i></button>
                     <button class="btn btn-primary btn-custom btn-sm" (click)="save()">Lock Topology</button>
                 </div>
-            </div>
-        </div>
+            </div> -->
+        <!-- </div> -->
         <!-- <div *ngIf="spinner" class="lds-dual-ring"></div> -->
         <div id="sample" style="width: 100%;">
             <div *ngIf="step == 2" id="tutorial2" class="body2 row">
@@ -153,12 +153,29 @@
 
                 <!-- <button class="btn-sm btn-outlined-"></button> -->
             </div>
-            <div *ngIf="!spinner" style="width: 99%; display: flex">
+            <div *ngIf="!spinner" style="width: 99%; display: flex;gap:3px;">
                 <div id="myPaletteDiv" class="col-4" class="palette"
                     style="width: 120px; background-color: white; border: outset 1px black">
                 </div>
-                <div id="myDiagramDiv" class="col-8 diagram" style=" flex-grow: 1; height:
-                500px; border: outset 1px black">
+                <div id="myDiagramDiv" class="col-8 diagram" style=" height:
+                500px;width:50vw; border: outset 1px black">
+                </div>
+                <div class="col">
+                    <div class="configuration" style="height:100%">
+                        <h4 class="text-dark text-center">Selected Application: {{application}}</h4>
+
+                        <p-breadcrumb [model]="breadcrumbItems"></p-breadcrumb>
+                        <div *ngIf="activeIndex == 0">
+                            <h5>
+                                Step 1: Setup Topology
+                            </h5>
+                            <br>
+                            <p-checkbox [(ngModel)]="checked" [binary]="true" (onChange)="preloadTopology()"
+                                inputId="binary"></p-checkbox>&nbsp;<b>Do
+                                you
+                                want to use our preconfigured topology?</b>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
