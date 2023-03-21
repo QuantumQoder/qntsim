@@ -112,7 +112,7 @@
                     </div>
                 </div>
 
-                <div *ngIf="app.value != null">
+                <div *ngIf="app.touched">
                     <br>
                     <p class="text-black text-center">
                         For More Setting,<br>
@@ -120,11 +120,10 @@
                     </p>
                 </div>
             </div>
-
         </form>
         <form [formGroup]="appSettingsForm">
             <div *ngIf="appForm.get('app')?.value != '' ">
-                <br>
+
                 <h5 class="text-center mt-1">Application Settings</h5>
                 <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value != 4">
                     <label for="type" class="form-label font-bold">

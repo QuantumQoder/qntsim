@@ -1,3 +1,4 @@
+import { HoldingDataService } from 'src/services/holding-data.service';
 import { transition } from '@angular/animations';
 import { CookieService } from 'ngx-cookie-service';
 import { ApiServiceService } from './../../../services/api-service.service';
@@ -73,7 +74,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     type: 'star', level: this.level
   }
 
-  constructor(private fb: FormBuilder, private service: ConditionsService, private route: Router, private api: ApiServiceService, private cookie: CookieService) { }
+  constructor(private fb: FormBuilder, private service: ConditionsService, private route: Router, private holdingData: HoldingDataService, private api: ApiServiceService, private cookie: CookieService) { }
   ngAfterViewInit(): void {
 
     let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value, this.level);
@@ -273,6 +274,11 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       noOfMemory: this.topologyForm.get('noOfMemories')?.value,
       memory: this.service.getMemory()
     }));
+    if (app_id != 4) {
+      localStorage.setItem('sender', this.appSettingsForm.get('sender')?.value);
+      localStorage.setItem('receiver', this.appSettingsForm.get('receiver')?.value)
+    }
+
     localStorage.setItem('app_id', app_id);
     console.log(nodeArray)
     for (const link of linkDataArray) {
@@ -285,6 +291,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     }
     console.log(linkRequestArray);
     var cc = []
+    this.cc = []
     for (var i = 0; i < nodeDataArray.length; i++) {
       for (var j = 0; j < nodeDataArray.length; j++) {
         cc.push([nodeDataArray[i].key, nodeDataArray[j].key]);
@@ -322,7 +329,6 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     })
   }
   buildForm(app: Number) {
-
     switch (app) {
       case 1:
         if (!this.appSettingsForm.controls['keyLength'])

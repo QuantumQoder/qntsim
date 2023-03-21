@@ -1,9 +1,11 @@
+import { HoldingDataService } from 'src/services/holding-data.service';
 import { ViewEncapsulation } from '@angular/core';
 import { AfterViewInit, Component, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { ApiServiceService } from 'src/services/api-service.service';
 import { ConditionsService } from 'src/services/conditions.service';
+import { local } from 'd3';
 @Component({
   selector: 'app-results',
   templateUrl: './results.component.html',
@@ -11,6 +13,7 @@ import { ConditionsService } from 'src/services/conditions.service';
   encapsulation: ViewEncapsulation.None
 })
 export class ResultsComponent implements OnInit, AfterViewInit {
+  nodeData: any
   performance: any
   match: any = []
   alice_r: any
@@ -26,14 +29,17 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   infoqsdc: boolean;
   app: string;
   constructor(private con: ConditionsService, public api: ApiServiceService,
-    private router: Router) { }
+    private router: Router, private holdingData: HoldingDataService) { }
   ngAfterViewInit(): void {
   }
   ngOnInit(): void {
+    this.nodeData.sender = localStorage.getItem('sender')
+    this.nodeData.receiver = localStorage.getItem('receiver')
     this.app_id = localStorage.getItem('app_id')
     if (!this.app_id) {
       this.router.navigate(['/'])
     }
+    this.nodeData = this.holdingData.getNodeData()
     this.performance = this.con.getResult().performance
     // this.performance.execution_time = this.performance.execution_time.toFixed(3);
     this.performance.latency = this.performance.latency.toFixed(3);

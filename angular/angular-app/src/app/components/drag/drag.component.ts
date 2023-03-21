@@ -29,7 +29,7 @@ export class DragComponent implements OnInit, AfterViewInit {
   link: boolean
   tutorial: boolean;
   checked: boolean = false;
-  nodesData: any
+  nodesData: any = {}
   memory: any = {
     "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93
   }
@@ -357,73 +357,7 @@ export class DragComponent implements OnInit, AfterViewInit {
     this.myDiagram.addDiagramListener("ChangedSelection", function (event) {
       console.log("selection changed")
     })
-    const nodesarray = this.savedModel.nodeDataArray;
-    const linkArray = this.savedModel.linkDataArray;
-    const namevar = {
-      0: 'node1',
-      1: 'node2',
-      2: 'node3',
-      3: 'node4'
-    };
-    console.log(nodesarray);
-    for (let i = 0; i < nodesarray.length; i++) {
-      const type = (nodesarray[i].figure == "Ellipse") ? "service" : "end";
-      console.log(type);
-      const nodereq = {
-        "Name": namevar[i],
-        "Type": type,
-        "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
-        "memory": this.memory
-      };
-      this.nodes.push(nodereq);
-    }
-    let array = []
-    var linkreq
-    let chunk = 2;
-    for (var i = 0; i < linkArray.length; i++) {
-      var from = linkArray[i].from
-      var to = linkArray[i].to
-      let positiveFromkey = from * (-1)
-      // console.log(positivekey * 2)
-      let positivetoKey = to * (-1)
-      var fromKey = positiveFromkey - 1;
-      let toKey = positivetoKey - 1;
-      array.push(this.nodes[fromKey].Name)
-      array.push(this.nodes[toKey].Name)
-      console.log(array)
-      linkreq = {
-        Nodes: array,
-        Attenuation: Number(this.toolbox.get('attenuation')?.value),
-        Distance: Number(this.toolbox.get('distance')?.value),
-      }
-      array = []
-      this.links.push(linkreq)
-    }
-    this.topology = {
-      nodes: this.nodes,
-      quantum_connections: this.links,
-      classical_connections: this.cc,
-    }
-    var cc = []
-    for (var i = 0; i < this.nodes.length; i++) {
-      for (var j = 0; j < this.nodes.length; j++) {
-        cc.push([this.nodes[i].Name, this.nodes[j].Name]);
-      }
-    }
-    if (cc.length) {
-      for (var i = 0; i < cc.length; i++) {
-        var [node1, node2] = cc[i];
-        var [distance, delay] = node1 == node2 ? [0, 0] : [1000, 10000000000];
-        this.cc.push({ Nodes: [node1, node2], Delay: delay, Distance: distance });
-      }
-    }
-    console.log(this.links)
-    console.log(this.nodes);
-    this.myDiagram.startTransaction("");
-    this.myDiagram.contentAlignment = go.Spot["Center"];
-    this.myDiagram.commitTransaction("");
-    this.updateNodes()
-    this.load();
+
   }
 
   e2eChange(data: string) {
@@ -436,14 +370,23 @@ export class DragComponent implements OnInit, AfterViewInit {
   }
   updateNodes() {
     this.serviceNodes = [];
-    this.endNodes = []
-    for (let i = 0; i < this.nodes.length; i++) {
-      if (this.nodes[i].Type == 'end') {
-        this.endNodes.push(this.nodes[i])
-      } else if (this.nodes[i].Type == 'service') {
-        this.serviceNodes.push(this.nodes[i])
+    this.endNodes = [];
+    // this.nodes = [];
+
+    // for (let i = 0; i < this.myDiagram.model.nodeDataArray.length; i++) {
+    //   if ((this.myDiagram.model.nodeDataArray[i] as any).key in this.nodesData) {
+    //     this.nodes.push(this.nodesData[(this.myDiagram.model.nodeDataArray[i] as any).key])
+    //   }
+    // }
+    for (const [key, value] of Object.entries(this.nodesData)) {
+      // console.log(value)
+      if (value["Type"] == 'end') {
+        this.endNodes.push(value)
+      } else if (value["Type"] == 'service') {
+        this.serviceNodes.push(value)
       }
     }
+    console.log(this.nodes)
     console.log(this.serviceNodes);
     console.log(this.endNodes)
   }
@@ -501,8 +444,10 @@ export class DragComponent implements OnInit, AfterViewInit {
             "noOfMemory": Number(this.toolbox.get('noOfMemories')?.value),
             "memory": this.memory
           };
-          this.nodes.push(nodereq);
+          this.nodesData[nodesarray[i].key] = nodereq;
+          this.nodes.push(this.nodesData[nodesarray[i].key])
         }
+        console.log(this.nodesData)
         let array = []
         var linkreq
         // let chunk = 2;
@@ -512,10 +457,9 @@ export class DragComponent implements OnInit, AfterViewInit {
           let positiveFromkey = from * (-1)
           // console.log(positivekey * 2)
           let positivetoKey = to * (-1)
-          var fromKey = positiveFromkey - 1;
-          let toKey = positivetoKey - 1;
-          array.push(this.nodes[fromKey].Name)
-          array.push(this.nodes[toKey].Name)
+
+          array.push(this.nodesData[from].Name)
+          array.push(this.nodesData[to].Name)
           console.log(array)
           linkreq = {
             Nodes: array,
@@ -524,11 +468,6 @@ export class DragComponent implements OnInit, AfterViewInit {
           }
           array = []
           this.links.push(linkreq)
-        }
-        this.topology = {
-          nodes: this.nodes,
-          quantum_connections: this.links,
-          classical_connections: this.cc,
         }
         var cc = []
         for (var i = 0; i < this.nodes.length; i++) {
@@ -543,6 +482,13 @@ export class DragComponent implements OnInit, AfterViewInit {
             this.cc.push({ Nodes: [node1, node2], Delay: delay, Distance: distance });
           }
         }
+        console.log(this.nodes)
+        this.topology = {
+          nodes: this.nodes,
+          quantum_connections: this.links,
+          classical_connections: this.cc,
+        }
+
         console.log(this.links)
         console.log(this.nodes)
         this.updateNodes()
@@ -602,8 +548,7 @@ export class DragComponent implements OnInit, AfterViewInit {
       console.log(nodesarray)
       var key = this.selectedNode.key
       console.log(key)
-      let positivekey = -1 * key
-      var indexFromKey = positivekey - 1
+
       type = this.selectedNode.figure === "Ellipse" ? 'service' : 'end'
       var node = this.myDiagram.model.findNodeDataForKey(key)
       this.myDiagram.model.startTransaction('modified property');
@@ -619,14 +564,13 @@ export class DragComponent implements OnInit, AfterViewInit {
       }
       localStorage.setItem("selected_node", this.selectedNode.key)
       console.log(this.savedModel.nodeDataArray)
-      this.savedModel.nodeDataArray[indexFromKey].text = this.toolbox.get('name')?.value
+      // var selectedNode = this.myDiagram.model.findNodeDataForKey(this.selectedNode)
+      this.myDiagram.model.removeNodeData(this.selectedNode)
+      this.selectedNode.text = this.toolbox.get('name')?.value
+      this.myDiagram.model.addNodeData(this.selectedNode)
       var nodeLinkStr = this.myDiagram.links
       console.log(nodeLinkStr)
-      if (this.nodes[indexFromKey] == null)
-        this.nodes.splice(indexFromKey, 0, nodereq)
-      if (this.nodes[indexFromKey] != null) {
-        this.nodes.splice(indexFromKey, 1, nodereq)
-      }
+      this.nodesData[key] = nodereq
       console.log(this.nodes)
       this.updateNodes()
     }
@@ -704,10 +648,10 @@ export class DragComponent implements OnInit, AfterViewInit {
     this.graphModel = this.myDiagram.model.nodeDataArray
     console.log(this.savedModel.nodeDataArray.length)
     console.log(this.nodes.length)
-    if (this.graphModel.length != this.nodes.length) {
-      alert("Nodes settings are not set properly!!");
-      return
-    }
+    // if (this.graphModel.length != this.nodes.length) {
+    //   alert("Nodes settings are not set properly!!");
+    //   return
+    // }
     this.links = []
     var linkarray: any[]
     if (this.savedModel.linkDataArray.length > this.links.length) {
@@ -725,13 +669,11 @@ export class DragComponent implements OnInit, AfterViewInit {
         this.links.push(linkData)
       }
     }
+    this.nodes = []
+    for (const [key, value] of Object.entries(this.nodesData)) {
+      this.nodes.push(value)
+    }
 
-    // this.position = 'bottom';
-    // this.displayPosition = true;
-
-    // console.log(this.graphModel)
-    // console.log(this.savedModel.linkDataArray)
-    // console.log(this.links)
     this.spinner = true;
     this.displayPosition = false
     this.app_id = localStorage.getItem('app_id')
@@ -745,6 +687,34 @@ export class DragComponent implements OnInit, AfterViewInit {
     this.displayPosition = false
     var token = localStorage.getItem('access')
     // console.log(this.finalNodes)
+    this.cc = []
+    var cc = []
+    if (this.nodes.length != 0) {
+      for (var i = 0; i < this.nodes.length; i++) {
+        for (var j = 0; j < this.nodes.length; j++) {
+          cc.push([this.nodes[i].Name, this.nodes[j].Name]);
+        }
+      }
+      if (cc.length != 0) {
+        var distance
+        var delay
+        for (var i = 0; i < cc.length; i++) {
+          if (cc[i][0] == cc[i][1]) {
+            distance = 0;
+            delay = 0;
+          } else {
+            distance = 1000;
+            delay = 1000000000;
+          }
+          let ccreq = {
+            Nodes: cc[i],
+            Delay: delay,
+            Distance: distance
+          }
+          this.cc.push(ccreq)
+        }
+      }
+    }
     this.topology = {
       nodes: this.nodes,
       quantum_connections: this.links,
@@ -839,6 +809,10 @@ export class DragComponent implements OnInit, AfterViewInit {
       links: this.links
     }
     this.holdingData.setDiagramData(diagramdata)
+    if (this.app_id != 4) {
+      localStorage.setItem('sender', this.appSettingsForm.get('sender')?.value);
+      localStorage.setItem('receiver', this.appSettingsForm.get('receiver')?.value)
+    }
     this.apiService.runApplication(req).subscribe((result: any) => {
       this.spinner = true;
       console.log(this.spinner)
@@ -903,6 +877,7 @@ export class DragComponent implements OnInit, AfterViewInit {
     // set Diagram.initialPosition, not Diagram.position, to handle initialization side-effects
     var pos = this.myDiagram.model.modelData.position;
     if (pos) this.myDiagram.initialPosition = go.Point.parse(pos);
+    this.myDiagram.contentAlignment = go.Spot["Center"];
   }
   nodeClicked(e: go.InputEvent, obj: go.GraphObject) {
     // var evt = e.copy();
@@ -919,29 +894,23 @@ export class DragComponent implements OnInit, AfterViewInit {
     console.log(this.graphModel)
     console.log(this.selectedNode);
     var key = this.selectedNode.key
-    if (this.nodes.length != 0) {
-      let positivekey = key * (-1)
-      // console.log(positivekey * 2)
-      var indexFromKey = positivekey - 1
-      console.log(indexFromKey)
-      console.log(this.nodes.length)
-      let node
-      if (this.nodes.length > indexFromKey) {
-        node = this.nodes[indexFromKey]
-        console.log(node)
-        console.log(node.noOfMemory)
-        this.toolbox.get('name')?.patchValue(node.Name)
-        this.toolbox.get('noOfMemories')?.patchValue(node.noOfMemory)
-      }
-      else {
-        this.toolbox.get('name')?.patchValue('');
-        this.toolbox.get('noOfMemories')?.patchValue('500')
-      }
+
+    if (key in this.nodesData) {
+      node = this.nodesData[key]
+      console.log(node)
+      console.log(this.nodesData[key].noOfMemory)
+      this.toolbox.get('name')?.patchValue(this.nodesData[key].Name)
+      this.toolbox.get('noOfMemories')?.patchValue(this.nodesData[key].noOfMemory)
     }
+    else {
+      this.toolbox.get('name')?.patchValue('');
+      this.toolbox.get('noOfMemories')?.patchValue('500')
+    }
+
     this.visibleSideNav = true
     this.nodeParams = true
     this.link = false;
-    console.log(this.nodes)
+    // console.log(this.nodes)
   }
   reload() {
     this.savedModel = this.savedModel1;
@@ -1053,7 +1022,7 @@ export class selectedNode {
 }
 
 function onNodeDataAdded(e: any) {
-  console.log(e.model.nodeDataArray)
+  // console.log(e.model.nodeDataArray)
   // if (e.change === go.ChangedEvent.Insert && e.propertyName === "nodeDataArray" &&
   //   !e.model.skipsUndoManager) {  // skip any temporary additions, such as during drag-and-drop
   //   var data = e.newValue;
@@ -1068,7 +1037,6 @@ function onNodeDataAdded(e: any) {
   //   e.model.set(counters, cname, count);
   //   e.model.set(data, "text", cname + count);
   // }
-
 }
 class Step {
   step1: any;
