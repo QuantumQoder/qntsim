@@ -43,8 +43,8 @@ import { CtrlClickDirective } from './directives/ctrl-click';
 import { JwtInterceptor } from './auth/jwt.interceptor';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { MinimalComponent } from './components/minimal/minimal.component';
-
+import { CheckboxModule } from 'primeng/checkbox';
+import { SliderModule } from 'primeng/slider';
 // import { GameComponent } from './components/game/game.component';
 // import { ToastModule } from 'primeng/toast';
 // import { Alert } from '@ng-bootstrap/ng-bootstrap';
@@ -70,7 +70,7 @@ import { MinimalComponent } from './components/minimal/minimal.component';
     FormsModule,
     DropdownModule,
     SpeedDialModule,
-
+    CheckboxModule,
 
     SidebarModule,
     FormsModule,
@@ -78,7 +78,7 @@ import { MinimalComponent } from './components/minimal/minimal.component';
     DialogModule,
     StyleClassModule,
     ConfirmDialogModule,
-
+    SliderModule,
     ToastModule,
     TabMenuModule,
     ReactiveFormsModule,

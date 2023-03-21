@@ -26,7 +26,11 @@
 
 .container .card .face.face1 {
     position: relative;
-    background: #7cb4ff;
+    // background-image: url("/assets/images/feature.png");
+    // background-image: linear-gradient(#C9EEFF, white);
+    background-color: #000;
+    border: 1px solid white;
+    // backdrop-filter: blur(10px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -35,8 +39,9 @@
 }
 
 .container .card:hover .face.face1 {
-    background: #0275d8;
+    // background: #0275d8;
     transform: translateY(0);
+    border: 0px;
 }
 
 .container .card .face.face1 .content {
@@ -56,7 +61,7 @@
 .container .card .face.face1 .content h3 {
     margin: 10px 0 0;
     padding: 0;
-    color: #000;
+    color: white;
     text-align: center;
     font-size: 1.5em;
 }
@@ -302,4 +307,11 @@ a {
     to {
         width: 200px;
     }
+}
+
+hr {
+    opacity: 1;
+    align-self: center;
+    width: 98%;
+    border: 1px solid white;
 }

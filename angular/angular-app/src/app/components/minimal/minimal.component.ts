@@ -1,3 +1,4 @@
+import { transition } from '@angular/animations';
 import { CookieService } from 'ngx-cookie-service';
 import { ApiServiceService } from './../../../services/api-service.service';
 
@@ -7,7 +8,6 @@ import * as go from 'gojs'
 import { map } from 'rxjs';
 import { ConditionsService } from 'src/services/conditions.service';
 import { Router } from '@angular/router';
-import { KatexOptions } from 'ng-katex';
 
 @Component({
   selector: 'app-minimal',
@@ -29,9 +29,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   {
     header: '/assets/images/amplitude/4.jpg', value: 4,
   }];
-  options: KatexOptions = {
-    displayMode: true,
-  };
+
   equation1: any = [{
     header: '|1\\rangle', value: 1,
   },
@@ -71,23 +69,49 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   cc: any[] = []
   appSettingsResult: any
   appConfig: any;
+  lastValue = {
+    type: 'star', level: this.level
+  }
 
   constructor(private fb: FormBuilder, private service: ConditionsService, private route: Router, private api: ApiServiceService, private cookie: CookieService) { }
   ngAfterViewInit(): void {
+
     let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value, this.level);
     this.service.getJson(urlData.url, urlData.type).subscribe((result) => {
-      // console.log(result)
       this.topologyData = result;
       this.updateNodes()
-      // console.log(this.topologyData.nodes)
     }, (error) => {
       console.log(error)
     }, () => {
-      // console.log(this.topologyData.nodes)
-
       this.init(this.topologyData.nodes, this.topologyData.links)
     }
     )
+  }
+  toggle(data: any) {
+    var content;
+    var toggler;
+    if (data == 1) {
+      content = document.getElementById('content1') as any;
+      toggler = document.getElementById('toggle-button1') as any;
+      toggler.classList.toggle('active');
+
+      if (toggler.classList.contains('active')) {
+        content.style.display = 'none';
+      } else {
+        content.style.display = 'block';
+      }
+    }
+    else if (data == 2) {
+      content = document.getElementById('content2') as any;
+      toggler = document.getElementById('toggle-button2') as any;
+      toggler.classList.toggle('active');
+      // content.classList.toggle('active');
+      if (toggler.classList.contains('active')) {
+        content.style.display = 'none';
+      } else {
+        content.style.display = 'block';
+      }
+    }
   }
   setSettings(formData: any) {
     let form = {}
@@ -102,22 +126,19 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       'type': ['Star', Validators.required],
       'level': [0, Validators.required],
       'noOfMemories': [500, Validators.required],
-      'distance': [150, [Validators.required, Validators.max(150)]],
-      'attenuity': [{ value: 0.00001, disabled: true }, Validators.required]
+      'distance': [150, [Validators.required]],
+      'attenuity': [0.00001, Validators.required]
     });
     this.appForm = this.fb.group({
       'app': ['', Validators.required]
     });
     this.appSettingsForm = this.fb.group({
-      'sender': [''],
-      'receiver': [''],
+      'sender': ['', Validators.required],
+      'receiver': ['', Validators.required],
       'targetFidelity': [0.5],
       'size': [6],
-      'amplitude': [''],
-      'endnode1': [''],
-      'endnode2': [''],
-      'endnode3': [''],
-      'middleNode': ['']
+      // 'amplitude': ['', Validators.required],
+
     })
     // this.appSettingsForm
     this.service.getAppList().pipe(map((d: any) => d.appList)).subscribe((result: any) => this.applist = result);
@@ -149,32 +170,12 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     }
   }
   getType($event: any) {
-    const { url, type } = this.service.jsonUrl(this.topologyForm.get('type')?.value.toLowerCase(), this.level);
-    this.service.getJson(url, type).subscribe(
-      (result: any) => {
-        this.topologyData = result;
-        this.updateNodes()
-      },
-      (error) => {
-        console.log(error);
-      },
-      () => {
-        this.updateDiagram(this.topologyData);
-      }
-    );
+
+    this.updateJson()
   }
   levelChange() {
     this.level = this.topologyForm.get('level')?.value;
-    let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value.toLowerCase(), this.level);
-    this.service.getJson(urlData.url, urlData.type).subscribe((result: any) => {
-      this.topologyData = result;
-      console.log(this.topologyData)
-      this.updateNodes()
-    }, (error) => {
-      console.log(error)
-    }, () => {
-      this.updateDiagram(this.topologyData)
-    })
+    this.updateJson();
   }
   selectAmplitude($event: any) {
 
@@ -255,48 +256,32 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       this.levelChange()
     }
     this.updateNodes()
+    localStorage.setItem('app_id', this.appForm.get('app')?.value)
     this.buildForm(this.appForm.get('app')?.value)
   }
   runApp() {
     this.spinner = true;
     var linkArray = []
-    var nodeArray = []
+    // var nodeArray = []
     var linkRequestArray = []
-    let nodeDataArray = this.topologyData.nodes
-    let linkDataArray = this.topologyData.links
-    this.service.setapp_id(this.appForm.get('app')?.value)
-    for (var i = 0; i < nodeDataArray.length; i++) {
-      var name = nodeDataArray[i].key;
-      var type
-      if (nodeDataArray[i].color == 'orange') {
-        type = 'service'
-      } else if (nodeDataArray[i].color == 'lightblue') {
-        type = 'end'
-      }
-      var memory = this.service.getMemory();
-      var noOfMemories = this.topologyForm.get('noOfMemories')?.value
-      var singleNode = {
-        Name: name,
-        Type: type,
-        noOfMemory: noOfMemories,
-        memory: memory
-      }
-      nodeArray.push(singleNode)
-    }
+    const nodeDataArray = this.topologyData.nodes;
+    const linkDataArray = this.topologyData.links;
+    const app_id = this.appForm.get('app')?.value;
+    const nodeArray = nodeDataArray.map((node: any) => ({
+      Name: node.key,
+      Type: node.color === 'orange' ? 'service' : 'end',
+      noOfMemory: this.topologyForm.get('noOfMemories')?.value,
+      memory: this.service.getMemory()
+    }));
+    localStorage.setItem('app_id', app_id);
     console.log(nodeArray)
-    for (var i = 0; i < linkDataArray.length; i++) {
-      let from = linkDataArray[i].from
-      let to = linkDataArray[i].to
-      linkArray.push(from);
-      linkArray.push(to);
-      var linkData
-      linkData = {
-        Nodes: linkArray,
+    for (const link of linkDataArray) {
+      const linkData = {
+        Nodes: [link.from, link.to],
         Attenuation: this.topologyForm.get('attenuity')?.value,
         Distance: this.topologyForm.get('distance')?.value
-      }
-      linkArray = []
-      linkRequestArray.push(linkData)
+      };
+      linkRequestArray.push(linkData);
     }
     console.log(linkRequestArray);
     var cc = []
@@ -305,24 +290,11 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         cc.push([nodeDataArray[i].key, nodeDataArray[j].key]);
       }
     }
-    if (cc.length != 0) {
-      var distance
-      var delay
+    if (cc.length) {
       for (var i = 0; i < cc.length; i++) {
-        if (cc[i][0] == cc[i][1]) {
-          distance = 0;
-          delay = 0;
-        } else {
-          distance = 1000;
-          delay = 10000000000;
-        }
-        let ccreq = {
-          Nodes: cc[i],
-          Delay: delay,
-          Distance: distance
-        }
-        this.cc.push(ccreq);
-        console.log(this.cc)
+        var [node1, node2] = cc[i];
+        var [distance, delay] = node1 == node2 ? [0, 0] : [1000, 10000000000];
+        this.cc.push({ Nodes: [node1, node2], Delay: delay, Distance: distance });
       }
     }
     var topology = {
@@ -350,48 +322,68 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     })
   }
   buildForm(app: Number) {
-    // this.appSettingsForm = null;
 
     switch (app) {
-      case 1: this.appSettingsForm.addControl('keyLength', new FormControl());
+      case 1:
+        if (!this.appSettingsForm.controls['keyLength'])
+          this.appSettingsForm.addControl('keyLength', new FormControl('', Validators.required));
         break;
       case 2: console.log(app)
         break;
       case 3: console.log(app);
         break;
-      case 4: console.log(app);
+      case 4:
+        if (!this.appSettingsForm.controls['endnode1'])
+          this.appSettingsForm.addControl('endnode1', new FormControl('node1', Validators.required))
+        if (!this.appSettingsForm.controls['endnode2'])
+          this.appSettingsForm.addControl('endnode2', new FormControl('node3', Validators.required))
+        if (!this.appSettingsForm.controls['endnode3'])
+          this.appSettingsForm.addControl('endnode3', new FormControl('node4', Validators.required))
+        if (!this.appSettingsForm.controls['middleNode'])
+          this.appSettingsForm.addControl('middleNode', new FormControl('node2', Validators.required))
+        console.log(this.appSettingsForm)
         break;
-      case 5: this.appSettingsForm.addControl('key', new FormControl());
+      case 5:
+        if (!this.appSettingsForm.controls['key'])
+          this.appSettingsForm.addControl('key', new FormControl('', [Validators.required, evenLengthValidator]));
         break;
-      case 6: this.appSettingsForm.addControl('message', new FormControl());
+      case 6:
+        if (!this.appSettingsForm.controls['message'])
+          this.appSettingsForm.addControl('message', new FormControl('', [Validators.required, evenLengthValidator]));
         break;
-      case 7: this.appSettingsForm.addControl('message', new FormControl());
+      case 7:
+        if (!this.appSettingsForm.controls['message'])
+          this.appSettingsForm.addControl('message', new FormControl('', [Validators.required, evenLengthValidator]));
         break;
-      case 8: this.appSettingsForm.addControl('message1', new FormControl());
-        this.appSettingsForm.addControl('message2', new FormControl());
+      case 8:
+        if (!this.appSettingsForm.controls['message1'])
+          this.appSettingsForm.addControl('message1', new FormControl('', Validators.required));
+        if (!this.appSettingsForm.controls['message2'])
+          this.appSettingsForm.addControl('message2', new FormControl('', Validators.required));
         break;
-      case 9: this.appSettingsForm.addControl('message', new FormControl());
+      case 9:
+        if (!this.appSettingsForm.controls['message'])
+          this.appSettingsForm.addControl('message', new FormControl('', Validators.required));
         break;
-      case 10: this.appSettingsForm.addControl('inputMessage', new FormControl());
+      case 10:
+        if (!this.appSettingsForm.controls['inputMessage'])
+          this.appSettingsForm.addControl('inputMessage', new FormControl('', Validators.required));
         break;
     }
+    console.log(this.appSettingsForm)
+
   }
-  selectSender($event: any) {
-    console.log(this.appSettingsForm.get('sender')?.value);
-  }
-  selectReceiver($event: any) {
-    console.log(this.appSettingsForm.get('receiver')?.value)
-  }
+
   getAppSettingsResults() {
     this.service.getAppSetting().subscribe((results: any) => {
       this.appSettingsResult = results
-      // console.log("APP SETTINGS:" + this.appSettingsResult)
     })
   }
+
   getAppSetting(app_id: any) {
 
-    switch (app_id) {
-      case 2: this.appConfig = {
+    const appConfigMap = {
+      2: {
         sender: this.appSettingsForm.get('sender')?.value,
         receiver: this.appSettingsForm.get('receiver')?.value,
         startTime: 1e12,
@@ -399,70 +391,118 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         priority: 0,
         targetFidelity: this.appSettingsForm.get('targetFidelity')?.value,
         timeout: 2e12
-      }
-        break;
-      case 1: this.appConfig = {
+      },
+      1: {
         sender: this.appSettingsForm.get('sender')?.value,
         receiver: this.appSettingsForm.get('receiver')?.value,
         keyLength: String(this.appSettingsForm.get('keyLength')?.value)
-      }
-        break;
-      case 3: this.appConfig = {
+      },
+      3: {
         sender: this.appSettingsForm.get('sender')?.value,
         receiver: this.appSettingsForm.get('receiver')?.value,
         amplitude1: '0.70710678118+0j',
         amplitude2: '0-0.70710678118j'
-      }
-        break;
-      case 4: this.appConfig = {
+      },
+      4: {
         endnode1: this.appSettingsForm.get('endnode1')?.value,
         endnode2: this.appSettingsForm.get('endnode2')?.value,
         endnode3: this.appSettingsForm.get('endnode3')?.value,
         middlenode: this.appSettingsForm.get('middleNode')?.value
-      }
-        break;
-      case 5: this.appConfig = {
+      },
+      5: {
         sender: this.appSettingsForm.get('sender')?.value,
         receiver: this.appSettingsForm.get('receiver')?.value,
         sequenceLength: 3,
         key: this.appSettingsForm.get('key')?.value
-      }
-        break;
-      case 6: this.appConfig = {
+      },
+      6: {
         sender: this.appSettingsForm.get('sender')?.value,
         receiver: this.appSettingsForm.get('receiver')?.value,
         sequenceLength: "2",
         message: this.appSettingsForm.get('message')?.value
-      }
-        break;
-      case 7: this.appConfig = {
+      },
+      7: {
         sender: this.appSettingsForm.get('sender')?.value,
         receiver: this.appSettingsForm.get('receiver')?.value,
         message: this.appSettingsForm.get('message')?.value
-      }
-        break;
-      case 8: this.appConfig = {
+      },
+      8: {
         sender: this.appSettingsForm.get('sender')?.value,
         receiver: this.appSettingsForm.get('receiver')?.value,
         message1: this.appSettingsForm.get('message1')?.value,
         message2: this.appSettingsForm.get('message2')?.value,
         num_photons: 5,
         attack: 'DoS'
-      }
-        break;
-      case 9: this.appConfig = {
+      },
+      9: {
         sender: 1,
         receiver: 2,
         message: this.appSettingsForm.get('message')?.value,
         attack: 'None'
+      },
+      10: {
+        input_messages: { 2: this.appSettingsForm.get('message')?.value },
+        ids: { 2: "1011", 1: "0111" },
+        num_check_bits: 4,
+        num_decoy: 4
       }
-        break;
-      case 10:
-        this.appConfig = { "input_messages": { 2: this.appSettingsForm.get('message')?.value }, "ids": { "2": "1011", "1": "0111" }, "num_check_bits": 4, "num_decoy": 4 }
-        break;
+    };
+
+    this.appConfig = appConfigMap[app_id];
+  }
+  updateJson() {
+    let type = this.topologyForm.get('type')?.value.toLowerCase();
+    if (type === this.lastValue.type && this.level == this.lastValue.level) {
+      return;
     }
+    let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value.toLowerCase(), this.level);
+    this.service.getJson(urlData.url, urlData.type).subscribe((result: any) => {
+      this.topologyData = result;
+      console.log(this.topologyData)
+      this.updateNodes()
+    }, (error) => {
+      console.log(error)
+    }, () => {
+      this.updateDiagram(this.topologyData)
+    })
+    this.lastValue.level = type;
+    this.lastValue.type = this.topologyForm.get('type')?.value.toLowerCase();
+  }
+  get app() {
+    return this.appForm.get('app')
+  }
+  get sender() {
+    return this.appSettingsForm.get('sender')
+  }
+  get receiver() {
+    return this.appSettingsForm.get('receiver')
+  }
+  get node1() {
+    return this.appSettingsForm.get('endnode1')
+  }
+  get node2() {
+    return this.appSettingsForm.get('endnode2')
+  }
+  get node3() {
+    return this.appSettingsForm.get('endnode3')
+  }
+  get middlenode() {
+    return this.appSettingsForm.get('middleNode')
+  }
+  get keyLength() {
+    return this.appSettingsForm.get('keyLength')
+  }
+  get key() {
+    return this.appSettingsForm.get('key')
   }
 
+}
+function evenLengthValidator(control: FormControl) {
+  const value = control.value;
+  if (value.length % 2 !== 0) {
+    return { evenLength: true };
+  }
+  return null;
 }
 
 

@@ -30,8 +30,7 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
   }
   ngOnInit(): void {
-    this.app_id = this.con.getapp_id()
-
+    this.app_id = localStorage.getItem('app_id')
     if (!this.app_id) {
       this.router.navigate(['/'])
     }
@@ -40,31 +39,17 @@ export class ResultsComponent implements OnInit, AfterViewInit {
     this.performance.latency = this.performance.latency.toFixed(3);
     this.data = this.con.getResult().application;
     if (this.app_id == 1) {
-      var length = this.data.sender_basis_list.length
-      for (i = 0; i < length; i++) {
-        let x = this.data.sender_basis_list[i];
-        let y = this.data.receiver_basis_list[i];
-        if (x == y) {
-          this.match.push(i);
-        }
-      }
-      console.log(this.match)
-      var senderKeys: any = []
-      var receiverKeys: any = []
-      for (var i = 0; i < this.data.sender_keys.length; i++) {
-        senderKeys.push(this.data.sender_keys[i])
-      }
-      for (var i = 0; i < this.data.receiver_keys.length; i++) {
-        receiverKeys.push(this.data.receiver_keys[i])
-      }
-      this.data.sender_keys = senderKeys.join('')
-      this.data.receiver_keys = receiverKeys.join('')
+      this.match = this.data.sender_basis_list.reduce((match: any, x: any, i: any) => {
+        if (x === this.data.receiver_basis_list[i]) match.push(i);
+        return match;
+      }, []);
+      this.data.sender_keys = this.data.sender_keys.join('');
+      this.data.receiver_keys = this.data.receiver_keys.join('');
     }
     else if (this.app_id == 7) {
       var alice = "Alice_r" + " "
       this.alice_r = this.data[alice]
     }
-
   }
   info(data: string) {
     switch (data) {

@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class HoldingDataService {
+  diagramData: any
   homepageData = [{
     appId: 1, appName: 'E91 QKD', image: 'assets/images/apps/e91.png', content: 'Entanglement-based Quantum Key Distribution'
   },
@@ -44,6 +45,9 @@ export class HoldingDataService {
       title: 'End-to-End Entanglement Distribution', description: 'Entanglement distribution is a crucial part of Quantum Networks, but it faces challenges due to distance constraints,entanglement fidelity, and quantum data decoherence.However, Entanglement Swapping and Purification offer interesting solutions.Entanglement Swapping involves using pre- shared entanglement between two nodes to establish distant entanglement by swapping immediate neighbors.Purification uses many entangled qubits to create fresh entanglement of higher quality than existing qubits, enabling remote parties to share entanglement.'
     },
     {
+      title: 'Quantum Error Correction', description: 'The implementation of quantum error correction can significantly enhance the effectiveness and reliability of quantum networks in real-world applications. By detecting and correcting errors that arise during the transmission of quantum information, quantum error correction techniques such as error-correcting codes and quantum repeaters can enable secure communication and distributed quantum computing. As research in this area continues, improvements in quantum error correction protocols are expected, leading to more reliable and robust quantum networks that can power a range of practical applications.'
+    },
+    {
       title: 'Quantum Teleportation', description: 'Quantum teleportation transfers the state of a quantum particle across great distances using entanglement, without any physical transfer of the particle.With perfect security, it has the potential to revolutionize information exchange, from secure communications to data transfer.It represents a significant development in quantum mechanics with implications for the future of communication.'
     },
     {
@@ -71,6 +75,12 @@ export class HoldingDataService {
   }
   getHomePageData() {
     return this.homepageData
+  }
+  getDiagramData() {
+    return this.diagramData
+  }
+  setDiagramData(data: any) {
+    this.diagramData = data
   }
 
 }

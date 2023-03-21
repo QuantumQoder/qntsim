@@ -212,4 +212,7 @@ export class ApiServiceService {
       "password": "qwerty"
     }
   }
+  getSavedModel() {
+    return this._http.get('/assets/preload-topologies/advanced/savedModel.json');
+  }
 }

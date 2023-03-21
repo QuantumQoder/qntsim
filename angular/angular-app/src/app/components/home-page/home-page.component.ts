@@ -39,7 +39,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       .height(globe.clientHeight / 1.5)
       .width(globe.clientWidth)
       .backgroundColor('rgba(0,0,0,0)')
-      .arcLabel((d: any) => `${d.airline}: ${d.srcIata} &#8594; ${d.dstIata}`)
+      // .arcLabel((d: any) => `${d.airline}: ${d.srcIata} &#8594; ${d.dstIata}`)
       .arcStartLat((d: any) => +d.srcAirport.lat)
       .arcStartLng((d: any) => +d.srcAirport.lng)
       .arcEndLat((d: any) => +d.dstAirport.lat)

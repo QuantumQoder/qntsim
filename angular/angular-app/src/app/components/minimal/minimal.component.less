@@ -127,6 +127,21 @@ a:focus {
     box-shadow: 0px 0px 20px yellow;
 }
 
+#toggle-button1,
+#toggle-button2 {
+    transition: transform 0.3s ease-in-out;
+}
+
+.col-custom-3 {
+    flex: 0 0 auto;
+    width: 24.6%;
+}
+
+#toggle-button1.active,
+#toggle-button2.active {
+    transform: rotate(180deg);
+}
+
 .yellow:before {
     content: " ";
     width: 5px;
