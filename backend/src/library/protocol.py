@@ -196,7 +196,7 @@ class Protocol:
                 print('Recived messages::', protocol.recv_msgs_list)
                 print('Error in execution:', mean(protocol.mean_list))
     """
-    networks = []
+
     # def __new__(cls, *args, **kwargs):
     #     """
     #     Returns the existing instance of the class if it exists, otherwise creates a new instance.
@@ -266,7 +266,7 @@ class Protocol:
         start_time = time_ns()
         
         # Create a list of networks, one for each set of messages in messages_list, using the provided topology
-        self.networks.extend([Network(**kwds, name=self.__name, topology=topology, messages=messages) for messages in self.messages_list])
+        self.networks = [Network(**kwds, name=self.__name, topology=topology, messages=messages) for messages in self.messages_list]
         
         # Record the midpoint time
         mid_time = time_ns()

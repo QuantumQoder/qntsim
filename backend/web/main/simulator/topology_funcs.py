@@ -331,27 +331,27 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     # messages = {(1, 2):'hello world'}
     # print("sender, receiver, message, attack",sender, receiver, message, attack)
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
-    tl.init()
+    # tl.init()
     topo_json = json_topo(network_config_json)
     print('network config json', network_topo)
     with open("topology.json", "w") as outfile:
         json.dump(topo_json, outfile)
     messages = {(sender,receiver):message}
-    attack=None
+    # attack=None
     topology = '/code/web/topology.json'
     print('topology', topology)
     protocol = Protocol(name='qsdc_tel', messages_list=[messages], label='00', attack=attack)
     protocol(topology=topology)
-    tl.init()
+    # tl.init()
     
-    print(protocol)
+    # print(protocol)
     # return protocol.recv_msgs_list[0], mean(protocol.mean_list)
     res={}
     res["input_message"] = message
     # res["input_message2"] = message2
     print("protocol.recv_msgs_list",protocol.recv_msgs_list)
-    result = list(protocol.recv_msgs_list[-1].values())
-    print(protocol)
+    result = list(protocol.recv_msgs_list[0].values())
+    # print(protocol)
     res["output_message"] = result[0]
     # res["output_message2"] = protocol.recv_msgs_list[0][2]
     res["attack"] = attack
@@ -363,6 +363,7 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     # report["performance"]["execution_time"] = execution_time
     report["application"] = res
     
+    protocol = None
     return report
     # network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
     # alice=network_topo.nodes[sender]
@@ -431,6 +432,7 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     print("mean(protocol.mean_list)",mean(protocol.mean_list))
     res={}
     result = list(protocol.recv_msgs_list[-1].values())
+    
     res["input_message1"] = message1
     res["input_message2"] = message2
     res["output_message1"] = result[0]
@@ -441,13 +443,13 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     end_time = time.time()
     execution_time = end_time-start_time
     source_node_list = [sender]
-
+   
     # report=network_graph(network_topo,source_node_list,report)
     # report["performance"]["execution_time"] = execution_time
    
     # report["performance"]["execution_time"] = execution_time
     report["application"] = res
-    
+    protocol = None
     return report
     # return protocol.recv_msgs_list, mean(protocol.mean_list)
     
