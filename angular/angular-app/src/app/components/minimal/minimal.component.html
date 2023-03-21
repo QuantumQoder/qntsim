@@ -1,16 +1,18 @@
 <div class="row" style="height:89vh;">
-    <div class="col-3 p-0 bg-white">
-        <p-dialog [draggable]="true" [(visible)]="spinner" [showHeader]="false" [blockScroll]="true"
-            contentStyleClass="mask-dialog" [closable]="false" [modal]="true" [style]="{color: '#000000'}">
-            <div class="loader-body">
-                <div class="loading">
-                    <div class="circle cyan"></div>
-                    <div class="circle magenta"></div>
-                    <div class="circle yellow"></div>
-                    <p class="paragraph">Running...</p>
-                </div>
+    <div class="col-3 p-0 bg-white " style="position:relative">
+        <!-- <div class="bg-transparent bg-blur" style="position:absolute;height: 100%;width:100%;background-color: black;">
+        </div> -->
+
+        <div *ngIf="spinner" class="loader-body">
+            <div class="container">
+                <img src="https://ik.imagekit.io/qulabs/loader-removebg-preview.png?updatedAt=1679398183211"
+                    class="loader-img" alt="...">
             </div>
-        </p-dialog>
+            <div class="loader-text"></div>
+        </div>
+        <!-- <div class="load">Loading . . . </div> -->
+
+
         <form [formGroup]="topologyForm">
             <h3 class="text-center display-5">
                 Configuration
@@ -86,7 +88,8 @@
         </form>
     </div>
     <div class="col-6" style="padding:0;">
-        <div id="topology" style="width:100%;height:80%;background-color:white;border: 1px solid black;"></div>
+        <div id="topology" style="width:100%;height:80%;background-color:white;border: 1px solid black; z-index: 1;">
+        </div>
         <div style=" height:20%;width:100%;background-color: white;border: 1px solid black;"
             class="d-flex justify-content-center align-items-center">
             <button class="btn btn-primary btn-custom" [disabled]="appForm.invalid || topologyForm.invalid"

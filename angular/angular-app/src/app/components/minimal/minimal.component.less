@@ -7,130 +7,35 @@ a:focus {
 
 
 .loader-body {
-    height: 40vw;
-    width: 100vw;
+    height: 43vw;
+    z-index: 2;
+    width: 99vw;
     margin: 0px;
     padding: 0px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #072155;
-}
-
-.mask-dialog {
-    padding: 0% !important;
-    background: #072155 !important;
-    color: #072155 !important;
-}
-
-.circle {
-    border: 5px transparent solid;
     position: absolute;
-    width: 100px;
-    height: 100px;
-    border-radius: 69%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-12%, -50%);
+    background: transparent;
+    // filter: grayscale(60%);
+    // background-repeat: no-repeat;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
-.cyan {
-    top: 0px;
-    border-top: 5px cyan solid;
-    animation-delay: 4s;
-    animation: cyan 1.5s infinite;
-}
-
-/*:after element = circle at the end of each line.
-:before element = cap in be start of each line*/
-.cyan:after {
-    position: absolute;
-    content: "";
-    width: 10px;
-    height: 10px;
-    background: cyan;
-    border-radius: 69%;
-    right: 5px;
-    top: 10px;
-    box-shadow: 0px 0px 20px cyan;
-}
-
-.loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 160px;
-    width: 170px;
-    position: relative;
-    margin: 0px;
-    padding: 0px;
-}
-
-.cyan:before {
-    content: " ";
-    width: 5px;
-    height: 5px;
-    position: absolute;
-    background: cyan;
-    top: 10px;
-    left: 11px;
-    border-radius: 69%;
-}
-
-.magenta {
-    left: 0px;
-    bottom: 0px;
-    border-top: 5px magenta solid;
-    animation: magenta 1.5s infinite;
-}
-
-// #sample {
-//     position: relative;
+// .mask-dialog {
+//     padding: 0% !important;
+//     background: #072155 !important;
+//     color: #072155 !important;
 // }
 
-.magenta:after {
-    position: absolute;
-    content: "";
-    width: 10px;
-    height: 10px;
-    background: magenta;
-    border-radius: 69%;
-    right: 5px;
-    top: 10px;
-    box-shadow: 0px 0px 20px magenta;
-}
-
-.magenta:before {
-    content: " ";
-    width: 5px;
-    height: 5px;
-    position: absolute;
-    background: magenta;
-    top: 10px;
-    left: 11px;
-    border-radius: 69%;
-}
-
-.yellow {
-    right: 0px;
-    bottom: 0px;
-    border-top: 5px yellow solid;
-    animation: yellow 1.5s infinite;
-}
-
-.yellow:after {
-    position: absolute;
-    content: "";
-    width: 10px;
-    height: 10px;
-    background: yellow;
-    border-radius: 69%;
-    right: 5px;
-    top: 10px;
-    box-shadow: 0px 0px 20px yellow;
-}
 
 #toggle-button1,
 #toggle-button2 {
     transition: transform 0.3s ease-in-out;
 }
+
+
 
 .col-custom-3 {
     flex: 0 0 auto;
@@ -144,45 +49,29 @@ a:focus {
     transform: rotate(180deg);
 }
 
-.yellow:before {
-    content: " ";
-    width: 5px;
-    height: 5px;
+.loader-text {
     position: absolute;
-    background: yellow;
-    top: 10px;
-    left: 11px;
-    border-radius: 69%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-30%, -50%);
+    color: skyblue;
+    font-size: 1.4rem;
+    font-family: arial, sans-serif;
 }
 
-@keyframes cyan {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
+.loader-text:after {
+    content: 'Loading';
+    animation: load 2s linear infinite;
 }
 
-@keyframes magenta {
-    0% {
-        transform: rotate(240deg);
-    }
-
-    100% {
-        transform: rotate(600deg);
-    }
-}
-
-@keyframes yellow {
-    0% {
-        transform: rotate(120deg);
-    }
-
-    100% {
-        transform: rotate(480deg);
-    }
+.loader-img {
+    position: absolute;
+    top: 40%;
+    left: 49%;
+    transform: translate(-35%, -70%);
+    animation-name: glow;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
 }
 
 .paragraph {
@@ -190,7 +79,7 @@ a:focus {
     color: #eee;
     position: absolute;
     top: 175px;
-    font-size: 1.5em;
+    font-size: 1.4em;
     letter-spacing: 0.15em;
     font-weight: 100;
     filter: drop-shadow(2px 2px 15px #ffffff70);
@@ -205,4 +94,36 @@ a:focus {
     color: #6f6f6f;
     line-height: 28px;
     letter-spacing: 1px;
+}
+
+@keyframes load {
+    0% {
+        content: 'Loading';
+    }
+
+    33% {
+        content: 'Loading.';
+    }
+
+    67% {
+        content: 'Loading..';
+    }
+
+    100% {
+        content: 'Loading...';
+    }
+}
+
+@keyframes glow {
+    0% {
+        opacity: 1
+    }
+
+    50% {
+        opacity: 0
+    }
+
+    100% {
+        opacity: 1
+    }
 }
