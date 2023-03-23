@@ -821,8 +821,8 @@ export class DragComponent implements OnInit, AfterViewInit {
       this.spinner = false
       console.error(error)
     }, () => {
-      // this.spinner = false
-      // this._route.navigate(['/results'])
+      this.spinner = false
+      this._route.navigate(['/results'])
     })
   }
   initDiagram(): go.Diagram {
