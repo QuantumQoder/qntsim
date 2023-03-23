@@ -4,7 +4,7 @@
         </div> -->
 
         <div *ngIf="spinner" class="loader-body">
-            <div class="container">
+            <div>
                 <img src="https://ik.imagekit.io/qulabs/loader-removebg-preview.png?updatedAt=1679398183211"
                     class="loader-img" alt="...">
             </div>
@@ -169,6 +169,12 @@
                         <p class="text-danger">Please enter key length.</p>
                     </div>
                 </div>
+                <div
+                    *ngIf="keyLength.touched && appSettingsForm.get('keyLength').value == 0 ||keyLength.touched && appSettingsForm.get('keyLength').value > 30">
+                    <p class="text-danger">
+                        Key Length should be 1 to 30.
+                    </p>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 2">
                 <label for="type" class="form-label font-bold">
@@ -242,7 +248,8 @@
                 <label for="type" class="form-label font-bold">
                     Binary message (only even)
                 </label>
-                <input type="text" (keypress)="allowBitsInput($event)" formControlName="key" class="form-control">
+                <input type="text" (keypress)="allowBitsInput($event)" formControlName="key" maxlength="10"
+                    class="form-control">
                 <div *ngIf="appSettingsForm.get('key').touched && appSettingsForm.get('key').invalid">
                     <div *ngIf="appSettingsForm.get('key').errors.required">
                         <p class="text-danger">Key is required.</p>
@@ -250,19 +257,28 @@
                     <div *ngIf="appSettingsForm.get('key').errors.evenLength">
                         <p class="text-danger">Key must have an even number of characters</p>
                     </div>
+                    <div
+                        *ngIf="appSettingsForm.get('key').value.length < 8 || appSettingsForm.get('key').value.length > 10 ">
+                        <p class="text-danger">Key Should be 8 to 10 characters.</p>
+                    </div>
                 </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 6">
                 <label for="type" class="form-label font-bold">
                     Message
                 </label>
-                <input type="text" (keypress)="allowBitsInput($event)" formControlName="message" class="form-control">
+                <input type="text" (keypress)="allowBitsInput($event)" minlength="8" maxlength="10"
+                    formControlName="message" class="form-control">
                 <div *ngIf="appSettingsForm.get('message').touched && appSettingsForm.get('message').invalid">
                     <div *ngIf="appSettingsForm.get('message').errors.required">
                         <p class="text-danger">Message is required.</p>
                     </div>
                     <div *ngIf="appSettingsForm.get('message').errors.evenLength">
                         <p class="text-danger">Message must have an even number of characters</p>
+                    </div>
+                    <div
+                        *ngIf="appSettingsForm.get('message').value.length < 8 || appSettingsForm.get('message').value.length > 10 ">
+                        <p class="text-danger">Key Should be 8 to 10 characters.</p>
                     </div>
                 </div>
             </div>
@@ -270,13 +286,18 @@
                 <label for="type" class="form-label font-bold">
                     Message (only binary)
                 </label>
-                <input type="text" (keypress)="allowBitsInput($event)" formControlName="message" class="form-control">
+                <input type="text" (keypress)="allowBitsInput($event)" maxlength="10" formControlName="message"
+                    class="form-control">
                 <div *ngIf="appSettingsForm.get('message').touched && appSettingsForm.get('message').invalid">
                     <div *ngIf="appSettingsForm.get('message').errors.required">
                         <p class="text-danger">Message is required.</p>
                     </div>
                     <div *ngIf="appSettingsForm.get('message').errors.evenLength">
                         <p class="text-danger">Message must have an even number of characters</p>
+                    </div>
+                    <div
+                        *ngIf="appSettingsForm.get('message').value.length < 8 || appSettingsForm.get('message').value.length > 10 ">
+                        <p class="text-danger">Key Should be 8 to 10 characters.</p>
                     </div>
                 </div>
             </div>

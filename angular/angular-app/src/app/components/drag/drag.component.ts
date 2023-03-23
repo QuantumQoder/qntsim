@@ -809,10 +809,10 @@ export class DragComponent implements OnInit, AfterViewInit {
       links: this.links
     }
     this.holdingData.setDiagramData(diagramdata)
-    if (this.app_id != 4) {
-      localStorage.setItem('sender', this.appSettingsForm.get('sender')?.value);
-      localStorage.setItem('receiver', this.appSettingsForm.get('receiver')?.value)
-    }
+    // if (this.app_id != 4) {
+    //   localStorage.setItem('sender', this.appSettingsForm.get('sender')?.value);
+    //   localStorage.setItem('receiver', this.appSettingsForm.get('receiver')?.value)
+    // }
     this.apiService.runApplication(req).subscribe((result: any) => {
       this.spinner = true;
       console.log(this.spinner)
@@ -821,8 +821,8 @@ export class DragComponent implements OnInit, AfterViewInit {
       this.spinner = false
       console.error(error)
     }, () => {
-      this.spinner = false
-      this._route.navigate(['/results'])
+      // this.spinner = false
+      // this._route.navigate(['/results'])
     })
   }
   initDiagram(): go.Diagram {

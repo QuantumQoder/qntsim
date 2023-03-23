@@ -332,7 +332,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     switch (app) {
       case 1:
         if (!this.appSettingsForm.controls['keyLength'])
-          this.appSettingsForm.addControl('keyLength', new FormControl('', Validators.required));
+          this.appSettingsForm.addControl('keyLength', new FormControl('5', Validators.required));
         break;
       case 2: console.log(app)
         break;
@@ -351,15 +351,15 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         break;
       case 5:
         if (!this.appSettingsForm.controls['key'])
-          this.appSettingsForm.addControl('key', new FormControl('', [Validators.required, evenLengthValidator]));
+          this.appSettingsForm.addControl('key', new FormControl('', [Validators.required, evenLengthValidator, Validators.minLength(8), Validators.maxLength(10)]));
         break;
       case 6:
         if (!this.appSettingsForm.controls['message'])
-          this.appSettingsForm.addControl('message', new FormControl('', [Validators.required, evenLengthValidator]));
+          this.appSettingsForm.addControl('message', new FormControl('', [Validators.required, evenLengthValidator, Validators.minLength(8), Validators.maxLength(10)]));
         break;
       case 7:
         if (!this.appSettingsForm.controls['message'])
-          this.appSettingsForm.addControl('message', new FormControl('', [Validators.required, evenLengthValidator]));
+          this.appSettingsForm.addControl('message', new FormControl('', [Validators.required, evenLengthValidator, Validators.minLength(8), Validators.maxLength(10)]));
         break;
       case 8:
         if (!this.appSettingsForm.controls['message1'])
@@ -509,6 +509,13 @@ function evenLengthValidator(control: FormControl) {
     return { evenLength: true };
   }
   return null;
+}
+function lengthValidator(control: FormControl) {
+  const value = control.value;
+  if (value.length <= 10 || value.length >= 8) {
+    return { len: true };
+  }
+  return null
 }
 
 

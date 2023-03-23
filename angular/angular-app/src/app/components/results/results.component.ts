@@ -1,6 +1,6 @@
 import { HoldingDataService } from 'src/services/holding-data.service';
 import { ViewEncapsulation } from '@angular/core';
-import { AfterViewInit, Component, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { ApiServiceService } from 'src/services/api-service.service';
@@ -33,13 +33,13 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
   }
   ngOnInit(): void {
-    this.nodeData.sender = localStorage.getItem('sender')
-    this.nodeData.receiver = localStorage.getItem('receiver')
+    // this.nodeData.sender = localStorage.getItem('sender')
+    // this.nodeData.receiver = localStorage.getItem('receiver')
     this.app_id = localStorage.getItem('app_id')
     if (!this.app_id) {
       this.router.navigate(['/'])
     }
-    this.nodeData = this.holdingData.getNodeData()
+    // this.nodeData = this.holdingData.getNodeData()
     this.performance = this.con.getResult().performance
     // this.performance.execution_time = this.performance.execution_time.toFixed(3);
     this.performance.latency = this.performance.latency.toFixed(3);
