@@ -55,7 +55,7 @@
                     <label for="type" class="form-label font-bold mb-2">
                         Number of Memories
                     </label>
-                    <input type="number" formControlName="noOfMemories" class="form-control">
+                    <input type="number" disabled formControlName="noOfMemories" class="form-control">
                 </div>
             </div>
             <hr>
@@ -76,13 +76,13 @@
                     <label for="type" class="form-label font-bold mb-2">
                         Link Length
                     </label>
-                    <input type="number" formControlName="distance" class="form-control">
+                    <input type="number" disabled maxlength="3" formControlName="distance" class="form-control">
                 </div>
                 <div class="mt-2 col-9 mx-auto">
                     <label for="type" class="form-label font-bold mb-2">
                         Attenuation
                     </label>
-                    <input type="number" formControlName="attenuity" class="form-control">
+                    <input type="number" disabled formControlName="attenuity" class="form-control">
                 </div>
             </div>
         </form>
@@ -99,8 +99,7 @@
     </div>
     <div class="col-custom-3 p-0 bg-white">
         <form [formGroup]="appForm">
-            <h3 class="text-center display-5">Application
-                <br> Configuration
+            <h3 class="text-center display-5">Configuration
             </h3>
             <div class="mt-2 col-9 mx-auto">
                 <label for="type" class="form-label font-bold">
@@ -132,8 +131,8 @@
                     <label for="type" class="form-label font-bold">
                         Sender
                     </label>
-                    <select class="form-control" formControlName="sender">
-                        <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
+                    <select class="form-control" formControlName="sender" (change)="senderChanged($event)">
+                        <option *ngFor="let data of senderNodes" [ngValue]="data.key">{{data.key}}</option>
                     </select>
                     <div *ngIf="sender.touched && sender.invalid">
                         <div *ngIf="sender.errors.required">
@@ -146,8 +145,8 @@
                     <label for="type" class="form-label font-bold">
                         Receiver
                     </label>
-                    <select class="form-control" formControlName="receiver">
-                        <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
+                    <select class="form-control" formControlName="receiver" (change)="receiverChanged($event)">
+                        <option *ngFor="let data of receiverNodes" [ngValue]="data.key">{{data.key}}</option>
                     </select>
                     <div *ngIf="receiver.touched && receiver.invalid">
                         <div *ngIf="receiver.errors.required">
@@ -156,7 +155,6 @@
                     </div>
                 </div>
             </div>
-
 
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 1">
                 <label for="type" class="form-label font-bold">
@@ -196,40 +194,53 @@
                 <label for="type" class="form-label font-bold">
                     End Node 1
                 </label>
-                <select class="form-control" formControlName="endnode1">
+                <select class="form-control" formControlName="endnode1"
+                    (change)="endNode(appSettingsForm.get('endnode1').value)">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
-                <!-- <div *ngIf="node1.touched && node1.invalid">
+                <div *ngIf="node1.touched && node1.invalid">
                     <div *ngIf="node1.errors.required">
                         <p class="text-danger">Please select End Node 1.</p>
                     </div>
-                </div> -->
+                </div>
+                <div *ngIf="node1.value == node2.value">
+                    <p class="text-danger">Same nodes should not be selected as two end nodes.</p>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
                 <label for="type" class="form-label font-bold">
                     End Node 2
                 </label>
-                <select class="form-control" autocomplete="off" formControlName="endnode2">
+                <select class="form-control" autocomplete="off" formControlName="endnode2"
+                    (change)="endNode(appSettingsForm.get('endnode2').value)">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
-                <!-- <div *ngIf="appSettingsForm.get('endnode2').touched && node2.invalid">
+                <div *ngIf="appSettingsForm.get('endnode2').touched && node2.invalid">
                     <div *ngIf="node2.errors.required">
                         <p class="text-danger">Please select End Node 2.</p>
                     </div>
-                </div> -->
+                </div>
+                <div *ngIf="node2.value == node3.value">
+                    <p class="text-danger">Same nodes should not be selected as two end nodes.</p>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
                 <label for="type" class="form-label font-bold">
                     End Node 3
                 </label>
-                <select class="form-control" autocomplete="off" formControlName="endnode3">
+                <select class="form-control" autocomplete="off" formControlName="endnode3"
+                    (change)="endNode(appSettingsForm.get('endnode3').value)">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
-                <!-- <div *ngIf="node3.touched && node3.invalid">
+                <div *ngIf="node3.touched && node3.invalid">
                     <div *ngIf="node3.errors.required">
                         <p class="text-danger">Please select End Node 3.</p>
                     </div>
-                </div> -->
+
+                </div>
+                <div *ngIf="node1.value == node3.value">
+                    <p class="text-danger">Same nodes should not be selected as two end nodes.</p>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
                 <label for="type" class="form-label font-bold">

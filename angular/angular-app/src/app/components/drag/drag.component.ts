@@ -70,6 +70,7 @@ export class DragComponent implements OnInit, AfterViewInit {
   breadcrumbItems: MenuItem[]
   public selectedNode: any;
   public selectedLink: any
+
   visibleSideNav: boolean
   public myDiagram: go.Diagram
   public myPalette: go.Palette
@@ -97,7 +98,7 @@ export class DragComponent implements OnInit, AfterViewInit {
     'targetFidelity': new FormControl('0.5'),
     'timeout': new FormControl('1'),
     'keyLength': new FormControl('5'),
-    'message': new FormControl('10011100'),
+    'message': new FormControl('10011100', evenLengthValidator),
     'sequenceLength': new FormControl('2'),
     'amplitude1': new FormControl('0.70710678118+0j'),
     'amplitude2': new FormControl('0-0.70710678118j'),
@@ -366,6 +367,12 @@ export class DragComponent implements OnInit, AfterViewInit {
     }
     else if (data == 'size') {
       this.e2e.size = this.appSettingsForm.get('size')?.value;
+    }
+  }
+  allowBitsInput($event: any) {
+    if ($event.key.match(/[0-1]*/)['0']) { }
+    else {
+      $event.preventDefault();
     }
   }
   updateNodes() {
@@ -820,6 +827,7 @@ export class DragComponent implements OnInit, AfterViewInit {
     }, (error) => {
       this.spinner = false
       console.error(error)
+      alert("Error has occurred:" + "" + error.status + "-" + error.statusText)
     }, () => {
       this.spinner = false
       this._route.navigate(['/results'])
@@ -1042,4 +1050,11 @@ class Step {
   step1: any;
   step2: any;
   step3: any;
+}
+function evenLengthValidator(control: FormControl) {
+  const value = control.value;
+  if (value.length % 2 !== 0) {
+    return { evenLength: true };
+  }
+  return null;
 }

@@ -54,6 +54,8 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     targetFidelity: 0.5,
     size: 6
   }
+  senderNodes: any[] = [];
+  receiverNodes: any[] = []
   serviceNodes: any[] = []
   endNodes: any[] = []
   topology: any
@@ -66,13 +68,17 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   nodes: any
   appSettingsForm: any
   type = ['Star', 'Mesh'];
-  level: number = 0
+  level: number = 2
   cc: any[] = []
   appSettingsResult: any
   appConfig: any;
   lastValue = {
     type: 'star', level: this.level
   }
+  endNode1: any[] = ['node1'];
+  endNode2: any[] = ['node3']; app_data: { 1: string; 2: string; 3: string; 4: string; 5: string; 6: string; 7: string; 8: string; 9: string; 10: string; };
+  ;
+  endNode3: any[] = ['node4'];;
 
   constructor(private fb: FormBuilder, private service: ConditionsService, private route: Router, private holdingData: HoldingDataService, private api: ApiServiceService, private cookie: CookieService) { }
   ngAfterViewInit(): void {
@@ -125,7 +131,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.topologyForm = this.fb.group({
       'type': ['Star', Validators.required],
-      'level': [0, Validators.required],
+      'level': [2, Validators.required],
       'noOfMemories': [500, Validators.required],
       'distance': [150, [Validators.required]],
       'attenuity': [0.00001, Validators.required]
@@ -142,6 +148,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
 
     })
     // this.appSettingsForm
+    this.app_data = this.holdingData.getAppData()
     this.service.getAppList().pipe(map((d: any) => d.appList)).subscribe((result: any) => this.applist = result);
     var data = this.api.getCredentials()
     this.api.accessToken(data).subscribe((result: any) => {
@@ -164,14 +171,68 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.endNodes = []
     for (let i = 0; i < this.topologyData.nodes.length; i++) {
       if (this.topologyData.nodes[i].color == 'lightblue') {
-        this.endNodes.push(this.topologyData.nodes[i])
+        this.endNodes.push(this.topologyData.nodes[i]);
+        this.senderNodes = this.endNodes;
+        this.receiverNodes = this.endNodes;
+        // this.endNode1 = this.endNodes
+        this.endNode1 = this.endNodes
+        this.endNode2 = this.endNodes
+        this.endNode3 = this.endNodes
       } else if (this.topologyData.nodes[i].color == 'orange') {
         this.serviceNodes.push(this.topologyData.nodes[i])
       }
     }
   }
-  getType($event: any) {
+  senderChanged(e: any) {
+    this.receiverNodes = this.endNodes.filter(e => e.key != this.appSettingsForm.get('sender')?.value)
+  }
+  receiverChanged(e: any) {
+    this.senderNodes = this.endNodes.filter(e => e.key != this.appSettingsForm.get('receiver')?.value)
+  }
+  endNode(data: any) {
+    var remainingNodes = [];
+    console.log(data)
+    this.endNode1 = this.endNodes
+    this.endNode1 = this.endNode1.filter(e => e.key != data)
+    // this.endNode2 = this.endNodes.filter(e => e.key != this.appSettingsForm.get('endnode1')?.value && e.key != this.appSettingsForm.get('endnode3')?.value)
+    // this.endNode3 = this.endNodes.filter(e => e.key != this.appSettingsForm.get('endnode1')?.value && e.key != this.appSettingsForm.get('endnode2')?.value)
+    console.log(this.endNode1)
+    // var remainingNodes2;
+    // if (endNumber == 2) {
+    //   // 
+    //   remainingNodes1 = this.endNodes.filter(e => e.key != this.appSettingsForm.get('endnode1')?.value && e.key != this.appSettingsForm.get('endnode3')?.value)
+    //   // this.appSettingsForm.get('endnode1').patchValue('')
+    //   // this.appSettingsForm.get('endnode3').patchValue('')
+    //   this.endNode1 = remainingNodes1;
+    //   this.endNode3 = remainingNodes1;
+    //   console.log(this.endNode1);
+    //   console.log(this.endNode3);
+    // }
+    // else if (endNumber == 1) {
+    //   // remainingNodes1 = this.endNodes.filter(e => e.key != this.appSettingsForm.get('endnode1')?.value)
+    //   remainingNodes1 = this.endNodes.filter(e => e.key != this.appSettingsForm.get('endnode1')?.value)
+    //   // this.appSettingsForm.get('endnode2').patchValue('')
+    //   // this.appSettingsForm.get('endnode3').patchValue('')
+    //   // remainingNodes2 = remainingNodes1.filter(e => e.key != this.appSettingsForm.get('endnode3')?.value);
+    //   this.endNode2 = remainingNodes1;
+    //   this.endNode3 = remainingNodes1;
+    //   console.log(this.endNode2)
+    //   console.log(this.endNode3)
+    // }
+    // else if (endNumber == 3) {
 
+    //   // remainingNodes1 = this.endNodes.filter(e => e.key != this.appSettingsForm.get('endnode3')?.value)
+    //   remainingNodes1 = this.endNodes.filter(e => e.key != this.appSettingsForm.get('endnode3')?.value)
+    //   // remainingNodes2 = remainingNodes1.filter(e => e.key != this.appSettingsForm.get('endnode2')?.value);
+    //   this.endNode1 = remainingNodes1
+    //   this.endNode2 = remainingNodes1
+    //   // this.appSettingsForm.get('endnode2').patchValue('')
+    //   // this.appSettingsForm.get('endnode1').patchValue('')
+    //   console.log(this.endNode2)
+    //   console.log(this.endNode1)
+    // }
+  }
+  getType($event: any) {
     this.updateJson()
   }
   levelChange() {
@@ -249,15 +310,20 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.appSettingsForm.get(data)?.patchValue(node)
   }
   getApp($event: any) {
-
+    let app_id = this.appForm.get('app')?.value
     this.nodes = this.topologyData.nodes
-    if (this.appForm.get('app')?.value == 4) {
+    if (app_id == 4 || app_id == 8 || app_id == 9 || app_id == 10 || app_id == 5) {
       this.topologyForm.get('level').patchValue(2);
       this.level = 2;
-      this.levelChange()
+      this.levelChange();
+
+      this.appSettingsForm.get('sender').patchValue('node1');
+      this.appSettingsForm.get('receiver').patchValue('node3');
     }
+
     this.updateNodes()
-    localStorage.setItem('app_id', this.appForm.get('app')?.value)
+    localStorage.setItem('app_id', this.appForm.get('app')?.value);
+    localStorage.setItem('app', this.app_data[this.appForm.get('app')?.value])
     this.buildForm(this.appForm.get('app')?.value)
   }
   runApp() {
@@ -322,7 +388,8 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       this.service.setResult(result)
     }, (error) => {
       this.spinner = false
-      console.error(error)
+      console.log(error)
+      alert("Error has occurred:" + "" + error.status + "-" + error.statusText)
     }, () => {
       this.spinner = false
       this.route.navigate(['/results'])
@@ -340,7 +407,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         break;
       case 4:
         if (!this.appSettingsForm.controls['endnode1'])
-          this.appSettingsForm.addControl('endnode1', new FormControl('node1', Validators.required))
+          this.appSettingsForm.addControl('endnode1', new FormControl('', Validators.required))
         if (!this.appSettingsForm.controls['endnode2'])
           this.appSettingsForm.addControl('endnode2', new FormControl('node3', Validators.required))
         if (!this.appSettingsForm.controls['endnode3'])
@@ -438,13 +505,13 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         message1: this.appSettingsForm.get('message1')?.value,
         message2: this.appSettingsForm.get('message2')?.value,
         num_photons: 5,
-        attack: 'DoS'
+        attack: ''
       },
       9: {
-        sender: 1,
-        receiver: 2,
+        sender: this.appSettingsForm.get('sender')?.value,
+        receiver: this.appSettingsForm.get('receiver')?.value,
         message: this.appSettingsForm.get('message')?.value,
-        attack: 'None'
+        attack: ''
       },
       10: {
         input_messages: { 2: this.appSettingsForm.get('message')?.value },
