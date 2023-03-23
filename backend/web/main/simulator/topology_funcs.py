@@ -87,6 +87,7 @@ def network_graph(network_topo,source_node_list,report):
         fc_throughl,pc_throughl,nc_throughl= throughput(network_topo,source_node_list,t,fc_throughl,pc_throughl,nc_throughl)
         t=t+1
         timel.append(t)
+    latency, fidelity, through =0,0,100
     for i in latencyl:
         if i>0:
             latency = i
@@ -316,7 +317,12 @@ def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
     tl.run()
     results = tel.run(alice,bob,amplitude1,amplitude2)
     report={}
+    results["alice_bob_entanglement"] = display_quantum_state(results["alice_bob_entanglement"])
+    results["random_qubit"] = display_quantum_state(results["random_qubit"])
+    results["bob_initial_state"] = display_quantum_state(results["bob_initial_state"])
+    results["bob_final_state"] = display_quantum_state(results["bob_final_state"])
     report["application"]=results
+    
     end_time = time.time()
     execution_time = end_time-start_time
     report=network_graph(network_topo,source_node_list,report)
@@ -359,6 +365,8 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     report = {}
     end_time = time.time()
     execution_time = end_time-start_time
+    report = network_graph(protocol.networks[0]._net_topo, [sender], report)
+    report["performance"]["execution_time"] = execution_time
     # report=network_graph(network_topo,source_node_list,report)
     # report["performance"]["execution_time"] = execution_time
     report["application"] = res
@@ -444,8 +452,8 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     execution_time = end_time-start_time
     source_node_list = [sender]
    
-    # report=network_graph(network_topo,source_node_list,report)
-    # report["performance"]["execution_time"] = execution_time
+    report=network_graph(network_topo,source_node_list,report)
+    report["performance"]["execution_time"] = execution_time
    
     # report["performance"]["execution_time"] = execution_time
     report["application"] = res
@@ -652,6 +660,9 @@ def ip2(network_config, alice_attrs,bob_id,threshold,num_decoy):
     # report = {}
     report["application"] = res
     end_time = time.time()
+    report = network_graph(network._net_topo, [sender], report)
+    execution_time = end_time-start_time
+    report["performance"]["execution_time"] = execution_time
     # execution_time = end_time-start_time
     # report["performance"]["execution_time"] = execution_time
     print('report',report)
