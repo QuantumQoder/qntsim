@@ -340,7 +340,7 @@
                                 Message
                             </label>
                             <input type="text" (keypress)="allowBitsInput($event)" formControlName="message"
-                                class="form-control">
+                                class="form-control" maxLength="8">
                             <div
                                 *ngIf="appSettingsForm.get('message').touched && appSettingsForm.get('message').invalid">
                                 <div *ngIf="appSettingsForm.get('message').errors.required">

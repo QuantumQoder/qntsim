@@ -319,20 +319,24 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         // this.spinner = false
         return
       }
-      if (app_id == 7) {
-        if (this.appSettingsForm.get('messageIp1')?.value.length % 2 != 0) {
-          alert("Message length should be even ");
-          // this.spinner = false
-          return
-        }
+    }
+    if (app_id == 7) {
+      if (this.appSettingsForm.get('messageIp1')?.value.length % 2 != 0) {
+        alert("Message length should be even ");
+        // this.spinner = false
+        return
       }
+    }
+
+    if (app_id == 10) {
       if (this.appSettingsForm.get('inputMessage')?.value.length % 2 != 0) {
         alert("Message length should be even");
         return
       }
     }
+
     if (app_id == 8) {
-      if (this.appSettingsForm.get('message1')?.value != this.appSettingsForm.get('message2')?.value) {
+      if (this.appSettingsForm.get('message1')?.value.length != this.appSettingsForm.get('message2')?.value.length) {
         alert("Sender's Message and Receiver's message length should be same.")
         return
       }
@@ -447,7 +451,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
           this.appSettingsForm.addControl('message', new FormControl('10100111', [Validators.required, evenLengthValidator, Validators.minLength(8), Validators.maxLength(10)]));
         break;
       case 7:
-        if (!this.appSettingsForm.controls['message'])
+        if (!this.appSettingsForm.controls['messageIp1'])
           this.appSettingsForm.addControl('messageIp1', new FormControl('10100111', [Validators.required, evenLengthValidator, Validators.minLength(8), Validators.maxLength(10)]));
         break;
       case 8:

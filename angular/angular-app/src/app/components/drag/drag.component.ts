@@ -801,10 +801,10 @@ export class DragComponent implements OnInit, AfterViewInit {
         timeout: this.appSettingsForm.get('timeout')?.value + 'e12'
       }
       , 4: {
-        endnode1: this.appSettingsForm.get('node1')?.value,
-        endnode2: this.appSettingsForm.get('node2')?.value,
-        endnode3: this.appSettingsForm.get('node3')?.value,
-        middlenode: this.appSettingsForm.get('middlenode')?.value,
+        endnode1: this.appSettingsForm.get('endnode1')?.value,
+        endnode2: this.appSettingsForm.get('endnode2')?.value,
+        endnode3: this.appSettingsForm.get('endnode3')?.value,
+        middlenode: this.appSettingsForm.get('middleNode')?.value,
       }, 3: {
         sender: this.appSettingsForm.get('sender')?.value,
         receiver: this.appSettingsForm.get('receiver')?.value,
@@ -836,7 +836,7 @@ export class DragComponent implements OnInit, AfterViewInit {
         message1: this.appSettingsForm.get('message1')?.value,
         message2: this.appSettingsForm.get('message2')?.value,
         // num_photons: this.appSettingsForm.get('num_photons')?.value,
-        attack: this.appSettingsForm.get('attacker')?.value
+        attack: ''
       }, 9:
       {
         sender: this.appSettingsForm.get('sender')?.value,
