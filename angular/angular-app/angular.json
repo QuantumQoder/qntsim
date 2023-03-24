@@ -79,13 +79,7 @@
             "development": {
               "buildOptimizer": true,
               "aot": true,
-              "optimization": {
-                "scripts": true,
-                "styles": {
-                  "minify": true,
-                  "inlineCritical": false
-                }
-              },
+              "optimization": true,
               "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": false,
