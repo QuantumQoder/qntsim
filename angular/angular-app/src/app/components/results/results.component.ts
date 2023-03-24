@@ -41,7 +41,8 @@ export class ResultsComponent implements OnInit, AfterViewInit {
     }
     // this.nodeData = this.holdingData.getNodeData()
     this.performance = this.con.getResult().performance
-    // this.performance.execution_time = this.performance.execution_time.toFixed(3);
+    this.performance.execution_time = this.performance.execution_time.toFixed(3);
+    this.performance.fidelity = this.performance.fidelity.toFixed(3)
     this.performance.latency = this.performance.latency.toFixed(3);
     this.data = this.con.getResult().application;
     if (this.app_id == 1) {
