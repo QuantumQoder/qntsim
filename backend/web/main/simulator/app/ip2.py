@@ -261,4 +261,4 @@ def ip2_run(topology, alice_attrs, bob_id, num_decoy_photons, threshold, attack)
     # Network.execute(networks=[network])
     # print('Received messages:', Bob.received_msgs)
     
-    return Bob.received_msgs, return_tuple[2:]
+    return network,Bob.received_msgs, return_tuple[2:]

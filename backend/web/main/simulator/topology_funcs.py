@@ -609,6 +609,7 @@ def mdi_qsdc(network_config, sender, receiver, message, attack):
 
 def ip2(network_config, alice_attrs,bob_id,threshold,num_decoy):
     report ={}
+    start_time = time.time()
     # print("input_messages,ids,num_check_bits,num_decoy",input_messages,ids,num_check_bits,num_decoy)
     network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
     tl.init()
@@ -635,7 +636,7 @@ def ip2(network_config, alice_attrs,bob_id,threshold,num_decoy):
     threshold = 0.2 # error threshold
     attack = (None, None)
     # topology = '/code/web/configs/2n_linear.json'
-    results = ip2_run(topology=topology,
+    network, recv_msgs, err_tup = ip2_run(topology=topology,
                   alice_attrs=alice_attrs,
                   bob_id=bob_id,
                   num_decoy_photons=num_decoy_photons,
@@ -644,7 +645,7 @@ def ip2(network_config, alice_attrs,bob_id,threshold,num_decoy):
     # results=ip2_run(topology,input_messages,ids,num_check_bits,num_decoy,attack)
     # report["application"]=results
     # return report
-    print('results', results[1][0])
+    # print('results', results[1][0])
     res={}
     res["input_message"] = input_message
     res["alice_id"] = alice_attrs["id"]
@@ -652,11 +653,11 @@ def ip2(network_config, alice_attrs,bob_id,threshold,num_decoy):
     res["bob_id"] = bob_id
     res["threshold"] = threshold
     res["num_decoy"] = num_decoy
-    res["output_msg"] = results[0]
-    res["avg_error"] = results[1][0]
-    res["standard_deviation"] = results[1][1]
-    res["info_leaked"] = results[1][2]
-    res["msg_fidelity"] = results[1][3]
+    res["output_msg"] = recv_msgs
+    res["avg_error"] = err_tup[0]
+    res["standard_deviation"] = err_tup[1]
+    res["info_leaked"] = err_tup[2]
+    res["msg_fidelity"] = err_tup[3]
     # report = {}
     report["application"] = res
     end_time = time.time()
