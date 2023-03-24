@@ -2,35 +2,43 @@
     "nodes": [
         {
             "key": "node1",
-            "color": "lightblue"
+            "color": "lightblue",
+            "loc": "0 0"
         },
         {
             "key": "node2",
-            "color": "lightblue"
+            "color": "lightblue",
+            "loc": "100 0"
         },
         {
             "key": "node3",
-            "color": "orange"
+            "color": "orange",
+            "loc": "0 100"
         },
         {
             "key": "node4",
-            "color": "orange"
+            "color": "orange",
+            "loc": "100 100"
         },
         {
             "key": "node5",
-            "color": "orange"
+            "color": "orange",
+            "loc": "0 200"
         },
         {
             "key": "node6",
-            "color": "orange"
+            "color": "orange",
+            "loc": "100 200"
         },
         {
             "key": "node7",
-            "color": "lightblue"
+            "color": "lightblue",
+            "loc": "0 300"
         },
         {
             "key": "node8",
-            "color": "lightblue"
+            "color": "lightblue",
+            "loc": "100 300"
         }
     ],
     "links": [

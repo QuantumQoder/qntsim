@@ -648,6 +648,62 @@ export class DragComponent implements OnInit, AfterViewInit {
   parameters() {
     this.app_id = localStorage.getItem('app_id')
     //console.log(this.app_id)
+
+    if (this.app_id == 5 || this.app_id == 6 || this.app_id == 10 || this.app_id == 7) {
+      if (this.appSettingsForm.get('message')?.value.length % 2 != 0) {
+        alert("Message length should be even ");
+        // this.spinner = false
+        return
+      }
+
+
+    }
+    if (this.app_id == 9) {
+      if (this.appSettingsForm.get('inputMessage')?.value == '') {
+        alert("Message is required");
+        return
+      }
+    }
+    if (this.app_id != 4) {
+      console.log(this.app_id)
+      if (this.appSettingsForm.get('sender')?.value == '') {
+        alert("Please select a sender")
+        return
+      }
+      else if (this.appSettingsForm.get('receiver')?.value == '') {
+        alert("Please select a receiver.")
+        return;
+      }
+      else if (this.appSettingsForm.get('sender')?.value == this.appSettingsForm.get('receiver')?.value) {
+        alert("Sender and Receiver cannot be same node");
+        return;
+      }
+    }
+    if (this.app_id == 4) {
+      let endnode1 = this.appSettingsForm.get('endnode1')?.value
+      let endnode2 = this.appSettingsForm.get('endnode2')?.value
+      let endnode3 = this.appSettingsForm.get('endnode3')?.value
+      let middleNode = this.appSettingsForm.get('middleNode')?.value
+      if (endnode1 == '' || endnode2 == '' || endnode3 == '' || middleNode == '') {
+        alert('Please select End Nodes.')
+        return;
+      }
+      if (endnode1 == endnode2 || endnode2 == endnode3 || endnode3 == endnode1) {
+        alert("End Nodes cannot be same node");
+        return;
+      }
+    }
+    for (let i = 0; i < this.myDiagram.model.nodeDataArray.length; i++) {
+      // console.log((this.myDiagram.model.nodeDataArray[i] as any).findLinksConnected())
+      console.log(this.nodesData);
+      console.log(this.myDiagram.model.nodeDataArray)
+      if (!((this.myDiagram.model.nodeDataArray[i] as any).key in this.nodesData)) {
+
+        alert("Please configure the node named:" + (this.myDiagram.model.nodeDataArray[i] as any).text);
+        return;
+      };
+
+    }
     this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
     this.savedModel = this.myDiagram.model;
     // var memory = [];
@@ -785,21 +841,20 @@ export class DragComponent implements OnInit, AfterViewInit {
       {
         sender: this.appSettingsForm.get('sender')?.value,
         receiver: this.appSettingsForm.get('receiver')?.value,
-        message: this.appSettingsForm.get('message')?.value,
+        message: this.appSettingsForm.get('inputMessage')?.value,
         attack: this.appSettingsForm.get('attack')?.value
       }, 10:
       {
-        sender: this.appSettingsForm.get('sender')?.value,
-        receiver: this.appSettingsForm.get('receiver')?.value,
-        input_messages: {
-          "2": this.appSettingsForm.get('inputMessage')?.value,
+        alice_attrs: {
+          sender: this.appSettingsForm.get('sender')?.value,
+          receiver: this.appSettingsForm.get('receiver')?.value,
+          message: this.appSettingsForm.get('message')?.value,
+          id: "1010",
+          check_bits: 4
         },
-        ids: {
-          "2": this.appSettingsForm.get('senderId')?.value,
-          "1": this.appSettingsForm.get('receiverId')?.value
-        },
-        num_check_bits: this.appSettingsForm.get('numCheckBits')?.value,
-        num_decoy: this.appSettingsForm.get('numDecoy')?.value
+        bob_id: "0111",
+        threshold: 0.2,
+        num_decoy: 4
       }
     }
     this.appSettings = appConfig[this.app_id]

@@ -317,10 +317,39 @@
                 Quantum Teleportation
             </div>
             <br>
+            <div class="row">
+                <h5 class="text-center col-12">Performance parameters of the
+                    constructed network topology</h5>
+            </div>
+            <br>
+            <div class="col">
+                <div class="row">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="col table-secondary text-center">Execution Time</th>
+                                <th class="col table-secondary text-center">Fidelity</th>
+                                <th class="col table-secondary text-center">Success Rate</th>
+                                <th class="col table-secondary text-center">Latency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col text-center">{{performance.execution_time}}&nbsp;secs</td>
+                                <td class="col text-center">{{performance.fidelity}}</td>
+                                <td class="col text-center">{{performance.throughput}}</td>
+                                <td class="col text-center">{{performance.latency}}&nbsp;secs</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <br>
             <h5 class="text-center">
                 <p class="text-center">Entanglement is shared between two parties​</p>
                 <p class="text-center">Two party Quantum State</p>
             </h5>
+
             <!-- <div class="row"> -->
             <table class="table table-bordered">
                 <thead class="table-primary">
@@ -1040,41 +1069,41 @@
                             Sender's Input Message
                         </td>
                         <td class="col">
-                            {{data.recv_msg}}
+                            {{data.input_message}}
                         </td>
                     </tr>
                 </thead>
                 <tbody>
                     <tr class="table-secondary">
                         <td class="col">
-                            Security Checked
+                            Information Leaked
                         </td>
                         <td class="col">
-                            {{data.security_check}}
-                        </td>
-                    </tr>
-                    <tr class="table-secondary">
-                        <td class="col">Alice's IdA Authentication</td>
-                        <td class="col">{{data.alice_ida_auth}}</td>
-                    </tr>
-                    <tr class="table-secondary">
-                        <td class="col">Bob's IdA Authentication</td>
-                        <td class="col">{{data.bob_ida_auth}}</td>
-                    </tr>
-                    <tr class="table-secondary">
-                        <td class="col">
-                            Sender Key
-                        </td>
-                        <td class="col">
-                            {{data.sender_key}}
+                            {{data.info_leaked}}
                         </td>
                     </tr>
                     <tr class="table-secondary">
+                        <td class="col">Sender's Id</td>
+                        <td class="col">{{data.alice_id}}</td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td class="col">Receiver's Id</td>
+                        <td class="col">{{data.bob_id}}</td>
+                    </tr>
+                    <tr class="table-secondary">
                         <td class="col">
-                            Receiver Key
+                            Message Fidelity
                         </td>
                         <td class="col">
-                            {{data.receiver_key}}
+                            {{data.msg_fidelity}}
+                        </td>
+                    </tr>
+                    <tr class="table-secondary">
+                        <td class="col">
+                            Average Error
+                        </td>
+                        <td class="col">
+                            {{data.avg_error}}
                         </td>
                     </tr>
                     <tr class="table-primary">
@@ -1082,7 +1111,7 @@
                             Receiver's Output message
                         </td>
                         <td class="col">
-                            {{data.output_message}}
+                            {{data.output_msg}}
                         </td>
                     </tr>
                 </tbody>

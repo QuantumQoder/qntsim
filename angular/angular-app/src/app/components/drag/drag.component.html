@@ -334,7 +334,8 @@
                             </div>
                         </div>
 
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 6 || app_id == 5 || app_id == 9">
+                        <div class="mt-2 col-9 mx-auto"
+                            *ngIf="app_id == 6 || app_id == 5 ||app_id == 7 || app_id == 10">
                             <label for="type" class="form-label font-bold">
                                 Message
                             </label>
@@ -350,7 +351,19 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 9">
+                            <label for="type" class="form-label font-bold">
+                                Input Message
+                            </label>
+                            <input type="text" formControlName="inputMessage" class="form-control">
+                            <div
+                                *ngIf="appSettingsForm.get('inputMessage').touched && appSettingsForm.get('inputMessage').invalid">
+                                <div *ngIf="appSettingsForm.get('inputMessage').errors.required">
+                                    <p class="text-danger">Message is required.</p>
+                                </div>
 
+                            </div>
+                        </div>
                         <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 8">
                             <label for="type" class="form-label font-bold">
                                 Sender's Message

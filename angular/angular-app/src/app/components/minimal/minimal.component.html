@@ -92,7 +92,7 @@
         </div>
         <div style=" height:20%;width:100%;background-color: white;border: 1px solid black;"
             class="d-flex justify-content-center align-items-center">
-            <button class="btn btn-primary btn-custom" [disabled]="appForm.invalid || topologyForm.invalid"
+            <button class="btn btn-primary btn-custom" [disabled]="appForm.invalid || topologyForm.invalid "
                 (click)="runApp()">Run
                 Application</button>
         </div>
@@ -131,7 +131,7 @@
                     <label for="type" class="form-label font-bold">
                         Sender
                     </label>
-                    <select class="form-control" formControlName="sender" (change)="senderChanged($event)">
+                    <select class="form-control" formControlName="sender">
                         <option *ngFor="let data of senderNodes" [ngValue]="data.key">{{data.key}}</option>
                     </select>
                     <div *ngIf="sender.touched && sender.invalid">
@@ -145,7 +145,7 @@
                     <label for="type" class="form-label font-bold">
                         Receiver
                     </label>
-                    <select class="form-control" formControlName="receiver" (change)="receiverChanged($event)">
+                    <select class="form-control" formControlName="receiver">
                         <option *ngFor="let data of receiverNodes" [ngValue]="data.key">{{data.key}}</option>
                     </select>
                     <div *ngIf="receiver.touched && receiver.invalid">
@@ -297,13 +297,13 @@
                 <label for="type" class="form-label font-bold">
                     Message (only binary)
                 </label>
-                <input type="text" (keypress)="allowBitsInput($event)" maxlength="10" formControlName="message"
+                <input type="text" (keypress)="allowBitsInput($event)" maxlength="10" formControlName="messageIp1"
                     class="form-control">
-                <div *ngIf="appSettingsForm.get('message').touched && appSettingsForm.get('message').invalid">
-                    <div *ngIf="appSettingsForm.get('message').errors.required">
+                <div *ngIf="appSettingsForm.get('messageIp1').touched && appSettingsForm.get('messageIp1').invalid">
+                    <div *ngIf="appSettingsForm.get('messageIp1').errors.required">
                         <p class="text-danger">Message is required.</p>
                     </div>
-                    <div *ngIf="appSettingsForm.get('message').errors.evenLength">
+                    <div *ngIf="appSettingsForm.get('messageIp1').errors.evenLength">
                         <p class="text-danger">Message must have an even number of characters</p>
                     </div>
                     <div
