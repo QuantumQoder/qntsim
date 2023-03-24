@@ -80,15 +80,15 @@
               "buildOptimizer": true,
               "aot": true,
               "optimization": {
-                "scripts": false,
+                "scripts": true,
                 "styles": {
-                  "minify": false,
+                  "minify": true,
                   "inlineCritical": false
                 }
               },
               "vendorChunk": true,
               "extractLicenses": false,
-              "sourceMap": true,
+              "sourceMap": false,
               "namedChunks": true
             }
           },
