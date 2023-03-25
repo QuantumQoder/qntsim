@@ -115,13 +115,13 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         lng: 78.4867,
       }];
 
-      myGlobe.controls().autoRotate = true;
+      // myGlobe.controls().autoRotate = true;
       // myGlobe.position.y = -1000
       myGlobe
         .polygonsData(cuntData)
-        .polygonCapColor((feat: any) => feat.properties.NAME == COUNTRY ? "#5D9C59" : "#6B7B8C")
+        .polygonCapColor((feat: any) => feat.properties.NAME == COUNTRY ? "#6B7B8C" : "#6B7B8C")
         .polygonSideColor(() => 'rgba(0, 100, 0, 0.15)')
-        .polygonStrokeColor(() => '#111')
+        .polygonStrokeColor(() => '#55626f')
         // .htmlElementsData(gData)
         // .htmlElement((d: any) => {
         //   const el = document.createElement('div');
