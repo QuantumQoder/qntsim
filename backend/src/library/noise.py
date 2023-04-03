@@ -4,6 +4,7 @@ Here following noises are included:
 i. SPAM (State Preparation And Measurement)
 '''
 
+from enum import Enum
 from .Error import NoiseError
     
 _ATOL = 1e-6
@@ -114,3 +115,7 @@ class ResetError:
             self.ideal = True
         self.probabilities = _scale_probability([1 - p0 - p1, p0, p1])
         pass
+
+class NOISE_TYPE(Enum):
+    reset = ResetError
+    readout = ReadoutError

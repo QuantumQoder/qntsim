@@ -3,6 +3,7 @@ from functools import partial
 from typing import Any, List, Dict, Tuple
 from time import time_ns, time
 from IPython.display import clear_output
+from numpy import mean
 
 from .network import Network
 from .attack import Attack, ATTACK_TYPE
@@ -196,7 +197,11 @@ class Protocol:
                 print('Recived messages::', protocol.recv_msgs_list)
                 print('Error in execution:', mean(protocol.mean_list))
     """
+<<<<<<< Updated upstream
 
+=======
+    # networks = []
+>>>>>>> Stashed changes
     # def __new__(cls, *args, **kwargs):
     #     """
     #     Returns the existing instance of the class if it exists, otherwise creates a new instance.
@@ -217,6 +222,7 @@ class Protocol:
             **kwds: Optional keyword arguments to modify the behaviour of the Protocol object.
         """
         self.__name = name
+        self._index = -1
         
         # Set up logging
         logging.basicConfig(filename=self.__name+'.log', filemode='w', level=logging.INFO, format='%(pathname)s > %(threadName)s : %(module)s . %(funcName)s %(message)s')
@@ -245,6 +251,15 @@ class Protocol:
         Returns an iterator over the networks list.
         """
         return iter(self.networks)
+    
+    def __next__(self):
+        if self._index<len(self.networks)-1:
+            self._index+=1
+            return self.networks[self._index]
+        else: print('No more networks left.')
+    
+    def __len__(self):
+        return len(self.networks)
     
     def __call__(self, topology, functions:List[partial]=None, *args: Any, **kwds: Any) -> Any:
         """
@@ -287,6 +302,8 @@ class Protocol:
         # Import and use the ErrorAnalyzer class to analyze errors in the network and store the results in the protocol instance
         from .error_analyzer import ErrorAnalyzer
         self.full_err_list, self.full_lk_list, self.mean_list, self.sd_list, self.lk_list, self.fid_list = ErrorAnalyzer.analyse(protocol=self)
+        
+        return self.recv_msgs_list, mean(self.mean_list), mean(self.sd_list), mean(self.lk_list), mean(self.fid_list)
     
     def __repr__(self) -> str:
         """

@@ -15,7 +15,7 @@ Timeline.DLCZ = False
 from ..topology.topology import Topology
 from ..components.circuit import QutipCircuit
 from .circuits import bell_type_state_analyzer
-from .noise import ReadoutError, ResetError
+from .noise import NOISE_TYPE
 from .NoiseModel import noise_model
 
 def string_to_binary(messages:Dict[Tuple, str]):
@@ -244,6 +244,7 @@ class Network:
         self.__dict__.update(**kwds)
         if not hasattr(self, 'size'): self.size = len(self._bin_msgs[0])
         elif callable(self.size): self.size = self.size(len(self._bin_msgs[0]))
+        if hasattr(self, 'noise'): self.__dict__.update({noise:NOISE_TYPE[noise].value(*probs) for noise, probs in self.noise.items()})
         stack = inspect.stack()
         caller = stack[1][0].f_locals.get('self').__class__.__name__
         from .protocol import Protocol
@@ -396,17 +397,34 @@ class Network:
             qtc = QutipCircuit(1)
             if bell_pair_index_j^int(label[1]): qtc.x(0)
             if bell_pair_index_i^int(label[0]): qtc.z(0)
-            # rst_err = ResetError(5, 6)
-            # model = noise_model()
-            # model.add_reset_error
             self.manager.run_circuit(qtc, [key1])
             self._bell_pairs[(key1, key2)] = (int(label[0]), int(label[1]))
     
-    # def _add_noise(self, qtc:QutipCircuit, err_cls:Callable, probs:List[float]):
-    #     model = noise_model()
-    #     err_obj = err_cls(*probs)
-    #     model.add_readout_error(err_obj) if isinstance(err_obj, ReadoutError) else model.add_reset_error(err_obj)
-    #     return model.apply(qc=qtc)
+    def _add_noise(self, err_type:str, qtc:QutipCircuit, keys:List[int]=None):
+        """
+        Add noise to a QutipCircuit object using the specified error model.
+
+        Args:
+        - err_type (str): The type of error to apply ('reset' or 'readout').
+        - qtc (QutipCircuit): The QutipCircuit object to apply the error to.
+        - keys (Optional[List[int]]): A list of qubit indices to apply the readout error to.
+
+        Returns:
+        - QutipCircuit: The QutipCircuit object with the specified error applied.
+        """
+        model = noise_model()  # Create a new noise model
+
+        # Apply the specified error to the noise model
+        match err_type:
+            case 'reset':
+                if hasattr(self, 'reset'):
+                    model.add_reset_error(err=self.reset)
+                    return model._apply_reset_error(crc=qtc, size=qtc.size)  # Apply the reset error to the circuit
+                return qtc  # If no reset error is specified, return the original circuit
+            case 'readout':
+                if hasattr(self, 'readout'):
+                    model.add_readout_error(err=self.readout)
+                return model._apply_readout_error_qntsim(crc=qtc, manager=self.manager, keys=keys)  # Apply the readout error to the circuit
     
     def _initialize_photons(self):
         """
@@ -417,6 +435,7 @@ class Network:
             key = info.memory.qstate_key
             q, r = divmod(initial, 2)
             qtc = QutipCircuit(1)
+            qtc = self._add_noise(err_type='reset', qtc=qtc)
             if r: qtc.x(0)
             if q: qtc.h(0)
             self.manager.run_circuit(qtc, [key])
@@ -448,11 +467,13 @@ class Network:
             label (str, optional): Initial state of the qubits. Defaults to None.
         """
         qtc = QutipCircuit(2)
+        qtc = self._add_noise(err_type='reset', qtc=qtc)
         qtc.cx(0, 1)
         if state: qtc.h(0)
         qtc.measure(1-state)
         
         qc = QutipCircuit(1)
+        qc = self._add_noise(err_type='reset', qtc=qc)
         if state: qc.z(0)
         else: qc.x(0)
         
@@ -462,13 +483,14 @@ class Network:
                                         self[key-1].resource_manager.memory_manager[self.size:]):
                     keys = [info1.memory.qstate_key, info2.memory.qstate_key]
                     qstate = self.manager.get(keys[1-state])
-                    if self.manager.run_circuit(qtc, keys).get(keys[1-state]): self.manager.run_circuit(qc, list(set(qstate.keys)-set([keys[1-state]])))
+                    if self._add_noise(err_type='readout', qtc=qtc, keys=keys).get(keys[1-state]): self.manager.run_circuit(qc, list(set(qstate.keys)-set([keys[1-state]])))
         if label:
             for info in self[0].resource_manager.memory_manager:
                 if info.state!='ENTANGLED': break
                 keys = self.manager.get(info.memory.qstate_key).keys
                 for key, (i, lbl) in zip(keys, enumerate(label)):
                     qtc = QutipCircuit(1)
+                    qtc = self._add_noise(err_type='reset', qtc=qtc)
                     if int(lbl): _ = qtc.x(0) if i else qtc.z(0)
                     self.manager.run_circuit(qtc, [key])
     
@@ -480,12 +502,13 @@ class Network:
             msg_index (int): Index of the message to be encoded.
             node_index (int, optional): Index of the node encoding the message. Defaults to 0.
         """
-        print(self._bin_msgs, self[node_index])
+        qtc = QutipCircuit(1)
+        qtc = self._add_noise(err_type='reset', qtc=qtc)
+        qtc.x(0)
+        qtc.z(0)
+        
         for bin, info in zip(self._bin_msgs[msg_index], self.nodes[node_index].resource_manager.memory_manager):
             if int(bin):
-                qtc = QutipCircuit(1)
-                qtc.x(0)
-                qtc.z(0)
                 key = info.memory.qstate_key
                 self.manager.run_circuit(qtc, [key])
         logging.info('message bits into qubits')
@@ -500,6 +523,7 @@ class Network:
         """
         for bin1, bin2, info in zip(self._bin_msgs[msg_index][::2], self._bin_msgs[msg_index][1::2], self.nodes[node_index].resource_manager.memory_manager):
             qtc = QutipCircuit(1)
+            qtc = self._add_noise(err_type='reset', qtc=qtc)
             if int(bin2): qtc.x(0)
             if int(bin1): qtc.z(0)
             key = info.memory.qstate_key
@@ -523,7 +547,7 @@ class Network:
             new_key = self.manager.new([alpha, ((-1)**int(bin))*alpha])
             state = self.manager.get(key)
             keys = tuple(set(state.keys)-set([key]))
-            outputs = self.manager.run_circuit(bsa, [new_key, key])
+            outputs = self._add_noise(err_type='readout', qtc=bsa, keys=[new_key, key])
             self._corrections[keys] = [outputs.get(new_key), outputs.get(key)]
         logging.info('message states')
     
@@ -539,20 +563,23 @@ class Network:
             for info, initial in zip(node.resource_manager.memory_manager, self._initials):
                 key = info.memory.qstate_key
                 qtc = QutipCircuit(1)
+                qtc = self._add_noise(err_type='reset', qtc=qtc)
                 if initial//2: qtc.h(0)
                 qtc.measure(0)
-                self._outputs.append(self.manager.run_circuit(qtc, [key]))
+                self._outputs.append(self._add_noise(err_type='readout', qtc=qtc, keys=[key]))
         elif hasattr(self, '_corrections'):
             output = 0
             for keys, value in self._corrections.items():
                 if len(keys)>1:
                     key = max(keys)
                     qtc = QutipCircuit(1)
+                    qtc = self._add_noise(err_type='reset', qtc=qtc)
                     state = self._kwds.get('state', 0)
                     if ~state: qtc.h(0)
                     qtc.measure(0)
-                    output = self.manager.run_circuit(qtc, [key]).get(key)
+                    output = self._add_noise(err_type='readout', qtc=qtc, keys=[key]).get(key)
                 qtc = QutipCircuit(1)
+                qtc = self._add_noise(err_type='reset', qtc=qtc)
                 if output:
                     if state: qtc.x(0)
                     else: qtc.z(0)
@@ -561,7 +588,7 @@ class Network:
                 qtc.h(0)
                 qtc.measure(0)
                 key = min(keys)
-                self._outputs.append(self.manager.run_circuit(qtc, [key]))
+                self._outputs.append(self._add_noise(err_type='readout', qtc=qtc, keys=[key]))
     
     # @delayed
     # @wrap_non_picklable_objects
