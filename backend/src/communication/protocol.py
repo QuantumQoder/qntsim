@@ -197,11 +197,7 @@ class Protocol:
                 print('Recived messages::', protocol.recv_msgs_list)
                 print('Error in execution:', mean(protocol.mean_list))
     """
-<<<<<<< Updated upstream
-
-=======
     # networks = []
->>>>>>> Stashed changes
     # def __new__(cls, *args, **kwargs):
     #     """
     #     Returns the existing instance of the class if it exists, otherwise creates a new instance.

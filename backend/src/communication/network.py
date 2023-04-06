@@ -15,7 +15,7 @@ Timeline.DLCZ = False
 from ..topology.topology import Topology
 from ..components.circuit import QutipCircuit
 from .circuits import bell_type_state_analyzer
-from .noise import NOISE_TYPE
+from .noise import ERROR_TYPE
 from .NoiseModel import noise_model
 
 def string_to_binary(messages:Dict[Tuple, str]):
@@ -244,7 +244,7 @@ class Network:
         self.__dict__.update(**kwds)
         if not hasattr(self, 'size'): self.size = len(self._bin_msgs[0])
         elif callable(self.size): self.size = self.size(len(self._bin_msgs[0]))
-        if hasattr(self, 'noise'): self.__dict__.update({noise:NOISE_TYPE[noise].value(*probs) for noise, probs in self.noise.items()})
+        if hasattr(self, 'noise'): self.__dict__.update({noise:ERROR_TYPE[noise].value(*probs) for noise, probs in self.noise.items()})
         stack = inspect.stack()
         caller = stack[1][0].f_locals.get('self').__class__.__name__
         from .protocol import Protocol

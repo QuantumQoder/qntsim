@@ -116,6 +116,6 @@ class ResetError:
         self.probabilities = _scale_probability([1 - p0 - p1, p0, p1])
         pass
 
-class NOISE_TYPE(Enum):
+class ERROR_TYPE(Enum):
     reset = ResetError
     readout = ReadoutError
