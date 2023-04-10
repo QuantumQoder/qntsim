@@ -1,39 +1,41 @@
-from typing import Dict, Tuple
+import importlib
+import math
+import time
+from collections.abc import Iterable
+from contextlib import nullcontext
 from enum import Enum
-from time import time
-from statistics import mean
-from qntsim.communication import Protocol, Network
+from pprint import pprint
 from random import shuffle
-from main.simulator.app.utils import *
-from main.simulator.app.e91 import *
-from main.simulator.app.qsdc1 import *
-from main.simulator.app.ghz import *
+from statistics import mean
+from time import time
+from tokenize import String
+from typing import Dict, Tuple
+
+import numpy as np
+import pandas as pd
 from main.simulator.app.e2e import *
-from main.simulator.app.teleportation import *
-from main.simulator.app.ping_pong import *
+from main.simulator.app.e91 import *
+from main.simulator.app.ghz import *
 from main.simulator.app.ip1 import *
-from main.simulator.app.qsdc_teleportation import *
-from main.simulator.app.single_photon_qd import *
 from main.simulator.app.ip2 import ip2_run
 from main.simulator.app.mdi_qsdc import *
-from pprint import pprint
-from tabulate import tabulate
-from qntsim.topology.topology import Topology
+from main.simulator.app.ping_pong import *
+from main.simulator.app.qsdc1 import *
+from main.simulator.app.qsdc_teleportation import *
+from main.simulator.app.single_photon_qd import *
+from main.simulator.app.teleportation import *
+from main.simulator.app.utils import *
 from main.simulator.helpers import *
-from tokenize import String
 from pyvis.network import Network
-from contextlib import nullcontext
-from collections.abc import Iterable
-import importlib
-import time
-import pandas as pd
-import numpy as np
-import math
+from qntsim.communication import Network, Protocol
+from qntsim.topology.topology import Topology
+from tabulate import tabulate
 
 
 def display_quantum_state(state_vector):
     """
-    Converts a quantum state vector to Dirac notation and returns it as a string.
+    Converts a quantum state vector to Dirac notation in qubita and returns it
+    as a string.
 
     Parameters:
     state_vector (numpy.ndarray): An array representing a quantum state vector.
@@ -61,9 +63,11 @@ def display_quantum_state(state_vector):
         coeff = normalized_state[i]
         if abs(coeff) > 1e-15:  # Ignore small coefficients that round to 0.
             if abs(coeff.imag) > 1e-15:  # Handle complex coefficients.
-                output_str += (f"({coeff.real:.3f}" if coeff.real > 0 else "(") + ("+" if coeff.real > 0 and coeff.imag > 0 else "") + f"{coeff.imag:.3f}j)|" + basis_states[i] + "> + "
+                output_str += (f"({coeff.real:.3f}" if coeff.real > 0 else "(") + (
+                    "+" if coeff.real > 0 and coeff.imag > 0 else "") + f"{coeff.imag:.3f}j)|"
             else:
-                output_str += f"({coeff.real:.3f})|" + basis_states[i] + "> + "
+                output_str += f"({coeff.real:.3f})|"
+            output_str += basis_states[i] + "> + "
     return output_str[:-3]
 
 
@@ -100,7 +104,8 @@ def network_graph(network_topo, source_node_list, report):
         if i > 0:
             through = i
     execution_time = 3
-    performance = {"latency": latency, "fidelity": fidelity, "throughput": through}
+    performance = {"latency": latency,
+                   "fidelity": fidelity, "throughput": through}
     # graph["throughput"]["fully_complete"]= fc_throughl
     # graph["throughput"]["partially_complete"]= pc_throughl
     # graph["throughput"]["rejected"]= nc_throughl        #{fc_throughl,pc_throughl,nc_throughl}
@@ -113,19 +118,23 @@ def network_graph(network_topo, source_node_list, report):
 def create_response(app_name, network_config, sender, receiver, **kwargs):
     start_time = time()
     protocol, results, source_nodes = run(**kwargs, topology=network_config,
-                            sender=sender, receiver=receiver, app_name=app_name)
+                                          sender=sender, receiver=receiver, app_name=app_name)
     end_time = time()
     execution_time = start_time-end_time
-    application = [{"header": f'input_message{str(i)}', "value":message}
-                    for i, message in enumerate(kwargs.get('messages', []), 1)]
+    application = [{"header": f'input_message{str(i)}', "value": message}
+                   for i, message in enumerate(kwargs.get('messages', []), 1)]
     application.extend([{"header": f'output_message{str(i)}', "value": message}
                         for i, message in enumerate(results.get('messages', []), 1)])
-    application.append({'header':'attack', 'value':kwargs.get('attack', 'none')})
-    application.extend({'header':key, 'value':value} for key, value in results.items() if key!='messages')
-    response = {'application':application}
-    response = network_graph(protocol.networks[0]._net_topo, source_nodes, response)
+    application.append(
+        {'header': 'attack', 'value': kwargs.get('attack', 'none')})
+    application.extend({'header': key, 'value': value}
+                       for key, value in results.items() if key != 'messages')
+    response = {'application': application}
+    response = network_graph(
+        protocol.networks[0]._net_topo, source_nodes, response)
     response['performance']['execution_time'] = execution_time
     return response
+
 
 class APPLICATION_TYPE(Enum):
     e91 = E91
@@ -137,6 +146,7 @@ class APPLICATION_TYPE(Enum):
     # qd_sp = SinglePhotonQD
     # qsdc_tel = QSDCTeleportation
     # ip2 = ip2_run
+
 
 def run(app_name, **kwargs):
     topology = kwargs.get('topology')
@@ -157,10 +167,10 @@ def run(app_name, **kwargs):
             trials = 4
         case 'qsdc1':
             key = kwargs.get('key')
-            if len(key)%2:
+            if len(key) % 2:
                 return protocol, {'Error_Msg': 'Key should have even number of digits'}, []
             n = seq_len*len(key)
-        case 'e2e': # complete
+        case 'e2e':  # complete
             _, tl, net_topo = load_topology(
                 kwargs.get('topology'), 'Qiskit')
             trans_manager = net_topo.nodes[sender].transport_manager
@@ -174,32 +184,35 @@ def run(app_name, **kwargs):
             tl.init()
             tl.run()
             results, source_nodes = get_res(net_topo, [(sender, receiver)])
-        case 'ghz': # complete
+        case 'ghz':  # complete
             node1 = kwargs.get('endnode1')
             node2 = kwargs.get('endnode2')
             node3 = kwargs.get('endnode3')
             central_node = kwargs.get('middlenode')
         case 'tel':
-            amplitude1, amplitude2 = kwargs.get('amplitude1'), kwargs.get('amplitude2')
+            amplitude1, amplitude2 = kwargs.get(
+                'amplitude1'), kwargs.get('amplitude2')
         case 'pp':
-            if len(message)>9:
+            if len(message) > 9:
                 return protocol, {"Error_Msg": "Message should be less than or equal to 9."}
             n = seq_len*len(message)
         case 'ip1':
             n = 50
-        case 'qd_sp'|'qsdc_tel':
+        case 'qd_sp' | 'qsdc_tel':
             messages = {
-                (sender, receiver):message} if app_name=='qsdc_tel' else {
+                (sender, receiver): message} if app_name == 'qsdc_tel' else {
                     (sender, receiver): kwargs.get('message1'),
                     (receiver, sender): kwargs.get('message1')}
-            protocol = Protocol(name=app_name, messages_list=[messages], attack=attack)
-            messages, avg_err, avg_sd, avg_leak, avg_fid = protocol(topology=topology)
+            protocol = Protocol(name=app_name, messages_list=[
+                                messages], attack=attack)
+            messages, avg_err, avg_sd, avg_leak, avg_fid = protocol(
+                topology=topology)
             results = {
-                "messages":messages,
-                "error":avg_err,
-                "std_dev":avg_sd,
-                "info_leak":avg_leak,
-                "msg_fidelity":avg_fid
+                "messages": messages,
+                "error": avg_err,
+                "std_dev": avg_sd,
+                "info_leak": avg_leak,
+                "msg_fidelity": avg_fid
             }
             source_nodes = [sender]
         case 'ip2':
@@ -208,8 +221,10 @@ def run(app_name, **kwargs):
             network, recv_msgs, err_val = ip2_run(topology=topology,
                                                   alice_attrs=alice_attrs,
                                                   bob_id=kwargs.get('bob_id'),
-                                                  num_decoy_photons=kwargs.get('num_decoy'),
-                                                  threshold=kwargs.get('threshold'),
+                                                  num_decoy_photons=kwargs.get(
+                                                      'num_decoy'),
+                                                  threshold=kwargs.get(
+                                                      'threshold'),
                                                   attack=attack)
             protocol.networks = [network]
             results = {
@@ -221,15 +236,16 @@ def run(app_name, **kwargs):
             }
             source_nodes = [sender]
         case _:
-            return protocol, {"Error_Msg":"Wrong app id."}, []
+            return protocol, {"Error_Msg": "Wrong app id."}, []
     app = APPLICATION_TYPE[app_name].value() if trials else None
     match app_name:
-        case 'e91'|'qsdc1'|'pp'|'ip1':
+        case 'e91' | 'qsdc1' | 'pp' | 'ip1':
             source, destination, source_nodes = app.roles(sender, receiver, n)
         case 'tel':
             source, destination, source_nodes = app.roles(sender, receiver)
         case 'ghz':
-            n1, n2, n3, cn, source_nodes = app.roles(node1, node2, node3, central_node)
+            n1, n2, n3, cn, source_nodes = app.roles(
+                node1, node2, node3, central_node)
     params = [source, destination]
     while trials:
         tl.init()
@@ -252,7 +268,7 @@ def run(app_name, **kwargs):
         trials -= 1
     match app_name:
         case 'e91': return protocol, {"Error_Msg": "Couldn't generate required length.Retry Again"}, []
-        case 'ghz'|'tel': results = {k: display_quantum_state(state) for k, state in results.items()}
+        case 'ghz' | 'tel': results = {k: display_quantum_state(state) for k, state in results.items()}
 
     return protocol, results, source_nodes
 
