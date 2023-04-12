@@ -202,11 +202,11 @@
                     (change)="endNode(appSettingsForm.get('endnode1').value)">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
-                <div *ngIf="node1.touched && node1.invalid">
+                <!-- <div *ngIf="node1.touched && node1.invalid">
                     <div *ngIf="node1.errors.required">
                         <p class="text-danger">Please select End Node 1.</p>
                     </div>
-                </div>
+                </div> -->
                 <div *ngIf="node1.value == node2.value">
                     <p class="text-danger">Same nodes should not be selected as two end nodes.</p>
                 </div>
@@ -219,11 +219,11 @@
                     (change)="endNode(appSettingsForm.get('endnode2').value)">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
-                <div *ngIf="appSettingsForm.get('endnode2').touched && node2.invalid">
+                <!-- <div *ngIf="appSettingsForm.get('endnode2').touched && node2.invalid">
                     <div *ngIf="node2.errors.required">
                         <p class="text-danger">Please select End Node 2.</p>
                     </div>
-                </div>
+                </div> -->
                 <div *ngIf="node2.value == node3.value">
                     <p class="text-danger">Same nodes should not be selected as two end nodes.</p>
                 </div>
@@ -236,12 +236,12 @@
                     (change)="endNode(appSettingsForm.get('endnode3').value)">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
-                <div *ngIf="node3.touched && node3.invalid">
+                <!-- <div *ngIf="node3.touched && node3.invalid">
                     <div *ngIf="node3.errors.required">
                         <p class="text-danger">Please select End Node 3.</p>
                     </div>
 
-                </div>
+                </div> -->
                 <div *ngIf="node1.value == node3.value">
                     <p class="text-danger">Same nodes should not be selected as two end nodes.</p>
                 </div>
@@ -362,11 +362,8 @@
             </div>
         </form>
         <div *ngIf="app.dirty && appForm.get('app')?.value != ''">
-
-
-
             <p class="text-black text-center">
-                For More Setting,<br>
+                For More Settings,<br>
                 try <a [routerLink]="['/drag']" routerLinkActive="router-link-active">Advanced Version</a>
             </p>
         </div>

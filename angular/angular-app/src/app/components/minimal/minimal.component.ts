@@ -219,9 +219,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.level = this.topologyForm.get('level')?.value;
     this.updateJson();
   }
-  selectAmplitude($event: any) {
 
-  }
 
   e2eChange(data: string) {
     if (data == 'target') {
@@ -347,27 +345,34 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   //   // Force re-layout of the diagram to apply the updated template
   //   this.topology.layoutDiagram(true);
   // }
-  updateContextMenu() {
-    this.topology.startTransaction("updateContextMenu");
-    this.topology.nodes.each(function (node: any) {
-      node.contextMenu = this.getAppropriateContextMenu(this.appId);
-    });
-    this.topology.commitTransaction("updateContextMenu");
-  }
+
 
   getApp($event: any) {
     let app_id = this.appForm.get('app')?.value
     this.nodes = this.topologyData.nodes
-    this.updateContextMenu()
+
     if (app_id == 4) {
-      this.level = this.topologyForm.get('type')?.value == 'Star' ? 2 : 3;
+      this.level = 3;
       this.topologyForm.get('level').patchValue(this.level);
       this.levelChange();
+
     }
     this.updateNodes()
     localStorage.setItem('app_id', this.appForm.get('app')?.value);
     localStorage.setItem('app', this.app_data[this.appForm.get('app')?.value])
     this.buildForm(this.appForm.get('app')?.value)
+    if (this.topologyForm.get('type')?.value == 'Star') {
+
+      this.appSettingsForm.get('endnode1').patchValue('node1')
+      this.appSettingsForm.get('endnode2').patchValue('node3')
+      this.appSettingsForm.get('endnode3').patchValue('node4')
+    }
+    else if (this.topologyForm.get('type')?.value == 'Mesh') {
+
+      this.appSettingsForm.get('endnode1').patchValue('node1')
+      this.appSettingsForm.get('endnode2').patchValue('node5')
+      this.appSettingsForm.get('endnode3').patchValue('node6')
+    }
   }
   runApp() {
     // this.spinner = true;
@@ -511,7 +516,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         break;
       case 4:
         if (!this.appSettingsForm.controls['endnode1'])
-          this.appSettingsForm.addControl('endnode1', new FormControl('', Validators.required))
+          this.appSettingsForm.addControl('endnode1', new FormControl('node1', Validators.required))
         if (!this.appSettingsForm.controls['endnode2'])
           this.appSettingsForm.addControl('endnode2', new FormControl('node3', Validators.required))
         if (!this.appSettingsForm.controls['endnode3'])
@@ -651,7 +656,20 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     }, (error) => {
       console.log(error)
     }, () => {
-      this.updateDiagram(this.topologyData)
+      this.updateDiagram(this.topologyData);
+      if (this.appForm.get('app')?.value == 4)
+        if (this.topologyForm.get('type')?.value == 'Star') {
+
+          this.appSettingsForm.get('endnode1').patchValue('node1')
+          this.appSettingsForm.get('endnode2').patchValue('node3')
+          this.appSettingsForm.get('endnode3').patchValue('node4')
+        }
+        else if (this.topologyForm.get('type')?.value == 'Mesh') {
+
+          this.appSettingsForm.get('endnode1').patchValue('node1')
+          this.appSettingsForm.get('endnode2').patchValue('node5')
+          this.appSettingsForm.get('endnode3').patchValue('node6')
+        }
     })
     this.lastValue.level = type;
     this.lastValue.type = this.topologyForm.get('type')?.value.toLowerCase();
