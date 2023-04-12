@@ -33,6 +33,10 @@ export class DragComponent implements OnInit, AfterViewInit {
   memory: any = {
     "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93
   }
+  infoTips: any = {
+    end: 'Origin or destination nodes for user/application requests, each connected to one service node.',
+    service: "Entanglement-swapping nodes (similar to classical routers) connect non-neighbor nodes\n but don't support request creation or application hosting."
+  }
   serviceNodes: any[] = []
   endNodes: any[] = []
   step: any
@@ -64,7 +68,7 @@ export class DragComponent implements OnInit, AfterViewInit {
     'name': new FormControl(''),
     'noOfMemories': new FormControl('500'),
     'memoryFidelity': new FormControl('0.98'),
-    'attenuation': new FormControl('0.00001'),
+    'attenuation': new FormControl('0.1'),
     'distance': new FormControl('70')
   })
   breadcrumbItems: MenuItem[]
@@ -144,7 +148,12 @@ export class DragComponent implements OnInit, AfterViewInit {
     this.myDiagram.addDiagramListener("PartCreated", e => {
       console.log(this.myDiagram.selection)
     })
-
+    var tooltipTemplate =
+      $(go.Adornment, "Auto",
+        $(go.Shape, "RoundedRectangle", { fill: "lightyellow" }),
+        $(go.TextBlock, { margin: 4 },
+          new go.Binding("text", "description"))
+      );
     function makePort(name: any, spot: any, output: any, input: any) {
       // the port is basically just a small transparent square
       return $(go.Shape, "Circle",
@@ -184,10 +193,14 @@ export class DragComponent implements OnInit, AfterViewInit {
     // });
     this.myDiagram.nodeTemplate =
       $(go.Node, "Spot",
+        { // Add the tooltip to the node
+          toolTip: tooltipTemplate
+        },
         {
           click: (e: go.InputEvent, obj: go.GraphObject) => {
             this.nodeClicked(e, obj)
           },
+
           doubleClick: this.nodeClicked,
           contextMenu:
             $("ContextMenu",
@@ -284,11 +297,11 @@ export class DragComponent implements OnInit, AfterViewInit {
         $(go.TextBlock, {
           segmentOffset: new go.Point(0, -10),
           editable: false,
-        },
-          // centered multi-line text
-          new go.Binding("text", "text")),
-        $(go.Shape,  // the link path shape
-          { isPanelMain: true, strokeWidth: 2 }),
+        },),
+        // centered multi-line text
+        //   new go.Binding("text", "text")),
+        // $(go.Shape,  // the link path shape
+        //   { isPanelMain: true, strokeWidth: 2 }),
         $(go.Shape,  // the arrowhead
           { toArrow: "Standard", stroke: null },
           new go.Binding('fill', 'color')),
@@ -346,8 +359,8 @@ export class DragComponent implements OnInit, AfterViewInit {
               new go.Binding('fill', 'color'),
             ),
           model: new go.GraphLinksModel([  // specify the contents of the Palette
-            { text: "Service", figure: "Ellipse", "size": "75 75", fill: "#FBFFB1" },
-            { text: "End", figure: "Circle", "size": "75 75", fill: "#7D8F69" },
+            { text: "Service", figure: "Ellipse", "size": "75 75", fill: "#FBFFB1", description: this.infoTips.service },
+            { text: "End", figure: "Circle", "size": "75 75", fill: "#7D8F69", description: this.infoTips.end },
 
           ], [
             // the Palette also has a disconnected Link, which the user can drag-and-drop
@@ -726,7 +739,7 @@ export class DragComponent implements OnInit, AfterViewInit {
         linkarray.push(to);
         let linkData = {
           Nodes: linkarray,
-          Attenuation: 0.00001,
+          Attenuation: 0.1,
           Distance: 70
         }
         this.links.push(linkData)
@@ -917,7 +930,8 @@ export class DragComponent implements OnInit, AfterViewInit {
           // "rotatingTool.snapAngleEpsilon": 15,
           "InitialLayoutCompleted": function (e: any) { e.diagram.addModelChangedListener(onNodeDataAdded); },
           "undoManager.isEnabled": true,
-          "panningTool.isEnabled": false
+          "panningTool.isEnabled": false,
+          "toolManager.hoverDelay": 0
         });
     return myDiagram;
   }

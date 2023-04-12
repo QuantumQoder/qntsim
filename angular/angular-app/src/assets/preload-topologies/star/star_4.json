@@ -19,10 +19,6 @@
         {
             "key": "node5",
             "color": "lightblue"
-        },
-        {
-            "key": "node6",
-            "color": "lightblue"
         }
     ],
     "links": [
@@ -41,10 +37,6 @@
         {
             "from": "node2",
             "to": "node5"
-        },
-        {
-            "from": "node2",
-            "to": "node6"
         }
     ]
 }
