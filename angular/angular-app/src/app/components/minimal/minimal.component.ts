@@ -256,9 +256,19 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       $(go.Node, "Auto",  // the Shape will go around the TextBlockcontextMenu:
         { // Add the tooltip to the node
           toolTip: tooltipTemplate,
-          contextMenu: new go.Binding("contextMenu", "", function (node) {
-            return () => this.getAppropriateContextMenu(this.appId);
-          }).ofObject(),
+          contextMenu: $(go.Adornment, "Vertical",  // that has one button
+            $("ContextMenuButton",
+              $(go.TextBlock, "Set as Sender"),
+              {
+                click: (e: go.InputEvent, obj: go.GraphObject) => { this.showProperties(e, obj, 'sender') }
+              }),
+            $("ContextMenuButton",
+              $(go.TextBlock, "Set as Receiver"),
+              {
+                click: (e: go.InputEvent, obj: go.GraphObject) => { this.showProperties(e, obj, 'receiver') }
+              })
+            // more ContextMenuButtons would go here
+          )
           // contextMenu: new go.Binding("contextMenu", "", this.nodeContextMenu).ofObject(),
         },
         $(go.Shape, "RoundedRectangle", { strokeWidth: 0 },
