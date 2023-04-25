@@ -67,7 +67,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   appForm: any
   applist: any
   nodes: any
-  distance: number = 70
+  distance: number = 100
   appSettingsForm: any
   type = ['Star', 'Mesh'];
   level: number = 2
@@ -146,7 +146,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       'type': ['Star', Validators.required],
       'level': [2, Validators.required],
       'noOfMemories': [500, Validators.required],
-      'distance': [70, [Validators.required]],
+      'distance': [100, [Validators.required]],
       'attenuity': [0.1, Validators.required]
     });
     this.appForm = this.fb.group({
