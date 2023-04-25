@@ -32,9 +32,9 @@
 
             <div class="mt-2 col-9 mx-auto">
                 <label for="type" class="form-label font-bold mb-2">
-                    Size {{level}}
+                    Number of Nodes {{level}}
                 </label>
-                <p-slider formControlName="level" (onChange)="levelChange()" [min]="0" [step]="1" [max]="4"
+                <p-slider formControlName="level" (onChange)="levelChange()" [min]="2" [step]="1" [max]="4"
                     (onSlideEnd)="levelChange()"></p-slider>
             </div>
             <hr>
@@ -73,14 +73,18 @@
             </div>
             <div id="content2">
                 <div class="mt-2 col-9 mx-auto">
-                    <label for="type" class="form-label font-bold mb-2">
-                        Link Length
+                    <label for="type" class="form-label font-bold mb-2"
+                        pTooltip="All optical channels in the homogenous network have the same length (in km) connecting two nodes.">
+                        Length {{distance}} km
                     </label>
-                    <input type="number" disabled maxlength="3" formControlName="distance" class="form-control">
+                    <!-- <input type="number" disabled maxlength="3" formControlName="distance" class="form-control"> -->
+                    <p-slider formControlName="distance" (onChange)="updateDistance()" [min]="1" [max]="100"
+                        (onSlideEnd)="updateDistance()"></p-slider>
                 </div>
                 <div class="mt-2 col-9 mx-auto">
-                    <label for="type" class="form-label font-bold mb-2">
-                        Attenuation
+                    <label for="type" class="form-label font-bold mb-2"
+                        pTooltip="The optical signal experiences loss (in dB/km) as it travels through the channel due to photon travel.">
+                        Attenuation (dB/km)
                     </label>
                     <input type="number" disabled formControlName="attenuity" class="form-control">
                 </div>
@@ -114,12 +118,12 @@
                     </div>
                 </div>
 
-                <div *ngIf="app.touched">
-                    <br>
+                <div *ngIf="app.dirty && appForm.get('app')?.value != ''">
+
                     <p class="text-black text-center">
-                        For More Setting,<br>
-                        try <a [routerLink]="['/drag']" routerLinkActive="router-link-active">Advanced Version</a>
+                        <a [routerLink]="['/intro']" routerLinkActive="router-link-active">More info</a>
                     </p>
+
                 </div>
             </div>
         </form>
@@ -198,11 +202,11 @@
                     (change)="endNode(appSettingsForm.get('endnode1').value)">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
-                <div *ngIf="node1.touched && node1.invalid">
+                <!-- <div *ngIf="node1.touched && node1.invalid">
                     <div *ngIf="node1.errors.required">
                         <p class="text-danger">Please select End Node 1.</p>
                     </div>
-                </div>
+                </div> -->
                 <div *ngIf="node1.value == node2.value">
                     <p class="text-danger">Same nodes should not be selected as two end nodes.</p>
                 </div>
@@ -215,11 +219,11 @@
                     (change)="endNode(appSettingsForm.get('endnode2').value)">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
-                <div *ngIf="appSettingsForm.get('endnode2').touched && node2.invalid">
+                <!-- <div *ngIf="appSettingsForm.get('endnode2').touched && node2.invalid">
                     <div *ngIf="node2.errors.required">
                         <p class="text-danger">Please select End Node 2.</p>
                     </div>
-                </div>
+                </div> -->
                 <div *ngIf="node2.value == node3.value">
                     <p class="text-danger">Same nodes should not be selected as two end nodes.</p>
                 </div>
@@ -232,12 +236,12 @@
                     (change)="endNode(appSettingsForm.get('endnode3').value)">
                     <option *ngFor="let data of endNodes" [ngValue]="data.key">{{data.key}}</option>
                 </select>
-                <div *ngIf="node3.touched && node3.invalid">
+                <!-- <div *ngIf="node3.touched && node3.invalid">
                     <div *ngIf="node3.errors.required">
                         <p class="text-danger">Please select End Node 3.</p>
                     </div>
 
-                </div>
+                </div> -->
                 <div *ngIf="node1.value == node3.value">
                     <p class="text-danger">Same nodes should not be selected as two end nodes.</p>
                 </div>
@@ -357,5 +361,11 @@
                 </div>
             </div>
         </form>
+        <div *ngIf="app.dirty && appForm.get('app')?.value != ''">
+            <p class="text-black text-center">
+                For More Settings,<br>
+                try <a [routerLink]="['/drag']" routerLinkActive="router-link-active">Advanced Version</a>
+            </p>
+        </div>
     </div>
 </div>

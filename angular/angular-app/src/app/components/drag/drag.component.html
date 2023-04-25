@@ -169,15 +169,16 @@
                             <u>Connections</u>
                         </h6>
                         <div class="form-group col-8 mx-auto">
-                            <label for="attenuation" class="form-label mx-auto">Attenuation</label>
+                            <label for="attenuation" class="form-label mx-auto">Attenuation (dB/km)</label>
                             <input type="number" class="form-control" formControlName="attenuation" id="attenuation"
                                 placeholder="Enter in decimals">
                             <!-- <div class="text-muted">attenuation of Optical channel's fiber (in dB/m).</div> -->
                         </div>
                         <div class="form-group col-8 mx-auto">
-                            <label for="distance" class="form-label mx-auto">Link Length</label>
+                            <label for="distance" class="form-label mx-auto">Link Length {{distance}}km</label>
                             <input type="number" class="form-control mx-auto" id="distance" formControlName="distance"
                                 placeholder="Enter Distance">
+
                             <!-- <div class="text-muted">length of the fiber (in km)</div> -->
                         </div>
                         <br>
