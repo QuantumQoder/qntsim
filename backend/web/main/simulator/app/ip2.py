@@ -17,6 +17,7 @@ class Party:
     received_msgs:Dict[int, str] = None
 
 class Alice(Party):
+    node = str
     chk_bts_insrt_lctns:List[int] = None
     num_check_bits:int = None
     
@@ -87,6 +88,7 @@ class Alice(Party):
         return cls.d_a
 
 class Bob(Party):
+    node = str
     @classmethod
     def setup(cls, network:Network, returns:Any, num_decoy_photons:int):
         """_summary_
@@ -98,7 +100,7 @@ class Bob(Party):
             i_a (List):
             cls.d_a: 
         """
-        seq_a, seq_b = list(zip(*[sorted(network.manager.get(key=info.memory.qstate_key).keys) for info in network.nodes[1].resource_manager.memory_manager if info.state=='ENTANGLED']))
+        seq_a, seq_b = list(zip(*[sorted(network.manager.get(key=info.memory.qstate_key).keys) for info in network._net_topo.nodes[cls.node].resource_manager.memory_manager if info.state=='ENTANGLED']))
         cls.i_b = list(seq_b[-len(cls.id)//2:])
         cls.s_b = [ele for ele in seq_b if ele not in cls.i_b]
         for k, i1, i2 in zip(cls.i_b, cls.id[::2], cls.id[1::2]):
@@ -230,6 +232,8 @@ def pass_(network:Network, returns:Any):
     return returns
 
 def ip2_run(topology, alice_attrs, bob_id, num_decoy_photons, threshold, attack):
+    Alice.node = alice_attrs.get('sender')
+    Bob.node = alice_attrs.get('receiver')
     Alice.input_messages = alice_attrs.get('message')
     Alice.id = alice_attrs.get('id')
     Alice.num_check_bits = alice_attrs.get('check_bits')

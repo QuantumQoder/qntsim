@@ -97,7 +97,7 @@ def network_graph(network_topo,source_node_list,report):
     for i in fc_throughl:
         if i>0:
             through = i
-    execution_time = 3
+    # execution_time = 3
     performance["latency"]    = latency
     performance["fidelity"]   = fidelity
     performance["throughput"] = through
@@ -195,7 +195,7 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     execution_time = end_time-start_time
    
     report=network_graph(network_topo,source_node_list,report)
-    report["performance"]["execution_time"] = "{:.2f}".format(execution_time)
+    report["performance"]["execution_time"] = execution_time
     print(report)
     return report
     #graph = network_topo.get_virtual_graph()
@@ -347,7 +347,7 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     topology = '/code/web/topology.json'
     print('topology', topology)
     protocol = Protocol(name='qsdc_tel', messages_list=[messages], label='00', attack=attack)
-    protocol(topology=topology)
+    protocol(topology=network_config)
     # tl.init()
     
     # print(protocol)
@@ -439,6 +439,7 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     print("protocol.recv_msgs_list",protocol.recv_msgs_list[-1])
     print("mean(protocol.mean_list)",mean(protocol.mean_list))
     res={}
+    print(protocol.networks[0].messages)
     result = list(protocol.recv_msgs_list[-1].values())
     
     res["input_message1"] = message1
@@ -607,6 +608,7 @@ def mdi_qsdc(network_config, sender, receiver, message, attack):
     print('network',network,basis)
 
 
+
 def ip2(network_config, alice_attrs,bob_id,threshold,num_decoy):
     report ={}
     start_time = time.time()
@@ -628,18 +630,19 @@ def ip2(network_config, alice_attrs,bob_id,threshold,num_decoy):
     # print('network config json', network_topo)
     # with open("topology.json", "w") as outfile:
     #     json.dump(topo_json, outfile)
-    alice_attrs = {'message':{(sender, receiver):'011010'},
-                   'id':'1011',
-                   'check_bits':4}
-    bob_id = '0111'
-    num_decoy_photons = 4
-    threshold = 0.2 # error threshold
+    # alice_attrs = {'message':{(sender, receiver):'011010'},
+    #                'id':'1011',
+    #                'check_bits':4}
+    alice_attrs["message"] = {(sender,receiver): input_message}
+    # bob_id = '0111'
+    # num_decoy_photons = 4
+    # threshold = 0.2 # error threshold
     attack = (None, None)
     # topology = '/code/web/configs/2n_linear.json'
-    network, recv_msgs, err_tup = ip2_run(topology=topology,
+    network, recv_msgs, err_tup = ip2_run(topology=network_config,
                   alice_attrs=alice_attrs,
                   bob_id=bob_id,
-                  num_decoy_photons=num_decoy_photons,
+                  num_decoy_photons=num_decoy,
                   threshold=threshold,
                   attack=attack)
     # results=ip2_run(topology,input_messages,ids,num_check_bits,num_decoy,attack)

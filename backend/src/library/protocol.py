@@ -232,7 +232,7 @@ class Protocol:
         self.__funcs.append(partial(Network.teleport) if 'encode' not in kwds and 'label' in kwds else partial(kwds.get('encode', Network.encode), msg_index=0))
         
         # Add an attack to the flow if one was specified
-        if (attack:=kwds.get('attack', '')): self.__funcs.append(partial(Attack.implement, attack=ATTACK_TYPE[attack].value))
+        if hasattr(ATTACK_TYPE,(attack:=kwds.get('attack'))): self.__funcs.append(partial(Attack.implement, attack=ATTACK_TYPE[attack].value))
         
         # If there is more than one message, add encoding functions for each subsequent message
         if len(messages_list[0])>1: self.__funcs.extend(partial(kwds.get('encode', Network.encode), msg_index=i) for i in range(1, len(messages_list[0])))
