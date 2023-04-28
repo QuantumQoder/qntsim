@@ -3,8 +3,8 @@ from typing import Dict, List
 from random import shuffle
 from numpy.random import randint
 
-from qntsim.components.circuit import QutipCircuit
-from qntsim.library.network import Network
+from qntsim.communication.circuits import QutipCircuit
+from qntsim.communication.network import Network
 
 messages = {1:'hi'}
 

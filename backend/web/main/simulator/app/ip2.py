@@ -4,8 +4,8 @@ from functools import partial
 from numpy.random import randint
 from random import sample
 from typing import Any, Dict, List, Tuple
-from qntsim.library import Network, insert_check_bits, insert_decoy_photons, bell_type_state_analyzer, Protocol, ErrorAnalyzer
-from qntsim.library.attack import Attack, ATTACK_TYPE
+from qntsim.communication import Network, insert_check_bits, insert_decoy_photons, bell_type_state_analyzer, Protocol, ErrorAnalyzer
+from qntsim.communication.attack import Attack, ATTACK_TYPE
 from qntsim.components.circuit import QutipCircuit
 
 logging.basicConfig(filename='ip2.log', filemode='w', level=logging.INFO, format='%(pathname)s %(threadName)s %(module)s %(funcName)s %(message)s')
@@ -99,8 +99,11 @@ class Bob(Party):
             seq_a (List): _description_
             i_a (List):
             cls.d_a: 
+        
         """
+        print('clas node', cls.node)
         seq_a, seq_b = list(zip(*[sorted(network.manager.get(key=info.memory.qstate_key).keys) for info in network._net_topo.nodes[cls.node].resource_manager.memory_manager if info.state=='ENTANGLED']))
+        
         cls.i_b = list(seq_b[-len(cls.id)//2:])
         cls.s_b = [ele for ele in seq_b if ele not in cls.i_b]
         for k, i1, i2 in zip(cls.i_b, cls.id[::2], cls.id[1::2]):
@@ -232,6 +235,7 @@ def pass_(network:Network, returns:Any):
     return returns
 
 def ip2_run(topology, alice_attrs, bob_id, num_decoy_photons, threshold, attack):
+    print('alice attr', alice_attrs)
     Alice.node = alice_attrs.get('sender')
     Bob.node = alice_attrs.get('receiver')
     Alice.input_messages = alice_attrs.get('message')

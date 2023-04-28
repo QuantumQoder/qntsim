@@ -27,7 +27,8 @@ def get_res(network_topo,req_pairs):
 		src=pair[0]
 		for info in network_topo.nodes[src].resource_manager.memory_manager:
 			if info.state == 'ENTANGLED' or info.state == 'OCCUPIED':
-				table.append([info.index,src,info.remote_node,info.fidelity,info.entangle_time * 1e-12,info.entangle_time * 1e-12+info.memory.coherence_time,info.state])
+       
+				table.append([info.index,src,info.remote_node,round(info.fidelity,4),round(info.entangle_time * 1e-12,4),round(info.memory.coherence_time,4),info.state])
 		print(tabulate(table, headers=cols, tablefmt='grid'))
 		memoryDict["sender"] = table
 		
