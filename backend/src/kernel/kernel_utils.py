@@ -24,6 +24,7 @@ class EventList:
     def __init__(self): 
         self.data = makefheap()
         self.nodesl = []
+        self.data_list = []
 
     def __len__(self):
         return self.data.num_nodes
@@ -36,6 +37,7 @@ class EventList:
         t = Node(event)
         self.nodesl.append(t)
         self.data.insert(t)
+        self.data_list.append(event)
 
     def pop(self) -> "Event":
         """Method to extract minium node (i.e, event with min time )
@@ -50,6 +52,7 @@ class EventList:
         The event is set as the invalid state to save the time of removing event from heap.
         """
         event._is_removed=True
+        self.data_list.remove(event)
 
     def update_event_time(self, event: "Event", time: int):
         """Method to update the timestamp of event and maintain the min-heap structure.
@@ -79,5 +82,7 @@ class EventList:
                     self.nodesl.append(t)
                     self.data.insert(t)
                 break
-
-
+    
+    def filter_events(self):
+        events = [(event.owner,event.activation, event.act_params[1]) if len(event.act_params)>0 else (event.owner,event.activation) for event in self.data_list]
+        return events
