@@ -43,7 +43,7 @@ pyvis==0.1.9
 qiskit-ignis==0.7.0
 qiskit-terra==0.21.2
 # qntsim==0.1.1
-qutip==4.6.3
+qutip==4.7.1
 retworkx==0.11.0
 scipy==1.7.3
 six==1.16.0
