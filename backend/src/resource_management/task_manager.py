@@ -212,6 +212,7 @@ class SubTask:
 		Child subtask runs the protocol encapsulated within it on the memory passed as argument to it
 	"""
 	def run(self):
+		print('Running subtask:	', self.name)
 		
 		protocol, req_dsts, req_condition_funcs = self.action(self.memories_info)
 		if protocol == True:
@@ -344,7 +345,8 @@ class TaskManager:
 
 		task.wakeup(self.owner.timeline.now())
 		subtasks = task.action(task.memories_info, dependency_subtasks=dependency_subtasks)
-		#print('len(subtasks):	', len(subtasks))
+		print('Running task:	', task.name)
+		
 		for subtask in subtasks:
 			subtask.task = task
 			if subtask.is_eligible_to_run():
@@ -380,7 +382,7 @@ class TaskManager:
 		#Get the parent task from this subtask and obtain its dependents
 		dependent_tasks = self.task_map[subtask.task]['is_dependecy_of']
 		#print('dependent_tasks for this: ', len(dependent_tasks))
-
+		print('subtask success:	', subtask.name)
 		#Call the dependent task's dependency_subtask_map and append to it
 		for dependent_task in dependent_tasks:
 			dependent_task.set_dependency_to_subtask(subtask)
@@ -399,8 +401,8 @@ class TaskManager:
 
 	def subtask_failure(self, subtask):
 		#Since subtask has failed we check if it was dependent on any other subtask and we keep on doing this till we reach the first subtask in the chain
-		#print('subtask failed:	', subtask.name)
-		#print('initial dependencies for this subtask:	', [i.name for i in subtask.initial_dependency_subtasks])
+		print('subtask failed:	', subtask.name)
+		print('initial dependencies for this subtask:	', [i.name for i in subtask.initial_dependency_subtasks])
 		for init_dep_subtask in subtask.initial_dependency_subtasks:
 			init_dep_subtask.run()
 		

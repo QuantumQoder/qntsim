@@ -193,6 +193,7 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     network_config_json, tl, network_topo = load_topology(
         network_config, "Qiskit")
     tm = network_topo.nodes[sender].transport_manager
+    nm = network_topo.nodes[sender].network_manager
     tm.request(receiver, float(startTime), int(size), 20e12,
                int(priority), float(targetFidelity), float(timeout))
     req_pairs.append((sender, receiver))
@@ -205,14 +206,13 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     report["application"] = results
     end_time = time.time()
     execution_time = end_time-start_time
-    print("====================== Transport Protocol Map ======================")
-    print(tm.transportprotocolmap)
-
-    retrials = tm.transportprotocolmap[0].retry
-
+    
     report = network_graph(network_topo, source_node_list, report)
     report["performance"]["execution_time"] = "{:.2f}".format(execution_time)
-    report["performance"]["retrials"] = retrials
+    report["performance"]["transport"] = {
+        "retrials": tm.transportprotocolmap[0].retry,
+    }
+    # report["performance"]["network"]["retrials"] = nm
     print(report)
     return report
     # graph = network_topo.get_virtual_graph()
