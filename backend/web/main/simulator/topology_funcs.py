@@ -9,19 +9,19 @@ from tokenize import String
 
 import numpy as np
 import pandas as pd
-from main.simulator.app.e2e import *
-from main.simulator.app.e91 import *
-from main.simulator.app.ghz import *
-from main.simulator.app.ip1 import *
-from main.simulator.app.ip2 import ip2_run
-from main.simulator.app.mdi_qsdc import *
-from main.simulator.app.ping_pong import *
-from main.simulator.app.qsdc1 import *
-from main.simulator.app.qsdc_teleportation import *
-from main.simulator.app.single_photon_qd import *
-from main.simulator.app.teleportation import *
-from main.simulator.app.utils import *
-from main.simulator.helpers import *
+from .app.e2e import *
+from .app.e91 import *
+from .app.ghz import *
+from .app.ip1 import *
+from .app.ip2 import ip2_run
+from .app.mdi_qsdc import *
+from .app.ping_pong import *
+from .app.qsdc1 import *
+from .app.qsdc_teleportation import *
+from .app.single_photon_qd import *
+from .app.teleportation import *
+from .app.utils import *
+from .helpers import *
 from pyvis.network import Network
 # from qntsim.library.protocol_handler.protocol_handler import Protocol
 from qntsim.communication.protocol import Protocol
@@ -190,9 +190,11 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     # TODO: Integrate Network Graphs
     req_pairs = []
     start_time = time.time()
+    print('network config', network_config)
     network_config_json, tl, network_topo = load_topology(
         network_config, "Qiskit")
     tm = network_topo.nodes[sender].transport_manager
+    nm = network_topo.nodes[sender].network_manager
     tm.request(receiver, float(startTime), int(size), 20e12,
                int(priority), float(targetFidelity), float(timeout))
     req_pairs.append((sender, receiver))
@@ -205,9 +207,13 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     report["application"] = results
     end_time = time.time()
     execution_time = end_time-start_time
-
+    
     report = network_graph(network_topo, source_node_list, report)
     report["performance"]["execution_time"] = "{:.2f}".format(execution_time)
+    report["performance"]["transport"] = {
+        "retrials": tm.transportprotocolmap[0].retry,
+    }
+    # report["performance"]["network"]["retrials"] = nm
     print(report)
     return report
     # graph = network_topo.get_virtual_graph()
@@ -376,7 +382,7 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     print('topology', topology)
     protocol = Protocol(name='qsdc_tel', messages_list=[
                         messages], label='00', attack=attack)
-    protocol(topology=topology)
+    protocol(topology=network_config)
     # tl.init()
 
     # print(protocol)
@@ -667,15 +673,15 @@ def ip2(network_config, alice_attrs, bob_id, threshold, num_decoy):
     # print('network config json', network_topo)
     # with open("topology.json", "w") as outfile:
     #     json.dump(topo_json, outfile)
-    alice_attrs = {'message': {(sender, receiver): '011010'},
+    alice_attrs.update({'message': {(sender, receiver): input_message},
                    'id': '1011',
-                   'check_bits': 4}
+                   'check_bits': 4})
     bob_id = '0111'
     num_decoy_photons = 4
     threshold = 0.2  # error threshold
     attack = (None, None)
     # topology = '/code/web/configs/2n_linear.json'
-    network, recv_msgs, err_tup = ip2_run(topology=topology,
+    network, recv_msgs, err_tup = ip2_run(topology=network_config,
                                           alice_attrs=alice_attrs,
                                           bob_id=bob_id,
                                           num_decoy_photons=num_decoy_photons,

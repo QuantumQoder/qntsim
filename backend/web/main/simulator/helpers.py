@@ -1,29 +1,52 @@
 
 
 import string
-from main.simulator.constants import *
-
+from .constants import *
+from qntsim.kernel.timeline import Timeline
+from qntsim.topology.topology import Topology
 
 def load_topology(network_config_json, backend):
-    from qntsim.kernel.timeline import Timeline
+    """
+        Creates the network with nodes, quantum connections and 
+        updates their respective components with the parameters specified in json
+    """
     Timeline.DLCZ=False
     Timeline.bk=True
-    from qntsim.topology.topology import Topology
-    #from qntsim.topology.node import force_import
-    #force_import("bk")
     print(f'Loading Topology: {network_config_json}')
     
     tl = Timeline(20e12,backend)
-    # print('Timeline', tl)
 
+    #Create the topology
     network_topo = Topology("network_topo", tl)
     network_topo.load_config_json(network_config_json)
-    all_pair_dist, G = network_topo.all_pair_shortest_dist()
-    # print('all pair distance', all_pair_dist, G)
 
-    # print(f'Topology Graph: {network_topo}')
+    #Configure the parameters
 
+    #Memory Parameters
+    for node_properties in network_config_json["nodes"]:
+        node = network_topo.nodes[node_properties["Name"]]
+        node.memory_array.update_memory_params("frequency", node_properties["memory"]["frequency"])
+        node.memory_array.update_memory_params("coherence_time", node_properties["memory"]["expiry"])
+        node.memory_array.update_memory_params("efficiency", node_properties["memory"]["efficiency"])
+        node.memory_array.update_memory_params("raw_fidelity", node_properties["memory"]["fidelity"])
     
+    #Detector Parameters
+    if "detector_properties" in network_config_json:
+        for node in network_topo.get_nodes_by_type("BSMNode"):
+            node.bsm.update_detectors_params("efficiency", network_config_json["detector_properties"]["efficiency"])
+            node.bsm.update_detectors_params("count_rate", network_config_json["detector_properties"]["count_rate"])
+            node.bsm.update_detectors_params("time_resolution", network_config_json["detector_properties"]["time_resolution"])
+        
+    #Light Source Parameters
+    if "light_source_properties" in network_config_json:
+        Qnodes = network_topo.get_nodes_by_type("EndNode")+network_topo.get_nodes_by_type("ServiceNode")
+        for node in Qnodes:
+            node.lightsource.frequency = network_config_json["light_source_properties"]["frequency"]
+            node.lightsource.wavelength = network_config_json["light_source_properties"]["wavelength"]
+            node.lightsource.bandwidth = network_config_json["light_source_properties"]["bandwidth"]
+            node.lightsource.mean_photon_num = network_config_json["light_source_properties"]["mean_photon_num"]
+            node.lightsource.phase_error = network_config_json["light_source_properties"]["phase_error"]
+
     return network_config_json,tl,network_topo
 
 
