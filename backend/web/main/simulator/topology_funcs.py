@@ -9,19 +9,19 @@ from tokenize import String
 
 import numpy as np
 import pandas as pd
-from main.simulator.app.e2e import *
-from main.simulator.app.e91 import *
-from main.simulator.app.ghz import *
-from main.simulator.app.ip1 import *
-from main.simulator.app.ip2 import ip2_run
-from main.simulator.app.mdi_qsdc import *
-from main.simulator.app.ping_pong import *
-from main.simulator.app.qsdc1 import *
-from main.simulator.app.qsdc_teleportation import *
-from main.simulator.app.single_photon_qd import *
-from main.simulator.app.teleportation import *
-from main.simulator.app.utils import *
-from main.simulator.helpers import *
+from .app.e2e import *
+from .app.e91 import *
+from .app.ghz import *
+from .app.ip1 import *
+from .app.ip2 import ip2_run
+from .app.mdi_qsdc import *
+from .app.ping_pong import *
+from .app.qsdc1 import *
+from .app.qsdc_teleportation import *
+from .app.single_photon_qd import *
+from .app.teleportation import *
+from .app.utils import *
+from .helpers import *
 from pyvis.network import Network
 # from qntsim.library.protocol_handler.protocol_handler import Protocol
 from qntsim.communication.protocol import Protocol
@@ -206,6 +206,10 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     report["application"] = results
     end_time = time.time()
     execution_time = end_time-start_time
+    print("====================== Transport Protocol Map ======================")
+    print(tm.transportprotocolmap)
+
+    retrials = tm.transportprotocolmap[0].retry
 
     report = network_graph(network_topo, source_node_list, report)
     report["performance"]["execution_time"] = float("{:.2f}".format(execution_time))

@@ -20,7 +20,9 @@ from main.models import Applications,Results
 import importlib
 from main.simulator import topology_funcs
 import qntsim
-
+from django.http import StreamingHttpResponse
+import time
+import os
 
 def home(request):
     context = {
@@ -249,4 +251,18 @@ def stream_response_generator():
         yield " " * 1024  # Encourage browser to render incrementally
         time.sleep(0.5)
 
+@csrf_exempt
+def stream_logs(request):
+    def generate_response():
+        print('pwd',os.getcwd())
+        with open('/code/web/qsdc_tel.log', 'r') as f:
+            while True:
+                line = f.readline()
+                print('line', line)
+                if not line:
+                    time.sleep(1)  # wait for new lines to be added
+                else:
+                    yield line.encode()
 
+    response = StreamingHttpResponse(generate_response(), content_type='text/plain')
+    return response
