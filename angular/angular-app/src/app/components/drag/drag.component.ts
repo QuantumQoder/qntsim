@@ -1,6 +1,6 @@
 import { HoldingDataService } from 'src/services/holding-data.service';
 
-import { AfterViewInit, Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -20,6 +20,8 @@ import { ConditionsService } from 'src/services/conditions.service';
   encapsulation: ViewEncapsulation.None
 })
 export class DragComponent implements OnInit, AfterViewInit {
+  @ViewChild('diagramContainer') private diagramRef: ElementRef;
+  private addButtonAdornment: go.Adornment;
   stepDrag = new Step();
   position_popover: string = 'top'
   info: boolean;
@@ -76,7 +78,7 @@ export class DragComponent implements OnInit, AfterViewInit {
   public selectedLink: any
 
   visibleSideNav: boolean
-  public myDiagram: go.Diagram
+  public myDiagram: any
   public myPalette: go.Palette
   public linksModel: go.GraphLinksModel
   public myRotate: go.RotatingTool
@@ -120,7 +122,10 @@ export class DragComponent implements OnInit, AfterViewInit {
     'numDecoy': new FormControl(''),
     'inputMessage': new FormControl('')
   })
-  constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private holdingData: HoldingDataService, private _route: Router, private modal: NgbModal, private confirmationService: ConfirmationService) { }
+  constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private holdingData: HoldingDataService, private _route: Router, private modal: NgbModal, private confirmationService: ConfirmationService) {
+    // const $ = go.GraphObject.make;
+
+  }
 
 
   @HostListener('window:resize', ['$event'])
@@ -128,249 +133,249 @@ export class DragComponent implements OnInit, AfterViewInit {
     this.step = 0;
   }
   ngAfterViewInit(): void {
-    var $ = go.GraphObject.make;
-    this.myDiagram = this.initDiagram()
+    // var $ = go.GraphObject.make;
+    this.initDiagram();
 
     // when the document is modified, add a "*" to the title and enable the "Save" button
-    this.myDiagram.addDiagramListener("Modified", e => {
-      var button = document.getElementById("SaveButton") as HTMLButtonElement;
-      if (button) button.disabled = !this.myDiagram.isModified;
-      var idx = document.title.indexOf("*");
-      if (this.myDiagram.isModified) {
-        if (idx < 0) document.title += "*";
-      } else {
-        if (idx >= 0) document.title = document.title.slice(0, idx);
-      }
-    });
-    this.myDiagram.addDiagramListener("SelectionMoved", e => {
-      console.log(this.myDiagram.selection)
-    })
-    this.myDiagram.addDiagramListener("PartCreated", e => {
-      console.log(this.myDiagram.selection)
-    })
-    var tooltipTemplate =
-      $(go.Adornment, "Auto",
-        $(go.Shape, "RoundedRectangle", { fill: "lightyellow" }),
-        $(go.TextBlock, { margin: 4 },
-          new go.Binding("text", "description"))
-      );
-    function makePort(name: any, spot: any, output: any, input: any) {
-      // the port is basically just a small transparent square
-      return $(go.Shape, "Circle",
-        {
-          fill: null,  // not seen, by default; set to a translucent gray by showSmallPorts, defined below
-          stroke: null,
-          desiredSize: new go.Size(7, 7),
-          alignment: spot,  // align the port on the main Shape
-          alignmentFocus: spot,  // just inside the Shape
-          portId: name,  // declare this object to be a "port"
-          fromSpot: spot, toSpot: spot,  // declare where links may connect at this port
-          fromLinkable: output, toLinkable: input,  // declare whether the user may draw links to/from here
-          cursor: "pointer"  // show a different cursor to indicate potential link point
-        });
-    }
-    var nodeSelectionAdornmentTemplate =
-      $(go.Adornment, "Auto",
-        $(go.Shape, { fill: null, stroke: "deepskyblue", strokeWidth: 1.5, strokeDashArray: [4, 2] }),
-        $(go.Placeholder)
-      );
-
-    var nodeResizeAdornmentTemplate =
-      $(go.Adornment, "Spot",
-        { locationSpot: go.Spot.Right },
-        $(go.Placeholder),
-      );
-
-    var nodeRotateAdornmentTemplate =
-      $(go.Adornment,
-        { locationSpot: go.Spot.Center, locationObjectName: "CIRCLE" },
-        $(go.Shape, "Circle", { name: "CIRCLE", cursor: "pointer", desiredSize: new go.Size(7, 7), fill: "lightblue", stroke: "deepskyblue" }),
-        $(go.Shape, { geometryString: "M3.5 7 L3.5 30", isGeometryPositioned: true, stroke: "deepskyblue", strokeWidth: 1.5, strokeDashArray: [4, 2] })
-      );
-    // var myToolTip = $(go.HTMLInfo, {
-    //   show: showToolTip,
-    //   hide: hideToolTip
+    // this.myDiagram.addDiagramListener("Modified", e => {
+    //   var button = document.getElementById("SaveButton") as HTMLButtonElement;
+    //   if (button) button.disabled = !this.myDiagram.isModified;
+    //   var idx = document.title.indexOf("*");
+    //   if (this.myDiagram.isModified) {
+    //     if (idx < 0) document.title += "*";
+    //   } else {
+    //     if (idx >= 0) document.title = document.title.slice(0, idx);
+    //   }
     // });
-    this.myDiagram.nodeTemplate =
-      $(go.Node, "Spot",
-        { // Add the tooltip to the node
-          toolTip: tooltipTemplate
-        },
-        {
-          click: (e: go.InputEvent, obj: go.GraphObject) => {
-            this.nodeClicked(e, obj)
-          },
+    // this.myDiagram.addDiagramListener("SelectionMoved", e => {
+    //   console.log(this.myDiagram.selection)
+    // })
+    // this.myDiagram.addDiagramListener("PartCreated", e => {
+    //   console.log(this.myDiagram.selection)
+    // })
+    // var tooltipTemplate =
+    //   $(go.Adornment, "Auto",
+    //     $(go.Shape, "RoundedRectangle", { fill: "lightyellow" }),
+    //     $(go.TextBlock, { margin: 4 },
+    //       new go.Binding("text", "description"))
+    //   );
+    // function makePort(name: any, spot: any, output: any, input: any) {
+    //   // the port is basically just a small transparent square
+    //   return $(go.Shape, "Circle",
+    //     {
+    //       fill: null,  // not seen, by default; set to a translucent gray by showSmallPorts, defined below
+    //       stroke: null,
+    //       desiredSize: new go.Size(7, 7),
+    //       alignment: spot,  // align the port on the main Shape
+    //       alignmentFocus: spot,  // just inside the Shape
+    //       portId: name,  // declare this object to be a "port"
+    //       fromSpot: spot, toSpot: spot,  // declare where links may connect at this port
+    //       fromLinkable: output, toLinkable: input,  // declare whether the user may draw links to/from here
+    //       cursor: "pointer"  // show a different cursor to indicate potential link point
+    //     });
+    // }
+    // var nodeSelectionAdornmentTemplate =
+    //   $(go.Adornment, "Auto",
+    //     $(go.Shape, { fill: null, stroke: "deepskyblue", strokeWidth: 1.5, strokeDashArray: [4, 2] }),
+    //     $(go.Placeholder)
+    //   );
 
-          doubleClick: this.nodeClicked,
-          contextMenu:
-            $("ContextMenu",
-              $("ContextMenuButton",
-                $(go.TextBlock, "Delete"),
-                {
-                  click: (e: go.InputEvent, obj: go.GraphObject) => { this.showProperties(e, obj) },
-                })
-            )
-        },
-        {
-          movable: false,
-          copyable: true,
-          deletable: true, locationSpot: go.Spot.Center
-        },
-        new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
-        { selectable: true, selectionAdornmentTemplate: nodeSelectionAdornmentTemplate },
-        { resizable: false, resizeObjectName: "PANEL", resizeAdornmentTemplate: nodeResizeAdornmentTemplate },
-        { rotatable: false, rotateAdornmentTemplate: nodeRotateAdornmentTemplate },
+    // var nodeResizeAdornmentTemplate =
+    //   $(go.Adornment, "Spot",
+    //     { locationSpot: go.Spot.Right },
+    //     $(go.Placeholder),
+    //   );
 
-        new go.Binding("angle").makeTwoWay(),
-        // the main object is a Panel that surrounds a TextBlock with a Shape
-        $(go.Panel, "Auto",
-          {
-            name: "PANEL",
-            // toolTip: myToolTip
-          },
-          new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
-          $(go.Shape, "Rectangle",  // default figure
-            {
-              portId: "", // the default port: if no spot on link data, use closest side
-              fromLinkable: true, toLinkable: true, cursor: "pointer",
-              fill: "white",  // default color
-              strokeWidth: 2
-            },
-            new go.Binding("figure"),
-            new go.Binding("fill")
-          ),
-          new go.Binding("strokeDashArray", "dash")),
-        $(go.TextBlock,
-          {
-            font: "bold 11pt Helvetica, Arial, sans-serif",
-            margin: 8,
-            maxSize: new go.Size(160, NaN),
-            wrap: go.TextBlock.WrapDesiredSize,
-            editable: false
-          },
-          new go.Binding("text", "text").makeTwoWay()),
-      );
-    // four small named ports, one on each side:
-    makePort("T", go.Spot.Top, false, true),
-      makePort("L", go.Spot.Left, true, true),
-      makePort("R", go.Spot.Right, true, true),
-      makePort("B", go.Spot.Bottom, true, false),
-    { // handle mouse enter/leave events to show/hide the ports
-      mouseEnter: function (e: any, node: any) { },
-      mouseLeave: function (e: any, node: any) { }
-    }
+    // var nodeRotateAdornmentTemplate =
+    //   $(go.Adornment,
+    //     { locationSpot: go.Spot.Center, locationObjectName: "CIRCLE" },
+    //     $(go.Shape, "Circle", { name: "CIRCLE", cursor: "pointer", desiredSize: new go.Size(7, 7), fill: "lightblue", stroke: "deepskyblue" }),
+    //     $(go.Shape, { geometryString: "M3.5 7 L3.5 30", isGeometryPositioned: true, stroke: "deepskyblue", strokeWidth: 1.5, strokeDashArray: [4, 2] })
+    //   );
+    // // var myToolTip = $(go.HTMLInfo, {
+    // //   show: showToolTip,
+    // //   hide: hideToolTip
+    // // });
+    // this.myDiagram.nodeTemplate =
+    //   $(go.Node, "Spot",
+    //     { // Add the tooltip to the node
+    //       toolTip: tooltipTemplate
+    //     },
+    //     {
+    //       click: (e: go.InputEvent, obj: go.GraphObject) => {
+    //         this.nodeClicked(e, obj)
+    //       },
 
-    var linkSelectionAdornmentTemplate =
-      $(go.Adornment, "Link",
-        $(go.Shape,
-          // isPanelMain declares that this Shape shares the Link.geometry
-          { isPanelMain: true, fill: null, stroke: "", strokeWidth: 0 })  // use selection object's strokeWidth
-      );
+    //       doubleClick: this.nodeClicked,
+    //       contextMenu:
+    //         $("ContextMenu",
+    //           $("ContextMenuButton",
+    //             $(go.TextBlock, "Delete"),
+    //             {
+    //               click: (e: go.InputEvent, obj: go.GraphObject) => { this.showProperties(e, obj) },
+    //             })
+    //         )
+    //     },
+    //     {
+    //       movable: false,
+    //       copyable: true,
+    //       deletable: true, locationSpot: go.Spot.Center
+    //     },
+    //     new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+    //     { selectable: true, selectionAdornmentTemplate: nodeSelectionAdornmentTemplate },
+    //     { resizable: false, resizeObjectName: "PANEL", resizeAdornmentTemplate: nodeResizeAdornmentTemplate },
+    //     { rotatable: false, rotateAdornmentTemplate: nodeRotateAdornmentTemplate },
 
-    this.myDiagram.linkTemplate =
-      $(go.Link,  // the whole link panel
-        { selectable: true, selectionAdornmentTemplate: linkSelectionAdornmentTemplate },
-        { relinkableFrom: true, relinkableTo: true, reshapable: false },
-        {
-          routing: go.Link.AvoidsNodes,
-          curve: go.Link.JumpOver,
-          corner: 5,
-          toShortLength: 4,
-          cursor: 'pointer',
-          click: (e: any, obj: any) => {
-            console.log(obj);
-            // this.linkClicked(e, obj)
-          },
-          contextMenu:
-            $("ContextMenu",
-              $("ContextMenuButton",
-                $(go.TextBlock, "Delete"),
-                {
-                  click: (e: go.InputEvent, obj: go.GraphObject) => { this.deleteLink(e, obj) },
-                })
-            )
-        },
-        new go.Binding("points").makeTwoWay(),
-        $(go.Shape,  // the link path shape
-          { isPanelMain: true, strokeWidth: 2 },
-          new go.Binding("stroke", "color")),
-        $(go.TextBlock, {
-          segmentOffset: new go.Point(0, -10),
-          editable: false,
-        },),
-        // centered multi-line text
-        //   new go.Binding("text", "text")),
-        // $(go.Shape,  // the link path shape
-        //   { isPanelMain: true, strokeWidth: 2 }),
-        $(go.Shape,  // the arrowhead
-          { toArrow: "Standard", stroke: null },
-          new go.Binding('fill', 'color')),
-        $(go.Panel, "Auto",
-          new go.Binding("visible", "isSelected").ofObject(),
-          $(go.Shape, "RoundedRectangle",  // the link shape
-            { fill: "#F8F8F8", stroke: null }),
-          $(go.TextBlock,
-            {
-              // textAlign: segmentOffset: new go.Point(0, -10)",
-              font: "10pt helvetica, arial, sans-serif",
-              stroke: "#919191",
-              margin: 2,
-              minSize: new go.Size(10, NaN),
-              editable: false
-            },
-            new go.Binding("text").makeTwoWay())
-        )
-      );
-    this.myPalette =
-      $(go.Palette, "myPaletteDiv",  // must name or refer to the DIV HTML element
-        {
-          maxSelectionCount: 1,
-          nodeTemplateMap: this.myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
-          linkTemplate: // simplify the link template, just in this Palette
-            $(go.Link,
-              { // because the GridLayout.alignment is Location and the nodes have locationSpot == Spot.Center,
-                // to line up the Link in the same manner we have to pretend the Link has the same location spot
-                locationSpot: go.Spot.Center,
-                selectionAdornmentTemplate:
-                  $(go.Adornment, "Link",
-                    { locationSpot: go.Spot.Center },
-                    $(go.Shape,
-                      { isPanelMain: true, fill: null, stroke: "deepskyblue", strokeWidth: 0 }),
-                    $(go.Shape,  // the arrowhead
-                      { toArrow: "Standard", stroke: "grey" })
-                  ),
-              },
-              {
-                routing: go.Link.AvoidsNodes,
-                curve: go.Link.JumpOver,
-                corner: 5,
-                toShortLength: 4,
-                click: (e: any, obj: any) => {
-                  console.log("palette")
-                },
-              },
-              new go.Binding("points"),
-              $(go.Shape,  // the link path shape
-                { isPanelMain: true, strokeWidth: 2 }),
-              $(go.Shape,  // the arrowhead
-                { toArrow: "Standard", stroke: null, strokeWidth: 2 }),
-              $(go.TextBlock, { segmentOffset: new go.Point(0, -10) },  // centered multi-line text
-                new go.Binding("text", "text")),
-              new go.Binding('fill', 'color'),
-            ),
-          model: new go.GraphLinksModel([  // specify the contents of the Palette
-            { text: "Service", figure: "Ellipse", "size": "75 75", fill: "#FBFFB1", description: this.infoTips.service },
-            { text: "End", figure: "Circle", "size": "75 75", fill: "#7D8F69", description: this.infoTips.end },
+    //     new go.Binding("angle").makeTwoWay(),
+    //     // the main object is a Panel that surrounds a TextBlock with a Shape
+    //     $(go.Panel, "Auto",
+    //       {
+    //         name: "PANEL",
+    //         // toolTip: myToolTip
+    //       },
+    //       new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
+    //       $(go.Shape, "Rectangle",  // default figure
+    //         {
+    //           portId: "", // the default port: if no spot on link data, use closest side
+    //           fromLinkable: true, toLinkable: true, cursor: "pointer",
+    //           fill: "white",  // default color
+    //           strokeWidth: 2
+    //         },
+    //         new go.Binding("figure"),
+    //         new go.Binding("fill")
+    //       ),
+    //       new go.Binding("strokeDashArray", "dash")),
+    //     $(go.TextBlock,
+    //       {
+    //         font: "bold 11pt Helvetica, Arial, sans-serif",
+    //         margin: 8,
+    //         maxSize: new go.Size(160, NaN),
+    //         wrap: go.TextBlock.WrapDesiredSize,
+    //         editable: false
+    //       },
+    //       new go.Binding("text", "text").makeTwoWay()),
+    //   );
+    // // four small named ports, one on each side:
+    // makePort("T", go.Spot.Top, false, true),
+    //   makePort("L", go.Spot.Left, true, true),
+    //   makePort("R", go.Spot.Right, true, true),
+    //   makePort("B", go.Spot.Bottom, true, false),
+    // { // handle mouse enter/leave events to show/hide the ports
+    //   mouseEnter: function (e: any, node: any) { },
+    //   mouseLeave: function (e: any, node: any) { }
+    // }
 
-          ], [
-            // the Palette also has a disconnected Link, which the user can drag-and-drop
-            // { points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) },
-            // { color: "grey", text: "VC", points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) }
-          ])
-        });
-    this.myDiagram.addDiagramListener("ChangedSelection", function (event) {
-      console.log("selection changed")
-    })
+    // var linkSelectionAdornmentTemplate =
+    //   $(go.Adornment, "Link",
+    //     $(go.Shape,
+    //       // isPanelMain declares that this Shape shares the Link.geometry
+    //       { isPanelMain: true, fill: null, stroke: "", strokeWidth: 0 })  // use selection object's strokeWidth
+    //   );
+
+    // this.myDiagram.linkTemplate =
+    //   $(go.Link,  // the whole link panel
+    //     { selectable: true, selectionAdornmentTemplate: linkSelectionAdornmentTemplate },
+    //     { relinkableFrom: true, relinkableTo: true, reshapable: false },
+    //     {
+    //       routing: go.Link.AvoidsNodes,
+    //       curve: go.Link.JumpOver,
+    //       corner: 5,
+    //       toShortLength: 4,
+    //       cursor: 'pointer',
+    //       click: (e: any, obj: any) => {
+    //         console.log(obj);
+    //         // this.linkClicked(e, obj)
+    //       },
+    //       contextMenu:
+    //         $("ContextMenu",
+    //           $("ContextMenuButton",
+    //             $(go.TextBlock, "Delete"),
+    //             {
+    //               click: (e: go.InputEvent, obj: go.GraphObject) => { this.deleteLink(e, obj) },
+    //             })
+    //         )
+    //     },
+    //     new go.Binding("points").makeTwoWay(),
+    //     $(go.Shape,  // the link path shape
+    //       { isPanelMain: true, strokeWidth: 2 },
+    //       new go.Binding("stroke", "color")),
+    //     $(go.TextBlock, {
+    //       segmentOffset: new go.Point(0, -10),
+    //       editable: false,
+    //     },),
+    //     // centered multi-line text
+    //     //   new go.Binding("text", "text")),
+    //     // $(go.Shape,  // the link path shape
+    //     //   { isPanelMain: true, strokeWidth: 2 }),
+    //     $(go.Shape,  // the arrowhead
+    //       { toArrow: "Standard", stroke: null },
+    //       new go.Binding('fill', 'color')),
+    //     $(go.Panel, "Auto",
+    //       new go.Binding("visible", "isSelected").ofObject(),
+    //       $(go.Shape, "RoundedRectangle",  // the link shape
+    //         { fill: "#F8F8F8", stroke: null }),
+    //       $(go.TextBlock,
+    //         {
+    //           // textAlign: segmentOffset: new go.Point(0, -10)",
+    //           font: "10pt helvetica, arial, sans-serif",
+    //           stroke: "#919191",
+    //           margin: 2,
+    //           minSize: new go.Size(10, NaN),
+    //           editable: false
+    //         },
+    //         new go.Binding("text").makeTwoWay())
+    //     )
+    //   );
+    // this.myPalette =
+    //   $(go.Palette, "myPaletteDiv",  // must name or refer to the DIV HTML element
+    //     {
+    //       maxSelectionCount: 1,
+    //       nodeTemplateMap: this.myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
+    //       linkTemplate: // simplify the link template, just in this Palette
+    //         $(go.Link,
+    //           { // because the GridLayout.alignment is Location and the nodes have locationSpot == Spot.Center,
+    //             // to line up the Link in the same manner we have to pretend the Link has the same location spot
+    //             locationSpot: go.Spot.Center,
+    //             selectionAdornmentTemplate:
+    //               $(go.Adornment, "Link",
+    //                 { locationSpot: go.Spot.Center },
+    //                 $(go.Shape,
+    //                   { isPanelMain: true, fill: null, stroke: "deepskyblue", strokeWidth: 0 }),
+    //                 $(go.Shape,  // the arrowhead
+    //                   { toArrow: "Standard", stroke: "grey" })
+    //               ),
+    //           },
+    //           {
+    //             routing: go.Link.AvoidsNodes,
+    //             curve: go.Link.JumpOver,
+    //             corner: 5,
+    //             toShortLength: 4,
+    //             click: (e: any, obj: any) => {
+    //               console.log("palette")
+    //             },
+    //           },
+    //           new go.Binding("points"),
+    //           $(go.Shape,  // the link path shape
+    //             { isPanelMain: true, strokeWidth: 2 }),
+    //           $(go.Shape,  // the arrowhead
+    //             { toArrow: "Standard", stroke: null, strokeWidth: 2 }),
+    //           $(go.TextBlock, { segmentOffset: new go.Point(0, -10) },  // centered multi-line text
+    //             new go.Binding("text", "text")),
+    //           new go.Binding('fill', 'color'),
+    //         ),
+    //       model: new go.GraphLinksModel([  // specify the contents of the Palette
+    //         { text: "Service", figure: "Ellipse", "size": "75 75", fill: "#FBFFB1", description: this.infoTips.service },
+    //         { text: "End", figure: "Circle", "size": "75 75", fill: "#7D8F69", description: this.infoTips.end },
+
+    //       ], [
+    //         // the Palette also has a disconnected Link, which the user can drag-and-drop
+    //         // { points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) },
+    //         // { color: "grey", text: "VC", points: new go.List(go.Point).addAll([new go.Point(0, 0), new go.Point(30, 0), new go.Point(30, 40), new go.Point(60, 40)]) }
+    //       ])
+    //     });
+    // this.myDiagram.addDiagramListener("ChangedSelection", function (event) {
+    //   console.log("selection changed")
+    // })
 
   }
 
@@ -389,20 +394,38 @@ export class DragComponent implements OnInit, AfterViewInit {
     }
   }
   updateNodes() {
+    var linkArray = this.myDiagram.model.linkDataArray
+    var nodesArray = this.myDiagram.model.nodeDataArray
     this.serviceNodes = [];
     this.endNodes = [];
-    // this.nodes = [];
+    this.nodes = [];
+    for (let i = 0; i < nodesArray.length; i++) {
+      const nodereq = {
+        "Name": nodesArray[i].name,
+        "Type": nodesArray[i].properties[0].propValue.toLowerCase(),
+        "noOfMemory": nodesArray[i].properties[1].propValue,
+        "memory": {
+          'frequency': nodesArray[i].memory[0].propValue,
+          'expiry': nodesArray[i].memory[1].propValue,
+          'efficiency': nodesArray[i].memory[2].propValue,
+          'fidelity': nodesArray[i].memory[3].propValue
+        }
+      };
 
-    // for (let i = 0; i < this.myDiagram.model.nodeDataArray.length; i++) {
-    //   if ((this.myDiagram.model.nodeDataArray[i] as any).key in this.nodesData) {
-    //     this.nodes.push(this.nodesData[(this.myDiagram.model.nodeDataArray[i] as any).key])
-    //   }
-    // }
+      this.nodesData[nodesArray[i].key] = nodereq;
+
+      if ((this.myDiagram.model.nodeDataArray[i] as any).key in this.nodesData) {
+        this.nodes.push(this.nodesData[(this.myDiagram.model.nodeDataArray[i] as any).key])
+      }
+
+
+    }
+    console.log(this.nodesData)
     for (const [key, value] of Object.entries(this.nodesData)) {
       // console.log(value)
-      if (value["Type"] == 'end') {
+      if (value["Type"].toLowerCase() == 'end') {
         this.endNodes.push(value)
-      } else if (value["Type"] == 'service') {
+      } else if (value["Type"].toLowerCase() == 'service') {
         this.serviceNodes.push(value)
       }
     }
@@ -438,7 +461,7 @@ export class DragComponent implements OnInit, AfterViewInit {
     }]
 
 
-    this.showBottomCenter();
+    // this.showBottomCenter();
   }
   preloadTopology() {
     if (this.checked == true) {
@@ -474,9 +497,7 @@ export class DragComponent implements OnInit, AfterViewInit {
         for (var i = 0; i < linkArray.length; i++) {
           var from = linkArray[i].from
           var to = linkArray[i].to
-          let positiveFromkey = from * (-1)
-          // console.log(positivekey * 2)
-          let positivetoKey = to * (-1)
+
 
           array.push(this.nodesData[from].Name)
           array.push(this.nodesData[to].Name)
@@ -545,7 +566,6 @@ export class DragComponent implements OnInit, AfterViewInit {
   }
   save() {
 
-    //console.log(this.graphModel)
   }
   add() {
     var nodereq;
@@ -654,10 +674,10 @@ export class DragComponent implements OnInit, AfterViewInit {
     console.log(this.links)
     this.nodeParams = false
   }
-  showBottomCenter() {
-    // console.log("hi")
-    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message Content' });
-  }
+  // showBottomCenter() {
+  //   // console.log("hi")
+  //   this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message Content' });
+  // }
   parameters() {
     this.app_id = localStorage.getItem('app_id')
     //console.log(this.app_id)
@@ -668,8 +688,6 @@ export class DragComponent implements OnInit, AfterViewInit {
         // this.spinner = false
         return
       }
-
-
     }
     if (this.app_id == 9) {
       if (this.appSettingsForm.get('inputMessage')?.value == '') {
@@ -731,10 +749,11 @@ export class DragComponent implements OnInit, AfterViewInit {
     this.links = []
     var linkarray: any[]
     if (this.savedModel.linkDataArray.length > this.links.length) {
+      console.log(this.savedModel)
       for (var i = 0; i < this.savedModel.linkDataArray.length; i++) {
         linkarray = []
-        var from = this.myDiagram.model.findNodeDataForKey(this.savedModel.linkDataArray[i].from).text
-        var to = this.myDiagram.model.findNodeDataForKey(this.savedModel.linkDataArray[i].to).text
+        var from = this.myDiagram.model.findNodeDataForKey(this.savedModel.linkDataArray[i].from).name
+        var to = this.myDiagram.model.findNodeDataForKey(this.savedModel.linkDataArray[i].to).name
         linkarray.push(from);
         linkarray.push(to);
         let linkData = {
@@ -879,7 +898,7 @@ export class DragComponent implements OnInit, AfterViewInit {
       "appSettings": this.appSettings
     }
     let diagramdata = {
-      diagram: this.myDiagram.model,
+      myDiagram: this.myDiagram.model,
       nodes: this.nodes,
       links: this.links
     }
@@ -895,45 +914,243 @@ export class DragComponent implements OnInit, AfterViewInit {
     }, (error) => {
       this.spinner = false
       console.error(error)
-      alert("Error has occurred:" + "" + error.status + "-" + error.statusText)
+      // alert("Error has occurred:" + "" + error.status + "-" + error.statusText)
     }, () => {
       this.spinner = false
       this._route.navigate(['/results'])
     })
   }
-  initDiagram(): go.Diagram {
-    var $ = go.GraphObject.make;  // for conciseness in defining templates
-    var myDiagram =
-      $(go.Diagram, "myDiagramDiv",  // must name or refer to the DIV HTML element
+  initDiagram() {
+    const $ = go.GraphObject.make;
+
+    this.myDiagram = $(go.Diagram, this.diagramRef.nativeElement, {
+      'undoManager.isEnabled': true,
+      'initialAutoScale': go.Diagram.Uniform, // Ensures the myDiagram fits the viewport
+      'allowZoom': false, // Disables zooming
+      // layout: $(go.GridLayout,
+      //   { // this only lays out in trees nodes connected by "generalization" links
+      //     // angle: 90,
+      //     // path: go.GridLayout.PathSource,  // links go from child to parent
+      //     // setsPortSpot: false,  // keep Spot.AllSides for link connection spot
+      //     // setsChildPortSpot: false,  // keep Spot.AllSides
+      //     // nodes not connected by "generalization" links are laid out horizontally
+      //     // arrangement: go.TreeLayout.ArrangementHorizontal
+      //   })
+    });
+    this.addButtonAdornment = $(go.Adornment, 'Spot',
+      $(go.Panel, 'Auto',
+        $(go.Shape, { fill: null, strokeWidth: 0 }),
+        $(go.Placeholder)
+      ),
+      $(go.Panel, 'Spot', { alignment: go.Spot.Right, alignmentFocus: go.Spot.Left, cursor: 'pointer' },
+        { click: (e: any, obj: any) => this.addNode(obj.part.adornedPart) },
+        $(go.TextBlock, '+', { font: 'bold 10pt sans-serif', margin: new go.Margin(0, 5, 0, 0) })
+      )
+    );
+
+    function isPositiveNumber(val: any) {
+      console.log(val)
+      const regex = /^\d+$/;
+      return regex.test(val);
+    }
+    function isDecimalNumber(val: any) {
+      const regex = /^\d+(\.\d*)?$/;
+      return regex.test(val);
+    }
+
+    var memoryTemplate =
+      $(go.Panel, "Horizontal",
+        $(go.TextBlock,
+          { isMultiline: false, editable: false },
+          new go.Binding("text", "propName").makeTwoWay(),
+          new go.Binding("isUnderline", "scope", s => s[0] === 'c')),
+        // property type, if known
+        $(go.TextBlock, "",
+          new go.Binding("text", "propValue", t => t ? ": " : "")),
+        $(go.TextBlock,
+          { isMultiline: false, editable: true },
+          new go.Binding("text", "propValue").makeTwoWay()),
+        // property default value, if any
+        $(go.TextBlock,
+          { isMultiline: false, editable: false },
+          new go.Binding("text", "default", s => s ? " = " + s : ""))
+      );
+    var propertyTemplate =
+      $(go.Panel, "Horizontal",
+        $(go.TextBlock,
+          { isMultiline: false, editable: false },
+          new go.Binding("text", "propName").makeTwoWay(),
+          new go.Binding("isUnderline", "scope", s => s[0] === 'c')),
+        // property type, if known
+        $(go.TextBlock, "",
+          new go.Binding("text", "propValue", t => t ? ": " : "")),
+        $(go.TextBlock,
+          { isMultiline: false, editable: true },
+          new go.Binding("text", "propValue").makeTwoWay()),
+        // property default value, if any
+        $(go.TextBlock,
+          { isMultiline: false, editable: false },
+          new go.Binding("text", "default", s => s ? " = " + s : ""))
+      );
+    this.myDiagram.nodeTemplate =
+      $(go.Node, "Auto",
         {
-          grid: $(go.Panel, "Grid",
-            $(go.Shape, "LineH", { visible: false, stroke: "lightgray", strokeWidth: 0.5 }),
-            $(go.Shape, "LineH", { visible: false, stroke: "gray", strokeWidth: 0.5, interval: 10 }),
-            $(go.Shape, "LineV", { visible: false, stroke: "lightgray", strokeWidth: 0.5 }),
-            $(go.Shape, "LineV", { visible: false, stroke: "gray", strokeWidth: 0.5, interval: 10 })
+          locationSpot: go.Spot.Center,
+          fromSpot: go.Spot.AllSides,
+          toSpot: go.Spot.AllSides
+        },
+        $(go.Shape, {
+          fill: 'lightyellow'
+        }),
+        $(go.Panel, "Table",
+          { defaultRowSeparatorStroke: "black" },
+          // header
+          $(go.TextBlock,
+            {
+              row: 0, columnSpan: 2, margin: 3, alignment: go.Spot.Center,
+              font: "bold 12pt sans-serif",
+              isMultiline: false, editable: true
+            },
+            new go.Binding("text", "name").makeTwoWay()),
+          // properties
+          $(go.TextBlock, "Properties",
+            { row: 1, font: "italic 10pt sans-serif" },
+            new go.Binding("visible", "visible", v => !v).ofObject("PROPERTIES")),
+          $(go.Panel, "Vertical", { name: "PROPERTIES" },
+            new go.Binding("itemArray", "properties"),
+            {
+              row: 1, margin: 3, stretch: go.GraphObject.Fill,
+              defaultAlignment: go.Spot.Left, background: "lightyellow",
+              itemTemplate: propertyTemplate
+            }
           ),
-          allowDrop: true,  // must be true to accept drops from the Palette
-          "draggingTool.dragsLink": true,
-          "draggingTool.isGridSnapEnabled": true,
-          "linkingTool.isUnconnectedLinkValid": true,
-          "linkingTool.portGravity": 20,
-          "relinkingTool.isUnconnectedLinkValid": true,
-          "relinkingTool.portGravity": 20,
-          "relinkingTool.fromHandleArchetype":
-            $(go.Shape, "Diamond", { segmentIndex: 0, cursor: "pointer", desiredSize: new go.Size(8, 8), fill: "tomato", stroke: "darkred" }),
-          "relinkingTool.toHandleArchetype":
-            $(go.Shape, "Diamond", { segmentIndex: -1, cursor: "pointer", desiredSize: new go.Size(8, 8), fill: "darkred", stroke: "tomato" }),
-          "linkReshapingTool.handleArchetype":
-            $(go.Shape, "Diamond", { desiredSize: new go.Size(7, 7), fill: "lightblue", stroke: "deepskyblue" }),
-          // rotatingTool: go.RotatingTool,  // defined below
-          // "rotatingTool.snapAngleMultiple": 15,
-          // "rotatingTool.snapAngleEpsilon": 15,
-          "InitialLayoutCompleted": function (e: any) { e.diagram.addModelChangedListener(onNodeDataAdded); },
-          "undoManager.isEnabled": true,
-          "panningTool.isEnabled": false,
-          "toolManager.hoverDelay": 0
-        });
-    return myDiagram;
+          $("PanelExpanderButton", "PROPERTIES",
+            { row: 1, column: 1, alignment: go.Spot.TopRight, visible: false },
+            new go.Binding("visible", "properties", arr => arr.length > 0)),
+          // methods
+          $(go.TextBlock, "Memory",
+            { row: 2, font: "italic 10pt sans-serif" },
+            new go.Binding("visible", "visible", v => !v).ofObject("MEMORY")),
+          $(go.Panel, "Vertical", { name: "MEMORY" },
+            new go.Binding("itemArray", "memory"),
+            {
+              row: 2, margin: 3, stretch: go.GraphObject.Fill,
+              defaultAlignment: go.Spot.Left, background: "lightyellow",
+              itemTemplate: memoryTemplate
+            }
+          ),
+          $("PanelExpanderButton", "MEMORY",
+            { row: 2, column: 1, alignment: go.Spot.Right, visible: false },
+            new go.Binding("visible", "memory", arr => arr.length > 0)),
+          $(go.Panel, 'Spot',
+            {
+              alignment: go.Spot.Right,
+              alignmentFocus: go.Spot.Left,
+              click: (e: any, obj: any) => this.addNode(obj.part)
+            },
+            $(go.Shape,
+              {
+                figure: 'Circle',
+                spot1: new go.Spot(0, 0, 1, 1), spot2: new go.Spot(1, 1, -1, -1),
+                fill: 'white', strokeWidth: 0,
+                desiredSize: new go.Size(20, 20),
+                mouseEnter: (e: any, obj: any) => {
+                  obj.fill = 'rgba(128,128,128,0.7)';
+                },
+                mouseLeave: (e: any, obj: any) => {
+                  obj.fill = 'white';
+                }
+              }
+            ),
+            $(go.TextBlock, '+', { font: 'bold 10pt sans-serif', margin: new go.Margin(0, 5, 0, 0) })
+          )
+        )
+      );
+    this.myDiagram.linkTemplate =
+      $(go.Link,
+        $(go.Shape),
+        $(go.Shape, { toArrow: 'Standard' })
+      );
+    var nodeDataArray = [
+      {
+        key: 1,
+        name: "node1",
+        color: "blue",
+        properties: [
+          { propName: "Type", propValue: "End", nodeType: true },
+          { propName: "NoOfMemories", propValue: 500, numericValueOnly: true }
+        ],
+        memory: [
+          { propName: "frequency(hz)", propValue: 2000, numericValueOnly: true },
+          { propName: "expiry(ms)", propValue: 2000, numericValueOnly: true },
+          { propName: "efficiency", propValue: 1, decimalValueAlso: true },
+          { propName: "fidelity", propValue: 0.93, decimalValueAlso: true }
+        ]
+      }
+    ];
+
+    this.myDiagram.model = new go.GraphLinksModel(nodeDataArray, []);
+    this.myDiagram.addDiagramListener("TextEdited", (e: any) => {
+      const tb = e.subject;
+      const nodeData = tb.part && tb.part.data;
+      if (nodeData && nodeData.properties) {
+        const editedProperty = nodeData.properties.find((prop: any) => prop.propValue.toString() === tb.text);
+        console.log(editedProperty)
+        if (editedProperty && editedProperty.numericValueOnly) {
+          if (!isPositiveNumber(tb.text)) {
+            tb.text = e.parameter; // Revert to the previous text value
+          }
+        }
+        if (editedProperty && editedProperty.nodeType) {
+          if (!(tb.text == 'Service') || !(tb.text == 'End')) {
+            tb.text = e.parameter
+          }
+        }
+
+      }
+      if (nodeData && nodeData.memory) {
+        // console.log(tb.text)
+        const editedProperty = nodeData.memory.find((prop: any) => prop.propValue.toString() === tb.text);
+        if (editedProperty && editedProperty.decimalValueAlso) {
+          // console.log(tb.text)
+
+          if (!isDecimalNumber(tb.text)) {
+            // console.log(e.parameter)
+            tb.text = e.parameter; // Revert to the previous text value
+          }
+        }
+        if (editedProperty && editedProperty.numericValueOnly) {
+          if (!isPositiveNumber(tb.text)) {
+            tb.text = e.parameter; // Revert to the previous text value
+          }
+        }
+      }
+    });
+
+
+  }
+
+  addNode(adornedPart: go.Part) {
+    const newNode = {
+      key: this.myDiagram.nodes.count + 1,
+      name: `node${this.myDiagram.nodes.count + 1}`,
+
+      properties: [
+        // { propName: "Type", propValue: 'Service', nodeType: true },
+        { propName: "Type", propValue: adornedPart.data.properties[0].propValue == 'Service' ? 'End' : adornedPart.data.properties[0].propValue == 'End' ? 'Service' : null, nodeType: true },
+        { propName: "No of Memories", propValue: 500, numericValueOnly: true }
+      ],
+      memory: [
+        { propName: "frequency(hz)", propValue: 2000, numericValueOnly: true },
+        { propName: "expiry(ms)", propValue: 2000, numericValueOnly: true },
+        { propName: "efficiency", propValue: 1, decimalValueAlso: true },
+        { propName: "fidelity", propValue: 0.93, decimalValueAlso: true }
+      ]
+    };
+    this.myDiagram.startTransaction('Add node and link');
+    this.myDiagram.model.addNodeData(newNode);
+    this.myDiagram.model.addLinkData({ from: adornedPart.data.key, to: newNode.key });
+    this.myDiagram.commitTransaction('Add node and link');
   }
   load() {
     this.myDiagram.model = go.Model.fromJson(this.savedModel)
@@ -1040,6 +1257,7 @@ export class DragComponent implements OnInit, AfterViewInit {
     }));
   }
   activeindex(data: any) {
+    this.updateNodes();
     if (data == 'next') {
       if (this.activeIndex <= 1) {
         this.activeIndex++;
@@ -1127,3 +1345,5 @@ function evenLengthValidator(control: FormControl) {
   }
   return null;
 }
+
+

@@ -88,10 +88,10 @@
     </p-dialog>
 
     <div style="width: 99%; display: flex;gap:3px;">
-        <div id="myPaletteDiv" class="col-4" class="palette"
+        <!-- <div id="myPaletteDiv" class="col-4" class="palette"
             style="width: 120px; background-color: white; border: outset 1px black; z-index: 1;">
-        </div>
-        <div id="myDiagramDiv" class="col-8 diagram" style=" height:
+        </div> -->
+        <div #diagramContainer id="myDiagramDiv" class="col-12 diagram" style=" height:
                 calc(100vh - 100px);width:50vw; border: outset 1px black;z-index: 1;">
         </div>
         <div class="col">
@@ -107,13 +107,15 @@
                     <div class="text-center">
                         <br>
                         <br>
-                        <p-checkbox [(ngModel)]="checked" [binary]="true" (onChange)="preloadTopology()"
+                        <!-- <p-checkbox [(ngModel)]="checked" [binary]="true" (onChange)="preloadTopology()"
                             inputId="binary"></p-checkbox>&nbsp;<b>Use our preconfigured topology,
                             <br></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b *ngIf="!checked">or follow the
-                            steps.</b>
+                            steps.</b> -->
                     </div>
                     <br>
-                    <div *ngIf="!checked">
+                    <!-- <button (click)="addNode()">Add Node</button> -->
+                    <br>
+                    <!-- <div *ngIf="!checked">
                         <ol style="padding-left: 4rem">
 
                             <li>
@@ -128,7 +130,7 @@
                                 </p>
                             </li>
                         </ol>
-                    </div>
+                    </div> -->
                     <br>
                     <div class="d-flex justify-content-center">
                         <button class="btn btn-primary" (click)="activeindex('next')">Next</button>
