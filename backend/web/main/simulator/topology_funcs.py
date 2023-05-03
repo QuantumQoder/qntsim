@@ -190,6 +190,7 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     # TODO: Integrate Network Graphs
     req_pairs = []
     start_time = time.time()
+    print('network config', network_config)
     network_config_json, tl, network_topo = load_topology(
         network_config, "Qiskit")
     tm = network_topo.nodes[sender].transport_manager
@@ -381,7 +382,7 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     print('topology', topology)
     protocol = Protocol(name='qsdc_tel', messages_list=[
                         messages], label='00', attack=attack)
-    protocol(topology=topology)
+    protocol(topology=network_config)
     # tl.init()
 
     # print(protocol)
@@ -672,15 +673,15 @@ def ip2(network_config, alice_attrs, bob_id, threshold, num_decoy):
     # print('network config json', network_topo)
     # with open("topology.json", "w") as outfile:
     #     json.dump(topo_json, outfile)
-    alice_attrs = {'message': {(sender, receiver): '011010'},
+    alice_attrs.update({'message': {(sender, receiver): input_message},
                    'id': '1011',
-                   'check_bits': 4}
+                   'check_bits': 4})
     bob_id = '0111'
     num_decoy_photons = 4
     threshold = 0.2  # error threshold
     attack = (None, None)
     # topology = '/code/web/configs/2n_linear.json'
-    network, recv_msgs, err_tup = ip2_run(topology=topology,
+    network, recv_msgs, err_tup = ip2_run(topology=network_config,
                                           alice_attrs=alice_attrs,
                                           bob_id=bob_id,
                                           num_decoy_photons=num_decoy_photons,
