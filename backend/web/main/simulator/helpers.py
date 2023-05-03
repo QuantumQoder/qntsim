@@ -1,7 +1,7 @@
 
 
 import string
-from main.simulator.constants import *
+from .constants import *
 from qntsim.kernel.timeline import Timeline
 from qntsim.topology.topology import Topology
 
