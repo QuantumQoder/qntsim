@@ -112,6 +112,7 @@ class Timeline:
             event.run()
 
             self.run_counter += 1
+            # print(f'The event-queue is: {self.events.filter_events()}')
 
        
         self.is_running = False
