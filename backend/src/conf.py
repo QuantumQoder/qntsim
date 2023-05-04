@@ -1,3 +1,4 @@
 import os
 
-LOG_CONFIG_FILE = "/home/qulabs-sangru/Desktop/Projects/QNT/QNTSim/backend/src/logging.ini"
+#print("HARE", os.getcwd())
+LOG_CONFIG_FILE = "src/logging.ini"

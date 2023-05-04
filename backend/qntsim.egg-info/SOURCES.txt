@@ -64,7 +64,6 @@ src/resource_management/resource_manager.py
 src/resource_management/rule_manager.py
 src/resource_management/task_manager.py
 src/topology/__init__.py
-src/topology/asaihi.py
 src/topology/message_queue_handler.py
 src/topology/node.py
 src/topology/topology.py
