@@ -18,74 +18,7 @@
         <div class="loader-text"></div>
     </div>
 
-    <!-- <p-toast position="top-right"></p-toast> -->
-    <p-dialog header="HELP FOR USING APPLICATION" [draggable]="true" [(visible)]="info" [modal]="false"
-        [style]="{width: '50vw'}" position="bottom-right" [resizable]="true">
 
-        <div class="accordion" id="accordionExample">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingOne">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                        1.Configure the network topology
-                    </button>
-                </h2>
-                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
-                    data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
-                        The first step is to graph the nodes and quantum connections of the quantum network.
-                        Drag and drop components from the
-                        left-side toolbox to create the topology graph.
-                        Furthermore, you can modify the settings of every component by clicking on it.
-                    </div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingTwo">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                        2.Set the parameters for the application
-                    </button>
-                </h2>
-                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
-                    data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
-                        The parameters of every application determine the requests that network will have to
-                        fulfill in order to successfully
-                        execute the application.
-                    </div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingThree">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                        3.Run the application and get Results
-                    </button>
-                </h2>
-                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
-                    data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
-                        Now, you can run the application and fetch the statistics and results for a run of the
-                        simulator.
-                    </div>
-                </div>
-            </div>
-        </div>
-        <br>
-        <hr>
-        <ul>
-            <li><strong>Service Node:</strong> This is the Quantum Router with quantum circuits and bell state
-                analyzers
-            </li>
-            <li><strong>End Node:</strong> This is the end user node where requests originate from.</li>
-            <li><strong>Quantum Connection:</strong> These are optical channels using which entanglements are shared
-            </li>
-        </ul>
-        <ng-template pTemplate="footer">
-            <p-button icon="pi pi-check" (click)="info=false" label="Ok" styleClass="p-button-text"></p-button>
-        </ng-template>
-    </p-dialog>
 
     <div style="width: 99%; display: flex;gap:3px;">
         <!-- <div id="myPaletteDiv" class="col-4" class="palette"
@@ -401,16 +334,4 @@
             </div>
         </div>
     </div>
-    <p-confirmDialog [style]="{width: '50vw'}" [baseZIndex]="10000"
-        rejectButtonStyleClass="p-button-text"></p-confirmDialog>
-    <div *ngIf="step == 1" id="tutorial1" class="body1">
-        <div class="d-flex">
-            <h6>You can drag and drop an object to start building topology.
-            </h6>
-        </div>
-        <div class="d-flex justify-content-end align-items-end btn-custom1">
-            <button class="btn btn-primary-sm btn-custom" (click)="next(2)">Next</button>
-        </div>
-    </div>
-
 </div>

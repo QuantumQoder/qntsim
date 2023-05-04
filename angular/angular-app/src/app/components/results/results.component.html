@@ -1,120 +1,7 @@
 <div class="main">
     <!-- <p-tabMenu #menuItems [model]="items" [activeItem]="activeItem" (click)="activateMenu()"></p-tabMenu> -->
     <br>
-    <p-dialog header="Details" [draggable]="true" [(visible)]="info1" [modal]="true" [style]="{width: '50vw'}"
-        position="right" [resizable]="true">
-        <ul>
-            <li>
-                <strong>Request Id:</strong> &nbsp;<small>Every request have a unique Id​</small>
-            </li>
-            <li>
-                <strong>Source:</strong>&nbsp;<small>Source is the end node from where request raised​</small>
-            </li>
-            <li>
-                <strong>Destination:</strong>&nbsp;<small>Destination is the end node where source should be
-                    entangled​</small>
-            </li>
-            <li>
-                <strong>Demand Size:</strong>&nbsp;<small>Demand size is the no. Of entangled pairs requested between
-                    source &
-                    destination​</small>
-            </li>
-            <li>
-                <strong>Start Time:</strong>&nbsp;<small>Start time of the simulation ​</small>
-            </li>
-            <li>
-                <strong>End Time:</strong>&nbsp;<small>End time of the simulation ​</small>
-            </li>
-        </ul>
-    </p-dialog>
-    <p-dialog header="Details" [draggable]="true" [(visible)]="info2" [modal]="true" [style]="{width: '50vw'}"
-        position="right" [resizable]="true">
-        <ul>
-            <li>
-                <strong>Memory Index:</strong>&nbsp;<small>Every memory array has a unique Id​</small>
-            </li>
-            <li>
-                <strong>Current Node:</strong>&nbsp;<small>Node initiating request.​</small>
-            </li>
-            <li>
-                <strong>Entangled Node:</strong>&nbsp;<small>Destination Node.​
 
-                    ​</small>
-            </li>
-            <li>
-                <strong>Fidelity:</strong>&nbsp;
-                <small>Fidelity is the quality parameter for the entanglement pair​ 0 < f < 1​ </small>
-            </li>
-            <li>
-                <strong>Entangled Time:</strong>&nbsp;<small>Time of end to end entanglement made after start time of
-                    simulation ​</small>
-            </li>
-            <li>
-                <strong>Expiry Time:</strong>&nbsp;<small>Time of expiry of end to end entanglement after the entangled
-                    time​</small>
-            </li>
-            <li>
-                <strong>State:</strong>&nbsp;<small>Status of the memory​
-
-                    Entangled- E2E​
-
-                    Occupied – memory in use​
-
-                    Raw- memory not in use​</small>
-            </li>
-        </ul>
-    </p-dialog>
-    <p-dialog header="Details" [draggable]="true" [(visible)]="infoqsdc" [modal]="true" [style]="{width: '50vw'}"
-        position="right" [resizable]="true">
-        <ul *ngIf="app_id!=7 && app_id!=10">
-            <li>
-                <strong>Input Message:</strong> &nbsp;<small>Sender's message​</small>
-            </li>
-            <li>
-                <strong>Key Transmitted:</strong>&nbsp;<small>Sender's message after converting into binary​</small>
-            </li>
-            <li>
-                <strong>Eavesdrop:</strong>&nbsp;<small>Eavesdropping happened or not​</small>
-            </li>
-            <li>
-                <strong>Checkbit:</strong>&nbsp;<small>Bits used to check security​</small>
-            </li>
-            <li>
-                <strong>message_shared_received:</strong>&nbsp;<small>message received at receiver's end (original
-                    message along with checkbit) ​</small>
-            </li>
-            <li>
-                <strong>message_received:</strong>&nbsp;<small>received message after removing the checkbit ​</small>
-            </li>
-            <li>
-                <strong>Output Message:</strong>&nbsp;<small>Received message as character​</small>
-            </li>
-        </ul>
-
-        <ul *ngIf="app_id==7">
-            <li>
-                <strong>Input Message:</strong> &nbsp;<small>Sender's message​</small>
-            </li>
-            <li>
-                <strong>IdA:</strong>&nbsp;<small>Sender's authentication Id</small>
-            </li>
-            <li>
-                <strong>Sender key:</strong>&nbsp;<small>Checkbit added by sender
-                </small>
-            </li>
-            <li>
-                <strong>Receiver key:</strong>&nbsp;<small>Checkbit received by receiver
-                </small>
-            </li>
-            <li>
-                <strong>r:</strong>&nbsp;<small>Constructed using receiver's authentication Id to
-                    authenticate receiver</small>
-            </li>
-            <li>
-                <strong>Output Message:</strong>&nbsp;<small>Received message as character​</small>
-            </li>
-        </ul>
-    </p-dialog>
     <div class="container shadow p-4 mb-5 bg-white rounded">
         <div *ngIf="app_id==1">
             <h1 class="display-3">Ekert 91 QKD </h1>
@@ -129,10 +16,6 @@
                     <table class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
-
-                                <!-- <th class="col table-secondary text-center">Source</th>
-                                <th class="col table-secondary text-center">Destination</th> -->
-
                                 <th class="col table-secondary text-center">Execution Time</th>
                                 <th class="col table-secondary text-center">Fidelity</th>
                                 <th class="col table-secondary text-center">Success Rate</th>
@@ -141,9 +24,6 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <!-- <td class="col text-center">{{nodeData.sender}}</td>
-                                <td class="col text-center">{{nodeData.receiver}}</td> -->
-
                                 <td class="col text-center">{{performance.execution_time}}&nbsp;secs</td>
                                 <td class="col text-center">{{performance.fidelity}}</td>
                                 <td class="col text-center">{{performance.throughput}}%</td>
@@ -217,10 +97,6 @@
                         given
                         below​</p>
                     <br>
-                    <!-- <p>Shifted Key [The final key] is obtained at Alice and Bob from Measurement results obtained from
-                        Matching
-                        basis (that are
-                        indicated in green above)</p> -->
                     <table class="table table-bordered align-middle">
                         <thead class="thead-light">
                             <tr>

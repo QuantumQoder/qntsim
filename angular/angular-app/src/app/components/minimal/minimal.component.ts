@@ -9,7 +9,7 @@ import * as go from 'gojs'
 import { map } from 'rxjs';
 import { ConditionsService } from 'src/services/conditions.service';
 import { Router } from '@angular/router';
-import { any } from 'underscore';
+
 
 @Component({
   selector: 'app-minimal',
@@ -199,12 +199,6 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       }
     }
   }
-  // senderChanged(e: any) {
-  //   this.receiverNodes = this.endNodes.filter(e => e.key != this.appSettingsForm.get('sender')?.value)
-  // }
-  // receiverChanged(e: any) {
-  //   this.senderNodes = this.endNodes.filter(e => e.key != this.appSettingsForm.get('receiver')?.value)
-  // }
   endNode(data: any) {
     var remainingNodes = [];
     console.log(data)
@@ -465,19 +459,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     }
     console.log(linkRequestArray);
     var cc = []
-    this.cc = []
-    for (var i = 0; i < nodeDataArray.length; i++) {
-      for (var j = 0; j < nodeDataArray.length; j++) {
-        cc.push([nodeDataArray[i].key, nodeDataArray[j].key]);
-      }
-    }
-    if (cc.length) {
-      for (var i = 0; i < cc.length; i++) {
-        var [node1, node2] = cc[i];
-        var [distance, delay] = node1 == node2 ? [0, 0] : [1000, 10000000000];
-        this.cc.push({ Nodes: [node1, node2], Delay: delay, Distance: distance });
-      }
-    }
+    this.cc = this.holdingData.getClassicalConnections(nodeDataArray)
     var topology = {
       nodes: nodeArray,
       quantum_connections: linkRequestArray,
@@ -634,10 +616,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         num_decoy: 4,
         bob_id: "0111"
       },
-
     }
-
-
     this.appConfig = appConfigMap[app_id];
   }
   updateJson() {

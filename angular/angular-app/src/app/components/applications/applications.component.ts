@@ -13,7 +13,6 @@ import { HoldingDataService } from 'src/services/holding-data.service';
 export class ApplicationsComponent implements OnInit {
   data: any
   token: any;
-  pageNumber: number;
   responsiveOptions: any
   items: MenuItem[] = [
     { label: 'Home', routerLink: ['/'] },
@@ -25,7 +24,6 @@ export class ApplicationsComponent implements OnInit {
   ngOnInit(): void {
     this.data = this.holdingData.getHomePageData();
     this.appDescription = this.holdingData.getAppDescription();
-    // console.log(this.appDescription)
     this.responsiveOptions = [
       {
         breakpoint: '1024px',

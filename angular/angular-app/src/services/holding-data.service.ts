@@ -3,8 +3,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class HoldingDataService {
-  Nodedata = new NodeData()
-  diagramData: any
+
   homepageData = [{
     appId: 1, appName: 'E91 QKD', image: 'assets/images/apps/e91.png', content: 'Entanglement-based Quantum Key Distribution'
   },
@@ -39,16 +38,8 @@ export class HoldingDataService {
     9: 'QSDC with Teleportation',
     10: 'MDI-QSDC with user authentication',
   }
-  spqd = {
-    "application": {
-      "input_message1": "Hello",
-      "input_message2": "World",
-      "attack": "None",
-      "output_message1": "x-dln",
-      "output_message2": "g'zle",
-      "error": 0
-    }
-  }
+  spqd = {}
+
   qsdct: any
   appDescription: any = [
     {
@@ -76,6 +67,41 @@ export class HoldingDataService {
       title: 'Distributed Quantum Computing', description: "Distributed quantum computing is a promising new approach that uses a network of interconnected quantum processors instead of a single large quantum computer. This approach offers advantages such as increased fault tolerance, scalability, and performance, enabling new applications and problem-solving capabilities. Though still in early stages, distributed quantum computing has already shown promising results and has the potential to transform the field in the future. With continued research, we can expect significant advancements and new use cases in quantum computing."
     },
   ]
+
+  getClassicalConnections(nodes: any) {
+    var tempcc = []
+    var cc = []
+    if (nodes.length != 0) {
+
+      let ccreq;
+      var distance
+      var delay
+      for (var i = 0; i < nodes.length; i++) {
+        for (var j = 0; j < nodes.length; j++) {
+          tempcc.push([nodes[i].Name, nodes[j].Name]);
+        }
+      }
+      if (tempcc.length != 0) {
+        for (var i = 0; i < tempcc.length; i++) {
+          if (tempcc[i][0] == tempcc[i][1]) {
+            distance = 0;
+            delay = 0;
+          } else {
+            distance = 1000;
+            delay = 1000000000;
+          }
+          ccreq = {
+            Nodes: tempcc[i],
+            Delay: delay,
+            Distance: distance
+          }
+          cc.push(ccreq)
+        }
+      }
+
+    }
+    return cc
+  }
   getAppDescription() {
     return this.appDescription
   }
@@ -89,24 +115,8 @@ export class HoldingDataService {
   getHomePageData() {
     return this.homepageData
   }
-  getDiagramData() {
-    return this.diagramData
-  }
-  setDiagramData(data: any) {
-    this.diagramData = data
-  }
-  getNodeData() {
-    return this.Nodedata
-  }
-  setNodeData(sender: any, receiver: any) {
-    this.Nodedata.sender = sender;
-    this.Nodedata.receiver = receiver;
-  }
   getAppData() {
     return this.appData
   }
 }
-class NodeData {
-  sender: any;
-  receiver: any;
-}
+
