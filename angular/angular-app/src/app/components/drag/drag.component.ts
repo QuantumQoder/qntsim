@@ -273,6 +273,7 @@ export class DragComponent implements OnInit, AfterViewInit {
       }
     }
     this.nodes = []
+    console.log(this.nodesData)
     for (const [key, value] of Object.entries(this.nodesData)) {
       this.nodes.push(value)
     }
@@ -285,6 +286,7 @@ export class DragComponent implements OnInit, AfterViewInit {
     }
     this.app_id = Number(this.app_id)
     this.cc = []
+    console.log(this.nodes)
     this.cc = this.holdingData.getClassicalConnections(this.nodes)
     this.topology = {
       nodes: this.nodes,

@@ -451,6 +451,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       localStorage.setItem('sender', this.appSettingsForm.get('sender')?.value);
       localStorage.setItem('receiver', this.appSettingsForm.get('receiver')?.value)
     }
+    let cc: any[] = []
     this.spinner = true;
     localStorage.setItem('app_id', app_id);
     console.log(nodeArray)
@@ -462,8 +463,22 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       };
       linkRequestArray.push(linkData);
     }
-    console.log(linkRequestArray);
-    this.cc = this.holdingData.getClassicalConnections(nodeDataArray)
+
+    this.cc = []
+    for (var i = 0; i < nodeDataArray.length; i++) {
+      for (var j = 0; j < nodeDataArray.length; j++) {
+        cc.push([nodeDataArray[i].key, nodeDataArray[j].key]);
+      }
+    }
+    if (cc.length) {
+      for (var i = 0; i < cc.length; i++) {
+        var [node1, node2] = cc[i];
+        var [distance, delay] = node1 == node2 ? [0, 0] : [1000, 10000000000];
+        this.cc.push({ Nodes: [node1, node2], Delay: delay, Distance: distance });
+      }
+    }
+
+
     var topology = {
       nodes: nodeArray,
       quantum_connections: linkRequestArray,
@@ -474,7 +489,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         "time_resolution": 150
       },
       "light_source_properties": {
-        "frequency": 80000000,
+        "frequency": 2000,
         "wavelength": 1550,
         "bandwidth": 0,
         "mean_photon_num": 0.1,
