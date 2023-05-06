@@ -25,13 +25,24 @@ export class DragComponent implements OnInit, AfterViewInit {
   routeFrom: string
   @ViewChild('diagramContainer') private diagramRef: ElementRef;
   private addButtonAdornment: go.Adornment;
+
   nodesSelection = {
     sender: '',
     receiver: '',
     endNode1: '',
     endNode2: '',
     endNode3: '',
-    middleNode: ''
+    middleNode: '',
+    attack: 'none',
+    numDecoy: 4,
+    numCheckBits: 4,
+    errorThreshold: 0.5,
+    message: 'hello',
+    senderId: 1010,
+    receiverId: 1011,
+    belltype: 10,
+    channel: 1,
+
   }
   detectorProps = {
     efficiency: 1,
@@ -73,6 +84,9 @@ export class DragComponent implements OnInit, AfterViewInit {
     'attenuation': new FormControl('0.1'),
     'distance': new FormControl('70')
   })
+  attackOptions = ['DoS', "EM", "IR", "none"]
+  bellTypeOptions = ["00", "01", "10", "11"];
+  channelOptions = [1, 2, 3]
   breadcrumbItems: MenuItem[]
   public selectedNode: any;
   public selectedLink: any
@@ -101,12 +115,16 @@ export class DragComponent implements OnInit, AfterViewInit {
     'message1': new FormControl(''),
     'message2': new FormControl(''),
     'num_photons': new FormControl(''),
-    'attack': new FormControl(''),
-    'senderId': new FormControl(''),
-    'receiverId': new FormControl(''),
+    'inputMessage': new FormControl(''),
+    'ip2message': new FormControl(''),
+    'senderId': new FormControl('1010'),
+    'receiverId': new FormControl('1011'),
     'numCheckBits': new FormControl(''),
     'numDecoy': new FormControl(''),
-    'inputMessage': new FormControl('')
+    'attack': new FormControl(''),
+    'belltype': [],
+    'channel': [],
+    'errorthreshold': []
   })
   app_data: { 1: string; 2: string; 3: string; 4: string; 5: string; 6: string; 7: string; 8: string; 9: string; 10: string; };
   constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private holdingData: HoldingDataService, private _route: Router, private modal: NgbModal, private confirmationService: ConfirmationService) {
@@ -190,6 +208,7 @@ export class DragComponent implements OnInit, AfterViewInit {
   }
   changeApp() {
     localStorage.setItem("app_id", this.app)
+    this.app_id = this.app
   }
   routeTo() {
     this._route.navigate(['/minimal'])
@@ -360,16 +379,23 @@ export class DragComponent implements OnInit, AfterViewInit {
         attack: this.appSettingsForm.get('attack')?.value
       }, 10:
       {
-        alice_attrs: {
-          sender: this.nodesSelection.sender,
-          receiver: this.nodesSelection.receiver,
+        sender: {
+          node: this.nodesSelection.sender,
           message: this.appSettingsForm.get('message')?.value,
-          id: "1010",
-          check_bits: 4
+          userID: this.nodesSelection.senderId,
+          num_check_bits: this.nodesSelection.numCheckBits,
+          num_decoy_photons: this.nodesSelection.numDecoy
         },
-        bob_id: "0111",
-        threshold: 0.2,
-        num_decoy: 4
+        receiver: {
+          node: this.nodesSelection.receiver,
+          userID: this.nodesSelection.receiverId
+        },
+
+        bell_type: this.nodesSelection.belltype,
+        error_threshold: this.nodesSelection.errorThreshold,
+        attack: this.nodesSelection.attack,
+        channel: this.nodesSelection.channel
+
       }
     }
     this.appSettings = appConfig[this.app_id]
@@ -494,35 +520,48 @@ export class DragComponent implements OnInit, AfterViewInit {
         $(go.TextBlock,
           { isMultiline: false, editable: false },
           new go.Binding("text", "propName").makeTwoWay(),
-          new go.Binding("isUnderline", "scope", s => s[0] === 'c')),
+          new go.Binding("isUnderline", "scope", s => s[0] === 'c')
+        ),
         // property type, if known
         $(go.TextBlock, "",
           new go.Binding("text", "propValue", t => t ? ": " : "")),
-        $(go.TextBlock,
-          { isMultiline: false, editable: true },
-          new go.Binding("text", "propValue").makeTwoWay()),
+        $(go.Panel, "Auto",
+          $(go.Shape, "RoundedRectangle", { fill: "white" }),
+          $(go.TextBlock,
+            { margin: 1, isMultiline: false, editable: true },
+            new go.Binding("text", "propValue").makeTwoWay()
+          )
+        ),
         // property default value, if any
         $(go.TextBlock,
           { isMultiline: false, editable: false },
-          new go.Binding("text", "default", s => s ? " = " + s : ""))
+          new go.Binding("text", "default", s => s ? " = " + s : "")
+        )
       );
     var propertyTemplate =
       $(go.Panel, "Horizontal",
         $(go.TextBlock,
           { isMultiline: false, editable: false },
           new go.Binding("text", "propName").makeTwoWay(),
-          new go.Binding("isUnderline", "scope", s => s[0] === 'c')),
+          new go.Binding("isUnderline", "scope", s => s[0] === 'c')
+        ),
         // property type, if known
         $(go.TextBlock, "",
           new go.Binding("text", "propValue", t => t ? ": " : "")),
-        $(go.TextBlock,
-          { isMultiline: false, editable: true },
-          new go.Binding("text", "propValue").makeTwoWay()),
+        $(go.Panel, "Auto",
+          $(go.Shape, "RoundedRectangle", { fill: "white" }),
+          $(go.TextBlock,
+            { margin: 1, isMultiline: false, editable: true },
+            new go.Binding("text", "propValue").makeTwoWay()
+          )
+        ),
         // property default value, if any
         $(go.TextBlock,
           { isMultiline: false, editable: false },
-          new go.Binding("text", "default", s => s ? " = " + s : ""))
+          new go.Binding("text", "default", s => s ? " = " + s : "")
+        )
       );
+
     this.myDiagram.nodeTemplate =
       $(go.Node, "Auto",
         {
@@ -531,7 +570,7 @@ export class DragComponent implements OnInit, AfterViewInit {
           toSpot: go.Spot.AllSides
         },
         $(go.Shape, {
-          fill: 'lightyellow'
+          fill: 'lightblue'
         }),
         $(go.Panel, "Table",
           { defaultRowSeparatorStroke: "black" },
@@ -551,7 +590,7 @@ export class DragComponent implements OnInit, AfterViewInit {
             new go.Binding("itemArray", "properties"),
             {
               row: 1, margin: 3, stretch: go.GraphObject.Fill,
-              defaultAlignment: go.Spot.Left, background: "lightyellow",
+              defaultAlignment: go.Spot.Left, background: "lightblue",
               itemTemplate: propertyTemplate
             }
           ),
@@ -566,7 +605,7 @@ export class DragComponent implements OnInit, AfterViewInit {
             new go.Binding("itemArray", "memory"),
             {
               row: 2, margin: 3, stretch: go.GraphObject.Fill,
-              defaultAlignment: go.Spot.Left, background: "lightyellow",
+              defaultAlignment: go.Spot.Left, background: "lightblue",
               itemTemplate: memoryTemplate
             }
           ),
@@ -581,19 +620,20 @@ export class DragComponent implements OnInit, AfterViewInit {
             },
             $(go.Shape,
               {
-                figure: 'Circle',
-                spot1: new go.Spot(0, 0, 1, 1), spot2: new go.Spot(1, 1, -1, -1),
-                fill: 'white', strokeWidth: 0,
+                figure: 'Rectangle',
+                spot1: new go.Spot(0, 0, 4, 0), spot2: new go.Spot(1, 1, -1, -1),
+                fill: 'lightblue', strokeWidth: 0,
                 desiredSize: new go.Size(20, 20),
+                margin: new go.Margin(0, 0, 0, 20),
                 mouseEnter: (e: any, obj: any) => {
-                  obj.fill = 'rgba(128,128,128,0.7)';
+                  // obj.fill = 'rgba(128,128,128,0.7)';
                 },
                 mouseLeave: (e: any, obj: any) => {
-                  obj.fill = 'white';
+                  // obj.fill = 'lighblue';
                 }
               }
             ),
-            $(go.TextBlock, '+', { font: 'bold 10pt sans-serif', margin: new go.Margin(0, 5, 0, 0) })
+            $(go.TextBlock, '+', { font: 'bold 10pt sans-serif', margin: new go.Margin(0, 0, 0, 5) })
           ),
           $(go.Panel, "Spot",
             {
@@ -603,16 +643,16 @@ export class DragComponent implements OnInit, AfterViewInit {
             },
             $(go.Shape,
               {
-                figure: 'Circle',
-                spot1: new go.Spot(0, 0, 1, 1), spot2: new go.Spot(1, 1, -1, -1),
-                fill: 'white', strokeWidth: 0,
+                figure: 'Rectangle',
+                spot1: new go.Spot(0, 0, 0, 1), spot2: new go.Spot(1, 1, -1, -1),
+                fill: 'lightblue', strokeWidth: 0,
                 desiredSize: new go.Size(20, 20),
-                margin: new go.Margin(0, 2, 0, 0),
+                margin: new go.Margin(0, 0, 0, 2),
                 mouseEnter: (e: any, obj: any) => {
-                  obj.fill = 'rgba(128,128,128,0.7)';
+                  // obj.fill = 'lightblue';
                 },
                 mouseLeave: (e: any, obj: any) => {
-                  obj.fill = 'white';
+                  // obj.fill = 'lightblue';
                 }
               }
             ),
