@@ -209,10 +209,10 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     execution_time = end_time-start_time
     
     report = network_graph(network_topo, source_node_list, report)
-    report["performance"]["execution_time"] = "{:.2f}".format(execution_time)
-    report["performance"]["transport"] = {
-        "retrials": tm.transportprotocolmap[0].retry,
-    }
+    report["performance"]["execution_time"] = float("{:.2f}".format(execution_time))
+    # report["performance"]["transport"] = {
+    #     "retrials": tm.transportprotocolmap[0].retry,
+    # }
     # report["performance"]["network"]["retrials"] = nm
     print(report)
     return report

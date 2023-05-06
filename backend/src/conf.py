@@ -1,4 +1,4 @@
 import os
 
 #print("HARE", os.getcwd())
-LOG_CONFIG_FILE = "src/logging.ini"
+LOG_CONFIG_FILE = "/code/web/logging.ini"
