@@ -27,6 +27,7 @@ from pyvis.network import Network
 from qntsim.communication.protocol import Protocol
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
+import logging
 
 
 def display_quantum_state(state_vector):
@@ -186,7 +187,8 @@ def e91(network_config, sender, receiver, keyLength):
 
 
 def e2e(network_config, sender, receiver, startTime, size, priority, targetFidelity, timeout):
-
+    logger = logging.getLogger("main_logger." + "e2e")
+    logger.info("In e2e")
     # TODO: Integrate Network Graphs
     req_pairs = []
     start_time = time.time()
@@ -195,6 +197,7 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
         network_config, "Qiskit")
     tm = network_topo.nodes[sender].transport_manager
     nm = network_topo.nodes[sender].network_manager
+    logger.info('Creating request...')
     tm.request(receiver, float(startTime), int(size), 20e12,
                int(priority), float(targetFidelity), float(timeout))
     req_pairs.append((sender, receiver))
