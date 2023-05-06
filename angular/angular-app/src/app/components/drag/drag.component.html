@@ -20,311 +20,318 @@
 
 
 
-    <div style="width: 99%; display: flex;gap:3px;">
+    <div style="width: 100%; display: flex;gap:3px;">
         <!-- <div id="myPaletteDiv" class="col-4" class="palette"
             style="width: 120px; background-color: white; border: outset 1px black; z-index: 1;">
         </div> -->
         <div #diagramContainer id="myDiagramDiv" class="col-12 diagram" style=" height:
-                calc(100vh - 100px);width:50vw; border: outset 1px black;z-index: 1;">
+                calc(100vh - 100px);width:50vw; border: outset 1px black;z-index: 1;border-radius: 3px;">
         </div>
-        <div class="col">
+        <div class="col ">
             <div class="configuration" style="height:100%">
                 <h4 class="text-dark text-center">Selected Application: {{application}}</h4>
-                <p-breadcrumb [model]="breadcrumbItems"></p-breadcrumb>
-
-                <div *ngIf="activeIndex == 0">
-                    <br>
+                <!-- <p-breadcrumb [model]="breadcrumbItems"></p-breadcrumb> -->
+                <div class="row">
+                    <div class="col-4 mx-2">
+                        <label class="form-label">Select Simulator</label>
+                        <select class="form-control" [(ngModel)]="simulator">
+                            <option value="version0">Version 0</option>
+                            <option value="version1">Version 1</option>
+                        </select>
+                    </div>
+                </div>
+                <br>
+                <!-- <div *ngIf="activeIndex == 0">
                     <h5 style="padding-left: 1rem;">
                         Step 1: Setup Topology
                     </h5>
                     <div class="text-center">
-                        <br>
-                        <br>
-                        <!-- <p-checkbox [(ngModel)]="checked" [binary]="true" (onChange)="preloadTopology()"
+                         <p-checkbox [(ngModel)]="checked" [binary]="true" (onChange)="preloadTopology()"
                             inputId="binary"></p-checkbox>&nbsp;<b>Use our preconfigured topology,
                             <br></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b *ngIf="!checked">or follow the
-                            steps.</b> -->
+                            steps.</b> 
                     </div>
-                    <br>
-                    <!-- <button (click)="addNode()">Add Node</button> -->
-                    <br>
-                    <!-- <div *ngIf="!checked">
-                        <ol style="padding-left: 4rem">
-
-                            <li>
-                                <p>
-                                    Please drag a component from the palette.
-                                </p>
-                            </li>
-
-                            <li>
-                                <p>
-                                    Please drag your pointer from node to node to create a connection.
-                                </p>
-                            </li>
-                        </ol>
-                    </div> -->
                     <br>
                     <div class="d-flex justify-content-center">
                         <button class="btn btn-primary" (click)="activeindex('next')">Next</button>
                     </div>
 
-                </div>
-                <div id="step2" *ngIf="activeIndex == 1">
+                </div> -->
+                <div id="step2" *ngIf="activeIndex == 0">
                     <h5>
-                        Step 2: Configuration
+                        Configure Topology
                     </h5>
-                    <ol>
-                        <li>
-                            Click on Component to configure its settings.
-                        </li>
-                    </ol>
-                    <form [formGroup]="toolbox">
-                        <h6 class="text-center text-black" *ngIf="nodeParams">
-                            <u>Node</u>
-                        </h6>
-                        <div class="form-group col-8 mx-auto" *ngIf="nodeParams">
-                            <label for="name" class="form-label mx-auto">Name</label>
-                            <input type="email" class="form-control mx-auto" id="name" formControlName="name"
-                                aria-describedby="emailHelp" placeholder="Enter Name">
-                            <!-- <small class="text-muted">Name of the selected node</small> -->
-                        </div>
-                        <div class="form-group col-8 mx-auto" *ngIf="nodeParams">
-                            <label for="noOfMemories" class="form-label mx-auto">No of Memories</label>
-                            <input type="number" class="form-control mx-auto" id="noOfMemories"
-                                formControlName="noOfMemories" placeholder="No of Memories">
-                            <!-- <small class="text-muted">No of Memories</small> -->
-                        </div>
-                        <br>
-                        <div class="d-flex justify-content-center" *ngIf="nodeParams">
-                            <button class="btn btn-primary" (click)="add()">Save</button>
-                        </div>
+                    <p-accordion>
 
-                        <h6 class="text-center text-black">
-                            <u>Connections</u>
-                        </h6>
-                        <div class="form-group col-8 mx-auto">
-                            <label for="attenuation" class="form-label mx-auto">Attenuation (dB/km)</label>
-                            <input type="number" class="form-control" formControlName="attenuation" id="attenuation"
-                                placeholder="Enter in decimals">
-                            <!-- <div class="text-muted">attenuation of Optical channel's fiber (in dB/m).</div> -->
-                        </div>
-                        <div class="form-group col-8 mx-auto">
-                            <label for="distance" class="form-label mx-auto">Link Length {{distance}}km</label>
-                            <input type="number" class="form-control mx-auto" id="distance" formControlName="distance"
-                                placeholder="Enter Distance">
+                        <p-accordionTab header="Connection Settings">
+                            <form [formGroup]="toolbox">
+                                <div class="form-group col-8 mx-auto">
+                                    <label for="attenuation" class="form-label mx-auto">Attenuation (dB/km)</label>
+                                    <input type="number" class="form-control" formControlName="attenuation"
+                                        id="attenuation" placeholder="Enter in decimals">
+                                </div>
+                                <div class="form-group col-8 mx-auto">
+                                    <label for="distance" class="form-label mx-auto">Link Length {{distance}}km</label>
+                                    <input type="number" class="form-control mx-auto" id="distance"
+                                        formControlName="distance" placeholder="Enter Distance">
+                                </div>
+                                <br>
+                            </form>
+                        </p-accordionTab>
+                        <p-accordionTab header="Detector Properties">
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Efficiency
+                                </label>
+                                <input class="form-control" [(ngModel)]="detectorProps.efficiency" />
+                            </div>
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Count Rate
+                                </label>
+                                <input class="form-control" [(ngModel)]="detectorProps.countRate" />
+                            </div>
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Time Resolution
+                                </label>
+                                <input class="form-control" [(ngModel)]="detectorProps.timeResolution" />
+                            </div>
+                        </p-accordionTab>
+                        <p-accordionTab header="Light Source Properties">
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Frequency
+                                </label>
+                                <input class="form-control" [(ngModel)]="lightSourceProps.frequency" />
+                            </div>
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Wavelength
+                                </label>
+                                <input class="form-control" [(ngModel)]="lightSourceProps.wavelength" />
+                            </div>
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Bandwidth
+                                </label>
+                                <input class="form-control" [(ngModel)]="lightSourceProps.bandwidth" />
+                            </div>
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Mean Photon
+                                </label>
+                                <input class="form-control" [(ngModel)]="lightSourceProps.meanPhotonNum" />
+                            </div>
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Phase Error
+                                </label>
+                                <input class="form-control" [(ngModel)]="lightSourceProps.phaseError" />
+                            </div>
+                        </p-accordionTab>
 
-                            <!-- <div class="text-muted">length of the fiber (in km)</div> -->
-                        </div>
-                        <br>
-                        <div class="d-flex justify-content-center">
-                            <button class="btn btn-primary" (click)="activeindex('next')">Next</button>
-                        </div>
-                        <br>
-                    </form>
+                    </p-accordion>
+                    <div class="d-flex justify-content-center">
+                        <button class="btn btn-primary" (click)="activeindex('next')">Next</button>
+                    </div>
                 </div>
-                <div *ngIf="activeIndex == 2">
-                    <h5>
-                        Step 3: Application Parameters
-                    </h5>
-                    <form [formGroup]="appSettingsForm">
-                        <h5 class="text-center mt-1">Application Settings</h5>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id != 4">
-                            <label for="type" class="form-label font-bold">
-                                Sender
-                            </label>
-                            <select class="form-control" formControlName="sender">
-                                <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}</option>
-                            </select>
-                            <div *ngIf="endNodes.length ==0">
-                                <p class="text-danger">
-                                    Please drag a end node and configure it.
-                                </p>
-                            </div>
-                            <div *ngIf="sender.touched && sender.invalid">
-                                <div *ngIf="sender.errors.required">
-                                    <p class="text-danger">Please select an Sender.</p>
+                <div *ngIf="activeIndex == 1">
+                    <p-accordion [activeIndex]="0">
+                        <p-accordionTab header="Application Parameters">
+                            <form [formGroup]="appSettingsForm">
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id != 4">
+                                    <label for="type" class="form-label font-bold">
+                                        Sender
+                                    </label>
+                                    <select class="form-control" formControlName="sender"
+                                        [(ngModel)]="nodesSelection.sender">
+                                        <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}
+                                        </option>
+                                    </select>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id != 4">
-                            <label for="type" class="form-label font-bold">
-                                Receiver
-                            </label>
-                            <select class="form-control" formControlName="receiver">
-                                <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}</option>
-                            </select>
-                            <div *ngIf="endNodes.length ==0">
-                                <p class="text-danger">
-                                    Please drag a end node and configure it.
-                                </p>
-                            </div>
-                            <div *ngIf="receiver.touched && receiver.invalid">
-                                <div *ngIf="receiver.errors.required">
-                                    <p class="text-danger">Please select an Receiver.</p>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id != 4">
+                                    <label for="type" class="form-label font-bold">
+                                        Receiver
+                                    </label>
+                                    <select class="form-control" formControlName="receiver"
+                                        [(ngModel)]="nodesSelection.receiver">
+                                        <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}
+                                        </option>
+                                    </select>
+                                    <!-- <div *ngIf="endNodes.length ==0">
+                                                            <p class="text-danger">
+                                                                Please drag a end node and configure it.
+                                                            </p>
+                                                        </div>
+                                                        <div *ngIf="receiver.touched && receiver.invalid">
+                                                            <div *ngIf="receiver.errors.required">
+                                                                <p class="text-danger">Please select an Receiver.</p>
+                                                            </div>
+                                                        </div> -->
                                 </div>
-                            </div>
-                        </div>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 1">
-                            <label for="type" class="form-label font-bold">
-                                Key Length
-                            </label>
-                            <input type="number" min="1" oninput="this.value = Math.abs(this.value)"
-                                formControlName="keyLength" class="form-control">
-                            <div *ngIf="keyLength.touched && keyLength.invalid">
-                                <div *ngIf="keyLength.errors.required">
-                                    <p class="text-danger">Please enter key length.</p>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 1">
+                                    <label for="type" class="form-label font-bold">
+                                        Key Length
+                                    </label>
+                                    <input type="number" min="1" oninput="this.value = Math.abs(this.value)"
+                                        formControlName="keyLength" class="form-control">
+                                    <div *ngIf="keyLength.touched && keyLength.invalid">
+                                        <div *ngIf="keyLength.errors.required">
+                                            <p class="text-danger">Please enter key length.</p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 2">
-                            <label for="type" class="form-label font-bold">
-                                Target Fidelity: {{e2e.targetFidelity}}
-                            </label>
-                            <br>
-                            <p-slider formControlName="targetFidelity" [min]="0" [step]="0.05" [max]="1"
-                                (onSlideEnd)="e2eChange('target')"></p-slider>
-                        </div>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 2">
-                            <label class="form-label">
-                                Demand: {{e2e.size}}
-                            </label>
-                            <br>
-                            <p-slider formControlName="size" [min]="0" [step]="1" [max]="6"
-                                (onSlideEnd)="e2eChange('size')"></p-slider>
-                        </div>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 2">
-                            <label for="timeout" class="col-12">TimeOut (e12)</label>
-                            <input type="text" class="form-control col-12" aria-label="Amount (to the nearest dollar)"
-                                formControlName="timeout">
-                        </div>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 5 || app_id == 6">
-                            <label for="type" class="form-label font-bold">
-                                Sequence Length
-                            </label>
-                            <input type="number" min="1" oninput="this.value = Math.abs(this.value)"
-                                formControlName="sequenceLength" class="form-control">
-                        </div>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 3">
-                            <label for="endNode">Random Qubit Amplitude 1</label>&nbsp;
-                            <input type="text" class="form-control" formControlName="amplitude1">
-                            <div class="text-muted">Random Single Qubit's amplitude at |0></div>
-                        </div>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 3">
-                            <label for="endNode">Random Qubit Amplitude 1</label>&nbsp;
-                            <input type="text" class="form-control" formControlName="amplitude2">
-                            <div class="text-muted">Random Single Qubit's amplitude at |0></div>
-                        </div>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 4">
-                            <label for="type" class="form-label font-bold">
-                                End Node 1
-                            </label>
-                            <select class="form-control" formControlName="endnode1">
-                                <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}</option>
-                            </select>
-                            <div *ngIf="node1.touched && node1.invalid">
-                                <div *ngIf="node1.errors.required">
-                                    <p class="text-danger">Please select End Node 1.</p>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
+                                    <label for="type" class="form-label font-bold">
+                                        Target Fidelity: {{e2e.targetFidelity}}
+                                    </label>
+                                    <br>
+                                    <p-slider formControlName="targetFidelity" [min]="0" [step]="0.05" [max]="1"
+                                        (onSlideEnd)="e2eChange('target')"></p-slider>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 4">
-                            <label for="type" class="form-label font-bold">
-                                End Node 2
-                            </label>
-                            <select class="form-control" formControlName="endnode2">
-                                <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}</option>
-                            </select>
-                            <div *ngIf="node2.touched && node2.invalid">
-                                <div *ngIf="node2.errors.required">
-                                    <p class="text-danger">Please select End Node 2.</p>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
+                                    <label class="form-label">
+                                        Demand: {{e2e.size}}
+                                    </label>
+                                    <br>
+                                    <p-slider formControlName="size" [min]="0" [step]="1" [max]="6"
+                                        (onSlideEnd)="e2eChange('size')"></p-slider>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 4">
-                            <label for="type" class="form-label font-bold">
-                                End Node 3
-                            </label>
-                            <select class="form-control" formControlName="endnode3">
-                                <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}</option>
-                            </select>
-                            <div *ngIf="node3.touched && node3.invalid">
-                                <div *ngIf="node3.errors.required">
-                                    <p class="text-danger">Please select End Node 3.</p>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
+                                    <label for="timeout" class="col-12">TimeOut (e12)</label>
+                                    <input type="text" class="form-control col-12"
+                                        aria-label="Amount (to the nearest dollar)" formControlName="timeout">
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 4">
-                            <label for="type" class="form-label font-bold">
-                                Central Node
-                            </label>
-                            <select class="form-control" formControlName="middleNode" (change)="selectReceiver($event)">
-                                <option *ngFor="let data of serviceNodes" [ngValue]="data.Name">{{data.Name}}
-                                </option>
-                            </select>
-                            <div *ngIf="middlenode.touched && middlenode.invalid">
-                                <div *ngIf="middlenode.errors.required">
-                                    <p class="text-danger">Please select an Central Node.</p>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 5 || app_id == 6">
+                                    <label for="type" class="form-label font-bold">
+                                        Sequence Length
+                                    </label>
+                                    <input type="number" min="1" oninput="this.value = Math.abs(this.value)"
+                                        formControlName="sequenceLength" class="form-control">
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-2 col-9 mx-auto"
-                            *ngIf="app_id == 6 || app_id == 5 ||app_id == 7 || app_id == 10">
-                            <label for="type" class="form-label font-bold">
-                                Message
-                            </label>
-                            <input type="text" (keypress)="allowBitsInput($event)" formControlName="message"
-                                class="form-control" maxLength="8">
-                            <div
-                                *ngIf="appSettingsForm.get('message').touched && appSettingsForm.get('message').invalid">
-                                <div *ngIf="appSettingsForm.get('message').errors.required">
-                                    <p class="text-danger">Message is required.</p>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 3">
+                                    <label for="endNode">Random Qubit Amplitude 1</label>&nbsp;
+                                    <input type="text" class="form-control" formControlName="amplitude1">
+                                    <div class="text-muted">Random Single Qubit's amplitude at |0></div>
                                 </div>
-                                <div *ngIf="appSettingsForm.get('message').errors.evenLength">
-                                    <p class="text-danger">Message must have an even number of characters</p>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 3">
+                                    <label for="endNode">Random Qubit Amplitude 1</label>&nbsp;
+                                    <input type="text" class="form-control" formControlName="amplitude2">
+                                    <div class="text-muted">Random Single Qubit's amplitude at |0></div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 9">
-                            <label for="type" class="form-label font-bold">
-                                Input Message
-                            </label>
-                            <input type="text" formControlName="inputMessage" class="form-control">
-                            <div
-                                *ngIf="appSettingsForm.get('inputMessage').touched && appSettingsForm.get('inputMessage').invalid">
-                                <div *ngIf="appSettingsForm.get('inputMessage').errors.required">
-                                    <p class="text-danger">Message is required.</p>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 4">
+                                    <label for="type" class="form-label font-bold">
+                                        End Node 1
+                                    </label>
+                                    <select class="form-control" formControlName="endnode1"
+                                        [(ngModel)]="nodesSelection.endNode1">
+                                        <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}
+                                        </option>
+                                    </select>
+                                    <!-- <div *ngIf="node1.touched && node1.invalid">
+                                                            <div *ngIf="node1.errors.required">
+                                                                <p class="text-danger">Please select End Node 1.</p>
+                                                            </div>
+                                                        </div> -->
+                                </div>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 4">
+                                    <label for="type" class="form-label font-bold">
+                                        End Node 2
+                                    </label>
+                                    <select class="form-control" formControlName="endnode2"
+                                        [(ngModel)]="nodesSelection.endNode2">
+                                        <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}
+                                        </option>
+                                    </select>
+                                    <!-- <div *ngIf="node2.touched && node2.invalid">
+                                                            <div *ngIf="node2.errors.required">
+                                                                <p class="text-danger">Please select End Node 2.</p>
+                                                            </div>
+                                                        </div> -->
+                                </div>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 4">
+                                    <label for="type" class="form-label font-bold">
+                                        End Node 3
+                                    </label>
+                                    <select class="form-control" formControlName="endnode3"
+                                        [(ngModel)]="nodesSelection.endNode3">
+                                        <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 4">
+                                    <label for="type" class="form-label font-bold">
+                                        Central Node
+                                    </label>
+                                    <select class="form-control" formControlName="middleNode">
+                                        <option *ngFor="let data of serviceNodes" [ngValue]="data.Name">{{data.Name}}
+                                        </option>
+                                    </select>
+                                    <div *ngIf="middlenode.touched && middlenode.invalid">
+                                        <div *ngIf="middlenode.errors.required">
+                                            <p class="text-danger">Please select an Central Node.</p>
+                                        </div>
+                                    </div>
                                 </div>
 
-                            </div>
-                        </div>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 8">
-                            <label for="type" class="form-label font-bold">
-                                Sender's Message
-                            </label>
-                            <input type="text" formControlName="message1" class="form-control">
-                            <div
-                                *ngIf="appSettingsForm.get('message1').touched && appSettingsForm.get('message1').invalid">
-                                <div *ngIf="appSettingsForm.get('message1').errors.required">
-                                    <p class="text-danger">Sender's Message is required.</p>
+                                <div class="mt-1 col-9 mx-auto"
+                                    *ngIf="app_id == 6 || app_id == 5 ||app_id == 7 || app_id == 10">
+                                    <label for="type" class="form-label font-bold">
+                                        Message
+                                    </label>
+                                    <input type="text" (keypress)="allowBitsInput($event)" formControlName="message"
+                                        class="form-control" maxLength="8">
+                                    <div
+                                        *ngIf="appSettingsForm.get('message').touched && appSettingsForm.get('message').invalid">
+                                        <div *ngIf="appSettingsForm.get('message').errors.required">
+                                            <p class="text-danger">Message is required.</p>
+                                        </div>
+                                        <div *ngIf="appSettingsForm.get('message').errors.evenLength">
+                                            <p class="text-danger">Message must have an even number of characters</p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="mt-2 col-9 mx-auto" *ngIf="app_id == 8">
-                            <label for="type" class="form-label font-bold">
-                                Receiver's Message
-                            </label>
-                            <input type="text" formControlName="message2" class="form-control">
-                            <div
-                                *ngIf="appSettingsForm.get('message2').touched && appSettingsForm.get('message2').invalid">
-                                <div *ngIf="appSettingsForm.get('message2').errors.required">
-                                    <p class="text-danger">Receiver's Message is required.</p>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 9">
+                                    <label for="type" class="form-label font-bold">
+                                        Input Message
+                                    </label>
+                                    <input type="text" formControlName="inputMessage" class="form-control">
+                                    <div
+                                        *ngIf="appSettingsForm.get('inputMessage').touched && appSettingsForm.get('inputMessage').invalid">
+                                        <div *ngIf="appSettingsForm.get('inputMessage').errors.required">
+                                            <p class="text-danger">Message is required.</p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </form>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 8">
+                                    <label for="type" class="form-label font-bold">
+                                        Sender's Message
+                                    </label>
+                                    <input type="text" formControlName="message1" class="form-control">
+                                    <div
+                                        *ngIf="appSettingsForm.get('message1').touched && appSettingsForm.get('message1').invalid">
+                                        <div *ngIf="appSettingsForm.get('message1').errors.required">
+                                            <p class="text-danger">Sender's Message is required.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 8">
+                                    <label for="type" class="form-label font-bold">
+                                        Receiver's Message
+                                    </label>
+                                    <input type="text" formControlName="message2" class="form-control">
+                                    <div
+                                        *ngIf="appSettingsForm.get('message2').touched && appSettingsForm.get('message2').invalid">
+                                        <div *ngIf="appSettingsForm.get('message2').errors.required">
+                                            <p class="text-danger">Receiver's Message is required.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </p-accordionTab>
+
+                    </p-accordion>
                     <br>
                     <div class="d-flex justify-content-center">
                         <button class="btn btn-primary btn-custom btn-sm" (click)="parameters()">Run

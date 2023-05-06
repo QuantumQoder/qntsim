@@ -10,6 +10,7 @@ import { ConfirmationService, MenuItem, Message, MessageService } from 'primeng/
 import { ApiServiceService } from 'src/services/api-service.service';
 
 import { ConditionsService } from 'src/services/conditions.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-drag',
@@ -21,6 +22,26 @@ import { ConditionsService } from 'src/services/conditions.service';
 export class DragComponent implements OnInit, AfterViewInit {
   @ViewChild('diagramContainer') private diagramRef: ElementRef;
   private addButtonAdornment: go.Adornment;
+  nodesSelection = {
+    sender: '',
+    receiver: '',
+    endNode1: '',
+    endNode2: '',
+    endNode3: '',
+  }
+  detectorProps = {
+    efficiency: 1,
+    countRate: 25000000,
+    timeResolution: 150
+  }
+  lightSourceProps = {
+    frequency: 80000000,
+    wavelength: 1550,
+    bandwidth: 0,
+    meanPhotonNum: 0.1,
+    phaseError: 0
+  }
+  simulator: string = 'version0';
   link_array: any = []
   app_id: any
   checked: boolean = false;
@@ -135,6 +156,18 @@ export class DragComponent implements OnInit, AfterViewInit {
         this.serviceNodes.push(value)
       }
     }
+    console.log(this.endNodes)
+    // this.appSettingsForm.reset()
+    this.nodesSelection.sender = this.endNodes[0].Name
+    this.nodesSelection.receiver = this.endNodes.length > 1 ? this.endNodes[1].Name : this.endNodes[0].Name
+    this.nodesSelection.endNode1 = this.endNodes[0].Name
+    this.nodesSelection.endNode2 = this.endNodes.length > 1 ? this.endNodes[1].Name : this.endNodes[0].Name
+    this.nodesSelection.endNode3 = this.endNodes.length > 2 ? this.endNodes[2].Name : this.endNodes.length == 2 ? this.endNodes[1].Name : this.endNodes[0].Name
+
+    // this.appSettingsForm.get('sender')?.reset()
+    // this.appSettingsForm.get('receiver')?.reset()
+    // this.appSettingsForm.get('receiver')?.patchValue(this.endNodes[1])
+
   }
   ngOnInit(): void {
     this.e2e = {
@@ -176,29 +209,31 @@ export class DragComponent implements OnInit, AfterViewInit {
       }
     }
     if (this.app_id != 4) {
-      if (this.appSettingsForm.get('sender')?.value == '') {
+      if (this.nodesSelection.sender == '') {
         alert("Please select a sender")
         return
       }
-      else if (this.appSettingsForm.get('receiver')?.value == '') {
+      else if (this.nodesSelection.receiver == '') {
         alert("Please select a receiver.")
         return;
       }
-      else if (this.appSettingsForm.get('sender')?.value == this.appSettingsForm.get('receiver')?.value) {
+      else if (this.nodesSelection.sender == this.nodesSelection.receiver) {
         alert("Sender and Receiver cannot be same node");
         return;
       }
     }
     if (this.app_id == 4) {
-      let endnode1 = this.appSettingsForm.get('endnode1')?.value
-      let endnode2 = this.appSettingsForm.get('endnode2')?.value
-      let endnode3 = this.appSettingsForm.get('endnode3')?.value
       let middleNode = this.appSettingsForm.get('middleNode')?.value
-      if (endnode1 == '' || endnode2 == '' || endnode3 == '' || middleNode == '') {
+      console.log(this.nodesSelection.endNode1)
+      console.log(this.nodesSelection.endNode2)
+      console.log(this.nodesSelection.endNode3)
+      if (this.nodesSelection.endNode1 == '' || this.nodesSelection.endNode2 == '' || this.nodesSelection.endNode3 == '' || middleNode == '') {
         alert('Please select End Nodes.')
         return;
       }
-      if (endnode1 == endnode2 || endnode2 == endnode3 || endnode3 == endnode1) {
+      if (this.nodesSelection.endNode1 == this.nodesSelection.endNode2
+        || this.nodesSelection.endNode2 == this.nodesSelection.endNode3
+        || this.nodesSelection.endNode3 == this.nodesSelection.endNode1) {
         alert("End Nodes cannot be same node");
         return;
       }
@@ -248,18 +283,30 @@ export class DragComponent implements OnInit, AfterViewInit {
       nodes: this.nodes,
       quantum_connections: this.links,
       classical_connections: this.cc,
+      detector_properties: {
+        efficiency: this.detectorProps.efficiency,
+        count_rate: this.detectorProps.countRate,
+        time_resolution: this.detectorProps.timeResolution
+      },
+      light_source_properties: {
+        frequency: this.lightSourceProps.frequency,
+        wavelength: this.lightSourceProps.wavelength,
+        bandwidth: this.lightSourceProps.bandwidth,
+        mean_photon_num: this.lightSourceProps.meanPhotonNum,
+        phase_error: this.lightSourceProps.phaseError,
+      }
     }
     const appConfig =
     {
       1: {
-        sender: this.appSettingsForm.get('sender')?.value,
-        receiver: this.appSettingsForm.get('receiver')?.value,
+        sender: this.nodesSelection.sender,
+        receiver: this.nodesSelection.receiver,
         keyLength: Number(this.appSettingsForm.get('keyLength')?.value)
       },
 
       2: {
-        sender: this.appSettingsForm.get('sender')?.value,
-        receiver: this.appSettingsForm.get('receiver')?.value,
+        sender: this.nodesSelection.sender,
+        receiver: this.nodesSelection.receiver,
         startTime: 1e12,
         size: this.appSettingsForm.get('size')?.value,
         priority: 0,
@@ -272,47 +319,47 @@ export class DragComponent implements OnInit, AfterViewInit {
         endnode3: this.appSettingsForm.get('endnode3')?.value,
         middlenode: this.appSettingsForm.get('middleNode')?.value,
       }, 3: {
-        sender: this.appSettingsForm.get('sender')?.value,
-        receiver: this.appSettingsForm.get('receiver')?.value,
+        sender: this.nodesSelection.sender,
+        receiver: this.nodesSelection.receiver,
         amplitude1: this.appSettingsForm.get('amplitude1')?.value,
         amplitude2: this.appSettingsForm.get('amplitude2')?.value
       }, 5:
       {
-        sender: this.appSettingsForm.get('sender')?.value,
-        receiver: this.appSettingsForm.get('receiver')?.value,
+        sender: this.nodesSelection.sender,
+        receiver: this.nodesSelection.receiver,
         sequenceLength: this.appSettingsForm.get('sequenceLength')?.value,
         key: this.appSettingsForm.get('message')?.value
       }, 7:
       {
-        sender: this.appSettingsForm.get('sender')?.value,
-        receiver: this.appSettingsForm.get('receiver')?.value,
+        sender: this.nodesSelection.sender,
+        receiver: this.nodesSelection.receiver,
         message: this.appSettingsForm.get('message')?.value
       }, 6:
 
       {
-        sender: this.appSettingsForm.get('sender')?.value,
-        receiver: this.appSettingsForm.get('receiver')?.value,
+        sender: this.nodesSelection.sender,
+        receiver: this.nodesSelection.receiver,
         sequenceLength: this.appSettingsForm.get('sequenceLength')?.value,
         message: this.appSettingsForm.get('message')?.value,
       },
       8:
       {
-        sender: this.appSettingsForm.get('sender')?.value,
-        receiver: this.appSettingsForm.get('receiver')?.value,
+        sender: this.nodesSelection.sender,
+        receiver: this.nodesSelection.receiver,
         message1: this.appSettingsForm.get('message1')?.value,
         message2: this.appSettingsForm.get('message2')?.value,
         attack: ''
       }, 9:
       {
-        sender: this.appSettingsForm.get('sender')?.value,
-        receiver: this.appSettingsForm.get('receiver')?.value,
+        sender: this.nodesSelection.sender,
+        receiver: this.nodesSelection.receiver,
         message: this.appSettingsForm.get('inputMessage')?.value,
         attack: this.appSettingsForm.get('attack')?.value
       }, 10:
       {
         alice_attrs: {
-          sender: this.appSettingsForm.get('sender')?.value,
-          receiver: this.appSettingsForm.get('receiver')?.value,
+          sender: this.nodesSelection.sender,
+          receiver: this.nodesSelection.receiver,
           message: this.appSettingsForm.get('message')?.value,
           id: "1010",
           check_bits: 4
@@ -328,7 +375,8 @@ export class DragComponent implements OnInit, AfterViewInit {
       "topology": this.topology,
       "appSettings": this.appSettings
     }
-    this.apiService.runApplication(req).subscribe((result: any) => {
+    let url = this.simulator == 'version0' ? environment.apiUrl : this.simulator == 'version1' ? environment.apiUrlNew : null;
+    this.apiService.runApplication(req, url).subscribe((result: any) => {
       this.spinner = true;
       this.con.setResult(result)
     }, (error) => {
@@ -349,8 +397,8 @@ export class DragComponent implements OnInit, AfterViewInit {
         { propName: "No of Memories", propValue: 500, numericValueOnly: true }
       ],
       memory: [
-        { propName: "frequency(hz)", propValue: 2000, numericValueOnly: true },
-        { propName: "expiry(ms)", propValue: 2000, numericValueOnly: true },
+        { propName: "frequency(hz)", propValue: 80000000, numericValueOnly: true },
+        { propName: "expiry(ms)", propValue: "-1", numericValueOnly: true },
         { propName: "efficiency", propValue: 1, decimalValueAlso: true },
         { propName: "fidelity", propValue: 0.93, decimalValueAlso: true }
       ]
@@ -359,6 +407,8 @@ export class DragComponent implements OnInit, AfterViewInit {
     this.myDiagram.model.addNodeData(newNode);
     this.myDiagram.model.addLinkData({ from: adornedPart.data.key, to: newNode.key });
     this.myDiagram.commitTransaction('Add node and link');
+    this.myDiagram.zoomToFit();
+    this.updateNodes()
   }
   load() {
     this.myDiagram.model = go.Model.fromJson(this.savedModel)
@@ -370,16 +420,7 @@ export class DragComponent implements OnInit, AfterViewInit {
     this.myDiagram.contentAlignment = go.Spot["Center"];
   }
 
-  deleteLink(e: any, obj: any) {
-    var link = obj.part.data
-    var link1 = this.myDiagram.findLinkForData(link)
-    this.myDiagram.startTransaction("remove link");
-    this.myDiagram.remove(link1);
-    this.myDiagram.commitTransaction("remove link");
-  }
-
   activeindex(data: any) {
-    this.updateNodes();
     if (data == 'next') {
       if (this.activeIndex <= 1) {
         this.activeIndex++;
@@ -391,21 +432,20 @@ export class DragComponent implements OnInit, AfterViewInit {
       }
     }
   }
-  get sender() {
-    return this.appSettingsForm.get('sender')
+  // Define a method to delete a node
+  deleteNode(nodeData: any) {
+    const diagram = this.myDiagram;
+    if (diagram.model.nodeDataArray.length > 1) {
+      diagram.startTransaction('delete node');
+      // find the node in the diagram by its data
+      const node = diagram.findNodeForData(nodeData);
+      // remove the node from the diagram
+      diagram.remove(node);
+      diagram.commitTransaction('delete node');
+      this.myDiagram.zoomToFit();
+    }
   }
-  get receiver() {
-    return this.appSettingsForm.get('receiver')
-  }
-  get node1() {
-    return this.appSettingsForm.get('endnode1')
-  }
-  get node2() {
-    return this.appSettingsForm.get('endnode2')
-  }
-  get node3() {
-    return this.appSettingsForm.get('endnode3')
-  }
+
   get middlenode() {
     return this.appSettingsForm.get('middleNode')
   }
@@ -419,18 +459,11 @@ export class DragComponent implements OnInit, AfterViewInit {
     const $ = go.GraphObject.make;
 
     this.myDiagram = $(go.Diagram, this.diagramRef.nativeElement, {
+      initialContentAlignment: go.Spot.Center,
       'undoManager.isEnabled': true,
       'initialAutoScale': go.Diagram.Uniform, // Ensures the myDiagram fits the viewport
-      'allowZoom': false, // Disables zooming
-      // layout: $(go.GridLayout,
-      //   { // this only lays out in trees nodes connected by "generalization" links
-      //     // angle: 90,
-      //     // path: go.GridLayout.PathSource,  // links go from child to parent
-      //     // setsPortSpot: false,  // keep Spot.AllSides for link connection spot
-      //     // setsChildPortSpot: false,  // keep Spot.AllSides
-      //     // nodes not connected by "generalization" links are laid out horizontally
-      //     // arrangement: go.TreeLayout.ArrangementHorizontal
-      //   })
+      'allowZoom': true, // Disables zooming
+      layout: $(go.ForceDirectedLayout)
     });
     this.addButtonAdornment = $(go.Adornment, 'Spot',
       $(go.Panel, 'Auto',
@@ -558,6 +591,29 @@ export class DragComponent implements OnInit, AfterViewInit {
               }
             ),
             $(go.TextBlock, '+', { font: 'bold 10pt sans-serif', margin: new go.Margin(0, 5, 0, 0) })
+          ),
+          $(go.Panel, "Spot",
+            {
+              alignment: go.Spot.Left,
+              alignmentFocus: go.Spot.Right,
+              click: (e: any, obj: any) => this.deleteNode(obj.part.data)
+            },
+            $(go.Shape,
+              {
+                figure: 'Circle',
+                spot1: new go.Spot(0, 0, 1, 1), spot2: new go.Spot(1, 1, -1, -1),
+                fill: 'white', strokeWidth: 0,
+                desiredSize: new go.Size(20, 20),
+                margin: new go.Margin(0, 2, 0, 0),
+                mouseEnter: (e: any, obj: any) => {
+                  obj.fill = 'rgba(128,128,128,0.7)';
+                },
+                mouseLeave: (e: any, obj: any) => {
+                  obj.fill = 'white';
+                }
+              }
+            ),
+            $(go.TextBlock, '-', { font: 'bold 10pt sans-serif', margin: new go.Margin(0, 5, 0, 0) })
           )
         )
       );
@@ -576,8 +632,8 @@ export class DragComponent implements OnInit, AfterViewInit {
           { propName: "NoOfMemories", propValue: 500, numericValueOnly: true }
         ],
         memory: [
-          { propName: "frequency(hz)", propValue: 2000, numericValueOnly: true },
-          { propName: "expiry(ms)", propValue: 2000, numericValueOnly: true },
+          { propName: "frequency(hz)", propValue: 80000000, numericValueOnly: true },
+          { propName: "expiry(ms)", propValue: "-1", numericValueOnly: true },
           { propName: "efficiency", propValue: 1, decimalValueAlso: true },
           { propName: "fidelity", propValue: 0.93, decimalValueAlso: true }
         ]

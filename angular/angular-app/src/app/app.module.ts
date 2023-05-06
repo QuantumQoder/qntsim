@@ -64,7 +64,7 @@ import { SliderModule } from 'primeng/slider';
     DropdownModule,
     SpeedDialModule,
     CheckboxModule,
-
+    AccordionModule,
     SidebarModule,
     FormsModule,
     ReactiveFormsModule,
