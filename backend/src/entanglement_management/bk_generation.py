@@ -23,7 +23,7 @@ from ..kernel._event import Event
 from ..components.circuit import BaseCircuit
 from ..utils import log
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
-
+import logging
 
 class GenerationMsgType(Enum):
     """Defines possible message types for entanglement generation."""
@@ -116,7 +116,8 @@ class EntanglementGenerationA(EntanglementProtocol):
 
 
     def __init__(self, own: "Node", name: str, middle: str, other: str, memory: "Memory"):
-        """Constructor for entanglement generation A class.
+        """
+        Constructor for entanglement generation A class.
         Args:
             own (Node): node to attach protocol to.
             name (str): name of protocol instance.
@@ -161,10 +162,11 @@ class EntanglementGenerationA(EntanglementProtocol):
         self._z_circuit.z(0)
 
     def set_others(self, other: "EntanglementGenerationA") -> None:
-        """Method to set other entanglement protocol instance.
-        Args:
-            other (EntanglementGenerationA): other protocol instance.
-        """
+        
+        # Method to set other entanglement protocol instance.
+        # Args:
+        # other (EntanglementGenerationA): other protocol instance.
+        
 
         assert self.other_protocol is None
         assert self.fidelity == other.fidelity
@@ -175,11 +177,14 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.primary = self.own.name > self.other
 
     def start(self) -> None:
-        """Method to start entanglement generation protocol.
-        Will start negotiations with other protocol (if primary).
-        Side Effects:
-            Will send message through attached node.
-        """
+        logger = logging.getLogger("main_logger." + "bk_generation")
+        logger.info("Enteanglement Generaton A Protocal Starte...")
+        
+        # Method to start entanglement generation protocol.
+        # Will start negotiations with other protocol (if primary).
+        # Side Effects:
+        #     Will send message through attached node.
+        
 
         log.logger.info(self.own.name + " protocol start with partner {}".format(self.other))
         # print(self.own.name + " Generation protocol start with partner {}".format(self.other),self.name, self.middle)
