@@ -134,10 +134,11 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       }
     }
   }
-  intro() {
+  routeTo(url: string) {
     this.holdingData.setRoute('minimal');
-    this.route.navigate(['/intro'])
+    this.route.navigate([`/${url}`])
   }
+
   setSettings(formData: any) {
     let form = {}
     this.appSettingsForm = null

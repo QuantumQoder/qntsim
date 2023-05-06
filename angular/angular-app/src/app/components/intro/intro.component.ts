@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
 import { HoldingDataService } from 'src/services/holding-data.service';
@@ -9,7 +9,7 @@ import { HoldingDataService } from 'src/services/holding-data.service';
   styleUrls: ['./intro.component.less'],
   encapsulation: ViewEncapsulation.None,
 })
-export class IntroComponent implements OnInit {
+export class IntroComponent implements OnInit, OnDestroy {
   items: MenuItem[];
   activeIndex = 0;
   step = 1;
@@ -18,6 +18,9 @@ export class IntroComponent implements OnInit {
   e2e = new E2E();
   routeFrom: string;
   constructor(private router: Router, private holding: HoldingDataService) { }
+  ngOnDestroy(): void {
+    this.holding.setRoute('')
+  }
 
   ngOnInit(): void {
     this.routeFrom = this.holding.getRoute();
@@ -55,7 +58,9 @@ export class IntroComponent implements OnInit {
     this.step += val;
     window.scroll({ top: 0, behavior: 'smooth' });
   }
-
+  goto() {
+    this.router.navigate(['/advanced'])
+  }
   previousStep() { this.changeStep(-1); }
   nextStep() { this.changeStep(1); }
   quant_ph(url: string) { window.open(url, "_blank"); }

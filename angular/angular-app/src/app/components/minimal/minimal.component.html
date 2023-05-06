@@ -121,7 +121,8 @@
                 <div *ngIf="app.dirty && appForm.get('app')?.value != ''">
 
                     <p class="text-black text-center">
-                        <a (click)="intro()" routerLinkActive="router-link-active">More info</a>
+                        <a (click)="routeTo('intro')" routerLinkActive="router-link-active" class="btn btn-link">More
+                            info</a>
                     </p>
 
                 </div>
@@ -363,7 +364,8 @@
         <div *ngIf="app.dirty && appForm.get('app')?.value != ''">
             <p class="text-black text-center">
                 For More Settings,<br>
-                try <a [routerLink]="['/drag']" routerLinkActive="router-link-active">Advanced Version</a>
+                try <a (click)="routeTo('advanced')" routerLinkActive="router-link-active" class="btn btn-link">Advanced
+                    Version</a>
             </p>
         </div>
     </div>

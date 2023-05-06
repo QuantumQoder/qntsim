@@ -7,7 +7,7 @@ import { DragComponent } from './components/drag/drag.component';
 const routes: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'applications', loadChildren: () => import('./components/applications/application-modules/application.module').then(m => m.ApplicationModule) },
-  { path: 'drag', component: DragComponent },
+  { path: 'advanced', component: DragComponent },
   { path: 'results', component: ResultsComponent },
   { path: 'intro', loadChildren: () => import('./components/intro/intro-modules/intro.module').then(m => m.IntroModule) },
   { path: 'minimal', loadChildren: () => import('./components/minimal/modules/minimal.module').then(m => m.MinimalModule) },

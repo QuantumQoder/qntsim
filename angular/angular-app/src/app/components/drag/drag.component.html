@@ -47,22 +47,12 @@
                     </div>
                 </div>
                 <br>
-                <!-- <div *ngIf="activeIndex == 0">
-                    <h5 style="padding-left: 1rem;">
-                        Step 1: Setup Topology
-                    </h5>
-                    <div class="text-center">
-                         <p-checkbox [(ngModel)]="checked" [binary]="true" (onChange)="preloadTopology()"
-                            inputId="binary"></p-checkbox>&nbsp;<b>Use our preconfigured topology,
-                            <br></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b *ngIf="!checked">or follow the
-                            steps.</b> 
-                    </div>
-                    <br>
-                    <div class="d-flex justify-content-center">
-                        <button class="btn btn-primary" (click)="activeindex('next')">Next</button>
-                    </div>
+                <div *ngIf="routeFrom == 'minimal'" class="col-4 mx-auto">
+                    <button class="btn btn-primary" (click)="routeTo()">
+                        Go to Minimal
+                    </button>
+                </div>
 
-                </div> -->
                 <div id="step2" *ngIf="activeIndex == 0">
                     <h5>
                         Configure Topology
@@ -107,7 +97,7 @@
                         <p-accordionTab header="Light Source Properties">
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold">
-                                    Frequency
+                                    Frequency(hz)
                                 </label>
                                 <input class="form-control" [(ngModel)]="lightSourceProps.frequency" />
                             </div>
@@ -205,7 +195,7 @@
                                         (onSlideEnd)="e2eChange('size')"></p-slider>
                                 </div>
                                 <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
-                                    <label for="timeout" class="col-12">TimeOut (e12)</label>
+                                    <label for="timeout" class="col-12">TimeOut (Seconds)</label>
                                     <input type="text" class="form-control col-12"
                                         aria-label="Amount (to the nearest dollar)" formControlName="timeout">
                                 </div>
@@ -270,7 +260,8 @@
                                     <label for="type" class="form-label font-bold">
                                         Central Node
                                     </label>
-                                    <select class="form-control" formControlName="middleNode">
+                                    <select class="form-control" formControlName="middleNode"
+                                        [(ngModel)]="nodesSelection.middleNode">
                                         <option *ngFor="let data of serviceNodes" [ngValue]="data.Name">{{data.Name}}
                                         </option>
                                     </select>

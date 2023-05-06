@@ -22,6 +22,7 @@ import { map } from 'rxjs';
 })
 export class DragComponent implements OnInit, AfterViewInit {
   app: any
+  routeFrom: string
   @ViewChild('diagramContainer') private diagramRef: ElementRef;
   private addButtonAdornment: go.Adornment;
   nodesSelection = {
@@ -30,6 +31,7 @@ export class DragComponent implements OnInit, AfterViewInit {
     endNode1: '',
     endNode2: '',
     endNode3: '',
+    middleNode: ''
   }
   detectorProps = {
     efficiency: 1,
@@ -115,6 +117,7 @@ export class DragComponent implements OnInit, AfterViewInit {
   }
   ngAfterViewInit(): void {
     this.initDiagram();
+    this.updateNodes()
   }
   e2eChange(data: string) {
     if (data == 'target') {
@@ -166,7 +169,7 @@ export class DragComponent implements OnInit, AfterViewInit {
     this.nodesSelection.endNode1 = this.endNodes[0].Name
     this.nodesSelection.endNode2 = this.endNodes.length > 1 ? this.endNodes[1].Name : this.endNodes[0].Name
     this.nodesSelection.endNode3 = this.endNodes.length > 2 ? this.endNodes[2].Name : this.endNodes.length == 2 ? this.endNodes[1].Name : this.endNodes[0].Name
-
+    this.nodesSelection.middleNode = this.serviceNodes.length > 0 ? this.serviceNodes[0].Name : ''
     // this.appSettingsForm.get('sender')?.reset()
     // this.appSettingsForm.get('receiver')?.reset()
     // this.appSettingsForm.get('receiver')?.patchValue(this.endNodes[1])
@@ -182,23 +185,14 @@ export class DragComponent implements OnInit, AfterViewInit {
     this.con.getAppList().pipe(map((d: any) => d.appList)).subscribe((result: any) => this.app_data = result);
     this.app_id = localStorage.getItem('app_id')
     this.application = localStorage.getItem('app')
-    this.breadcrumbItems = [{
-      label: '1.Setup Topology', command: () => {
-        this.activeIndex = 0;
-      }
-    }, {
-      label: '2.Configuration', command: () => {
-        this.activeIndex = 1
-      }
-    },
-    {
-      label: '3.Application Settings', command: () => {
-        this.activeIndex = 2
-      }
-    }]
+    this.routeFrom = this.holdingData.getRoute();
+    this.app = Number(localStorage.getItem('app_id'))
   }
   changeApp() {
     localStorage.setItem("app_id", this.app)
+  }
+  routeTo() {
+    this._route.navigate(['/minimal'])
   }
   parameters() {
     this.app_id = localStorage.getItem('app_id')
