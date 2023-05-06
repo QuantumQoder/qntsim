@@ -30,4 +30,9 @@ export class AppComponent implements AfterViewInit {
       behavior: 'smooth'
     });
   }
+  // @HostListener('window:beforeunload', ['$event'])
+  // onBeforeUnload(event: BeforeUnloadEvent) {
+  //   // Clear the localStorage
+  //   localStorage.clear();
+  // }
 }
