@@ -9,6 +9,7 @@ import * as go from 'gojs'
 import { map } from 'rxjs';
 import { ConditionsService } from 'src/services/conditions.service';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -473,7 +474,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       appSettings: this.appConfig
     }
 
-    this.api.runApplication(request).subscribe((result) => {
+    this.api.runApplication(request, environment.apiUrl).subscribe((result) => {
       this.spinner = true;
       console.log(this.spinner)
       this.service.setResult(result)

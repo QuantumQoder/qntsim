@@ -27,8 +27,8 @@ export class ApiServiceService {
   accessToken(data: any) {
     return this._http.post(environment.apiUrl + 'api/token/', data);
   }
-  runApplication(data: any) {
-    return this._http.post(environment.apiUrl + 'run/', data)
+  runApplication(data: any, apiUrl: string) {
+    return this._http.post(apiUrl + 'run/', data)
   }
   ghz1() {
     return this.ghz
