@@ -32,11 +32,18 @@
                 <h4 class="text-dark text-center">Selected Application: {{application}}</h4>
                 <!-- <p-breadcrumb [model]="breadcrumbItems"></p-breadcrumb> -->
                 <div class="row">
-                    <div class="col-4 mx-2">
+                    <div class="col-6">
                         <label class="form-label">Select Simulator</label>
                         <select class="form-control" [(ngModel)]="simulator">
-                            <option value="version0">Version 0</option>
                             <option value="version1">Version 1</option>
+                            <option value="version2">Version 2</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Select Simulator</label>
+                        <select class="form-control" [(ngModel)]="app">
+                            <option value="version0">Version 0</option>
+
                         </select>
                     </div>
                 </div>

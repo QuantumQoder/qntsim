@@ -20,6 +20,7 @@ import { environment } from 'src/environments/environment';
   encapsulation: ViewEncapsulation.None
 })
 export class DragComponent implements OnInit, AfterViewInit {
+  app: any
   @ViewChild('diagramContainer') private diagramRef: ElementRef;
   private addButtonAdornment: go.Adornment;
   nodesSelection = {
@@ -41,7 +42,7 @@ export class DragComponent implements OnInit, AfterViewInit {
     meanPhotonNum: 0.1,
     phaseError: 0
   }
-  simulator: string = 'version0';
+  simulator: string = 'version1';
   link_array: any = []
   app_id: any
   checked: boolean = false;
@@ -397,8 +398,8 @@ export class DragComponent implements OnInit, AfterViewInit {
         { propName: "No of Memories", propValue: 500, numericValueOnly: true }
       ],
       memory: [
-        { propName: "frequency(hz)", propValue: 80000000, numericValueOnly: true },
-        { propName: "expiry(ms)", propValue: "-1", numericValueOnly: true },
+        { propName: "frequency(hz)", propValue: 2000, numericValueOnly: true },
+        { propName: "expiry(ms)", propValue: -1, numericValueOnly: true },
         { propName: "efficiency", propValue: 1, decimalValueAlso: true },
         { propName: "fidelity", propValue: 0.93, decimalValueAlso: true }
       ]
@@ -632,8 +633,8 @@ export class DragComponent implements OnInit, AfterViewInit {
           { propName: "NoOfMemories", propValue: 500, numericValueOnly: true }
         ],
         memory: [
-          { propName: "frequency(hz)", propValue: 80000000, numericValueOnly: true },
-          { propName: "expiry(ms)", propValue: "-1", numericValueOnly: true },
+          { propName: "frequency(hz)", propValue: 2000, numericValueOnly: true },
+          { propName: "expiry(ms)", propValue: -1, numericValueOnly: true },
           { propName: "efficiency", propValue: 1, decimalValueAlso: true },
           { propName: "fidelity", propValue: 0.93, decimalValueAlso: true }
         ]
@@ -669,6 +670,7 @@ export class DragComponent implements OnInit, AfterViewInit {
           }
         }
       }
+      this.updateNodes()
     });
   }
 }
