@@ -88,7 +88,7 @@ export class HoldingDataService {
             delay = 0;
           } else {
             distance = 1000;
-            delay = 1000000000;
+            delay = 10000000000;
           }
           ccreq = {
             Nodes: tempcc[i],
