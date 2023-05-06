@@ -29,21 +29,20 @@
         </div>
         <div class="col ">
             <div class="configuration" style="height:100%">
-                <h4 class="text-dark text-center">Selected Application: {{application}}</h4>
+                <!-- <h4 class="text-dark text-center">Selected Application: {{application}}</h4> -->
                 <!-- <p-breadcrumb [model]="breadcrumbItems"></p-breadcrumb> -->
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col mx-2">
                         <label class="form-label">Select Simulator</label>
                         <select class="form-control" [(ngModel)]="simulator">
                             <option value="version1">Version 1</option>
                             <option value="version2">Version 2</option>
                         </select>
                     </div>
-                    <div class="col-6">
-                        <label class="form-label">Select Simulator</label>
-                        <select class="form-control" [(ngModel)]="app">
-                            <option value="version0">Version 0</option>
-
+                    <div class="col mx-2">
+                        <label class="form-label">Select Application</label>
+                        <select class="form-control" [(ngModel)]="app" (change)="changeApp()">
+                            <option *ngFor="let data of app_data" [ngValue]="data.appId">{{data.appName}}</option>
                         </select>
                     </div>
                 </div>

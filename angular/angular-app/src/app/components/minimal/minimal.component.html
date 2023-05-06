@@ -14,9 +14,9 @@
 
 
         <form [formGroup]="topologyForm">
-            <h3 class="text-center display-5">
+            <!-- <h3 class="text-center display-5">
                 Configuration
-            </h3>
+            </h3> -->
             <div class="d-flex justify-content-center">
                 <h5 class="mx-auto">Topology</h5>
             </div>
@@ -103,8 +103,8 @@
     </div>
     <div class="col-custom-3 p-0 bg-white">
         <form [formGroup]="appForm">
-            <h3 class="text-center display-5">Configuration
-            </h3>
+            <!-- <h3 class="text-center display-5">Configuration
+            </h3> -->
             <div class="mt-2 col-9 mx-auto">
                 <label for="type" class="form-label font-bold">
                     Application
@@ -121,7 +121,7 @@
                 <div *ngIf="app.dirty && appForm.get('app')?.value != ''">
 
                     <p class="text-black text-center">
-                        <a [routerLink]="['/intro']" routerLinkActive="router-link-active">More info</a>
+                        <a (click)="intro()" routerLinkActive="router-link-active">More info</a>
                     </p>
 
                 </div>
@@ -129,7 +129,6 @@
         </form>
         <form [formGroup]="appSettingsForm">
             <div *ngIf="appForm.get('app')?.value != '' ">
-
                 <h5 class="text-center mt-1">Application Settings</h5>
                 <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value != 4">
                     <label for="type" class="form-label font-bold">

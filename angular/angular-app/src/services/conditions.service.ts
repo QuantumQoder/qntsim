@@ -58,7 +58,7 @@ export class ConditionsService {
     return this.http.get('../assets/app-infos/appSettings.json')
   }
   getMemory() {
-    return { "frequency": 2000, "expiry": 2000, "efficiency": 0, "fidelity": 0.93 }
+    return { "frequency": 2000, "expiry": -1, "efficiency": 1, "fidelity": 0.93 }
   }
 
 }

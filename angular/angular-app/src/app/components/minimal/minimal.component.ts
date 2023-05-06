@@ -134,6 +134,10 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       }
     }
   }
+  intro() {
+    this.holdingData.setRoute('minimal');
+    this.route.navigate(['/intro'])
+  }
   setSettings(formData: any) {
     let form = {}
     this.appSettingsForm = null
@@ -459,12 +463,23 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       linkRequestArray.push(linkData);
     }
     console.log(linkRequestArray);
-    var cc = []
     this.cc = this.holdingData.getClassicalConnections(nodeDataArray)
     var topology = {
       nodes: nodeArray,
       quantum_connections: linkRequestArray,
-      classical_connections: this.cc
+      classical_connections: this.cc,
+      "detector_properties": {
+        "efficiency": 1,
+        "count_rate": 25e6,
+        "time_resolution": 150
+      },
+      "light_source_properties": {
+        "frequency": 80000000,
+        "wavelength": 1550,
+        "bandwidth": 0,
+        "mean_photon_num": 0.1,
+        "phase_error": 0
+      }
     }
     this.getAppSetting(this.appForm.get('app')?.value)
     console.log(this.appConfig)

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class HoldingDataService {
-
+  routeFrom: string;
   homepageData = [{
     appId: 1, appName: 'E91 QKD', image: 'assets/images/apps/e91.png', content: 'Entanglement-based Quantum Key Distribution'
   },
@@ -39,7 +39,12 @@ export class HoldingDataService {
     10: 'MDI-QSDC with user authentication',
   }
   spqd = {}
-
+  getRoute() {
+    return this.routeFrom
+  }
+  setRoute(route: string) {
+    this.routeFrom = route
+  }
   qsdct: any
   appDescription: any = [
     {

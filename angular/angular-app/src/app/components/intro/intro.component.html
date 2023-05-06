@@ -11,8 +11,10 @@
                     states
                     shared between
                     Alice and Bob for secure distribution of secret key . ​</p>
-                <div class="btn-group col-2">
+                <div class="btn-group col-4 d-flex justify-content-center">
                     <button class="btn btn-primary btn-custom" routerLink="/drag">Go To Application</button>
+                    <button *ngIf="!(routeFrom == 'minimal')" class="btn btn-primary btn-custom"
+                        (click)="route()"></button>
                 </div>
             </div>
             <br>

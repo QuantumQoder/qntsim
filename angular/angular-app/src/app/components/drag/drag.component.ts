@@ -11,6 +11,7 @@ import { ApiServiceService } from 'src/services/api-service.service';
 
 import { ConditionsService } from 'src/services/conditions.service';
 import { environment } from 'src/environments/environment';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-drag',
@@ -105,6 +106,7 @@ export class DragComponent implements OnInit, AfterViewInit {
     'numDecoy': new FormControl(''),
     'inputMessage': new FormControl('')
   })
+  app_data: { 1: string; 2: string; 3: string; 4: string; 5: string; 6: string; 7: string; 8: string; 9: string; 10: string; };
   constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private holdingData: HoldingDataService, private _route: Router, private modal: NgbModal, private confirmationService: ConfirmationService) {
   }
   @HostListener('window:resize', ['$event'])
@@ -177,6 +179,7 @@ export class DragComponent implements OnInit, AfterViewInit {
     }
     // init for these samples -- you don't need to call this
     this.activeIndex = 0
+    this.con.getAppList().pipe(map((d: any) => d.appList)).subscribe((result: any) => this.app_data = result);
     this.app_id = localStorage.getItem('app_id')
     this.application = localStorage.getItem('app')
     this.breadcrumbItems = [{
@@ -193,6 +196,9 @@ export class DragComponent implements OnInit, AfterViewInit {
         this.activeIndex = 2
       }
     }]
+  }
+  changeApp() {
+    localStorage.setItem("app_id", this.app)
   }
   parameters() {
     this.app_id = localStorage.getItem('app_id')

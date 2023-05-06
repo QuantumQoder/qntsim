@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
-import { ConditionsService } from 'src/services/conditions.service';
+import { HoldingDataService } from 'src/services/holding-data.service';
 
 @Component({
   selector: 'app-intro',
@@ -16,13 +16,18 @@ export class IntroComponent implements OnInit {
   app: any;
   tel = new Teleportation();
   e2e = new E2E();
-  constructor(private router: Router, private conService: ConditionsService) { }
+  routeFrom: string;
+  constructor(private router: Router, private holding: HoldingDataService) { }
 
   ngOnInit(): void {
+    this.routeFrom = this.holding.getRoute();
+    console.log(this.routeFrom)
     this.app = localStorage.getItem('app_id');
     this.initItems();
   }
-
+  route() {
+    this.router.navigate(['/minimal'])
+  }
   initItems() {
     const baseItems = [
       { label: 'Sharing Bell States', index: 1 },
