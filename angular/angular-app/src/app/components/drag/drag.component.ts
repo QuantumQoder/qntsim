@@ -376,7 +376,7 @@ export class DragComponent implements OnInit, AfterViewInit {
       "topology": this.topology,
       "appSettings": this.appSettings
     }
-    let url = this.simulator == 'version0' ? environment.apiUrl : this.simulator == 'version1' ? environment.apiUrlNew : null;
+    let url = this.simulator == 'version1' ? environment.apiUrl : this.simulator == 'version2' ? environment.apiUrlNew : null;
     this.apiService.runApplication(req, url).subscribe((result: any) => {
       this.spinner = true;
       this.con.setResult(result)
