@@ -23,7 +23,7 @@ import { CarouselModule } from 'primeng/carousel';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { TableModule } from 'primeng/table';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DragComponent } from './components/drag/drag.component';
+import { AdvancedComponent } from './components/drag/advanced.component';
 import { TabMenuModule } from 'primeng/tabmenu';
 import { ResultsComponent } from './components/results/results.component';
 import { ToastModule } from 'primeng/toast';
@@ -43,6 +43,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CheckboxModule } from 'primeng/checkbox';
 import { SliderModule } from 'primeng/slider';
+
+
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA,
     NO_ERRORS_SCHEMA
@@ -52,7 +54,7 @@ import { SliderModule } from 'primeng/slider';
     HomePageComponent,
     NavbarComponent,
     FooterComponent,
-    DragComponent,
+    // AdvancedComponent,
     ResultsComponent,
     CtrlClickDirective
   ],
