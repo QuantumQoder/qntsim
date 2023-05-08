@@ -20,7 +20,16 @@ from main.models import Applications,Results
 import importlib
 from main.simulator import topology_funcs
 import qntsim
+from django.http import StreamingHttpResponse
+import time
+import os
+import logging 
 
+logger = logging.getLogger("main_logger")
+logger.setLevel(logging.DEBUG)
+memory_handler = logging.handlers.MemoryHandler(capacity=1000, flushLevel=logging.WARNING)
+logger.addHandler(memory_handler)
+logger.info('Logging Begins...')
 
 def home(request):
     context = {
@@ -249,4 +258,39 @@ def stream_response_generator():
         yield " " * 1024  # Encourage browser to render incrementally
         time.sleep(0.5)
 
+@csrf_exempt
+def stream_logs(request):
+    def generate_response():
+        print('pwd',os.getcwd())
+        with open('/code/web/qsdc_tel.log', 'r') as f:
+            while True:
+                line = f.readline()
+                print('line', line)
+                if not line:
+                    time.sleep(1)  # wait for new lines to be added
+                else:
+                    yield line.encode()
 
+    response = StreamingHttpResponse(generate_response(), content_type='text/plain')
+    return response
+
+def log_view(request):
+    def stream_logs():
+        # retrieve log records from the MemoryHandler buffer
+        records = memory_handler.buffer
+        for record in records:
+            # format the log record as a string
+            if record.levelname == "INFO":
+                log_message = f"{record.levelname}: {record.getMessage()}\n"
+                # yield the log message to the response stream
+                yield log_message.encode('utf-8')
+    
+    # create a StreamingHttpResponse that streams the log messages
+    response = StreamingHttpResponse(stream_logs(), content_type='text/plain')
+    # set the response status code to 200 OK
+    response.status_code = 200
+    # # set the Content-Disposition header to force download of the log file
+    # response['Content-Disposition'] = 'attachment; filename="my_log_file.txt"'
+    # for handler in logger.handlers:
+    #     logger.removeHandler(handler)
+    return response

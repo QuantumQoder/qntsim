@@ -10,26 +10,29 @@ export class AppComponent implements AfterViewInit {
     header: 'Home',
     link: '/'
   }, {
-    header: 'Get Started',
+    header: 'Minimal',
     link: '/minimal/'
   }, {
     header: 'Applications',
     link: '/applications'
   }]
   ngAfterViewInit(): void {
-    var img = document.body.getElementsByTagName('img');
-    console.log(img);
-    for (var i = 0; i < img.length; i++) {
-      img[i].setAttribute('loading', 'lazy');
-    }
+    // var img = document.body.getElementsByTagName('img');
+    // console.log(img);
+    // for (var i = 0; i < img.length; i++) {
+    //   img[i].setAttribute('loading', 'lazy');
+    // }
   }
-  title = 'QNTSim';
-  width: any;
-  height: any;
+  title = 'QNT Simulator';
   onActivate($event: any) {
     window.scroll({
       top: 0,
       behavior: 'smooth'
     });
   }
+  // @HostListener('window:beforeunload', ['$event'])
+  // onBeforeUnload(event: BeforeUnloadEvent) {
+  //   // Clear the localStorage
+  //   localStorage.clear();
+  // }
 }

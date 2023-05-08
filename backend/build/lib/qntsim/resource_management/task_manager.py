@@ -1,4 +1,9 @@
 import itertools
+import logging
+from logging import config
+from qntsim.conf import LOG_CONFIG_FILE
+config.fileConfig(LOG_CONFIG_FILE)
+#from qntsim.utils.log import logger
 
 from typing import Callable, TYPE_CHECKING, List, Tuple
 if TYPE_CHECKING:
@@ -232,6 +237,7 @@ class SubTask:
 			info.memory.detach(info.memory.memory_array)
 			info.memory.attach(protocol[0])
 		
+		logging.debug('Running subtask:	' + str(self.name))
 		for dst, req_func in zip(req_dsts, req_condition_funcs):
 			self.task.task_manager.send_request(protocol[0], dst, req_func)
 			#print('dst, req_func:	', dst, req_func)
@@ -344,7 +350,8 @@ class TaskManager:
 
 		task.wakeup(self.owner.timeline.now())
 		subtasks = task.action(task.memories_info, dependency_subtasks=dependency_subtasks)
-		#print('len(subtasks):	', len(subtasks))
+		logging.debug('Running task:	' + str (task.name))
+		
 		for subtask in subtasks:
 			subtask.task = task
 			if subtask.is_eligible_to_run():
@@ -380,7 +387,7 @@ class TaskManager:
 		#Get the parent task from this subtask and obtain its dependents
 		dependent_tasks = self.task_map[subtask.task]['is_dependecy_of']
 		#print('dependent_tasks for this: ', len(dependent_tasks))
-
+		logging.debug('subtask success:	' + str(subtask.name))
 		#Call the dependent task's dependency_subtask_map and append to it
 		for dependent_task in dependent_tasks:
 			dependent_task.set_dependency_to_subtask(subtask)
@@ -399,8 +406,8 @@ class TaskManager:
 
 	def subtask_failure(self, subtask):
 		#Since subtask has failed we check if it was dependent on any other subtask and we keep on doing this till we reach the first subtask in the chain
-		#print('subtask failed:	', subtask.name)
-		#print('initial dependencies for this subtask:	', [i.name for i in subtask.initial_dependency_subtasks])
+		logging.debug('subtask failed:	' + str(subtask.name))
+		logging.debug('initial dependencies for this subtask:	'+ str( [i.name for i in subtask.initial_dependency_subtasks]))
 		for init_dep_subtask in subtask.initial_dependency_subtasks:
 			init_dep_subtask.run()
 		

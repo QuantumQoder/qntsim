@@ -9,6 +9,8 @@ import * as go from 'gojs'
 import { map } from 'rxjs';
 import { ConditionsService } from 'src/services/conditions.service';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
+
 
 @Component({
   selector: 'app-minimal',
@@ -66,18 +68,26 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   appForm: any
   applist: any
   nodes: any
+  distance: number = 100
   appSettingsForm: any
   type = ['Star', 'Mesh'];
   level: number = 2
   cc: any[] = []
   appSettingsResult: any
   appConfig: any;
+  info: any = {
+    end: 'Origin or destination nodes for user/application requests, each connected to one service node.',
+    service: "Entanglement-swapping nodes (similar to classical routers) connect non-neighbor nodes\n but don't support request creation or application hosting."
+  }
   lastValue = {
     type: 'star', level: this.level
   }
   endNode1: any[] = ['node1'];
   endNode2: any[] = ['node3']; app_data: { 1: string; 2: string; 3: string; 4: string; 5: string; 6: string; 7: string; 8: string; 9: string; 10: string; };
   valid: any;
+  nodeTemplateCopy: any;
+  contextMenuVersion1: any;
+  contextMenuVersion2: any;
   ;
   endNode3: any[] = ['node4'];;
 
@@ -87,6 +97,9 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value, this.level);
     this.service.getJson(urlData.url, urlData.type).subscribe((result) => {
       this.topologyData = result;
+      for (var i = 0; i < this.topologyData.nodes.length; i++) {
+        this.topologyData.nodes[i].description = this.topologyData.nodes[i].color == 'orange' ? this.info.service : this.info.end
+      }
       this.updateNodes()
     }, (error) => {
       console.log(error)
@@ -121,6 +134,11 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       }
     }
   }
+  routeTo(url: string) {
+    this.holdingData.setRoute('minimal');
+    this.route.navigate([`/${url}`])
+  }
+
   setSettings(formData: any) {
     let form = {}
     this.appSettingsForm = null
@@ -134,8 +152,8 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       'type': ['Star', Validators.required],
       'level': [2, Validators.required],
       'noOfMemories': [500, Validators.required],
-      'distance': [70, [Validators.required]],
-      'attenuity': [0.00001, Validators.required]
+      'distance': [100, [Validators.required]],
+      'attenuity': [0.1, Validators.required]
     });
     this.appForm = this.fb.group({
       'app': ['', Validators.required]
@@ -167,6 +185,9 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       $event.preventDefault();
     }
   }
+  updateDistance() {
+    this.distance = this.topologyForm.get('distance')?.value
+  }
   updateNodes() {
     this.serviceNodes = [];
     this.endNodes = []
@@ -184,20 +205,12 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       }
     }
   }
-  // senderChanged(e: any) {
-  //   this.receiverNodes = this.endNodes.filter(e => e.key != this.appSettingsForm.get('sender')?.value)
-  // }
-  // receiverChanged(e: any) {
-  //   this.senderNodes = this.endNodes.filter(e => e.key != this.appSettingsForm.get('receiver')?.value)
-  // }
   endNode(data: any) {
     var remainingNodes = [];
     console.log(data)
     this.endNode1 = this.endNodes
     this.endNode1 = this.endNode1.filter(e => e.key != data)
-
     console.log(this.endNode1)
-
   }
   getType($event: any) {
     this.updateJson()
@@ -206,9 +219,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.level = this.topologyForm.get('level')?.value;
     this.updateJson();
   }
-  selectAmplitude($event: any) {
 
-  }
 
   e2eChange(data: string) {
     if (data == 'target') {
@@ -219,21 +230,45 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     }
   }
   init(nodes: any, links: any) {
+
     var $ = go.GraphObject.make;  // for conciseness in defining templates
     this.topology = $(go.Diagram, "topology",  // create a Diagram for the DIV HTML element
       {
         initialContentAlignment: go.Spot.Center,  // center the content
         "undoManager.isEnabled": true,  // enable undo & redo
-        "panningTool.isEnabled": false
+        "panningTool.isEnabled": false,
+        "toolManager.hoverDelay": 0
         // "ViewportBoundsChanged": function (e: any) {
         //   e.diagram.toolManager.panningTool.isEnabled =
         //     !e.diagram.viewportBounds.containsRect(e.diagram.documentBounds);
         // },
       });
     // define a simple Node template
+    var tooltipTemplate =
+      $(go.Adornment, "Auto",
+        $(go.Shape, "RoundedRectangle", { fill: "lightyellow" }),
+        $(go.TextBlock, { margin: 4 },
+          new go.Binding("text", "description"))
+      );
     this.topology.nodeTemplate =
       $(go.Node, "Auto",  // the Shape will go around the TextBlockcontextMenu:
-
+        { // Add the tooltip to the node
+          toolTip: tooltipTemplate,
+          contextMenu: $(go.Adornment, "Vertical",  // that has one button
+            $("ContextMenuButton",
+              $(go.TextBlock, "Set as Sender"),
+              {
+                click: (e: go.InputEvent, obj: go.GraphObject) => { this.showProperties(e, obj, 'sender') }
+              }),
+            $("ContextMenuButton",
+              $(go.TextBlock, "Set as Receiver"),
+              {
+                click: (e: go.InputEvent, obj: go.GraphObject) => { this.showProperties(e, obj, 'receiver') }
+              })
+            // more ContextMenuButtons would go here
+          )
+          // contextMenu: new go.Binding("contextMenu", "", this.nodeContextMenu).ofObject(),
+        },
         $(go.Shape, "RoundedRectangle", { strokeWidth: 0 },
           // Shape.fill is bound to Node.data.color
           new go.Binding("fill", "color")),
@@ -243,24 +278,28 @@ export class MinimalComponent implements OnInit, AfterViewInit {
           { margin: 8 },  // some room around the text
           // TextBlock.text is bound to Node.data.key
           new go.Binding("text", "key")),
-        {
-          contextMenu:     // define a context menu for each node
-            $(go.Adornment, "Vertical",  // that has one button
-              $("ContextMenuButton",
-                $(go.TextBlock, "Set as Sender"),
-                {
-                  click: (e: go.InputEvent, obj: go.GraphObject) => { this.showProperties(e, obj, 'sender') }
-                }),
-              $("ContextMenuButton",
-                $(go.TextBlock, "Set as Receiver"),
-                {
-                  click: (e: go.InputEvent, obj: go.GraphObject) => { this.showProperties(e, obj, 'receiver') }
-                })
-              // more ContextMenuButtons would go here
-            )  // end Adornment
-        },
 
       );
+
+    function getAppropriateContextMenu(appId: any) {
+      var $ = go.GraphObject.make;
+      if (appId == '' || appId == undefined || appId == null) {
+        return ''
+      }
+      if (appId == 4) {
+        return $(go.Adornment, "Vertical",
+          $("ContextMenuButton", $(go.TextBlock, "Set as endnode1"), { click: function (e: any, obj: any) { alert("Set as endnode1"); } }),
+          $("ContextMenuButton", $(go.TextBlock, "Set as endnode2"), { click: function (e: any, obj: any) { alert("Set as endnode2"); } }),
+          $("ContextMenuButton", $(go.TextBlock, "Set as endnode3"), { click: function (e: any, obj: any) { alert("Set as endnode3"); } }),
+          $("ContextMenuButton", $(go.TextBlock, "Set as endnode4"), { click: function (e: any, obj: any) { alert("Set as endnode4"); } })
+        );
+      } else {
+        return $(go.Adornment, "Vertical",
+          $("ContextMenuButton", $(go.TextBlock, "Set as sender"), { click: function (e: any, obj: any) { alert("Set as sender"); } }),
+          $("ContextMenuButton", $(go.TextBlock, "Set as receiver"), { click: function (e: any, obj: any) { alert("Set as receiver"); } })
+        );
+      }
+    }
 
     this.topology.linkTemplate =
       $(go.Link,
@@ -270,6 +309,27 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       nodes, links
     )
   }
+
+  getAppropriateContextMenu(appId: any) {
+    var $ = go.GraphObject.make;
+    if (appId == '' || appId == undefined || appId == null) {
+      return ''
+    }
+    if (appId == 4) {
+      return $(go.Adornment, "Vertical",
+        $("ContextMenuButton", $(go.TextBlock, "Set as endnode1"), { click: function (e: any, obj: any) { alert("Set as endnode1"); } }),
+        $("ContextMenuButton", $(go.TextBlock, "Set as endnode2"), { click: function (e: any, obj: any) { alert("Set as endnode2"); } }),
+        $("ContextMenuButton", $(go.TextBlock, "Set as endnode3"), { click: function (e: any, obj: any) { alert("Set as endnode3"); } }),
+        $("ContextMenuButton", $(go.TextBlock, "Set as endnode4"), { click: function (e: any, obj: any) { alert("Set as endnode4"); } })
+      );
+    } else {
+      return $(go.Adornment, "Vertical",
+        $("ContextMenuButton", $(go.TextBlock, "Set as sender"), { click: function (e: any, obj: any) { alert("Set as sender"); } }),
+        $("ContextMenuButton", $(go.TextBlock, "Set as receiver"), { click: function (e: any, obj: any) { alert("Set as receiver"); } })
+      );
+    }
+  }
+
   showProperties(e: go.InputEvent, obj: any, data: String) {
     console.log(obj)
     var node = obj.part.adornedPart.data.key;
@@ -277,11 +337,22 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.nodes = this.topologyData.nodes
     this.appSettingsForm.get(data)?.patchValue(node)
   }
+  // updateNodeContextMenu() {
+  //   var $ = go.GraphObject.make;
+  //   var nodeTemplate = this.topology.nodeTemplate.copy();
+  //   nodeTemplate.contextMenu = new go.Binding("contextMenu", "", this.nodeContextMenu).ofObject();
+  //   this.topology.nodeTemplate = nodeTemplate;
+  //   // Force re-layout of the diagram to apply the updated template
+  //   this.topology.layoutDiagram(true);
+  // }
+
+
   getApp($event: any) {
     let app_id = this.appForm.get('app')?.value
     this.nodes = this.topologyData.nodes
+
     if (app_id == 4) {
-      this.level = this.topologyForm.get('type')?.value == 'Star' ? 2 : 3;
+      this.level = 3;
       this.topologyForm.get('level').patchValue(this.level);
       this.levelChange();
 
@@ -290,6 +361,18 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     localStorage.setItem('app_id', this.appForm.get('app')?.value);
     localStorage.setItem('app', this.app_data[this.appForm.get('app')?.value])
     this.buildForm(this.appForm.get('app')?.value)
+    if (this.topologyForm.get('type')?.value == 'Star') {
+
+      this.appSettingsForm.get('endnode1').patchValue('node1')
+      this.appSettingsForm.get('endnode2').patchValue('node3')
+      this.appSettingsForm.get('endnode3').patchValue('node4')
+    }
+    else if (this.topologyForm.get('type')?.value == 'Mesh') {
+
+      this.appSettingsForm.get('endnode1').patchValue('node1')
+      this.appSettingsForm.get('endnode2').patchValue('node5')
+      this.appSettingsForm.get('endnode3').patchValue('node6')
+    }
   }
   runApp() {
     // this.spinner = true;
@@ -369,6 +452,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       localStorage.setItem('sender', this.appSettingsForm.get('sender')?.value);
       localStorage.setItem('receiver', this.appSettingsForm.get('receiver')?.value)
     }
+    let cc: any[] = []
     this.spinner = true;
     localStorage.setItem('app_id', app_id);
     console.log(nodeArray)
@@ -380,8 +464,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       };
       linkRequestArray.push(linkData);
     }
-    console.log(linkRequestArray);
-    var cc = []
+
     this.cc = []
     for (var i = 0; i < nodeDataArray.length; i++) {
       for (var j = 0; j < nodeDataArray.length; j++) {
@@ -395,10 +478,24 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         this.cc.push({ Nodes: [node1, node2], Delay: delay, Distance: distance });
       }
     }
+
+
     var topology = {
       nodes: nodeArray,
       quantum_connections: linkRequestArray,
-      classical_connections: this.cc
+      classical_connections: this.cc,
+      "detector_properties": {
+        "efficiency": 1,
+        "count_rate": 25e6,
+        "time_resolution": 150
+      },
+      "light_source_properties": {
+        "frequency": 2000,
+        "wavelength": 1550,
+        "bandwidth": 0,
+        "mean_photon_num": 0.1,
+        "phase_error": 0
+      }
     }
     this.getAppSetting(this.appForm.get('app')?.value)
     console.log(this.appConfig)
@@ -408,7 +505,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       appSettings: this.appConfig
     }
 
-    this.api.runApplication(request).subscribe((result) => {
+    this.api.runApplication(request, environment.apiUrl).subscribe((result) => {
       this.spinner = true;
       console.log(this.spinner)
       this.service.setResult(result)
@@ -433,7 +530,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         break;
       case 4:
         if (!this.appSettingsForm.controls['endnode1'])
-          this.appSettingsForm.addControl('endnode1', new FormControl('', Validators.required))
+          this.appSettingsForm.addControl('endnode1', new FormControl('node1', Validators.required))
         if (!this.appSettingsForm.controls['endnode2'])
           this.appSettingsForm.addControl('endnode2', new FormControl('node3', Validators.required))
         if (!this.appSettingsForm.controls['endnode3'])
@@ -551,10 +648,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         num_decoy: 4,
         bob_id: "0111"
       },
-
     }
-
-
     this.appConfig = appConfigMap[app_id];
   }
   updateJson() {
@@ -565,12 +659,28 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value.toLowerCase(), this.level);
     this.service.getJson(urlData.url, urlData.type).subscribe((result: any) => {
       this.topologyData = result;
+      for (var i = 0; i < this.topologyData.nodes.length; i++) {
+        this.topologyData.nodes[i].description = this.topologyData.nodes[i].color == 'orange' ? this.info.service : this.info.end
+      }
       console.log(this.topologyData)
       this.updateNodes()
     }, (error) => {
       console.log(error)
     }, () => {
-      this.updateDiagram(this.topologyData)
+      this.updateDiagram(this.topologyData);
+      if (this.appForm.get('app')?.value == 4)
+        if (this.topologyForm.get('type')?.value == 'Star') {
+
+          this.appSettingsForm.get('endnode1').patchValue('node1')
+          this.appSettingsForm.get('endnode2').patchValue('node3')
+          this.appSettingsForm.get('endnode3').patchValue('node4')
+        }
+        else if (this.topologyForm.get('type')?.value == 'Mesh') {
+
+          this.appSettingsForm.get('endnode1').patchValue('node1')
+          this.appSettingsForm.get('endnode2').patchValue('node5')
+          this.appSettingsForm.get('endnode3').patchValue('node6')
+        }
     })
     this.lastValue.level = type;
     this.lastValue.type = this.topologyForm.get('type')?.value.toLowerCase();

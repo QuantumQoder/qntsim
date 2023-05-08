@@ -481,6 +481,7 @@ class RoutingTableUpdateProtocol(NewRoutingProtocol):
         self.name='RoutingTableUpdateProtocol'
         self.update_time=1e9  # Time interval at which this protocol will be called
         self.vlink_data={}
+        self.prev_vdata = None
 
     def find_neighbors(self):
         '''
@@ -505,17 +506,15 @@ class RoutingTableUpdateProtocol(NewRoutingProtocol):
         '''
         neighbors=self.own.neighbors
         G=self.own.nx_graph
-        # [*vneighbors]=self.own.find_virtual_neighbors() 
         neighbor_list=self.find_neighbors()
-        # #print('neighborhoodlist',self.own.name, neighbor_list,neighbors)
-        # #print('vneighbor',self.own.name,vneighbors,self.own.virtualneighbors,self.own.timeline.now()*1e-12)
-        # #print('updaterouting',self.own.name,vneighbors,self.own.timeline.now()*1e-12)
-       
+        
+        #Issue: Routing message being sent to all nodes instead of just neighbors
         for node in G.nodes:
             if node != self.own.name:
-                msg=Message(MsgRecieverType.PROTOCOL,ProtocolType.RoutingTableUpdateProtocol,UpdateRoutingMessageType.UPDATE_ROUTING_TABLE,node=node,v_neighbor=self.own.virtualneighbors)
-                self.own.message_handler.send_message(node,msg)
-                # #print('nds',node,self.own.name,vneighbors)
+                if self.prev_vdata != self.own.virtualneighbors:
+                    msg=Message(MsgRecieverType.PROTOCOL,ProtocolType.RoutingTableUpdateProtocol,UpdateRoutingMessageType.UPDATE_ROUTING_TABLE,node=node,v_neighbor=self.own.virtualneighbors)
+                    self.own.message_handler.send_message(node,msg)
+                    self.prev_vdata = self.own.virtualneighbors
 
         for node in self.own.nx_graph:
             # #print('edges',self.own.nx_graph.edges)

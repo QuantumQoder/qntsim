@@ -1,7 +1,8 @@
 <div class="container shadow p-1 mb-2 bg-white rounded mx-auto">
     <div class="menu">
 
-        <div *ngIf="app=='2'" class="col-11">
+
+        <div *ngIf="app=='1'" class="col-11">
 
             <h1 class="display-1 text-center">E91 Protocol </h1>
             <div class="row">
@@ -11,8 +12,15 @@
                     states
                     shared between
                     Alice and Bob for secure distribution of secret key . ​</p>
-                <div class="btn-group col-2">
-                    <button class="btn btn-primary btn-custom" routerLink="/drag">Go To Application</button>
+                <div class="btn-group col-12 d-flex justify-content-center gap-2">
+                    <div>
+                        <button class="btn btn-primary btn-custom" routerLink="/advanced">Launch Application</button>
+                    </div>
+                    <div>
+                        <button *ngIf="routeFrom == 'minimal'" class="btn btn-primary btn-custom" (click)="route()">Go
+                            to
+                            Minimal</button>
+                    </div>
                 </div>
             </div>
             <br>
@@ -61,7 +69,7 @@
                 ​</p>
             <br>
         </div>
-        <div *ngIf="app=='1'" class="col-11">
+        <div *ngIf="app=='2'" class="col-11">
             <h1 class="display-1">E2E Protocol</h1>
             <br>
             <div class="row">
@@ -70,8 +78,15 @@
                     fidelity
                     between two
                     nodes, the source and the destination, those can be present anywhere in a given topology.</p>
-                <div class="btn-group col-2">
-                    <button class="btn btn-primary btn-custom" routerLink="/drag">Go To Application</button>
+                <div class="btn-group col-12 d-flex justify-content-center gap-2">
+                    <div>
+                        <button class="btn btn-primary btn-custom" routerLink="/advanced">Launch Application</button>
+                    </div>
+                    <div>
+                        <button *ngIf="routeFrom == 'minimal'" class="btn btn-primary btn-custom" (click)="route()">Go
+                            to
+                            Minimal</button>
+                    </div>
                 </div>
             </div>
             <br>
@@ -124,8 +139,15 @@
                     state.
                     This
                     application is related to preparation of a three party entangled pair .​</p>
-                <div class="btn-group col-2">
-                    <button class="btn btn-primary btn-custom" routerLink="/drag">Go To Application</button>
+                <div class="btn-group col-12 d-flex justify-content-center gap-2">
+                    <div>
+                        <button class="btn btn-primary btn-custom" routerLink="/advanced">Launch Application</button>
+                    </div>
+                    <div>
+                        <button *ngIf="routeFrom == 'minimal'" class="btn btn-primary btn-custom" (click)="route()">Go
+                            to
+                            Minimal</button>
+                    </div>
                 </div>
             </div>
             <br>
@@ -178,8 +200,15 @@
                     the
                     help of
                     entangled pair shared between them.​</p>
-                <div class="btn-group col-2">
-                    <button class="btn btn-primary btn-custom" routerLink="/drag">Go To Application</button>
+                <div class="btn-group col-12 d-flex justify-content-center gap-2">
+                    <div>
+                        <button class="btn btn-primary btn-custom" routerLink="/advanced">Launch Application</button>
+                    </div>
+                    <div>
+                        <button *ngIf="routeFrom == 'minimal'" class="btn btn-primary btn-custom" (click)="route()">Go
+                            to
+                            Minimal</button>
+                    </div>
                 </div>
             </div>
             <br>
@@ -242,8 +271,15 @@
                     seminal work on QSDC by G.L. Long and X.S. Liu <a href=""
                         (click)="quant_ph('https://arxiv.org/pdf/quant-ph/0012056.pdf')">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​
                 </p>
-                <div class="btn-group col-2">
-                    <button class="btn btn-primary btn-custom" routerLink="/drag">Go To Application</button>
+                <div class="btn-group col-12 d-flex justify-content-center gap-2">
+                    <div>
+                        <button class="btn btn-primary btn-custom" routerLink="/advanced">Launch Application</button>
+                    </div>
+                    <div>
+                        <button *ngIf="routeFrom == 'minimal'" class="btn btn-primary btn-custom" (click)="route()">Go
+                            to
+                            Minimal</button>
+                    </div>
                 </div>
             </div>
             <br>
@@ -293,8 +329,15 @@
                     seminal work on QSDC by G.L. Long and X.S. Liu <a href=""
                         (click)="quant_ph('https://arxiv.org/pdf/quant-ph/0012056.pdf')">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​
                 </p>
-                <div class="btn-group col-2">
-                    <button class="btn btn-primary btn-custom" routerLink="/drag">Go To Application</button>
+                <div class="btn-group col-12 d-flex justify-content-center gap-2">
+                    <div>
+                        <button class="btn btn-primary btn-custom" routerLink="/advanced">Launch Application</button>
+                    </div>
+                    <div>
+                        <button *ngIf="routeFrom == 'minimal'" class="btn btn-primary btn-custom" (click)="route()">Go
+                            to
+                            Minimal</button>
+                    </div>
                 </div>
             </div>
             <br>
@@ -359,8 +402,15 @@
                     ​<a href=""
                         (click)="quant_ph('https://doi.org/10.1007/s10773-021-04952-4')">https://doi.org/10.1007/s10773-021-04952-4​</a>​
                 </p>
-                <div class="btn-group col-2">
-                    <button class="btn btn-primary btn-custom" routerLink="/drag">Go To Application</button>
+                <div class="btn-group col-12 d-flex justify-content-center gap-2">
+                    <div>
+                        <button class="btn btn-primary btn-custom" routerLink="/advanced">Launch Application</button>
+                    </div>
+                    <div>
+                        <button *ngIf="routeFrom == 'minimal'" class="btn btn-primary btn-custom" (click)="route()">Go
+                            to
+                            Minimal</button>
+                    </div>
                 </div>
             </div>
             <br>
@@ -432,9 +482,15 @@
                     The implementation refers to the research article:<a href=""
                         (click)="quant_ph('https://iopscience.iop.org/article/10.1088/1009-1963/15/7/005 ')">https://iopscience.iop.org/article/10.1088/1009-1963/15/7/005</a>
                 </p>
-                <div class="btngroup">
-                    <button class="btn btn-primary btn-custom col-2" routerLink="/drag">Go To
-                        Application</button>
+                <div class="btn-group col-12 d-flex justify-content-center gap-2">
+                    <div>
+                        <button class="btn btn-primary btn-custom" routerLink="/advanced">Launch Application</button>
+                    </div>
+                    <div>
+                        <button *ngIf="routeFrom == 'minimal'" class="btn btn-primary btn-custom" (click)="route()">Go
+                            to
+                            Minimal</button>
+                    </div>
                 </div>
             </div>
             <br>
@@ -498,9 +554,15 @@
                         (click)="quant_ph('https://iopscience.iop.org/article/10.1088/1009-1963/14/5/006/meta')">https://iopscience.iop.org/article/10.1088/1009-1963/14/5/006/meta</a>
                 </p>
 
-                <div class="btngroup">
-                    <button class="btn btn-primary btn-custom col-2" routerLink="/drag">Go To
-                        Application</button>
+                <div class="btn-group col-12 d-flex justify-content-center gap-2">
+                    <div>
+                        <button class="btn btn-primary btn-custom" routerLink="/advanced">Launch Application</button>
+                    </div>
+                    <div>
+                        <button *ngIf="routeFrom == 'minimal'" class="btn btn-primary btn-custom" (click)="route()">Go
+                            to
+                            Minimal</button>
+                    </div>
                 </div>
             </div>
             <br>
@@ -562,9 +624,15 @@
 
 
                 </p>
-                <div style="margin-bottom: 5vh;">
-                    <button class="btn btn-primary btn-custom" (click)="goto()">Go To
-                        Application</button>
+                <div class="btn-group col-12 d-flex justify-content-center gap-2">
+                    <div>
+                        <button class="btn btn-primary btn-custom" routerLink="/advanced">Launch Application</button>
+                    </div>
+                    <div>
+                        <button *ngIf="routeFrom == 'minimal'" class="btn btn-primary btn-custom" (click)="route()">Go
+                            to
+                            Minimal</button>
+                    </div>
                 </div>
 
                 <p class="text-justify text-center col-12">
@@ -679,11 +747,9 @@
             <button type="button" *ngIf="app==5 && activeIndex==3" class="btn btn-primary btn-custom mx-2"
                 (click)="previous()">Previous</button>
             <button type="button" *ngIf="app!=5 && app!=10 && activeIndex==2" class="btn btn-primary btn-custom mx-2"
-                (click)="goto()">Go To
-                Application</button>
+                (click)="goto()">Launch Application</button>
             <button type="button" *ngIf="app==5 && activeIndex==3" class="btn btn-primary btn-custom mx-2"
-                (click)="goto()">Go To
-                Application</button>
+                (click)="goto()">Launch Application</button>
             <button type="button" *ngIf="step==1 && app==7 && activeIndex==0 ||step==1 && app==7 && activeIndex ==1"
                 class="btn btn-primary btn-custom mx-2" (click)="nextStep()">Next</button>
             <button type="button" *ngIf="step==2 && app==7 && activeIndex==0 ||step==2 && app==7 && activeIndex ==1"
@@ -698,7 +764,7 @@
             <button type="button" *ngIf=" app==10 && activeIndex==2 || app==10 && activeIndex ==3"
                 class="btn btn-primary btn-custom" (click)="next()">Next</button>
             <button type="button" *ngIf=" app==10 && activeIndex==4" class="btn btn-primary btn-custom"
-                (click)="goto()">Go To Application</button>
+                (click)="goto()">Launch Application</button>
 
         </div>
         <div style=" padding: 10px;">

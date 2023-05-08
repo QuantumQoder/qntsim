@@ -18,7 +18,7 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist/QNTSim",
             "index": "src/index.html",
@@ -26,12 +26,6 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "less",
-            "customWebpackConfig": {
-              "path": "./webpack.config.js",
-              "mergeRules": {
-                "externals": "replace"
-              }
-            },
             "allowedCommonJsDependencies": [
               "gojs",
               "typed.js"
@@ -59,7 +53,7 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
+                  "maximumWarning": "4mb",
                   "maximumError": "8mb"
                 },
                 {
@@ -77,13 +71,13 @@
               "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": true,
+              "buildOptimizer": false,
               "aot": true,
               "optimization": true,
-              "vendorChunk": true,
+              "vendorChunk": false,
               "extractLicenses": false,
               "sourceMap": false,
-              "namedChunks": true
+              "namedChunks": false
             }
           },
           "defaultConfiguration": "production"
