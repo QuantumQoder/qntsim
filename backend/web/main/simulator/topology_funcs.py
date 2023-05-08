@@ -654,65 +654,65 @@ def mdi_qsdc(network_config, sender, receiver, message, attack):
     print('network', network, basis)
 
 
-def ip2(network_config, alice_attrs, bob_id, threshold, num_decoy):
-    report = {}
-    start_time = time.time()
-    # print("input_messages,ids,num_check_bits,num_decoy",input_messages,ids,num_check_bits,num_decoy)
-    network_config_json, tl, network_topo = load_topology(
-        network_config, "Qutip")
-    tl.init()
-    topo_json = json_topo(network_config_json)
-    print('network config json', network_topo)
-    with open("topology.json", "w") as outfile:
-        json.dump(topo_json, outfile)
-    topology = '/code/web/topology.json'
-    sender = alice_attrs["sender"]
-    receiver = alice_attrs["receiver"]
-    input_message = alice_attrs["message"]
-    print('sender, receievre', sender, receiver)
-    # network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
-    # tl.init()
-    # topo_json = json_topo(network_config_json)
-    # print('network config json', network_topo)
-    # with open("topology.json", "w") as outfile:
-    #     json.dump(topo_json, outfile)
-    alice_attrs.update({'message': {(sender, receiver): input_message},
-                   'id': '1011',
-                   'check_bits': 4})
-    bob_id = '0111'
-    num_decoy_photons = 4
-    threshold = 0.2  # error threshold
-    attack = (None, None)
-    # topology = '/code/web/configs/2n_linear.json'
-    network, recv_msgs, err_tup = ip2_run(topology=network_config,
-                                          alice_attrs=alice_attrs,
-                                          bob_id=bob_id,
-                                          num_decoy_photons=num_decoy_photons,
-                                          threshold=threshold,
-                                          attack=attack)
-    # results=ip2_run(topology,input_messages,ids,num_check_bits,num_decoy,attack)
-    # report["application"]=results
-    # return report
-    # print('results', results[1][0])
-    res = {}
-    res["input_message"] = input_message
-    res["alice_id"] = alice_attrs["id"]
-    res["alice_check_bits"] = alice_attrs["check_bits"]
-    res["bob_id"] = bob_id
-    res["threshold"] = threshold
-    res["num_decoy"] = num_decoy
-    res["output_msg"] = recv_msgs
-    res["avg_error"] = err_tup[0]
-    res["standard_deviation"] = err_tup[1]
-    res["info_leaked"] = err_tup[2]
-    res["msg_fidelity"] = err_tup[3]
-    # report = {}
-    report["application"] = res
-    end_time = time.time()
-    report = network_graph(network._net_topo, [sender], report)
-    execution_time = end_time-start_time
-    report["performance"]["execution_time"] = execution_time
-    # execution_time = end_time-start_time
-    # report["performance"]["execution_time"] = execution_time
-    print('report', report)
-    return report
+# def ip2(network_config, alice_attrs, bob_id, threshold, num_decoy):
+#     report = {}
+#     start_time = time.time()
+#     # print("input_messages,ids,num_check_bits,num_decoy",input_messages,ids,num_check_bits,num_decoy)
+#     network_config_json, tl, network_topo = load_topology(
+#         network_config, "Qutip")
+#     tl.init()
+#     topo_json = json_topo(network_config_json)
+#     print('network config json', network_topo)
+#     with open("topology.json", "w") as outfile:
+#         json.dump(topo_json, outfile)
+#     topology = '/code/web/topology.json'
+#     sender = alice_attrs["sender"]
+#     receiver = alice_attrs["receiver"]
+#     input_message = alice_attrs["message"]
+#     print('sender, receievre', sender, receiver)
+#     # network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
+#     # tl.init()
+#     # topo_json = json_topo(network_config_json)
+#     # print('network config json', network_topo)
+#     # with open("topology.json", "w") as outfile:
+#     #     json.dump(topo_json, outfile)
+#     alice_attrs.update({'message': {(sender, receiver): input_message},
+#                    'id': '1011',
+#                    'check_bits': 4})
+#     bob_id = '0111'
+#     num_decoy_photons = 4
+#     threshold = 0.2  # error threshold
+#     attack = (None, None)
+#     # topology = '/code/web/configs/2n_linear.json'
+#     network, recv_msgs, err_tup = ip2_run(topology=network_config,
+#                                           alice_attrs=alice_attrs,
+#                                           bob_id=bob_id,
+#                                           num_decoy_photons=num_decoy_photons,
+#                                           threshold=threshold,
+#                                           attack=attack)
+#     # results=ip2_run(topology,input_messages,ids,num_check_bits,num_decoy,attack)
+#     # report["application"]=results
+#     # return report
+#     # print('results', results[1][0])
+#     res = {}
+#     res["input_message"] = input_message
+#     res["alice_id"] = alice_attrs["id"]
+#     res["alice_check_bits"] = alice_attrs["check_bits"]
+#     res["bob_id"] = bob_id
+#     res["threshold"] = threshold
+#     res["num_decoy"] = num_decoy
+#     res["output_msg"] = recv_msgs
+#     res["avg_error"] = err_tup[0]
+#     res["standard_deviation"] = err_tup[1]
+#     res["info_leaked"] = err_tup[2]
+#     res["msg_fidelity"] = err_tup[3]
+#     # report = {}
+#     report["application"] = res
+#     end_time = time.time()
+#     report = network_graph(network._net_topo, [sender], report)
+#     execution_time = end_time-start_time
+#     report["performance"]["execution_time"] = execution_time
+#     # execution_time = end_time-start_time
+#     # report["performance"]["execution_time"] = execution_time
+#     print('report', report)
+#     return report
