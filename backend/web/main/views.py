@@ -102,7 +102,7 @@ class RunApp(APIView):
         elif application == "ip2":
             # input_messages = {int(k):str(v) for k,v in appSettings["input_messages"].items()}
             # ids = {int(k):str(v) for k,v in appSettings["ids"].items()}
-            results = ip2(topology,appSettings["alice_attrs"], appSettings["bob_id"],appSettings["threshold"],appSettings["num_decoy"])
+            results = ip2_run(topology,appSettings)
         # Add code for results here
         # print('results', results)
         # graphs = results.get('graph')

@@ -11,7 +11,7 @@ from .network import Network
 from .security_checks import insert_check_bits
 
 
-class Protocol:
+class ProtocolPipeline:
     """Creates the flow of functions for the execution of the communication protocols, which are a set of rules that enable data to be exchanged between nodes.
 
     During instantiation:
@@ -199,6 +199,7 @@ class Protocol:
                 print('Recived messages::', protocol.recv_msgs_list)
                 print('Error in execution:', mean(protocol.mean_list))
     """
+
     # networks = []
     # def __new__(cls, *args, **kwargs):
     #     """
@@ -209,7 +210,9 @@ class Protocol:
     #         cls._instance = super().__new__(cls)
     #     return cls._instance
 
-    def __init__(self, messages_list: List[Dict[Tuple, str]], name: str = 'protocol', **kwds) -> None:
+    def __init__(
+        self, messages_list: List[Dict[Tuple, str]], name: str = "protocol", **kwds
+    ) -> None:
         """
         Initializes the Protocol class.
 
@@ -224,35 +227,49 @@ class Protocol:
         self._index = -1
 
         # Set up logging
-        logging.basicConfig(filename=self.__name+'.log', filemode='w', level=logging.INFO,
-                            format='%(pathname)s > %(threadName)s : %(module)s . %(funcName)s %(message)s')
+        logging.basicConfig(
+            filename=self.__name + ".log",
+            filemode="w",
+            level=logging.INFO,
+            format="%(pathname)s > %(threadName)s : %(module)s . %(funcName)s %(message)s",
+        )
 
         self.messages_list = messages_list
         self.__funcs = []
 
         # Add functions to the flow based on the keyword arguments passed in
-        if 'state' in self.__kwds:
-            self.__funcs.append(partial(Network.generate_state, state=self.__kwds.get(
-                'state'), label=self.__kwds.get('label')))
+        if "state" in self.__kwds:
+            self.__funcs.append(
+                partial(
+                    Network.generate_state,
+                    state=self.__kwds.get("state"),
+                    label=self.__kwds.get("label"),
+                )
+            )
 
         # If 'encode' is not in the keyword arguments, use Network.teleport as the default encoding function
         # Otherwise, use the function specified in 'encode'
-        self.__funcs.append(partial(Network.teleport) if 'encode' not in self.__kwds and 'label' in self.__kwds else partial(
-            self.__kwds.get('encode', Network.encode), msg_index=0))
+        self.__funcs.append(
+            partial(Network.teleport)
+            if "encode" not in self.__kwds and "label" in self.__kwds
+            else partial(self.__kwds.get("encode", Network.encode), msg_index=0)
+        )
 
         # Add an attack to the flow if one was specified
-        if (attack := self.__kwds.get('attack', '')):
+        if attack := self.__kwds.get("attack", ""):
             self.__funcs.append(
-                partial(Attack.implement, attack=ATTACK_TYPE[attack].value))
+                partial(Attack.implement, attack=ATTACK_TYPE[attack].value)
+            )
 
         # If there is more than one message, add encoding functions for each subsequent message
         if len(messages_list[0]) > 1:
-            self.__funcs.extend(partial(self.__kwds.get(
-                'encode', Network.encode), msg_index=i) for i in range(1, len(messages_list[0])))
+            self.__funcs.extend(
+                partial(self.__kwds.get("encode", Network.encode), msg_index=i)
+                for i in range(1, len(messages_list[0]))
+            )
 
         # Add a measurement function to the end of the flow
-        self.__funcs.append(self.__kwds.get(
-            'measure', partial(Network.measure)))
+        self.__funcs.append(self.__kwds.get("measure", partial(Network.measure)))
 
     def __iter__(self):
         """
@@ -261,16 +278,18 @@ class Protocol:
         return iter(self.networks)
 
     def __next__(self):
-        if self._index < len(self.networks)-1:
+        if self._index < len(self.networks) - 1:
             self._index += 1
             return self.networks[self._index]
         else:
-            print('No more networks left.')
+            print("No more networks left.")
 
     def __len__(self):
         return len(self.networks)
 
-    def __call__(self, topology, functions: List[partial] = None, *args: Any, **kwds: Any) -> Any:
+    def __call__(
+        self, topology, functions: List[partial] = None, *args: Any, **kwds: Any
+    ) -> Any:
         """
         Calls the Protocol object.
 
@@ -290,52 +309,84 @@ class Protocol:
         start_time = time_ns()
 
         # Create a list of networks, one for each set of messages in messages_list, using the provided topology
-        self.networks = [Network(**kwds, **self.__kwds, name=self.__name,
-                                 topology=topology, messages=messages) for messages in self.messages_list]
+        self.networks = [
+            Network(
+                **kwds,
+                **self.__kwds,
+                name=self.__name,
+                topology=topology,
+                messages=messages,
+            )
+            for messages in self.messages_list
+        ]
 
         # Record the midpoint time
         mid_time = time_ns()
 
         # Log that all networks have been generated
-        logging.info('generated all networks')
+        logging.info("generated all networks")
 
         # Execute the network flow for all networks in parallel
         _ = Network.execute(networks=self.networks)
 
         # If the network flow was not provided as an argument, use the default flow and attempt to decode received messages
         if Network._flow == self.__funcs:
-            self.recv_msgs_list = kwds.get(
-                'decode', Network.decode)(networks=self.networks)
+            self.recv_msgs_list = kwds.get("decode", Network.decode)(
+                networks=self.networks
+            )
 
         # Log the completion time
         logging.info(
-            f'completed execution within {(time_ns()-start_time-mid_time):e} ns')
+            f"completed execution within {(time_ns()-start_time-mid_time):e} ns"
+        )
 
         # Import and use the ErrorAnalyzer class to analyze errors in the network and store the results in the protocol instance
         from .error_analyzer import ErrorAnalyzer
-        self.full_err_list, self.full_lk_list, self.mean_list, self.sd_list, self.lk_list, self.fid_list = ErrorAnalyzer.analyse(
-            protocol=self)
 
-        return self.recv_msgs_list, mean(self.mean_list), mean(self.sd_list), mean(self.lk_list), mean(self.fid_list)
+        (
+            self.full_err_list,
+            self.full_lk_list,
+            self.mean_list,
+            self.sd_list,
+            self.lk_list,
+            self.fid_list,
+        ) = ErrorAnalyzer.analyse(protocol=self)
+
+        return (
+            self.recv_msgs_list,
+            mean(self.mean_list),
+            mean(self.sd_list),
+            mean(self.lk_list),
+            mean(self.fid_list),
+        )
 
     def __repr__(self) -> str:
         """
         Return a string representation of the current state of the protocol.
         """
         # Use a list comprehension to build the string
-        string = '\n'.join([
-            # Use f-strings for string interpolation
-            f"Network:{network._Network__name}\n" +
-            f"Memory keys of node:{node.owner.name}\n" +
-            # Use a generator expression to iterate over the memory manager items
-            '\n'.join([f"{state.keys}\t{state.state}" for info in node.resource_manager.memory_manager
-                       # Get the state from the network's manager using the qstate_key
-                       # Use a try-except block to handle cases where the state has been deleted
-                       # before this method is called
-                       if (state := network.manager.get(info.memory.qstate_key)) is not None])
-            for network in self
-            for node in network
-        ])
+        string = "\n".join(
+            [
+                # Use f-strings for string interpolation
+                f"Network:{network._Network__name}\n"
+                + f"Memory keys of node:{node.owner.name}\n"
+                +
+                # Use a generator expression to iterate over the memory manager items
+                "\n".join(
+                    [
+                        f"{state.keys}\t{state.state}"
+                        for info in node.resource_manager.memory_manager
+                        # Get the state from the network's manager using the qstate_key
+                        # Use a try-except block to handle cases where the state has been deleted
+                        # before this method is called
+                        if (state := network.manager.get(info.memory.qstate_key))
+                        is not None
+                    ]
+                )
+                for network in self
+                for node in network
+            ]
+        )
 
         return string
 
