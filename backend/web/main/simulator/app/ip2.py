@@ -19,7 +19,7 @@ from qntsim.communication import (
 )
 from qntsim.components.circuit import QutipCircuit
 
-from ..topology_funcs import network_graph
+from main.simulator.topology_funcs import network_graph
 
 logging.basicConfig(
     filename="ip2.log",

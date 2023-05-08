@@ -13,7 +13,7 @@ from .app.e2e import *
 from .app.e91 import *
 from .app.ghz import *
 from .app.ip1 import *
-from .app.ip2 import ip2_run
+# from .app.ip2 import ip2_run
 from .app.mdi_qsdc import *
 from .app.ping_pong import *
 from .app.qsdc1 import *
@@ -24,7 +24,7 @@ from .app.utils import *
 from .helpers import *
 from pyvis.network import Network
 # from qntsim.library.protocol_handler.protocol_handler import Protocol
-from qntsim.communication.protocol import Protocol
+from qntsim.communication.protocol import ProtocolPipeline
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
 import logging

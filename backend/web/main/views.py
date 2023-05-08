@@ -273,7 +273,7 @@ def stream_logs(request):
 
     response = StreamingHttpResponse(generate_response(), content_type='text/plain')
     return response
-
+@csrf_exempt
 def log_view(request):
     def stream_logs():
         # retrieve log records from the MemoryHandler buffer
