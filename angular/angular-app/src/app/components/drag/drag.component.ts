@@ -56,7 +56,15 @@ export class DragComponent implements OnInit, AfterViewInit {
     meanPhotonNum: 0.1,
     phaseError: 0
   }
-  simulator: string = 'version1';
+  simulator = {
+    value: 'version1',
+    options: [{
+      header: 'Version 1', value: 'version1'
+    },
+    {
+      header: 'Version 2', value: 'version2'
+    }]
+  };
   link_array: any = []
   app_id: any
   checked: boolean = false;
@@ -205,10 +213,17 @@ export class DragComponent implements OnInit, AfterViewInit {
     this.application = localStorage.getItem('app')
     this.routeFrom = this.holdingData.getRoute();
     this.app = Number(localStorage.getItem('app_id'))
+    this.simulator.options = this.app == 2 ? [{ header: 'Version 1', value: 'version1' }, { header: 'Version 2', value: 'version2' }] : [{
+      header: 'Version 1', value: 'version1'
+    }]
   }
   changeApp() {
     localStorage.setItem("app_id", this.app)
     this.app_id = this.app
+    this.simulator.options = this.app == 2 ? [{ header: 'Version 1', value: 'version1' }, { header: 'Version 2', value: 'version2' }] : [{
+      header: 'Version 1', value: 'version1'
+    }]
+
   }
   routeTo() {
     this._route.navigate(['/minimal'])
@@ -404,7 +419,7 @@ export class DragComponent implements OnInit, AfterViewInit {
       "topology": this.topology,
       "appSettings": this.appSettings
     }
-    let url = this.simulator == 'version1' ? environment.apiUrl : this.simulator == 'version2' ? environment.apiUrlNew : null;
+    let url = this.simulator.value == 'version1' ? environment.apiUrl : this.simulator.value == 'version2' ? environment.apiUrlNew : null;
     this.apiService.runApplication(req, url).subscribe((result: any) => {
       this.spinner = true;
       this.con.setResult(result)
@@ -486,6 +501,7 @@ export class DragComponent implements OnInit, AfterViewInit {
   }
   initDiagram() {
     const $ = go.GraphObject.make;
+
 
     this.myDiagram = $(go.Diagram, this.diagramRef.nativeElement, {
       initialContentAlignment: go.Spot.Center,
@@ -682,6 +698,8 @@ export class DragComponent implements OnInit, AfterViewInit {
         ]
       }
     ];
+
+
     this.myDiagram.model = new go.GraphLinksModel(nodeDataArray, []);
     this.myDiagram.addDiagramListener("TextEdited", (e: any) => {
       const tb = e.subject;
@@ -715,6 +733,18 @@ export class DragComponent implements OnInit, AfterViewInit {
       this.updateNodes()
     });
   }
+  public zoomIn() {
+    const diagram = this.myDiagram;
+    const zoom = diagram.commandHandler.zoomFactor;
+    diagram.commandHandler.zoomTo(zoom + 0.1, diagram.lastInput.documentPoint);
+  }
+
+  public zoomOut() {
+    const diagram = this.myDiagram;
+    const zoom = diagram.commandHandler.zoomFactor;
+    diagram.commandHandler.zoomTo(Math.max(zoom - 0.1, 0.1), diagram.lastInput.documentPoint);
+  }
+
 }
 function evenLengthValidator(control: FormControl) {
   const value = control.value;

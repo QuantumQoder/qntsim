@@ -24,8 +24,17 @@
         <!-- <div id="myPaletteDiv" class="col-4" class="palette"
             style="width: 120px; background-color: white; border: outset 1px black; z-index: 1;">
         </div> -->
-        <div #diagramContainer id="myDiagramDiv" class="col-12 diagram" style=" height:
-                calc(100vh - 100px);width:50vw; border: outset 1px black;z-index: 1;border-radius: 3px;">
+        <div class="col-6">
+            <div #diagramContainer id="myDiagramDiv" class="col-12 diagram" style=" height:
+                calc(100vh - 100px); border: outset 1px black;z-index: 1;border-radius: 3px;">
+            </div>
+            <!-- <div class="row d-flex justify-content-center">
+                <div class="btn-group col-4">
+                    <button class=" btn btn-primary" (click)="zoomIn()">Zoom In</button>
+                    <button class="btn btn-primary" (click)="zoomOut()">Zoom Out</button>
+                </div>
+            </div> -->
+
         </div>
         <div class="col ">
             <div class="configuration" style="height:100%">
@@ -34,9 +43,9 @@
                 <div class="row">
                     <div class="col mx-2">
                         <label class="form-label">Select Simulator</label>
-                        <select class="form-control" [(ngModel)]="simulator">
-                            <option value="version1">Version 1</option>
-                            <option value="version2">Version 2</option>
+                        <select class="form-control" [(ngModel)]="simulator.value">
+                            <option *ngFor="let data of simulator.options" [ngValue]="data.value">{{data.header}}
+                            </option>
                         </select>
                     </div>
                     <div class="col mx-2">
@@ -121,7 +130,7 @@
                             </div>
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold">
-                                    Time Resolution
+                                    Time Resolution(ps)
                                 </label>
                                 <input class="form-control" [(ngModel)]="detectorProps.timeResolution" />
                             </div>
@@ -135,13 +144,13 @@
                             </div>
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold">
-                                    Wavelength
+                                    Wavelength(nm)
                                 </label>
                                 <input class="form-control" [(ngModel)]="lightSourceProps.wavelength" />
                             </div>
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold">
-                                    Bandwidth
+                                    Bandwidth(nm)
                                 </label>
                                 <input class="form-control" [(ngModel)]="lightSourceProps.bandwidth" />
                             </div>
