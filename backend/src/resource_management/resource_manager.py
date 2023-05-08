@@ -20,6 +20,8 @@ from ..message import Message
 from .rule_manager import RuleManager
 from .memory_manager import MemoryManager
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
+import logging
+logger = logging.getLogger("main_logger." + "resource_manager")
 
 class ResourceManagerMsgType(Enum):
     """Available message types for the ResourceManagerMessage."""
@@ -438,7 +440,8 @@ class ResourceManager():
 
         ##print("resoure man recv queue",self.owner.message_handler.manager_queue,self.owner.name)   
         self.owner.message_handler.process_msg(msg.receiver_type,msg.receiver)
-
+        logger.info("resource manager message received")
+        
     def memory_expire(self, memory: "Memory"):
         """Method to receive memory expiration events."""
 

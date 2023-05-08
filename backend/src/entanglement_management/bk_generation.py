@@ -24,7 +24,7 @@ from ..components.circuit import BaseCircuit
 from ..utils import log
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 import logging
-
+logger = logging.getLogger("main_logger." + "bk_generation")
 class GenerationMsgType(Enum):
     """Defines possible message types for entanglement generation."""
 
@@ -160,12 +160,14 @@ class EntanglementGenerationA(EntanglementProtocol):
         self._flip_circuit.x(0)
         self._z_circuit = Circuit(1)
         self._z_circuit.z(0)
+        
 
     def set_others(self, other: "EntanglementGenerationA") -> None:
         
-        # Method to set other entanglement protocol instance.
-        # Args:
-        # other (EntanglementGenerationA): other protocol instance.
+        
+        #Method to set other entanglement protocol instance.
+        #Args:
+        #other (EntanglementGenerationA): other protocol instance.
         
 
         assert self.other_protocol is None
@@ -177,16 +179,18 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.primary = self.own.name > self.other
 
     def start(self) -> None:
-        logger = logging.getLogger("main_logger." + "bk_generation")
-        logger.info("Enteanglement Generaton A Protocal Starte...")
+        
         
         # Method to start entanglement generation protocol.
         # Will start negotiations with other protocol (if primary).
         # Side Effects:
         #     Will send message through attached node.
         
+        
+        
 
         log.logger.info(self.own.name + " protocol start with partner {}".format(self.other))
+        logger.info(self.own.name + " protocol start with partner {}".format(self.other))
         # print(self.own.name + " Generation protocol start with partner {}".format(self.other),self.name, self.middle)
         ####print('start protocol',self.other_protocol.name,self.name)
         # to avoid start after remove protocol
@@ -213,6 +217,7 @@ class EntanglementGenerationA(EntanglementProtocol):
        
             
     def end(self) -> None:
+        
         """Method to end entanglement generation protocol.
         Checks the measurement results received to determine if valid entanglement achieved, and what the state is.
         If entanglement is achieved, the memory fidelity will be increased to equal the `fidelity` field.
@@ -451,6 +456,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             raise Exception("Invalid message {} received by EG on node {}".format(msg_type, self.own.name))
 
         self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
+        logger.info("bk_generation message recieved")
         return True
 
     def is_ready(self) -> bool:

@@ -20,7 +20,8 @@ from ..transport_layer.transport_manager import TransportProtocol
 from ..resource_management.resource_manager import ResourceManagerMsgType
 from ..kernel._event import Event
 from .request import Request ,RoutingProtocol,ReservationProtocol,RRPMsgType
-
+import logging
+logger = logging.getLogger("main_logger." + "network_manager")
 
 
 class NetworkManager():
@@ -86,6 +87,7 @@ class NetworkManager():
             #print("received at ", self.owner.name,msg.kwargs)
             self.process_request(msg)
         self.owner.message_handler.process_msg(msg.receiver_type,msg.receiver)
+        logger.info("newtwork manager message received")
         
 
    
