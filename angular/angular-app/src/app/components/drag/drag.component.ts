@@ -433,9 +433,11 @@ export class DragComponent implements OnInit, AfterViewInit {
     })
   }
   addNode(adornedPart: go.Part) {
+    const newKey = this.myDiagram.model.nodeDataArray[this.myDiagram.model.nodeDataArray.length - 1].key
     const newNode = {
-      key: this.myDiagram.nodes.count + 1,
-      name: `node${this.myDiagram.nodes.count + 1}`,
+      key: newKey + 1,
+      name: `node${newKey + 1}`,
+      color: adornedPart.data.properties[0].propValue == 'Service' ? 'lightblue' : adornedPart.data.properties[0].propValue == 'End' ? 'lightsalmon' : null,
       properties: [
         { propName: "Type", propValue: adornedPart.data.properties[0].propValue == 'Service' ? 'End' : adornedPart.data.properties[0].propValue == 'End' ? 'Service' : null, nodeType: true },
         { propName: "No of Memories", propValue: 500, numericValueOnly: true }
@@ -585,9 +587,9 @@ export class DragComponent implements OnInit, AfterViewInit {
           fromSpot: go.Spot.AllSides,
           toSpot: go.Spot.AllSides
         },
-        $(go.Shape, {
-          fill: 'lightblue'
-        }),
+        $(go.Shape, "RoundedRectangle", { strokeWidth: 1, stroke: "black" },
+          // Shape.fill is bound to Node.data.color
+          new go.Binding("fill", "color")),
         $(go.Panel, "Table",
           { defaultRowSeparatorStroke: "black" },
           // header
@@ -608,7 +610,7 @@ export class DragComponent implements OnInit, AfterViewInit {
               row: 1, margin: 3, stretch: go.GraphObject.Fill,
               defaultAlignment: go.Spot.Left, background: "lightblue",
               itemTemplate: propertyTemplate
-            }
+            }, new go.Binding("background", "color")
           ),
           $("PanelExpanderButton", "PROPERTIES",
             { row: 1, column: 1, alignment: go.Spot.TopRight, visible: false },
@@ -623,7 +625,8 @@ export class DragComponent implements OnInit, AfterViewInit {
               row: 2, margin: 3, stretch: go.GraphObject.Fill,
               defaultAlignment: go.Spot.Left, background: "lightblue",
               itemTemplate: memoryTemplate
-            }
+            },
+            new go.Binding("background", "color")
           ),
           $("PanelExpanderButton", "MEMORY",
             { row: 2, column: 1, alignment: go.Spot.Right, visible: false },
@@ -638,7 +641,7 @@ export class DragComponent implements OnInit, AfterViewInit {
               {
                 figure: 'Rectangle',
                 spot1: new go.Spot(0, 0, 4, 0), spot2: new go.Spot(1, 1, -1, -1),
-                fill: 'lightblue', strokeWidth: 0,
+                fill: 'transparent', strokeWidth: 0,
                 desiredSize: new go.Size(20, 20),
                 margin: new go.Margin(0, 0, 0, 20),
                 mouseEnter: (e: any, obj: any) => {
@@ -661,8 +664,8 @@ export class DragComponent implements OnInit, AfterViewInit {
               {
                 figure: 'Rectangle',
                 spot1: new go.Spot(0, 0, 0, 1), spot2: new go.Spot(1, 1, -1, -1),
-                fill: 'lightblue', strokeWidth: 0,
-                desiredSize: new go.Size(20, 20),
+                fill: 'transparent', strokeWidth: 0,
+                desiredSize: new go.Size(30, 30),
                 margin: new go.Margin(0, 0, 0, 2),
                 mouseEnter: (e: any, obj: any) => {
                   // obj.fill = 'lightblue';
@@ -685,7 +688,7 @@ export class DragComponent implements OnInit, AfterViewInit {
       {
         key: 1,
         name: "node1",
-        color: "blue",
+        color: "lightblue",
         properties: [
           { propName: "Type", propValue: "End", nodeType: true },
           { propName: "NoOfMemories", propValue: 500, numericValueOnly: true }

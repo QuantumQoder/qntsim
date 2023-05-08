@@ -231,7 +231,7 @@
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
                                         <label class="form-label">
-                                            Demand: {{e2e.size}}
+                                            Demand Size: {{e2e.size}}
                                         </label>
                                         <br>
                                         <p-slider formControlName="size" [min]="0" [step]="1" [max]="6"
@@ -399,7 +399,7 @@
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
                                     <label for="type" class="form-label font-bold">
-                                        Number of Decoy Bits
+                                        Number of Decoy Photons
                                     </label>
                                     <input type="number" class="form-control"
                                         oninput="this.value = Math.abs(this.value)"
