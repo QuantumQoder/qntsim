@@ -7,19 +7,13 @@ from random import sample
 from typing import Any, Dict, List, Tuple
 
 from numpy.random import randint
-from qntsim.communication import (
-    ATTACK_TYPE,
-    Attack,
-    ErrorAnalyzer,
-    Network,
-    bell_type_state_analyzer,
-    insert_check_bits,
-    insert_decoy_photons,
-    string_to_binary,
-)
+from qntsim.communication import (ATTACK_TYPE, Attack, ErrorAnalyzer, Network,
+                                  bell_type_state_analyzer, insert_check_bits,
+                                  insert_decoy_photons, string_to_binary)
 from qntsim.components.circuit import QutipCircuit
 
-from main.simulator.topology_funcs import network_graph
+# from main.simulator.topology_funcs import network_graph
+
 
 logging.basicConfig(
     filename="ip2.log",
@@ -38,7 +32,8 @@ class Party:
 
     @classmethod
     def update_params(cls, **kwargs):
-        cls.__dict__.update(**kwargs)
+        for var, val in kwargs.items():
+            setattr(cls, var, val)
 
 
 class Sender(Party):
@@ -53,15 +48,16 @@ class Sender(Party):
             returns (Any): Returns from the previous function in the sequence
         """
         modified_message = insert_check_bits(
-            messages=[cls.input_messages.get(key) for key in cls.input_messages],
+            messages=list(cls.input_messages.values()),
             num_check_bits=cls.num_check_bits,
         )
         cls.chk_bts_insrt_lctns = list(modified_message)[0]
-        cls.input_messages[1] = list(modified_message.values())[0]
+        for key, mod_msg in zip(cls.input_messages, modified_message.values()):
+            cls.input_messages[key] = mod_msg
         logging.info(f"in message by {cls.__name__}!")
 
     @classmethod
-    def encode(cls, network: Network, returns: Any):
+    def encode(cls, network: Network, returns: Any, receiver:'Receiver'):
         """Alice encodes her message into the memory nodes associated to her. In addition, she also performs {I, 𝑍} operations on the Id keys of Bob.
             She also applied cover operations on the decoy photons send by Bob.
         Args:
@@ -75,8 +71,8 @@ class Sender(Party):
         cls.m_a = sample(cls.s_a, k=len(cls.s_a) - len(cls.userID) // 2)
         cls.c_a = [ele for ele in cls.s_a if ele not in cls.m_a]
         ch0, ch1, i0, i1 = (
-            iter(cls.input_messages.get(1)[::2]),
-            iter(cls.input_messages.get(1)[1::2]),
+            iter(cls.input_messages.get((cls.node, receiver.node))[::2]),
+            iter(cls.input_messages.get((cls.node, receiver.node))[1::2]),
             iter(cls.userID[::2]),
             iter(cls.userID[1::2]),
         )
@@ -171,6 +167,7 @@ class Receiver(Party):
 
         return seq_a, list(seq_a[-len(cls.userID) // 2 :]), cls.d_a
 
+    @staticmethod
     def decode(network: Network, returns: Any):
         """_summary_
         Args:
@@ -186,7 +183,7 @@ class Receiver(Party):
         return outputs
 
     @classmethod
-    def check_integrity(cls, network: Network, returns: Any, cls1, threshold: float):
+    def check_integrity(cls, network: Network, returns: Any, cls1:'Sender', threshold: float):
         """_summary_
         Args:
             network (Network): The <Network> instance which executes the sequence of functions
@@ -199,7 +196,7 @@ class Receiver(Party):
         )
         network._strings = cls.received_msgs
         err = [
-            int(returns[pos]) ^ int(cls1.input_messages.get(1)[pos])
+            int(returns[pos]) ^ int(cls1.input_messages.get((cls1.node, cls.node))[pos])
             for pos in cls1.chk_bts_insrt_lctns
         ]
         if (err_prct := sum(err) / len(err)) > threshold:
@@ -247,6 +244,7 @@ class UTP:
 
         return returns
 
+    @staticmethod
     def authenticate(network: Network, returns: Any, cls1, cls2, circuit: QutipCircuit):
         """_summary_
         Args:
@@ -297,6 +295,7 @@ class UTP:
 
         return outputs
 
+    @staticmethod
     def measure(network: Network, returns: Any, circuit: QutipCircuit, cls):
         """_summary_
         Args:
@@ -386,10 +385,12 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
     )
     app_settings.get("sender").update(
         {
-            (
-                app_settings.get("sender").get("node"),
-                app_settings.get("receiver").get("node"),
-            ): message
+            "input_messages": {
+                (
+                    app_settings.get("sender").get("node"),
+                    app_settings.get("receiver").get("node"),
+                ): message
+            }
         }
     )
     Sender.update_params(**(app_settings.get("sender")))
@@ -402,7 +403,7 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
     Network._flow = [
         partial(Sender.input_check_bits),
         partial(Receiver.setup, num_decoy_photons=Sender.num_decoy_photons),
-        partial(Sender.encode),
+        partial(Sender.encode, receiver=Receiver),
         partial(Attack.implement, attack=ATTACK_TYPE[attack].value)
         if attack and channel[0]
         else partial(pass_),
@@ -454,7 +455,7 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
     print(f"Information leaked to the attacker:{err_tuple[4]}")
     print(f"Fidelity of the message:{err_tuple[5]}")
     # Network.execute(networks=[network])
-    # print('Received messages:', Bob.received_msgs)
+    print('Received messages:', Receiver.received_msgs)
 
     app_settings.update(
         output_msg=Receiver.received_msgs,
@@ -465,6 +466,9 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
     )
     response = {}
     response["application"] = app_settings
+    from main.simulator.topology_funcs import network_graph
+
+    # from ..topology_funcs import network_graph
     response = network_graph(
         network_topo=network._net_topo, source_node_list=[Sender.node], report=response
     )
@@ -472,3 +476,92 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
 
     # return network, Receiver.received_msgs, err_tuple[2:]
     return response
+
+
+if __name__ == "__main__":
+    topology = {
+        "nodes": [
+            {
+                "Name": "n1",
+                "Type": "end",
+                "noOfMemory": 500,
+                "memory": {
+                    "frequency": 2000,
+                    "expiry": 2000,
+                    "efficiency": 0,
+                    "fidelity": 0.93,
+                },
+            },
+            {
+                "Name": "n2",
+                "Type": "end",
+                "noOfMemory": 500,
+                "memory": {
+                    "frequency": 2000,
+                    "expiry": 2000,
+                    "efficiency": 0,
+                    "fidelity": 0.93,
+                },
+            },
+            {
+                "Name": "n3",
+                "Type": "end",
+                "noOfMemory": 500,
+                "memory": {
+                    "frequency": 2000,
+                    "expiry": 2000,
+                    "efficiency": 0,
+                    "fidelity": 0.93,
+                },
+            },
+            {
+                "Name": "n4",
+                "Type": "service",
+                "noOfMemory": 500,
+                "memory": {
+                    "frequency": 2000,
+                    "expiry": 2000,
+                    "efficiency": 0,
+                    "fidelity": 0.93,
+                },
+            },
+        ],
+        "quantum_connections": [
+            {"Nodes": ["n1", "n4"], "Attenuation": 0.00001, "Distance": 70},
+            {"Nodes": ["n2", "n4"], "Attenuation": 0.00001, "Distance": 70},
+            {"Nodes": ["n3", "n4"], "Attenuation": 0.00001, "Distance": 70},
+        ],
+        "classical_connections": [
+            {"Nodes": ["n1", "n1"], "Delay": 0, "Distance": 1000},
+            {"Nodes": ["n1", "n2"], "Delay": 1000000000, "Distance": 1000},
+            {"Nodes": ["n1", "n3"], "Delay": 1000000000, "Distance": 1000},
+            {"Nodes": ["n1", "n4"], "Delay": 1000000000, "Distance": 1000},
+            {"Nodes": ["n2", "n1"], "Delay": 1000000000, "Distance": 1000},
+            {"Nodes": ["n2", "n2"], "Delay": 0, "Distance": 1000},
+            {"Nodes": ["n2", "n3"], "Delay": 1000000000, "Distance": 1000},
+            {"Nodes": ["n2", "n4"], "Delay": 1000000000, "Distance": 1000},
+            {"Nodes": ["n3", "n1"], "Delay": 1000000000, "Distance": 1000},
+            {"Nodes": ["n3", "n2"], "Delay": 1000000000, "Distance": 1000},
+            {"Nodes": ["n3", "n3"], "Delay": 0, "Distance": 1000},
+            {"Nodes": ["n3", "n4"], "Delay": 1000000000, "Distance": 1000},
+            {"Nodes": ["n4", "n1"], "Delay": 1000000000, "Distance": 1000},
+            {"Nodes": ["n4", "n2"], "Delay": 1000000000, "Distance": 1000},
+            {"Nodes": ["n4", "n3"], "Delay": 1000000000, "Distance": 1000},
+            {"Nodes": ["n4", "n4"], "Delay": 0, "Distance": 1000},
+        ],
+    }
+    app_settings = {
+        "sender": {
+            "message": "011010",
+            "node": "n1",
+            "userID": "0111",
+            "num_check_bits": 4,
+            "num_decoy_photons": 4,
+        },
+        "receiver": {"node": "n2", "userID": "0110"},
+        "err_threshold": 0.4,
+        "bell_type": "00",
+    }
+    response = ip2_run(topology=topology, app_settings=app_settings)
+
+    print(response)

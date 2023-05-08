@@ -1,5 +1,5 @@
-
 import importlib
+import logging
 import time
 from contextlib import nullcontext
 from pprint import pprint
@@ -9,11 +9,16 @@ from tokenize import String
 
 import numpy as np
 import pandas as pd
+from pyvis.network import Network
+# from qntsim.library.protocol_handler.protocol_handler import Protocol
+from qntsim.communication.protocol import ProtocolPipeline
+from qntsim.topology.topology import Topology
+from tabulate import tabulate
+
 from .app.e2e import *
 from .app.e91 import *
 from .app.ghz import *
 from .app.ip1 import *
-# from .app.ip2 import ip2_run
 from .app.mdi_qsdc import *
 from .app.ping_pong import *
 from .app.qsdc1 import *
@@ -24,7 +29,7 @@ from .app.utils import *
 from .helpers import *
 from pyvis.network import Network
 # from qntsim.library.protocol_handler.protocol_handler import Protocol
-from qntsim.communication.protocol import ProtocolPipeline
+from qntsim.communication.protocol import Protocol
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
 import logging
@@ -383,7 +388,7 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     # attack=None
     topology = '/code/web/topology.json'
     print('topology', topology)
-    protocol = Protocol(name='qsdc_tel', messages_list=[
+    protocol = ProtocolPipeline(name='qsdc_tel', messages_list=[
                         messages], label='00', attack=attack)
     protocol(topology=network_config)
     # tl.init()
@@ -434,7 +439,7 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     # # message = ['hello']
     # message = [message]
     # # print('message', message, type(message),type([message]),attack)
-    # protocol = Protocol(platform='qntsim',
+    # protocol = ProtocolPipeline(platform='qntsim',
     #                     messages_list=[message],
     #                     topology=topo,
     #                     backend='Qutip',
@@ -474,7 +479,7 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     # attack=None
     topology = '/code/web/configs/singlenode.json'
     print('topology', topology)
-    protocol = Protocol(name='qd_sp', messages_list=[messages], attack=attack)
+    protocol = ProtocolPipeline(name='qd_sp', messages_list=[messages], attack=attack)
     protocol(topology=topology)
 
     print("protocol.recv_msgs_list", protocol.recv_msgs_list[-1])
@@ -508,7 +513,7 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     # topo = '/code/web/singlenode.json'
     # message = [message1,message2]
     # print('message', message)
-    # protocol = Protocol(platform='qntsim',
+    # protocol = ProtocolPipeline(platform='qntsim',
     #                 messages_list=[message],
     #                 topology=topo,
     #                 backend='Qutip',
@@ -533,7 +538,7 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
 
 def random_encode_photons(network: Network):
     print('inside random encode')
-    node = network.network.nodes['n1']
+    node = network._net_topo.nodes['n1']
     manager = network.manager
     basis = {}
     for info in node.resource_manager.memory_manager:
@@ -557,7 +562,7 @@ def random_encode_photons(network: Network):
 
 def authenticate_party(network: Network):
     manager = network.manager
-    node = network.network.nodes['n1']
+    node = network._net_topo.nodes['n1']
     keys = [info.memory.qstate_key for info in node.resource_manager.memory_manager[:2*network.size+150]]
     keys1 = keys[network.size-25:network.size]
     keys1.extend(keys[2*network.size:2*network.size+75])
@@ -594,7 +599,7 @@ def authenticate_party(network: Network):
 
 
 def swap_entanglement(network: Network):
-    node = network.network.nodes['n1']
+    node = network._net_topo.nodes['n1']
     manager = network.manager
     e_keys = []
     for info0, info1 in zip(node.resource_manager.memory_manager[:network.size-25],
