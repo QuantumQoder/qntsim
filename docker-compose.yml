@@ -39,5 +39,5 @@ services:
     container_name: ng1
     build: angular
     ports:
-      - "81:81"
+      - "80:80"
     tty: true
