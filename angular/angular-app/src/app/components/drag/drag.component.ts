@@ -397,16 +397,16 @@ export class DragComponent implements OnInit, AfterViewInit {
         sender: {
           node: this.nodesSelection.sender,
           message: this.appSettingsForm.get('message')?.value,
-          userID: this.nodesSelection.senderId,
+          userID: `${this.nodesSelection.senderId}`,
           num_check_bits: this.nodesSelection.numCheckBits,
           num_decoy_photons: this.nodesSelection.numDecoy
         },
         receiver: {
           node: this.nodesSelection.receiver,
-          userID: this.nodesSelection.receiverId
+          userID: `${this.nodesSelection.receiverId}`
         },
 
-        bell_type: this.nodesSelection.belltype,
+        bell_type: `${this.nodesSelection.belltype}`,
         error_threshold: this.nodesSelection.errorThreshold,
         attack: this.nodesSelection.attack,
         channel: this.nodesSelection.channel
