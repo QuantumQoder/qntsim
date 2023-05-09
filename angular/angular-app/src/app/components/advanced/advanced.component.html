@@ -1,0 +1,494 @@
+<!-- <div class="speeddial-linear-demo">
+    <p-speedDial [model]="items" direction="top-left" buttonClassName="p-button-success" styleClass="speed-dial">
+    </p-speedDial>
+</div> -->
+
+<!-- <p-blockUI [blocked]="blocked" [target]="comp"></p-blockUI> -->
+<!-- <div *ngIf="spinner==true" class="spinner-border text-primary text-center" role="status">
+    <span class="sr-only">Loading...</span>
+</div> -->
+<div id="comp" class="row-1 container-fluid shadow p-1 mb-1 bg-white rounded mx-auto">
+
+    <!-- <p-toast position="bottom-center" [baseZIndex]="5000"></p-toast> -->
+    <div *ngIf="spinner" class="loader-body">
+        <div>
+            <img src="https://ik.imagekit.io/qulabs/loader-removebg-preview.png?updatedAt=1679398183211"
+                class="loader-img" alt="...">
+        </div>
+        <div class="loader-text"></div>
+    </div>
+
+
+
+    <div style="width: 100%; display: flex;gap:3px;">
+        <!-- <div id="myPaletteDiv" class="col-4" class="palette"
+            style="width: 120px; background-color: white; border: outset 1px black; z-index: 1;">
+        </div> -->
+        <div class="col-6">
+            <div #diagramContainer id="myDiagramDiv" class="col-12 diagram" style=" height:
+                calc(100vh - 100px); border: outset 1px black;z-index: 1;border-radius: 3px;">
+            </div>
+            <!-- <div class="row d-flex justify-content-center">
+                <div class="btn-group col-4">
+                    <button class=" btn btn-primary" (click)="zoomIn()">Zoom In</button>
+                    <button class="btn btn-primary" (click)="zoomOut()">Zoom Out</button>
+                </div>
+            </div> -->
+
+        </div>
+        <div class="col ">
+            <div class="configuration" style="height:100%">
+                <!-- <h4 class="text-dark text-center">Selected Application: {{application}}</h4> -->
+                <!-- <p-breadcrumb [model]="breadcrumbItems"></p-breadcrumb> -->
+                <div class="row">
+                    <div class="col mx-2">
+                        <label class="form-label">Select Simulator</label>
+                        <select class="form-control" [(ngModel)]="simulator.value">
+                            <option *ngFor="let data of simulator.options" [ngValue]="data.value">{{data.header}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col mx-2">
+                        <label class="form-label">Select Application</label>
+                        <select class="form-control" [(ngModel)]="app" (change)="changeApp()">
+                            <option *ngFor="let data of app_data" [ngValue]="data.appId">{{data.appName}}</option>
+                        </select>
+                    </div>
+                </div>
+                <br>
+                <div *ngIf="routeFrom == 'minimal'" class="col-4 mx-auto">
+                    <button class="btn btn-primary" (click)="routeTo()">
+                        Go to Minimal
+                    </button>
+                </div>
+
+                <div id="step2" *ngIf="activeIndex == 0">
+                    <p-accordion [activeIndex]=1>
+                        <p-accordionTab header="General Information">
+                            <ul>
+                                <li>
+                                    <b>Sender</b>
+                                    <p>Entanglement-swapping nodes (similar to classical routers) connect non-neighbor
+                                        nodes\n but don't support request
+                                        creation or application hosting.</p>
+                                </li>
+                                <li>
+                                    <b>
+                                        End
+                                    </b>
+                                    <p>
+                                        Origin or destination nodes for user/application requests, each connected to one
+                                        service node.
+                                    </p>
+                                </li>
+                            </ul>
+                        </p-accordionTab>
+                        <p-accordionTab header="Setup Topology Info">
+                            <ul>
+                                <li>
+                                    Click "+" button to add a node connected to the selected node.
+                                </li>
+                                <li>
+                                    Click "-" button to delete the selected node.
+                                </li>
+                            </ul>
+                        </p-accordionTab>
+                    </p-accordion>
+
+                    <h5>
+                        Configure Topology
+                    </h5>
+                    <p-accordion>
+
+                        <p-accordionTab header="Connection Settings">
+                            <form [formGroup]="toolbox">
+                                <div class="form-group col-8 mx-auto">
+                                    <label for="attenuation" class="form-label mx-auto">Attenuation (dB/km)</label>
+                                    <input type="number" class="form-control" formControlName="attenuation"
+                                        id="attenuation" placeholder="Enter in decimals">
+                                </div>
+                                <div class="form-group col-8 mx-auto">
+                                    <label for="distance" class="form-label mx-auto">Link Length {{distance}}km</label>
+                                    <input type="number" class="form-control mx-auto" id="distance"
+                                        formControlName="distance" placeholder="Enter Distance">
+                                </div>
+                                <br>
+                            </form>
+                        </p-accordionTab>
+                        <p-accordionTab header="Detector Properties">
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Efficiency
+                                </label>
+                                <input class="form-control" [(ngModel)]="detectorProps.efficiency" />
+                            </div>
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Count Rate
+                                </label>
+                                <input class="form-control" [(ngModel)]="detectorProps.countRate" />
+                            </div>
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Time Resolution(ps)
+                                </label>
+                                <input class="form-control" [(ngModel)]="detectorProps.timeResolution" />
+                            </div>
+                        </p-accordionTab>
+                        <p-accordionTab header="Light Source Properties">
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Frequency(hz)
+                                </label>
+                                <input class="form-control" [(ngModel)]="lightSourceProps.frequency" />
+                            </div>
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Wavelength(nm)
+                                </label>
+                                <input class="form-control" [(ngModel)]="lightSourceProps.wavelength" />
+                            </div>
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Bandwidth(nm)
+                                </label>
+                                <input class="form-control" [(ngModel)]="lightSourceProps.bandwidth" />
+                            </div>
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Mean Photon
+                                </label>
+                                <input class="form-control" [(ngModel)]="lightSourceProps.meanPhotonNum" />
+                            </div>
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold">
+                                    Phase Error
+                                </label>
+                                <input class="form-control" [(ngModel)]="lightSourceProps.phaseError" />
+                            </div>
+                        </p-accordionTab>
+
+                    </p-accordion>
+                    <div class="d-flex justify-content-center">
+                        <button class="btn btn-primary" (click)="activeindex('next')">Next</button>
+                    </div>
+                </div>
+                <ng-container *ngIf="activeIndex == 1">
+                    <ng-container>
+                        <p-accordion [activeIndex]="0">
+
+                            <p-accordionTab header="Application Parameters" *ngIf="app_id != 10">
+                                <form [formGroup]="appSettingsForm">
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id != 4 && app_id !=10">
+                                        <label for="type" class="form-label font-bold">
+                                            Sender
+                                        </label>
+                                        <select class="form-control" formControlName="sender"
+                                            [(ngModel)]="nodesSelection.sender">
+                                            <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id != 4 && app_id !=10">
+                                        <label for="type" class="form-label font-bold">
+                                            Receiver
+                                        </label>
+                                        <select class="form-control" formControlName="receiver"
+                                            [(ngModel)]="nodesSelection.receiver">
+                                            <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}
+                                            </option>
+                                        </select>
+                                        <!-- <div *ngIf="endNodes.length ==0">
+                                                            <p class="text-danger">
+                                                                Please drag a end node and configure it.
+                                                            </p>
+                                                        </div>
+                                                        <div *ngIf="receiver.touched && receiver.invalid">
+                                                            <div *ngIf="receiver.errors.required">
+                                                                <p class="text-danger">Please select an Receiver.</p>
+                                                            </div>
+                                                        </div> -->
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 1">
+                                        <label for="type" class="form-label font-bold">
+                                            Key Length
+                                        </label>
+                                        <input type="number" min="1" oninput="this.value = Math.abs(this.value)"
+                                            formControlName="keyLength" class="form-control">
+                                        <div *ngIf="keyLength.touched && keyLength.invalid">
+                                            <div *ngIf="keyLength.errors.required">
+                                                <p class="text-danger">Please enter key length.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
+                                        <label for="type" class="form-label font-bold">
+                                            Target Fidelity: {{e2e.targetFidelity}}
+                                        </label>
+                                        <br>
+                                        <p-slider formControlName="targetFidelity" [min]="0" [step]="0.05" [max]="1"
+                                            (onSlideEnd)="e2eChange('target')"></p-slider>
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
+                                        <label class="form-label">
+                                            Demand Size: {{e2e.size}}
+                                        </label>
+                                        <br>
+                                        <p-slider formControlName="size" [min]="0" [step]="1" [max]="6"
+                                            (onSlideEnd)="e2eChange('size')"></p-slider>
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
+                                        <label for="timeout" class="col-12">TimeOut (Seconds)</label>
+                                        <input type="text" class="form-control col-12"
+                                            aria-label="Amount (to the nearest dollar)" formControlName="timeout">
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 5 || app_id == 6">
+                                        <label for="type" class="form-label font-bold">
+                                            Sequence Length
+                                        </label>
+                                        <input type="number" min="1" oninput="this.value = Math.abs(this.value)"
+                                            formControlName="sequenceLength" class="form-control">
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 3">
+                                        <label for="endNode">Random Qubit Amplitude 1</label>&nbsp;
+                                        <input type="text" class="form-control" formControlName="amplitude1">
+                                        <div class="text-muted">Random Single Qubit's amplitude at |0></div>
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 3">
+                                        <label for="endNode">Random Qubit Amplitude 1</label>&nbsp;
+                                        <input type="text" class="form-control" formControlName="amplitude2">
+                                        <div class="text-muted">Random Single Qubit's amplitude at |0></div>
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 4">
+                                        <label for="type" class="form-label font-bold">
+                                            End Node 1
+                                        </label>
+                                        <select class="form-control" formControlName="endnode1"
+                                            [(ngModel)]="nodesSelection.endNode1">
+                                            <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}
+                                            </option>
+                                        </select>
+                                        <!-- <div *ngIf="node1.touched && node1.invalid">
+                                                            <div *ngIf="node1.errors.required">
+                                                                <p class="text-danger">Please select End Node 1.</p>
+                                                            </div>
+                                                        </div> -->
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 4">
+                                        <label for="type" class="form-label font-bold">
+                                            End Node 2
+                                        </label>
+                                        <select class="form-control" formControlName="endnode2"
+                                            [(ngModel)]="nodesSelection.endNode2">
+                                            <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}
+                                            </option>
+                                        </select>
+                                        <!-- <div *ngIf="node2.touched && node2.invalid">
+                                                            <div *ngIf="node2.errors.required">
+                                                                <p class="text-danger">Please select End Node 2.</p>
+                                                            </div>
+                                                        </div> -->
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 4">
+                                        <label for="type" class="form-label font-bold">
+                                            End Node 3
+                                        </label>
+                                        <select class="form-control" formControlName="endnode3"
+                                            [(ngModel)]="nodesSelection.endNode3">
+                                            <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 4">
+                                        <label for="type" class="form-label font-bold">
+                                            Central Node
+                                        </label>
+                                        <select class="form-control" formControlName="middleNode"
+                                            [(ngModel)]="nodesSelection.middleNode">
+                                            <option *ngFor="let data of serviceNodes" [ngValue]="data.Name">
+                                                {{data.Name}}
+                                            </option>
+                                        </select>
+                                        <div *ngIf="middlenode.touched && middlenode.invalid">
+                                            <div *ngIf="middlenode.errors.required">
+                                                <p class="text-danger">Please select an Central Node.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 6 || app_id == 5 ||app_id == 7">
+                                        <label for="type" class="form-label font-bold">
+                                            Message
+                                        </label>
+                                        <input type="text" (keypress)="allowBitsInput($event)" formControlName="message"
+                                            class="form-control" maxLength="8">
+                                        <div
+                                            *ngIf="appSettingsForm.get('message').touched && appSettingsForm.get('message').invalid">
+                                            <div *ngIf="appSettingsForm.get('message').errors.required">
+                                                <p class="text-danger">Message is required.</p>
+                                            </div>
+                                            <div *ngIf="appSettingsForm.get('message').errors.evenLength">
+                                                <p class="text-danger">Message must have an even number of characters
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 9">
+                                        <label for="type" class="form-label font-bold">
+                                            Input Message
+                                        </label>
+                                        <input type="text" formControlName="inputMessage" class="form-control">
+                                        <div
+                                            *ngIf="appSettingsForm.get('inputMessage').touched && appSettingsForm.get('inputMessage').invalid">
+                                            <div *ngIf="appSettingsForm.get('inputMessage').errors.required">
+                                                <p class="text-danger">Message is required.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 8">
+                                        <label for="type" class="form-label font-bold">
+                                            Sender's Message
+                                        </label>
+                                        <input type="text" formControlName="message1" class="form-control">
+                                        <div
+                                            *ngIf="appSettingsForm.get('message1').touched && appSettingsForm.get('message1').invalid">
+                                            <div *ngIf="appSettingsForm.get('message1').errors.required">
+                                                <p class="text-danger">Sender's Message is required.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 8">
+                                        <label for="type" class="form-label font-bold">
+                                            Receiver's Message
+                                        </label>
+                                        <input type="text" formControlName="message2" class="form-control">
+                                        <div
+                                            *ngIf="appSettingsForm.get('message2').touched && appSettingsForm.get('message2').invalid">
+                                            <div *ngIf="appSettingsForm.get('message2').errors.required">
+                                                <p class="text-danger">Receiver's Message is required.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </p-accordionTab>
+                            <p-accordionTab header="Sender Parameters" *ngIf="app_id == 10">
+                                <div class="mt-1 col-9 mx-auto">
+                                    <label for="type" class="form-label font-bold">
+                                        Sender
+                                    </label>
+                                    <select class="form-control" [(ngModel)]="nodesSelection.sender">
+                                        <option *ngFor="let data of endNodes" [ngValue]="data.Name">
+                                            {{data.Name}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="mt-1 col-9 mx-auto">
+                                    <label for="type" class="form-label font-bold">
+                                        Sender ID
+                                    </label>
+                                    <input type="number" class="form-control"
+                                        oninput="this.value = Math.abs(this.value)"
+                                        [(ngModel)]="nodesSelection.senderId">
+                                </div>
+                                <div class="mt-1 col-9 mx-auto">
+                                    <label for="type" class="form-label font-bold">
+                                        Message
+                                    </label>
+                                    <input type="text" class="form-control" [(ngModel)]="nodesSelection.message">
+                                </div>
+                                <div class="mt-1 col-9 mx-auto">
+                                    <label for="type" class="form-label font-bold">
+                                        Number of Decoy Photons
+                                    </label>
+                                    <input type="number" class="form-control"
+                                        oninput="this.value = Math.abs(this.value)"
+                                        [(ngModel)]="nodesSelection.numDecoy">
+                                </div>
+                                <div class="mt-1 col-9 mx-auto">
+                                    <label for="type" class="form-label font-bold">
+                                        Number of Check Bits
+                                    </label>
+                                    <input type="number" class="form-control"
+                                        oninput="this.value = Math.abs(this.value)"
+                                        [(ngModel)]="nodesSelection.numCheckBits">
+                                </div>
+                            </p-accordionTab>
+                            <p-accordionTab header="Receiver Parameters" *ngIf="app_id == 10">
+                                <div class="mt-1 col-9 mx-auto">
+                                    <label for="type" class="form-label font-bold">
+                                        Receiver
+                                    </label>
+                                    <select class="form-control" [(ngModel)]="nodesSelection.receiver">
+                                        <option *ngFor="let data of endNodes" [ngValue]="data.Name">
+                                            {{data.Name}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="mt-1 col-9 mx-auto">
+                                    <label for="type" class="form-label font-bold">
+                                        Receiver ID
+                                    </label>
+                                    <input type="number" class="form-control"
+                                        oninput="this.value = Math.abs(this.value)"
+                                        [(ngModel)]="nodesSelection.receiverId">
+                                </div>
+                            </p-accordionTab>
+                            <p-accordionTab header="Common Parameters" *ngIf="app_id == 10">
+                                <div class="mt-1 col-9 mx-auto">
+                                    <label for="type" class="form-label font-bold">
+                                        Bell Type
+                                    </label>
+                                    <select class="form-control" [(ngModel)]="nodesSelection.bellType">
+                                        <option *ngFor="let data of bellTypeOptions" [ngValue]="data">
+                                            {{data}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="mt-1 col-9 mx-auto">
+                                    <label for="type" class="form-label font-bold">
+                                        Error Threshold
+                                    </label>
+                                    <input type="number" class="form-control"
+                                        [(ngModel)]="nodesSelection.errorthreshold">
+                                </div>
+                                <div class="mt-1 col-9 mx-auto">
+                                    <label for="type" class="form-label font-bold">
+                                        Attack
+                                    </label>
+                                    <select class="form-control" [(ngModel)]="nodesSelection.attack">
+                                        <option *ngFor="let data of attackOptions" [ngValue]="data">{{data}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="mt-1 col-9 mx-auto">
+                                    <label for="type" class="form-label font-bold">
+                                        Channel
+                                    </label>
+                                    <select class="form-control" [(ngModel)]="nodesSelection.channel">
+                                        <option *ngFor="let data of channelOptions" [ngValue]="data">
+                                            {{data}}
+                                        </option>
+                                    </select>
+                                </div>
+
+                            </p-accordionTab>
+                        </p-accordion>
+                    </ng-container>
+
+                    <br>
+                    <div class="btn-group col-12 d-flex justify-content-center gap-2">
+                        <div>
+                            <button class="btn btn-primary btn-custom btn-sm"
+                                (click)="activeIndex('prev')">Previous</button>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary btn-custom btn-sm" (click)="parameters()">Run
+                                Application</button>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>

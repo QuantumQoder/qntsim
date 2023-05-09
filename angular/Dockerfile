@@ -1,6 +1,6 @@
 ### Stage 1: build ###
 
-FROM node:19.9.0-alpine as builder
+FROM node:16.13-alpine as builder
 
 # Set working directory.
 RUN mkdir /app
@@ -10,7 +10,7 @@ WORKDIR /app
 COPY angular-app/package.json angular-app/package-lock.json /app/angular-app/
 
 # Install app dependencies.
-RUN npm install --prefix angular-app
+RUN npm install --prefix angular-app --force
 
 # Copy app files.
 COPY . /app
