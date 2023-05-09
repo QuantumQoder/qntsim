@@ -145,14 +145,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     this.initDiagram();
     this.updateNodes()
   }
-  e2eChange(data: string) {
-    if (data == 'target') {
-      this.e2e.targetFidelity = this.appSettingsForm.get('targetFidelity')?.value;
-    }
-    else if (data == 'size') {
-      this.e2e.size = this.appSettingsForm.get('size')?.value;
-    }
-  }
+
   allowBitsInput($event: any) {
     if ($event.key.match(/[0-1]*/)['0']) { }
     else {

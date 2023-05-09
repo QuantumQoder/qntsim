@@ -28,7 +28,8 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
   }
   ngOnInit(): void {
-    this.app_id = localStorage.getItem('app_id')
+    this.app_id = Number(localStorage.getItem('app_id'))
+    console.log(`APP ID: ${this.app_id}`)
     if (!this.app_id) {
       this.router.navigate(['/'])
     }
@@ -37,6 +38,7 @@ export class ResultsComponent implements OnInit, AfterViewInit {
     this.performance.fidelity = this.performance.fidelity.toFixed(3)
     this.performance.latency = this.performance.latency.toFixed(3);
     this.data = this.con.getResult().application;
+    console.log(this.data, this.performance)
     if (this.app_id == 1) {
       this.match = this.data.sender_basis_list.reduce((match: any, x: any, i: any) => {
         if (x === this.data.receiver_basis_list[i]) match.push(i);

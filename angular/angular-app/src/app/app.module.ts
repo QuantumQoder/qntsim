@@ -22,11 +22,14 @@ import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { CtrlClickDirective } from './directives/ctrl-click';
 import { JwtInterceptor } from './auth/jwt.interceptor';
 import { SliderModule } from 'primeng/slider';
+import { RouterModule } from '@angular/router';
+import { ResultsComponent } from './components/results/results.component';
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA,
     NO_ERRORS_SCHEMA
   ],
   declarations: [
+    ResultsComponent,
     AppComponent,
     HomePageComponent,
     NavbarComponent,
@@ -34,6 +37,7 @@ import { SliderModule } from 'primeng/slider';
     CtrlClickDirective
   ],
   imports: [SplitButtonModule,
+    RouterModule,
     ProgressSpinnerModule,
     HttpClientModule,
     FormsModule,

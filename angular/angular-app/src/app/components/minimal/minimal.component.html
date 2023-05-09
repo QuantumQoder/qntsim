@@ -34,8 +34,18 @@
                 <label for="type" class="form-label font-bold mb-2">
                     Number of Nodes {{level}}
                 </label>
-                <p-slider formControlName="level" (onChange)="levelChange()" [min]="2" [step]="1" [max]="4"
-                    (onSlideEnd)="levelChange()"></p-slider>
+                <div class="row">
+                    <div class="col-1">
+                        2
+                    </div>
+                    <div class="col-9">
+                        <input type="range" class="form-range" step="1" (change)="levelChange()" formControlName="level"
+                            [(ngModel)]="level" min="2" max="4">
+                    </div>
+                    <div class="col-1">
+                        4
+                    </div>
+                </div>
             </div>
             <hr>
             <div class="d-flex justify-content-end mx-2">
@@ -78,8 +88,19 @@
                         Length {{distance}} km
                     </label>
                     <!-- <input type="number" disabled maxlength="3" formControlName="distance" class="form-control"> -->
-                    <p-slider formControlName="distance" (onChange)="updateDistance()" [min]="1" [max]="100"
-                        (onSlideEnd)="updateDistance()"></p-slider>
+                    <div class="row">
+                        <div class="col-1">
+                            1
+                        </div>
+                        <div class="col-9">
+                            <input type="range" class="form-range" step="1" (change)="levelChange()"
+                                formControlName="distance" [(ngModel)]="distance" min="1" max="100">
+                        </div>
+                        <div class="col-1">
+                            100
+                        </div>
+                    </div>
+
                 </div>
                 <div class="mt-2 col-9 mx-auto">
                     <label for="type" class="form-label font-bold mb-2"
@@ -183,16 +204,37 @@
                     Target Fidelity:{{e2e.targetFidelity}}
                 </label>
                 <br>
-                <p-slider formControlName="targetFidelity" [min]="0" [step]="0.05" [max]="1"
-                    (onSlideEnd)="e2eChange('target')"></p-slider>
+                <div class="row">
+                    <div class="col-1">
+                        0
+                    </div>
+                    <div class="col-9">
+                        <input type="range" class="form-range" step="0.05" formControlName="targetFidelity"
+                            [(ngModel)]="e2e.targetFidelity" min="0" max="1">
+                    </div>
+                    <div class="col-1">
+                        1
+                    </div>
+                </div>
+
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 2">
                 <label for="type" class="form-label font-bold">
                     Demand:{{e2e.size}}
                 </label>
                 <br>
-                <p-slider formControlName="size" [min]="0" [step]="1" [max]="6"
-                    (onSlideEnd)="e2eChange('size')"></p-slider>
+                <div class="row">
+                    <div class="col-1">
+                        0
+                    </div>
+                    <div class="col-9">
+                        <input type="range" class="form-range" step="1" formControlName="size" [(ngModel)]="e2e.size"
+                            min="0" max="6">
+                    </div>
+                    <div class="col-1">
+                        6
+                    </div>
+                </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
                 <label for="type" class="form-label font-bold">
