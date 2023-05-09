@@ -23,7 +23,7 @@ import { CarouselModule } from 'primeng/carousel';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { TableModule } from 'primeng/table';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AdvancedComponent } from './components/drag/advanced.component';
+import { AdvancedComponent } from './components/advanced/advanced.component';
 import { TabMenuModule } from 'primeng/tabmenu';
 import { ResultsComponent } from './components/results/results.component';
 import { ToastModule } from 'primeng/toast';
