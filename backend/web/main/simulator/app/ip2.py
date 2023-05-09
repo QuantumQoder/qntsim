@@ -395,8 +395,8 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
     )
     Sender.update_params(**(app_settings.get("sender")))
     Receiver.update_params(**(app_settings.get("receiver")))
-    label = app_settings.get("bell_type")
-    err_threshold = app_settings.get("err_threshold")
+    label = app_settings.get("bell_type", "00")
+    err_threshold = app_settings.get("error _threshold")
     attack = app_settings.get("attack")
     channel = app_settings.get("channel")
     channel = [1 if i == channel else 0 for i in range(3)]

@@ -24,6 +24,7 @@ from django.http import StreamingHttpResponse
 import time
 import os
 import logging 
+from main.simulator.app.ip2 import ip2_run
 
 logger = logging.getLogger("main_logger")
 logger.setLevel(logging.DEBUG)
