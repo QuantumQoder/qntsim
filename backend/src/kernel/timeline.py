@@ -20,7 +20,8 @@ from .kernel_utils import EventList
 from ..utils import log
 from .quantum_kernel import QuantumKernel
 from .quantum_manager import QuantumManagerDensity
-
+import logging
+logger = logging.getLogger("main_logger." + "timeline")
 
 """
 ch=input("Enter 0 for DLCZ ,1 for barettkok")
@@ -88,6 +89,8 @@ class Timeline:
         A progress bar may also be displayed, if the `show_progress` flag is set.
         """
         log.logger.info("Timeline start simulation")
+        
+        logger.info("Timeline start simulation")
         tick = time_ns()
         self.is_running = True
 

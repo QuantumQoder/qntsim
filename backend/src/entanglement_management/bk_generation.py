@@ -24,7 +24,7 @@ from ..components.circuit import BaseCircuit
 from ..utils import log
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 import logging
-
+logger = logging.getLogger("main_logger." + "bk_generation")
 class GenerationMsgType(Enum):
     """Defines possible message types for entanglement generation."""
 
@@ -160,12 +160,14 @@ class EntanglementGenerationA(EntanglementProtocol):
         self._flip_circuit.x(0)
         self._z_circuit = Circuit(1)
         self._z_circuit.z(0)
+        
 
     def set_others(self, other: "EntanglementGenerationA") -> None:
         
-        # Method to set other entanglement protocol instance.
-        # Args:
-        # other (EntanglementGenerationA): other protocol instance.
+        
+        #Method to set other entanglement protocol instance.
+        #Args:
+        #other (EntanglementGenerationA): other protocol instance.
         
 
         assert self.other_protocol is None
@@ -177,16 +179,18 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.primary = self.own.name > self.other
 
     def start(self) -> None:
-        logger = logging.getLogger("main_logger." + "bk_generation")
-        logger.info("Enteanglement Generaton A Protocal Starte...")
+        
         
         # Method to start entanglement generation protocol.
         # Will start negotiations with other protocol (if primary).
         # Side Effects:
         #     Will send message through attached node.
         
+        
+        
 
         log.logger.info(self.own.name + " protocol start with partner {}".format(self.other))
+        logger.info(self.own.name + " protocol start with partner {}".format(self.other))
         # print(self.own.name + " Generation protocol start with partner {}".format(self.other),self.name, self.middle)
         ####print('start protocol',self.other_protocol.name,self.name)
         # to avoid start after remove protocol
@@ -213,6 +217,7 @@ class EntanglementGenerationA(EntanglementProtocol):
        
             
     def end(self) -> None:
+        
         """Method to end entanglement generation protocol.
         Checks the measurement results received to determine if valid entanglement achieved, and what the state is.
         If entanglement is achieved, the memory fidelity will be increased to equal the `fidelity` field.
@@ -284,6 +289,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         log.logger.debug(self.own.name + " EG protocol received_message of type {} from node {}, round={}".format(msg.msg_type, src, self.ent_round + 1))
 
         if  msg_type is GenerationMsgType.BSM_ALLOCATE:
+            logger.info("BSM Allocation message recieved by " + self.own.lightsource.name)
 
             self.qc_delay = self.own.qchannels[self.middle].delay
             frequency = self.memory.frequency
@@ -291,10 +297,12 @@ class EntanglementGenerationA(EntanglementProtocol):
             message = Message(MsgRecieverType.PROTOCOL, self.other_protocol.name, GenerationMsgType.NEGOTIATE, other_protocol=self.other_protocol.name,
                                                     qc_delay=self.qc_delay, frequency=frequency,protocol=self)
             self.own.message_handler.send_message(self.other, message)
+            print("Message Here", message)
             
             
 
         elif msg_type is GenerationMsgType.NEGOTIATE:
+            logger.info("Negotiation  message recieved by " + self.own.lightsource.name)
             # configure params
             #####print('negotiate starts')
             qc_delay=msg.kwargs["qc_delay"]
@@ -349,7 +357,10 @@ class EntanglementGenerationA(EntanglementProtocol):
                                                     emit_time_0=another_emit_time_0, emit_time_1=another_emit_time_1,total=total)
             self.own.message_handler.send_message(src, message)
             ####print('Negotiate ends')
+            
+            
         elif msg_type is GenerationMsgType.NEGOTIATE_ACK:
+            logger.info("Negotiation Acknowledgement message recieved by " + self.own.lightsource.name)
             # configure params
             msg_emit_time_0=msg.kwargs["emit_time_0"]
             msg_emit_time_1=msg.kwargs["emit_time_1"]
@@ -395,6 +406,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             self.own.timeline.events.push(event)
             self.scheduled_events.append(event)
             ###print('Negotiate ack ends')
+            
 
             ### scheduling at end of protocol
             
@@ -451,6 +463,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             raise Exception("Invalid message {} received by EG on node {}".format(msg_type, self.own.name))
 
         self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
+        #logger.info("bk_generation message recieved")
         return True
 
     def is_ready(self) -> bool:
@@ -482,7 +495,8 @@ class EntanglementGenerationA(EntanglementProtocol):
         src=self.subtask.task.get_reservation().initiator
         if (self.own.name==src and self.other==dst) or (self.own.name==dst and self.other==src) :
             print(f'Entanglement sucessful between {src,dst}')
-
+            print("Here")
+            logger.info(f'Entanglement sucessful between {src,dst}')
 
 
     def _entanglement_fail(self):
@@ -500,7 +514,8 @@ class EntanglementGenerationA(EntanglementProtocol):
 
 
 class EntanglementGenerationB(EntanglementProtocol):
-    """Entanglement generation protocol for BSM node.
+    """
+    Entanglement generation protocol for BSM node.
     The EntanglementGenerationB protocol should be instantiated on a BSM node.
     Instances will communicate with the A instance on neighboring quantum router nodes to generate entanglement.
     Attributes:

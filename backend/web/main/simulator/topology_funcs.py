@@ -1,5 +1,5 @@
-
 import importlib
+import logging
 import time
 from contextlib import nullcontext
 from pprint import pprint
@@ -9,11 +9,16 @@ from tokenize import String
 
 import numpy as np
 import pandas as pd
+from pyvis.network import Network
+# from qntsim.library.protocol_handler.protocol_handler import Protocol
+from qntsim.communication.protocol import ProtocolPipeline
+from qntsim.topology.topology import Topology
+from tabulate import tabulate
+
 from .app.e2e import *
 from .app.e91 import *
 from .app.ghz import *
 from .app.ip1 import *
-from .app.ip2 import ip2_run
 from .app.mdi_qsdc import *
 from .app.ping_pong import *
 from .app.qsdc1 import *
@@ -24,7 +29,7 @@ from .app.utils import *
 from .helpers import *
 from pyvis.network import Network
 # from qntsim.library.protocol_handler.protocol_handler import Protocol
-from qntsim.communication.protocol import Protocol
+from qntsim.communication.protocol import ProtocolPipeline
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
 import logging
@@ -383,7 +388,7 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     # attack=None
     topology = '/code/web/topology.json'
     print('topology', topology)
-    protocol = Protocol(name='qsdc_tel', messages_list=[
+    protocol = ProtocolPipeline(name='qsdc_tel', messages_list=[
                         messages], label='00', attack=attack)
     protocol(topology=network_config)
     # tl.init()
@@ -434,7 +439,7 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     # # message = ['hello']
     # message = [message]
     # # print('message', message, type(message),type([message]),attack)
-    # protocol = Protocol(platform='qntsim',
+    # protocol = ProtocolPipeline(platform='qntsim',
     #                     messages_list=[message],
     #                     topology=topo,
     #                     backend='Qutip',
@@ -474,7 +479,7 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     # attack=None
     topology = '/code/web/configs/singlenode.json'
     print('topology', topology)
-    protocol = Protocol(name='qd_sp', messages_list=[messages], attack=attack)
+    protocol = ProtocolPipeline(name='qd_sp', messages_list=[messages], attack=attack)
     protocol(topology=topology)
 
     print("protocol.recv_msgs_list", protocol.recv_msgs_list[-1])
@@ -508,7 +513,7 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
     # topo = '/code/web/singlenode.json'
     # message = [message1,message2]
     # print('message', message)
-    # protocol = Protocol(platform='qntsim',
+    # protocol = ProtocolPipeline(platform='qntsim',
     #                 messages_list=[message],
     #                 topology=topo,
     #                 backend='Qutip',
@@ -533,7 +538,7 @@ def single_photon_qd(network_config, sender, receiver, message1, message2, attac
 
 def random_encode_photons(network: Network):
     print('inside random encode')
-    node = network.network.nodes['n1']
+    node = network._net_topo.nodes['n1']
     manager = network.manager
     basis = {}
     for info in node.resource_manager.memory_manager:
@@ -557,7 +562,7 @@ def random_encode_photons(network: Network):
 
 def authenticate_party(network: Network):
     manager = network.manager
-    node = network.network.nodes['n1']
+    node = network._net_topo.nodes['n1']
     keys = [info.memory.qstate_key for info in node.resource_manager.memory_manager[:2*network.size+150]]
     keys1 = keys[network.size-25:network.size]
     keys1.extend(keys[2*network.size:2*network.size+75])
@@ -594,7 +599,7 @@ def authenticate_party(network: Network):
 
 
 def swap_entanglement(network: Network):
-    node = network.network.nodes['n1']
+    node = network._net_topo.nodes['n1']
     manager = network.manager
     e_keys = []
     for info0, info1 in zip(node.resource_manager.memory_manager[:network.size-25],
@@ -654,65 +659,65 @@ def mdi_qsdc(network_config, sender, receiver, message, attack):
     print('network', network, basis)
 
 
-def ip2(network_config, alice_attrs, bob_id, threshold, num_decoy):
-    report = {}
-    start_time = time.time()
-    # print("input_messages,ids,num_check_bits,num_decoy",input_messages,ids,num_check_bits,num_decoy)
-    network_config_json, tl, network_topo = load_topology(
-        network_config, "Qutip")
-    tl.init()
-    topo_json = json_topo(network_config_json)
-    print('network config json', network_topo)
-    with open("topology.json", "w") as outfile:
-        json.dump(topo_json, outfile)
-    topology = '/code/web/topology.json'
-    sender = alice_attrs["sender"]
-    receiver = alice_attrs["receiver"]
-    input_message = alice_attrs["message"]
-    print('sender, receievre', sender, receiver)
-    # network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
-    # tl.init()
-    # topo_json = json_topo(network_config_json)
-    # print('network config json', network_topo)
-    # with open("topology.json", "w") as outfile:
-    #     json.dump(topo_json, outfile)
-    alice_attrs.update({'message': {(sender, receiver): input_message},
-                   'id': '1011',
-                   'check_bits': 4})
-    bob_id = '0111'
-    num_decoy_photons = 4
-    threshold = 0.2  # error threshold
-    attack = (None, None)
-    # topology = '/code/web/configs/2n_linear.json'
-    network, recv_msgs, err_tup = ip2_run(topology=network_config,
-                                          alice_attrs=alice_attrs,
-                                          bob_id=bob_id,
-                                          num_decoy_photons=num_decoy_photons,
-                                          threshold=threshold,
-                                          attack=attack)
-    # results=ip2_run(topology,input_messages,ids,num_check_bits,num_decoy,attack)
-    # report["application"]=results
-    # return report
-    # print('results', results[1][0])
-    res = {}
-    res["input_message"] = input_message
-    res["alice_id"] = alice_attrs["id"]
-    res["alice_check_bits"] = alice_attrs["check_bits"]
-    res["bob_id"] = bob_id
-    res["threshold"] = threshold
-    res["num_decoy"] = num_decoy
-    res["output_msg"] = recv_msgs
-    res["avg_error"] = err_tup[0]
-    res["standard_deviation"] = err_tup[1]
-    res["info_leaked"] = err_tup[2]
-    res["msg_fidelity"] = err_tup[3]
-    # report = {}
-    report["application"] = res
-    end_time = time.time()
-    report = network_graph(network._net_topo, [sender], report)
-    execution_time = end_time-start_time
-    report["performance"]["execution_time"] = execution_time
-    # execution_time = end_time-start_time
-    # report["performance"]["execution_time"] = execution_time
-    print('report', report)
-    return report
+# def ip2(network_config, alice_attrs, bob_id, threshold, num_decoy):
+#     report = {}
+#     start_time = time.time()
+#     # print("input_messages,ids,num_check_bits,num_decoy",input_messages,ids,num_check_bits,num_decoy)
+#     network_config_json, tl, network_topo = load_topology(
+#         network_config, "Qutip")
+#     tl.init()
+#     topo_json = json_topo(network_config_json)
+#     print('network config json', network_topo)
+#     with open("topology.json", "w") as outfile:
+#         json.dump(topo_json, outfile)
+#     topology = '/code/web/topology.json'
+#     sender = alice_attrs["sender"]
+#     receiver = alice_attrs["receiver"]
+#     input_message = alice_attrs["message"]
+#     print('sender, receievre', sender, receiver)
+#     # network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
+#     # tl.init()
+#     # topo_json = json_topo(network_config_json)
+#     # print('network config json', network_topo)
+#     # with open("topology.json", "w") as outfile:
+#     #     json.dump(topo_json, outfile)
+#     alice_attrs.update({'message': {(sender, receiver): input_message},
+#                    'id': '1011',
+#                    'check_bits': 4})
+#     bob_id = '0111'
+#     num_decoy_photons = 4
+#     threshold = 0.2  # error threshold
+#     attack = (None, None)
+#     # topology = '/code/web/configs/2n_linear.json'
+#     network, recv_msgs, err_tup = ip2_run(topology=network_config,
+#                                           alice_attrs=alice_attrs,
+#                                           bob_id=bob_id,
+#                                           num_decoy_photons=num_decoy_photons,
+#                                           threshold=threshold,
+#                                           attack=attack)
+#     # results=ip2_run(topology,input_messages,ids,num_check_bits,num_decoy,attack)
+#     # report["application"]=results
+#     # return report
+#     # print('results', results[1][0])
+#     res = {}
+#     res["input_message"] = input_message
+#     res["alice_id"] = alice_attrs["id"]
+#     res["alice_check_bits"] = alice_attrs["check_bits"]
+#     res["bob_id"] = bob_id
+#     res["threshold"] = threshold
+#     res["num_decoy"] = num_decoy
+#     res["output_msg"] = recv_msgs
+#     res["avg_error"] = err_tup[0]
+#     res["standard_deviation"] = err_tup[1]
+#     res["info_leaked"] = err_tup[2]
+#     res["msg_fidelity"] = err_tup[3]
+#     # report = {}
+#     report["application"] = res
+#     end_time = time.time()
+#     report = network_graph(network._net_topo, [sender], report)
+#     execution_time = end_time-start_time
+#     report["performance"]["execution_time"] = execution_time
+#     # execution_time = end_time-start_time
+#     # report["performance"]["execution_time"] = execution_time
+#     print('report', report)
+#     return report

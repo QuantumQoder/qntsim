@@ -20,6 +20,8 @@ from ..message import Message
 from .rule_manager import RuleManager
 from .memory_manager import MemoryManager
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
+import logging
+logger = logging.getLogger("main_logger." + "resource_manager")
 
 class ResourceManagerMsgType(Enum):
     """Available message types for the ResourceManagerMessage."""
@@ -334,6 +336,7 @@ class ResourceManager():
         """
         ##print("resource manager receive method",msg.kwargs['protocol'].name,msg.msg_type ,self.owner.name)
         if msg.msg_type is ResourceManagerMsgType.REQUEST:
+            logger.info("Resourcemanager REQUEST received by " + self.owner.name)
             req_condition_func=msg.kwargs.get('req_condition_func')
             protocol = req_condition_func(self.waiting_protocols)
             
@@ -363,6 +366,7 @@ class ResourceManager():
                                              is_approved=False, paired_protocol=None)
             self.owner.message_handler.send_message(src, new_msg)
         elif msg.msg_type is ResourceManagerMsgType.RESPONSE:
+            logger.info("Resource manager RESPONSE message received by " + self.owner.name )
             #print('Resource manager Response')
             ini_protocol=msg.kwargs['protocol']
             is_approved=msg.kwargs['is_approved']
@@ -413,6 +417,7 @@ class ResourceManager():
                 assert isinstance(protocol, EntanglementProtocol)
                 protocol.release()
         elif msg.msg_type is ResourceManagerMsgType.RELEASE_MEMORY:
+            logger.info("RELEASE_MEMORY message received by "+ self.owner.name)
             target_id = msg.memory
             for protocol in self.owner.protocols:
                 for memory in protocol.memories:
@@ -435,10 +440,12 @@ class ResourceManager():
             for memory_index in self.reservation_to_memory_map[reservation]:
                 self.update(None, self.memory_manager.memory_array.memories[memory_index], "RAW")
             del self.reservation_to_memory_map[reservation]
+            logger.info("ABORT message received by "+ self.owner.name)
 
         ##print("resoure man recv queue",self.owner.message_handler.manager_queue,self.owner.name)   
         self.owner.message_handler.process_msg(msg.receiver_type,msg.receiver)
-
+        
+        
     def memory_expire(self, memory: "Memory"):
         """Method to receive memory expiration events."""
 

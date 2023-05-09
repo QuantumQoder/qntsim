@@ -24,6 +24,7 @@ from django.http import StreamingHttpResponse
 import time
 import os
 import logging 
+from main.simulator.app.ip2 import ip2_run
 
 logger = logging.getLogger("main_logger")
 logger.setLevel(logging.DEBUG)
@@ -102,7 +103,7 @@ class RunApp(APIView):
         elif application == "ip2":
             # input_messages = {int(k):str(v) for k,v in appSettings["input_messages"].items()}
             # ids = {int(k):str(v) for k,v in appSettings["ids"].items()}
-            results = ip2(topology,appSettings["alice_attrs"], appSettings["bob_id"],appSettings["threshold"],appSettings["num_decoy"])
+            results = ip2_run(topology,appSettings)
         # Add code for results here
         # print('results', results)
         # graphs = results.get('graph')
@@ -273,7 +274,7 @@ def stream_logs(request):
 
     response = StreamingHttpResponse(generate_response(), content_type='text/plain')
     return response
-
+@csrf_exempt
 def log_view(request):
     def stream_logs():
         # retrieve log records from the MemoryHandler buffer
@@ -293,4 +294,6 @@ def log_view(request):
     # response['Content-Disposition'] = 'attachment; filename="my_log_file.txt"'
     # for handler in logger.handlers:
     #     logger.removeHandler(handler)
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
     return response

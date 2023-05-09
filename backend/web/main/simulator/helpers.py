@@ -4,8 +4,11 @@ import string
 from .constants import *
 from qntsim.kernel.timeline import Timeline
 from qntsim.topology.topology import Topology
+import logging
+logger = logging.getLogger("main." + "helpers")
 
 def load_topology(network_config_json, backend):
+    
     """
         Creates the network with nodes, quantum connections and 
         updates their respective components with the parameters specified in json
@@ -15,6 +18,7 @@ def load_topology(network_config_json, backend):
     print(f'Loading Topology: {network_config_json}')
     
     tl = Timeline(20e12,backend)
+    logger.info("Timeline initiated with bk protocol")
 
     #Create the topology
     network_topo = Topology("network_topo", tl)
