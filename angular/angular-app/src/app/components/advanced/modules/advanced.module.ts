@@ -17,4 +17,4 @@ import { SliderModule } from 'primeng/slider';
     ],
     declarations: [AdvancedComponent]
 })
-export class ApplicationModule { }
+export class AdvancedModule { }
