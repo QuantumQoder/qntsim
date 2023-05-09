@@ -297,7 +297,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             message = Message(MsgRecieverType.PROTOCOL, self.other_protocol.name, GenerationMsgType.NEGOTIATE, other_protocol=self.other_protocol.name,
                                                     qc_delay=self.qc_delay, frequency=frequency,protocol=self)
             self.own.message_handler.send_message(self.other, message)
-            print("Message Here", message)
+            # print("Message Here", message)
             
             
 

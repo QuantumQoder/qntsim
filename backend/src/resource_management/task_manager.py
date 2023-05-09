@@ -2,7 +2,9 @@ import itertools
 import logging
 from logging import config
 from qntsim.conf import LOG_CONFIG_FILE
-config.fileConfig(LOG_CONFIG_FILE)
+import os
+print('ll',LOG_CONFIG_FILE,os.getcwd())
+config.fileConfig("/code/web/logging.ini")
 #from qntsim.utils.log import logger
 
 from typing import Callable, TYPE_CHECKING, List, Tuple
