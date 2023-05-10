@@ -20,6 +20,7 @@ from ..topology.topology import Topology
 from .circuits import bell_type_state_analyzer
 from .noise import ERROR_TYPE
 from .NoiseModel import noise_model
+from .utils import string_to_binary
 
 Timeline.bk = True
 Timeline.DLCZ = False
