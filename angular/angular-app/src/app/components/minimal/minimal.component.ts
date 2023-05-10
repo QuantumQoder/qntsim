@@ -3,7 +3,7 @@ import { transition } from '@angular/animations';
 import { CookieService } from 'ngx-cookie-service';
 import { ApiServiceService } from './../../../services/api-service.service';
 
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import * as go from 'gojs'
 import { map } from 'rxjs';
@@ -11,11 +11,11 @@ import { ConditionsService } from 'src/services/conditions.service';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 
-
 @Component({
   selector: 'app-minimal',
   templateUrl: './minimal.component.html',
-  styleUrls: ['./minimal.component.less']
+  styleUrls: ['./minimal.component.less'],
+  encapsulation: ViewEncapsulation.None
 })
 
 export class MinimalComponent implements OnInit, AfterViewInit {

@@ -8,7 +8,12 @@
     <span class="sr-only">Loading...</span>
 </div> -->
 <div id="comp" class="row-1 container-fluid shadow p-1 mb-1 bg-white rounded mx-auto">
-
+    <p-dialog header="Please select type of the node" [(visible)]="nodeTypeSelect" [modal]="true">
+        <div class="d-flex justify-content-center">
+            <button class="btn btn-primary m-2" (click)="addNode('Service')">Service</button>
+            <button class="btn btn-primary m-2" (click)="addNode('End')">End</button>
+        </div>
+    </p-dialog>
     <!-- <p-toast position="bottom-center" [baseZIndex]="5000"></p-toast> -->
     <div *ngIf="spinner" class="loader-body">
         <div>

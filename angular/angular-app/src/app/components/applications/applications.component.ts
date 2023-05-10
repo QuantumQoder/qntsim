@@ -11,6 +11,7 @@ import { HoldingDataService } from 'src/services/holding-data.service';
   styleUrls: ['./applications.component.less'],
 })
 export class ApplicationsComponent implements OnInit {
+  nodeTypeSelect: boolean = false
   data: any
   token: any;
   responsiveOptions: any
