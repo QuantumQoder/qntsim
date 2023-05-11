@@ -442,10 +442,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         { propName: "No of Memories", propValue: 500, numericValueOnly: true }
       ],
       memory: [
-        { propName: "frequency(hz)", propValue: 2000, numericValueOnly: true },
-        { propName: "expiry(ms)", propValue: -1, numericValueOnly: true },
-        { propName: "efficiency", propValue: 1, decimalValueAlso: true },
-        { propName: "fidelity", propValue: 0.93, decimalValueAlso: true }
+        { propName: "Frequency (Hz)", propValue: 2000, numericValueOnly: true },
+        { propName: "Expiry (ms)", propValue: -1, numericValueOnly: true },
+        { propName: "Efficiency", propValue: 1, decimalValueAlso: true },
+        { propName: "Fidelity", propValue: 0.93, decimalValueAlso: true }
       ]
     };
     this.myDiagram.startTransaction('Add node and link');
@@ -682,13 +682,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         color: "lightblue",
         properties: [
           { propName: "Type", propValue: "End", nodeType: true },
-          { propName: "NoOfMemories", propValue: 500, numericValueOnly: true }
+          { propName: "No of Memories", propValue: 500, numericValueOnly: true }
         ],
         memory: [
-          { propName: "frequency(hz)", propValue: 2000, numericValueOnly: true },
-          { propName: "expiry(ms)", propValue: -1, numericValueOnly: true },
-          { propName: "efficiency", propValue: 1, decimalValueAlso: true },
-          { propName: "fidelity", propValue: 0.93, decimalValueAlso: true }
+          { propName: "Frequency (Hz)", propValue: 2000, numericValueOnly: true },
+          { propName: "Expiry (ms)", propValue: -1, numericValueOnly: true },
+          { propName: "Efficiency", propValue: 1, decimalValueAlso: true },
+          { propName: "Fidelity", propValue: 0.93, decimalValueAlso: true }
         ]
       }
     ];
