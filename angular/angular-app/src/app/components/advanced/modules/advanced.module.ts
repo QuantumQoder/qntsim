@@ -5,6 +5,7 @@ import { AdvancedComponent } from '../advanced.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AccordionModule } from 'primeng/accordion';
 import { SliderModule } from 'primeng/slider';
+import { DialogModule } from 'primeng/dialog';
 
 @NgModule({
     imports: [
@@ -13,7 +14,8 @@ import { SliderModule } from 'primeng/slider';
         FormsModule,
         ReactiveFormsModule,
         AccordionModule,
-        SliderModule
+        SliderModule,
+        DialogModule
     ],
     declarations: [AdvancedComponent]
 })

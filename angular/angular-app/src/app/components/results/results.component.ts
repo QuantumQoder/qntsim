@@ -21,7 +21,6 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   keyGen: boolean
   keyBits: boolean
   cols: any
-
   app: string;
   constructor(private con: ConditionsService,
     private router: Router) { }

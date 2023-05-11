@@ -190,7 +190,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         
 
         log.logger.info(self.own.name + " protocol start with partner {}".format(self.other))
-        logger.info(self.own.name + " protocol start with partner {}".format(self.other))
+        #logger.info(self.own.name + " protocol start with partner {}".format(self.other))
         # print(self.own.name + " Generation protocol start with partner {}".format(self.other),self.name, self.middle)
         ####print('start protocol',self.other_protocol.name,self.name)
         # to avoid start after remove protocol
@@ -217,7 +217,7 @@ class EntanglementGenerationA(EntanglementProtocol):
        
             
     def end(self) -> None:
-        
+        #print("ENDDDDDDDDDDDDDDDDDDDDDDDD")
         """Method to end entanglement generation protocol.
         Checks the measurement results received to determine if valid entanglement achieved, and what the state is.
         If entanglement is achieved, the memory fidelity will be increased to equal the `fidelity` field.
@@ -289,7 +289,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         log.logger.debug(self.own.name + " EG protocol received_message of type {} from node {}, round={}".format(msg.msg_type, src, self.ent_round + 1))
 
         if  msg_type is GenerationMsgType.BSM_ALLOCATE:
-            logger.info("BSM Allocation message recieved by " + self.own.lightsource.name)
+            #logger.info("BSM Allocation message recieved by " + self.own.lightsource.name)
 
             self.qc_delay = self.own.qchannels[self.middle].delay
             frequency = self.memory.frequency
@@ -302,7 +302,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             
 
         elif msg_type is GenerationMsgType.NEGOTIATE:
-            logger.info("Negotiation  message recieved by " + self.own.lightsource.name)
+            #logger.info("Negotiation  message recieved by " + self.own.lightsource.name)
             # configure params
             #####print('negotiate starts')
             qc_delay=msg.kwargs["qc_delay"]
@@ -360,7 +360,7 @@ class EntanglementGenerationA(EntanglementProtocol):
             
             
         elif msg_type is GenerationMsgType.NEGOTIATE_ACK:
-            logger.info("Negotiation Acknowledgement message recieved by " + self.own.lightsource.name)
+            #logger.info("Negotiation Acknowledgement message recieved by " + self.own.lightsource.name)
             # configure params
             msg_emit_time_0=msg.kwargs["emit_time_0"]
             msg_emit_time_1=msg.kwargs["emit_time_1"]
@@ -495,7 +495,6 @@ class EntanglementGenerationA(EntanglementProtocol):
         src=self.subtask.task.get_reservation().initiator
         if (self.own.name==src and self.other==dst) or (self.own.name==dst and self.other==src) :
             print(f'Entanglement sucessful between {src,dst}')
-            print("Here")
             logger.info(f'Entanglement sucessful between {src,dst}')
 
 
@@ -511,6 +510,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.update_resource_manager(self.memory, 'RAW')
         #print('_entanglement_fail:  len(self.subtask.protocols): ', len(self.subtask.protocols))
         self.subtask.on_complete(-1)
+        logger.info(f'Entanglement failed between {self.own.name,self.other}')
 
 
 class EntanglementGenerationB(EntanglementProtocol):

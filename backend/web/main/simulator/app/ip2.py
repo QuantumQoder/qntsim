@@ -371,9 +371,10 @@ def pass_(network: Network, returns: Any):
 
 def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
     message = app_settings.get("sender").pop("message")
+    is_binary = all(char in '01' for char in message)
     message = (
         message
-        if all(char in "01" for char in message)
+        if is_binary
         else string_to_binary(
             {
                 (
@@ -396,7 +397,7 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
     Sender.update_params(**(app_settings.get("sender")))
     Receiver.update_params(**(app_settings.get("receiver")))
     label = app_settings.get("bell_type", "00")
-    err_threshold = app_settings.get("error _threshold")
+    error_threshold = app_settings.get("error_threshold")
     attack = app_settings.get("attack")
     channel = app_settings.get("channel")
     channel = [1 if i == channel else 0 for i in range(3)]
@@ -411,20 +412,20 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
             UTP.check_channel_security,
             cls1=Sender,
             cls2=Receiver,
-            threshold=err_threshold,
+            threshold=error_threshold,
         ),
         partial(
             Sender.insert_new_decoy_photons, num_decoy_photons=Sender.num_decoy_photons
         ),
         #  partial(Attack.implement, attack=ATTACK_TYPE[attack].value) if attack and chnnl[1] else partial(pass_),
         partial(
-            UTP.check_channel_security, cls1=UTP, cls2=Sender, threshold=err_threshold
+            UTP.check_channel_security, cls1=UTP, cls2=Sender, threshold=error_threshold
         ),
         partial(Attack.implement, attack=ATTACK_TYPE[attack].value)
         if attack and channel[2]
         else partial(pass_),
         partial(
-            UTP.check_channel_security, cls1=UTP, cls2=Receiver, threshold=err_threshold
+            UTP.check_channel_security, cls1=UTP, cls2=Receiver, threshold=error_threshold
         ),
         partial(
             UTP.authenticate,
@@ -434,7 +435,7 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
         ),
         partial(UTP.measure, circuit=bell_type_state_analyzer(2), cls=Sender),
         partial(Receiver.decode),
-        partial(Receiver.check_integrity, cls1=Sender, threshold=err_threshold),
+        partial(Receiver.check_integrity, cls1=Sender, threshold=error_threshold),
     ]
     network = Network(
         topology=topology,
@@ -558,8 +559,8 @@ if __name__ == "__main__":
             "num_check_bits": 4,
             "num_decoy_photons": 4,
         },
-        "receiver": {"node": "n2", "userID": "0110"},
-        "err_threshold": 0.4,
+        "receiver": {"node": "n3", "userID": "0110"},
+        "error_threshold": 0.4,
         "bell_type": "00",
     }
     response = ip2_run(topology=topology, app_settings=app_settings)

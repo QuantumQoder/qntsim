@@ -8,7 +8,8 @@ import { CarouselModule } from 'primeng/carousel';
     imports: [
         CommonModule,
         ApplicationRoutingModule,
-        CarouselModule
+        CarouselModule,
+
     ],
     declarations: [ApplicationsComponent]
 })

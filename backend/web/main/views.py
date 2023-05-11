@@ -1,30 +1,32 @@
-from re import S
-import time
-import json
 import base64
 import io
-import networkx as nx
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
-from django.template import loader
-from main.simulator.topology_funcs import *
-from django.views.decorators.http import condition
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.views import APIView
-from rest_framework import mixins, generics
-from main.serializers import ApplicationSerializer
-from main.models import Applications,Results
-import importlib
-from main.simulator import topology_funcs
-import qntsim
-from django.http import StreamingHttpResponse
+import json
 import time
+from re import S
+
+import matplotlib
+import networkx as nx
+
+matplotlib.use('Agg')
+import importlib
+import logging
 import os
-import logging 
+import time
+
+import matplotlib.pyplot as plt
+import qntsim
+from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
+from django.shortcuts import render
+from django.template import loader
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import condition
+from main.models import Applications, Results
+from main.serializers import ApplicationSerializer
+from main.simulator import topology_funcs
 from main.simulator.app.ip2 import ip2_run
+from main.simulator.topology_funcs import *
+from rest_framework import generics, mixins
+from rest_framework.views import APIView
 
 logger = logging.getLogger("main_logger")
 logger.setLevel(logging.DEBUG)
