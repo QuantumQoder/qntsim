@@ -22,10 +22,11 @@ import { map } from 'rxjs';
 })
 export class AdvancedComponent implements OnInit, AfterViewInit {
   app: any
+  adornedpart: any
   routeFrom: string
   @ViewChild('diagramContainer') private diagramRef: ElementRef;
   private addButtonAdornment: go.Adornment;
-
+  nodeTypeSelect: boolean = false
   nodesSelection = {
     sender: '',
     receiver: '',
@@ -151,6 +152,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     else {
       $event.preventDefault();
     }
+  }
+  selectNodeType(adornedpart: any) {
+    this.nodeTypeSelect = true;
+    this.adornedpart = adornedpart
   }
   updateNodes() {
     var nodesArray = this.myDiagram.model.nodeDataArray
@@ -425,21 +430,22 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       this._route.navigate(['/results'])
     })
   }
-  addNode(adornedPart: go.Part) {
+  addNode(nodetype: string) {
+    var adornedPart = this.adornedpart
     const newKey = this.myDiagram.model.nodeDataArray[this.myDiagram.model.nodeDataArray.length - 1].key
     const newNode = {
       key: newKey + 1,
       name: `node${newKey + 1}`,
-      color: adornedPart.data.properties[0].propValue == 'Service' ? 'lightblue' : adornedPart.data.properties[0].propValue == 'End' ? 'lightsalmon' : null,
+      color: nodetype == 'Service' ? 'lightsalmon' : nodetype == 'End' ? 'lightblue' : null,
       properties: [
-        { propName: "Type", propValue: adornedPart.data.properties[0].propValue == 'Service' ? 'End' : adornedPart.data.properties[0].propValue == 'End' ? 'Service' : null, nodeType: true },
+        { propName: "Type", propValue: nodetype, nodeType: true },
         { propName: "No of Memories", propValue: 500, numericValueOnly: true }
       ],
       memory: [
-        { propName: "frequency(hz)", propValue: 2000, numericValueOnly: true },
-        { propName: "expiry(ms)", propValue: -1, numericValueOnly: true },
-        { propName: "efficiency", propValue: 1, decimalValueAlso: true },
-        { propName: "fidelity", propValue: 0.93, decimalValueAlso: true }
+        { propName: "Frequency (Hz)", propValue: 2000, numericValueOnly: true },
+        { propName: "Expiry (ms)", propValue: -1, numericValueOnly: true },
+        { propName: "Efficiency", propValue: 1, decimalValueAlso: true },
+        { propName: "Fidelity", propValue: 0.93, decimalValueAlso: true }
       ]
     };
     this.myDiagram.startTransaction('Add node and link');
@@ -447,6 +453,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     this.myDiagram.model.addLinkData({ from: adornedPart.data.key, to: newNode.key });
     this.myDiagram.commitTransaction('Add node and link');
     this.myDiagram.zoomToFit();
+    this.nodeTypeSelect = false
     this.updateNodes()
   }
   load() {
@@ -505,16 +512,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       'allowZoom': true, // Disables zooming
       layout: $(go.ForceDirectedLayout)
     });
-    this.addButtonAdornment = $(go.Adornment, 'Spot',
-      $(go.Panel, 'Auto',
-        $(go.Shape, { fill: null, strokeWidth: 0 }),
-        $(go.Placeholder)
-      ),
-      $(go.Panel, 'Spot', { alignment: go.Spot.Right, alignmentFocus: go.Spot.Left, cursor: 'pointer' },
-        { click: (e: any, obj: any) => this.addNode(obj.part.adornedPart) },
-        $(go.TextBlock, '+', { font: 'bold 10pt sans-serif', margin: new go.Margin(0, 5, 0, 0) })
-      )
-    );
+
 
     function isPositiveNumber(val: any) {
       console.log(val)
@@ -628,7 +626,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
             {
               alignment: go.Spot.Right,
               alignmentFocus: go.Spot.Left,
-              click: (e: any, obj: any) => this.addNode(obj.part)
+              click: (e: any, obj: any) => this.selectNodeType(obj.part)
             },
             $(go.Shape,
               {
@@ -684,13 +682,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         color: "lightblue",
         properties: [
           { propName: "Type", propValue: "End", nodeType: true },
-          { propName: "NoOfMemories", propValue: 500, numericValueOnly: true }
+          { propName: "No of Memories", propValue: 500, numericValueOnly: true }
         ],
         memory: [
-          { propName: "frequency(hz)", propValue: 2000, numericValueOnly: true },
-          { propName: "expiry(ms)", propValue: -1, numericValueOnly: true },
-          { propName: "efficiency", propValue: 1, decimalValueAlso: true },
-          { propName: "fidelity", propValue: 0.93, decimalValueAlso: true }
+          { propName: "Frequency (Hz)", propValue: 2000, numericValueOnly: true },
+          { propName: "Expiry (ms)", propValue: -1, numericValueOnly: true },
+          { propName: "Efficiency", propValue: 1, decimalValueAlso: true },
+          { propName: "Fidelity", propValue: 0.93, decimalValueAlso: true }
         ]
       }
     ];

@@ -1,7 +1,7 @@
 //import { animate, style, transition, trigger, useAnimation } from '@angular/animations';
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MenuItem } from 'primeng/api/menuitem';
+// import { MenuItem } from 'primeng/api/menuitem';
 import { ApiServiceService } from 'src/services/api-service.service';
 import { ConditionsService } from 'src/services/conditions.service';
 import { HoldingDataService } from 'src/services/holding-data.service';
@@ -11,13 +11,14 @@ import { HoldingDataService } from 'src/services/holding-data.service';
   styleUrls: ['./applications.component.less'],
 })
 export class ApplicationsComponent implements OnInit {
+  nodeTypeSelect: boolean = false
   data: any
   token: any;
   responsiveOptions: any
-  items: MenuItem[] = [
-    { label: 'Home', routerLink: ['/'] },
-    { label: 'Application', routerLink: ['applications'] },
-  ];
+  // items: MenuItem[] = [
+  //   { label: 'Home', routerLink: ['/'] },
+  //   { label: 'Application', routerLink: ['applications'] },
+  // ];
   appDescription: any[] = []
   constructor(private conService: ConditionsService, private _router: Router, private apiService: ApiServiceService, private holdingData: HoldingDataService) { }
 

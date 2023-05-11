@@ -1,5 +1,6 @@
 <div class="content-wrapper shadow p-3 mb-3 bg-transparent">
-    <div class="d-flex justify-content-end btn-1">
+
+    <div class="d-flex justify-content-center btn-1">
 
         <button class="btn" (click)="scroll()"><span></span>
             <span></span>
@@ -9,7 +10,7 @@
         </button>
     </div>
     <div class="card-container">
-        <div *ngFor="let item of appDescription" class="mb-3 mx-auto">
+        <div id="container_copy" *ngFor="let item of appDescription" class="mb-3">
             <div class="container_copy mx-2">
                 <img class="img-apps" src="/assets/images/apps.jpg" alt="...">
                 <h1 class="display-6 text-white text-center">{{item.title}}</h1>
