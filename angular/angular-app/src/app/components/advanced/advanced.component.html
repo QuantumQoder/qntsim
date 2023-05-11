@@ -43,7 +43,7 @@
             <div class="configuration" style="height:100%">
                 <!-- <h4 class="text-dark text-center">Selected Application: {{application}}</h4> -->
                 <!-- <p-breadcrumb [model]="breadcrumbItems"></p-breadcrumb> -->
-                <div class="row">
+                <div class="row mt-3">
                     <div class="col mx-2">
                         <label class="form-label">Select Simulator</label>
                         <select class="form-control" [(ngModel)]="simulator.value">
@@ -135,7 +135,7 @@
                             </div>
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold">
-                                    Time Resolution(ps)
+                                    Time Resolution (ps)
                                 </label>
                                 <input class="form-control" [(ngModel)]="detectorProps.timeResolution" />
                             </div>
@@ -143,19 +143,19 @@
                         <p-accordionTab header="Light Source Properties">
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold">
-                                    Frequency(hz)
+                                    Frequency (Hz)
                                 </label>
                                 <input class="form-control" [(ngModel)]="lightSourceProps.frequency" />
                             </div>
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold">
-                                    Wavelength(nm)
+                                    Wavelength (nm)
                                 </label>
                                 <input class="form-control" [(ngModel)]="lightSourceProps.wavelength" />
                             </div>
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold">
-                                    Bandwidth(nm)
+                                    Bandwidth (nm)
                                 </label>
                                 <input class="form-control" [(ngModel)]="lightSourceProps.bandwidth" />
                             </div>
