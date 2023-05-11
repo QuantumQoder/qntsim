@@ -417,7 +417,7 @@ class ResourceManager():
                 assert isinstance(protocol, EntanglementProtocol)
                 protocol.release()
         elif msg.msg_type is ResourceManagerMsgType.RELEASE_MEMORY:
-            #("RELEASE_MEMORY message received by "+ self.owner.name)
+            #logger.info("RELEASE_MEMORY message received by "+ self.owner.name)
             target_id = msg.memory
             for protocol in self.owner.protocols:
                 for memory in protocol.memories:

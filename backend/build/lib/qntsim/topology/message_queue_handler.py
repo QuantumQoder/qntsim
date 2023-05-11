@@ -4,8 +4,6 @@ from collections import defaultdict
 
 from aenum import Enum
 # from ..entanglement_management.generation import GenerationMsgType
-import logging
-logger = logging.getLogger("main_logger." + "bk_swapping")
 
 class MsgRecieverType(Enum):
 
@@ -53,14 +51,14 @@ class MessageQueueHandler():
         self.manager_queue = {}
         
     def send_message(self, dst:str, msg, priority = inf):
-        #logger.info(msg.msg_type)
+
         if priority == inf:
             priority = self.owner.timeline.schedule_counter
         #print('send message', dst, self.owner.cchannels,self.owner.name)
         self.owner.cchannels[dst].transmit(msg, self.owner, priority)
    
     def push_message(self, src, msg):
-        #logger.info(msg.msg_type)
+        
         # self.protocol_queue = defaultdict(tuple)
         # self.manager_queue = defaultdict(tuple)
         #if hasattr(msg, 'id'):

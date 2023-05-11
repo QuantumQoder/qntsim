@@ -11,7 +11,7 @@ from functools import lru_cache
 from numpy.random import random
 
 if TYPE_CHECKING:
-    from ..components.bk_memory import Memory
+    from ..components.DLCZ_memory import Memory
     from ..topology.node import Node
 
 from ..message import Message
@@ -20,8 +20,6 @@ from ..utils import log
 from ..components.circuit import BaseCircuit
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
-import logging
-logger = logging.getLogger("main_logger." + "bk_swapping")
 class BBPSSWMsgType(Enum):
     """Defines possible message types for entanglement purification"""
 
@@ -41,21 +39,9 @@ class Message():
         self.receiver = receiver
         self.msg_type = msg_type
         self.kwargs = kwargs
-# class BBPSSWMessage(Message):
-#     """Message used by entanglement purification protocols.
-#     This message contains all information passed between purification protocol instances.
-#     Attributes:
-#         msg_type (BBPSSWMsgType): defines the message type.
-#         receiver (str): name of destination protocol instance.
-#     """
 
-#     def __init__(self, msg_type: BBPSSWMsgType, receiver: str, **kwargs):
-#         Message.__init__(self, msg_type, receiver)
-#         if self.msg_type is BBPSSWMsgType.PURIFICATION_RES:
-#             self.meas_res = kwargs['meas_res']
-#         else:
-#             raise Exception("BBPSSW protocol create unknown type of message: %s" % str(msg_type))
 
+    
 
 class BBPSSW(EntanglementProtocol):
     """Purification protocol instance.
@@ -91,15 +77,14 @@ class BBPSSW(EntanglementProtocol):
         self.kept_memo = kept_memo
         self.meas_memo = meas_memo
         self.another = None
-        self.meas_res = None
-        if self.meas_memo is None:
-            self.memories.pop()
-        Circuit =BaseCircuit.create(self.kept_memo.timeline.type)
-        #print("pur circuit",BaseCircuit.create(self.kept_memo.timeline.type))
+        self.F = None
+        # if self.meas_memo is None:
+        #     self.memories.pop()
+        Circuit =BaseCircuit.create(self.own.timeline.type)
+        #print("pur circuit",BaseCircuit.create(self.own.timeline.type))
         self.circuit = Circuit(2)
         self.circuit.cx(0, 1)
         self.circuit.measure(1)
-        print("PURR")
 
     def is_ready(self) -> bool:
         return self.another is not None
@@ -113,6 +98,7 @@ class BBPSSW(EntanglementProtocol):
         self.another = another
 
     def start(self) -> None:
+        # #print("purificatin has started")
         """Method to start entanglement purification.
         Run the circuit below on two pairs of entangled memories on both sides of protocol.
         o -------(x)----------| M |
@@ -136,8 +122,9 @@ class BBPSSW(EntanglementProtocol):
             May update parameters of kept memory.
             Will send message to other protocol instance.
         """
-
+        #print("Purification is Running")
         log.logger.info(self.own.name + " protocol start with partner {}".format(self.another.own.name))
+        print(self.name + " protocol start with partner {}".format(self.another.name))
 
         assert self.another is not None, "other protocol is not set; please use set_others function to set it."
         kept_memo_ent = self.kept_memo.entangled_memory["node_id"]
@@ -145,16 +132,14 @@ class BBPSSW(EntanglementProtocol):
         assert kept_memo_ent == meas_memo_ent, "mismatch of entangled memories {}, {} on node {}".format(kept_memo_ent, meas_memo_ent, self.own.name)
         assert self.kept_memo.fidelity == self.meas_memo.fidelity > 0.5
 
-        self.meas_res = self.own.timeline.quantum_manager.run_circuit(self.circuit, [self.kept_memo.qstate_key,
-                                                                                     self.meas_memo.qstate_key])
-        self.meas_res = self.meas_res[self.meas_memo.qstate_key]
         dst = self.kept_memo.entangled_memory["node_id"]
 
-        message = Message(MsgRecieverType.PROTOCOL, self.another.name, BBPSSWMsgType.PURIFICATION_RES, another=self.another.name, meas_res=self.meas_res)
+        # send message to other node to perform BBPSSW protocol 
+        message = Message(MsgRecieverType.PROTOCOL, self.another.name, BBPSSWMsgType.PURIFICATION_RES, another=self.another.name, F = self.kept_memo.fidelity)
         self.own.message_handler.send_message(dst, message)
+        #print("bbpssw start",self.name,dst, self.another.name )
 
     def received_message(self, src: str, msg: Message) -> None:
-        print("Purificationnnnnnn")
         """Method to receive messages.
         Args:
             src (str): name of node that sent the message.
@@ -163,19 +148,28 @@ class BBPSSW(EntanglementProtocol):
             Will call `update_resource_manager` method.
         """
 
-        #log.logger.info(self.own.name + " received result message, succeeded: {}".format(self.meas_res == msg.meas_res))
+        print('recv_msg_purification called')
         assert src == self.another.own.name
         self.update_resource_manager(self.meas_memo, "RAW")
-        if self.meas_res == msg.kwargs["meas_res"]:
-            # #print('receive pur if')
+
+        # generate random number to check if purification is succesful or not
+        x_rand = random()
+    
+        # check if purification succesful or not
+        if x_rand < self.success_probability(msg.kwargs['F']):
+            print("purification receive 1")
+            # if yes, update the fidelities.
             self.kept_memo.fidelity = self.improved_fidelity(self.kept_memo.fidelity)
             self.update_resource_manager(self.kept_memo, state="ENTANGLED")
+            print('purification succeeded: ', self.subtask.name)
+            self.subtask.on_complete(1, params = self.meas_memo)
         else:
-            # #print('receive pur else')
+            # else, turn the kept memory's status to raw
             self.update_resource_manager(self.kept_memo, state="RAW")
+            print('purification failed: ', self.subtask.name)
+            self.subtask.on_complete(-1, params = self.meas_memo)
             
         self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
-        logger.info("Purification Successfull")
 
     def memory_expire(self, memory: "Memory") -> None:
         """Method to receive memory expiration events.

@@ -19,9 +19,8 @@ from .entanglement_protocol import EntanglementProtocol
 from ..utils import log
 from ..components.circuit import BaseCircuit
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
-
 import logging
-logger = logging.getLogger("main_logger." + "bk_swapping")
+logger = logging.getLogger("main_logger." + "bk_purification")
 class BBPSSWMsgType(Enum):
     """Defines possible message types for entanglement purification"""
 
@@ -99,7 +98,6 @@ class BBPSSW(EntanglementProtocol):
         self.circuit = Circuit(2)
         self.circuit.cx(0, 1)
         self.circuit.measure(1)
-        print("PURR")
 
     def is_ready(self) -> bool:
         return self.another is not None
@@ -154,7 +152,6 @@ class BBPSSW(EntanglementProtocol):
         self.own.message_handler.send_message(dst, message)
 
     def received_message(self, src: str, msg: Message) -> None:
-        print("Purificationnnnnnn")
         """Method to receive messages.
         Args:
             src (str): name of node that sent the message.

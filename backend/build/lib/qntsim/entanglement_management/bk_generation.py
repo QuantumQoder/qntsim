@@ -217,7 +217,7 @@ class EntanglementGenerationA(EntanglementProtocol):
        
             
     def end(self) -> None:
-        #print("ENDDDDDDDDDDDDDDDDDDDDDDDD")
+        
         """Method to end entanglement generation protocol.
         Checks the measurement results received to determine if valid entanglement achieved, and what the state is.
         If entanglement is achieved, the memory fidelity will be increased to equal the `fidelity` field.
@@ -510,7 +510,6 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.update_resource_manager(self.memory, 'RAW')
         #print('_entanglement_fail:  len(self.subtask.protocols): ', len(self.subtask.protocols))
         self.subtask.on_complete(-1)
-        logger.info(f'Entanglement failed between {self.own.name,self.other}')
 
 
 class EntanglementGenerationB(EntanglementProtocol):
