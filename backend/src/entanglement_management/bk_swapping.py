@@ -226,13 +226,13 @@ class EntanglementSwappingA(EntanglementProtocol):
                                                 remote_memo=self.left_memo.entangled_memory["memo_id"],
                                                 expire_time=expire_time,
                                                 meas_res=[]) 
-            logger.log('Entanglement Swapping successful')
+            # logger.log('Entanglement Swapping successful')
             self.subtask.on_complete(1)
         else:
             expire_time = min(self.left_memo.get_expire_time(), self.right_memo.get_expire_time())
             msg_l = Message(MsgRecieverType.PROTOCOL, self.left_protocol.name ,SwappingMsgType.SWAP_RES, left_protocol=self.left_protocol.name, fidelity=0,expire_time=expire_time)
             msg_r = Message(MsgRecieverType.PROTOCOL, self.right_protocol.name,SwappingMsgType.SWAP_RES, right_protocol=self.right_protocol.name, fidelity=0,expire_time=expire_time)
-            logger.log('Entanglement Swapping failed')
+            # logger.log('Entanglement Swapping failed')
             self.subtask.on_complete(-1)
 
         self.own.message_handler.send_message(self.left_node, msg_l)
