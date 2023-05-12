@@ -62,3 +62,4 @@ djangorestframework==3.13.1
 django-cors-headers
 djangorestframework-simplejwt==5.1.0
 joblib
+gunicorn
