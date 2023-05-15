@@ -160,7 +160,6 @@
                             <tr>
                                 <!-- <td class="col text-center">{{nodeData.sender}}</td>
                                 <td class="col text-center">{{nodeData.receiver}}</td> -->
-
                                 <td class="col text-center">{{performance.execution_time}}&nbsp;secs</td>
                                 <td class="col text-center">{{performance.fidelity}}</td>
                                 <td class="col text-center">{{performance.throughput}}%</td>
@@ -172,7 +171,7 @@
                 <br>
                 <br>
                 <div class="row">
-                    <h5 class="text-center col-10" style="padding-top:10px ;">Execution details of entanglement
+                    <h5 class="text-center col-12" style="padding-top:10px ;">Execution details of entanglement
                         generation on the end nodes</h5>
                     <!-- <div class="text-right col-2">
                         <button class="btn btn-outline-primary" (click)="info_2()"><i
@@ -1118,8 +1117,9 @@
         </div>
         <br>
         <div class="d-flex justify-content-center">
-            <button class="btn btn-primary btn-custom" [routerLink]="['/applications']"
+            <button class="btn btn-primary btn-custom mx-1" [routerLink]="['/applications']"
                 routerLinkActive="router-link-active">Go to Applications</button>
+            <button class="btn btn-primary btn-custom" (click)="downloadTxtFile()">Download Logs</button>
         </div>
     </div>
 

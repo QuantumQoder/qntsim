@@ -21,6 +21,7 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   keyGen: boolean
   keyBits: boolean
   cols: any
+  logs: any
   app: string;
   constructor(private con: ConditionsService,
     private router: Router) { }
@@ -37,6 +38,7 @@ export class ResultsComponent implements OnInit, AfterViewInit {
     this.performance.fidelity = this.performance.fidelity.toFixed(3)
     this.performance.latency = this.performance.latency.toFixed(3);
     this.data = this.con.getResult().application;
+    this.logs = this.con.getResult().logs
     console.log(this.data, this.performance)
     if (this.app_id == 1) {
       this.match = this.data.sender_basis_list.reduce((match: any, x: any, i: any) => {
@@ -54,6 +56,15 @@ export class ResultsComponent implements OnInit, AfterViewInit {
   senderbasis(index: any) {
     var bool = this.match.includes(index)
     return bool ? "table-success" : "";
+  }
+  downloadTxtFile() {
+    const arrayData = this.logs.join('\n')
+    const blob = new Blob([arrayData], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    var anchor = document.createElement('a');
+    anchor.download = 'logs.log';
+    anchor.href = url;
+    anchor.click();
   }
 
 }
