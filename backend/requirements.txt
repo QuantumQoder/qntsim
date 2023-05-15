@@ -63,3 +63,4 @@ django-cors-headers
 djangorestframework-simplejwt==5.1.0
 joblib
 gunicorn
+websocket-client

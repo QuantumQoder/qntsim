@@ -33,7 +33,6 @@ from qntsim.communication.protocol import ProtocolPipeline
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
 import logging
-logger = logging.getLogger("main_logger." + "topology_funs")
 
 
 def display_quantum_state(state_vector):
@@ -155,8 +154,7 @@ def eve_e91(network_config, sender, receiver, keyLength):
 
 
 def e91(network_config, sender, receiver, keyLength):
-    logger.info("In e91")
-    print('In e91 network config', network_config)
+    print('network config', network_config)
     start_time = time.time()
     network_config_json, tl, network_topo = load_topology(
         network_config, "Qutip")
@@ -194,6 +192,7 @@ def e91(network_config, sender, receiver, keyLength):
 
 
 def e2e(network_config, sender, receiver, startTime, size, priority, targetFidelity, timeout):
+    logger = logging.getLogger("main_logger." + "e2e")
     logger.info("In e2e")
     # TODO: Integrate Network Graphs
     req_pairs = []
