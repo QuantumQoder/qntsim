@@ -8,3 +8,5 @@ angular/angular-app/node_modules/__ngcc_entry_points__.json
 *.txt
 *.log
 *.pyc
+build/
+qntsim.egg-info/

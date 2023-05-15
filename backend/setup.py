@@ -17,6 +17,7 @@ setup(
               'qntsim.transport_layer' ,
               'qntsim.utils'],
     package_dir={'qntsim': 'src'},
+    package_data={"qntsim":["logging.ini"]},
     install_requires=[
         'numpy',
 	'matplotlib',

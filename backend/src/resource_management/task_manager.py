@@ -1,21 +1,25 @@
 import itertools
 import logging
-from logging import config
-from qntsim.conf import LOG_CONFIG_FILE
 import os
+from logging import config
+
+from qntsim.conf import LOG_CONFIG_FILE
+
 print('ll',LOG_CONFIG_FILE,os.getcwd())
-config.fileConfig("/code/web/logging.ini")
+config.fileConfig(LOG_CONFIG_FILE)
 #from qntsim.utils.log import logger
 
-from typing import Callable, TYPE_CHECKING, List, Tuple
+from typing import TYPE_CHECKING, Callable, List, Tuple
+
 if TYPE_CHECKING:
-    from ..entanglement_management.entanglement_protocol import EntanglementProtocol
+    from ..entanglement_management.entanglement_protocol import \
+        EntanglementProtocol
+    from ..network_management.request import Request
+    from ..network_management.reservation import Reservation
+    from ..protocol import Protocol
+    from ..topology.node import QuantumRouter
     from .memory_manager import MemoryInfo, MemoryManager
     from .resource_manager import ResourceManager
-    from ..network_management.reservation import Reservation
-    from ..network_management.request import Request
-    from ..topology.node import QuantumRouter
-    from ..protocol import Protocol
 
 
 # class Task:

@@ -87,7 +87,7 @@ class NetworkManager():
             #print("received at ", self.owner.name,msg.kwargs)
             self.process_request(msg)
         self.owner.message_handler.process_msg(msg.receiver_type,msg.receiver)
-        logger.info("Reservation message received by "+self.owner.name)
+        #logger.info("Reservation message received by "+self.owner.name)
         
 
    

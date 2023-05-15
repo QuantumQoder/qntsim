@@ -215,7 +215,7 @@ class Network:
         messages: Dict[Tuple, str],
         name: str = "network",
         backend: str = "Qutip",
-        parameters: str = "parameters.json",
+        # parameters: str = "parameters.json",
         stop_time: int = 10e12,
         start_time: int = 5e12,
         end_time: int = 10e12,
@@ -227,7 +227,7 @@ class Network:
         self.__name = name
         self._topology = topology
         self._backend = backend
-        self._parameters = parameters
+        # self._parameters = parameters
         self._stop_time = stop_time
         self._start_time = start_time
         self._end_time = end_time
@@ -306,10 +306,12 @@ class Network:
         self._net_topo = Topology(name=self.__name, timeline=self._timeline)
 
         # Load the configuration for the network topology
-        if isinstance(self._topology, (Dict, dict)):
-            self._net_topo.load_config_json(config=self._topology)
-        else:
-            self._net_topo.load_config(self._topology)
+        load_topo = self._net_topo.load_config_json if "nodes" in self._topology else self._net_topo.load_config
+        load_topo(self._topology)
+        # if isinstance(self._topology, (Dict, dict)):
+        #     self._net_topo.load_config_json(config=self._topology)
+        # else:
+        #     self._net_topo.load_config(self._topology)
 
         # Set parameters for the quantum network
         self._set_parameters()
@@ -344,42 +346,53 @@ class Network:
             self._initialize_photons()
 
     def _set_parameters(self):
-        # Read the parameter data from the file
-        with open(self._parameters, "r") as file:
-            data = json.load(file)
+        nodes = self._net_topo.nodes
+        for node in self._topology.get("nodes", []):
+            node_obj = nodes.get(node.get("Name"))
+            if node.get("Type") in ["service", "end"]:
+                for arg, val in node.get("memory", {}).items():
+                    node_obj.memory_array.update_memory_params(arg, val)
+                for arg, val in node.get("lightSource", {}).items():
+                    setattr(node_obj.lightsource, arg, val)
+            elif node.get("Type")=="bsm":
+                for arg, val in node.get("detector", {}).items():
+                    setattr(node_obj.bsm, arg, val)
+        # # Read the parameter data from the file
+        # with open(self._parameters, "r") as file:
+        #     data = json.load(file)
 
-        # Loop through each parameter type and update the corresponding components
-        for key, value in data.items():
-            # Get the nodes of the current type
-            nodes = (
-                self._net_topo.get_nodes_by_type(key)
-                if key != "qchannel"
-                else self._net_topo.qchannels
-            )
+        # # Loop through each parameter type and update the corresponding components
+        # for key, value in data.items():
+        #     # Get the nodes of the current type
+        #     nodes = (
+        #         self._net_topo.get_nodes_by_type(key)
+        #         if key != "qchannel"
+        #         else self._net_topo.qchannels
+        #     )
 
-            # Loop through each node of the current type and update its parameters
-            for component in nodes:
-                if key == "qchannel":
-                    # Update qchannel parameters
-                    component.attenuation, component.frequency = value
-                elif key == "EndNode" or key == "ServiceNode":
-                    # Update memory array parameters for EndNodes and ServiceNodes
-                    for k, v in value.items():
-                        component.memory_array.update_memory_params(k, v)
-                elif key == "BSMNode":
-                    # Update detector parameters for BSMNodes
-                    for k, v in value.items():
-                        component.bsm.update_detectors_params(k, v)
-                elif key == "QuantumRouter":
-                    # Update swapping parameters for QuantumRouters
-                    if k == "SWAP_SUCCESS_PROBABILITY":
-                        component.network_manager.protocol_stack[
-                            1
-                        ].set_swapping_success_rate(v)
-                    else:
-                        component.network_manager.protocol_stack[
-                            1
-                        ].set_swapping_degradation(v)
+        #     # Loop through each node of the current type and update its parameters
+        #     for component in nodes:
+        #         if key == "qchannel":
+        #             # Update qchannel parameters
+        #             component.attenuation, component.frequency = value
+        #         elif key == "EndNode" or key == "ServiceNode":
+        #             # Update memory array parameters for EndNodes and ServiceNodes
+        #             for k, v in value.items():
+        #                 component.memory_array.update_memory_params(k, v)
+        #         elif key == "BSMNode":
+        #             # Update detector parameters for BSMNodes
+        #             for k, v in value.items():
+        #                 component.bsm.update_detectors_params(k, v)
+        #         elif key == "QuantumRouter":
+        #             # Update swapping parameters for QuantumRouters
+        #             if k == "SWAP_SUCCESS_PROBABILITY":
+        #                 component.network_manager.protocol_stack[
+        #                     1
+        #                 ].set_swapping_success_rate(v)
+        #             else:
+        #                 component.network_manager.protocol_stack[
+        #                     1
+        #                 ].set_swapping_degradation(v)
 
     def _request_entanglements(self):
         # Loop through each sequence of keys in messages
