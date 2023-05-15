@@ -94,6 +94,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   constructor(private fb: FormBuilder, private service: ConditionsService, private route: Router, private holdingData: HoldingDataService, private api: ApiServiceService, private cookie: CookieService) { }
   ngAfterViewInit(): void {
 
+
     let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value, this.level);
     this.service.getJson(urlData.url, urlData.type).subscribe((result) => {
       this.topologyData = result;

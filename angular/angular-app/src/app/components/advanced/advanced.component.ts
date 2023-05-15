@@ -53,7 +53,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     timeResolution: 150
   }
   lightSourceProps = {
-    frequency: 80000000,
+    frequency: 193548387096774.2,
     wavelength: 1550,
     bandwidth: 0,
     meanPhotonNum: 0.1,
@@ -418,7 +418,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     }
     // let url = this.simulator.value == 'version1' ? environment.apiUrl : this.simulator.value == 'version2' ? environment.apiUrlNew : null;
     let url = environment.apiUrlNew;
-    this.apiService.getStream().subscribe(data => { this.logs = data; });
+    // this.apiService.getStream().subscribe(data => { this.logs = data; });
     // whatever your request data is
     this.apiService.advancedRunApplication(req, url).subscribe({
       next: (response) => {
@@ -507,7 +507,16 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       this.myDiagram.zoomToFit();
     }
   }
-
+  calculateFrequency() {
+    const speedOfLight = 3e17; // speed of light in nm/s
+    this.lightSourceProps.frequency = speedOfLight / this.lightSourceProps.wavelength;
+    // console.log(this.lightSourceProps.frequency)
+  }
+  calculateWavelength() {
+    const speedOfLight = 3e17; // speed of light in nm/s
+    this.lightSourceProps.wavelength = speedOfLight / this.lightSourceProps.frequency;
+    // console.log(this.lightSourceProps.wavelength)
+  }
   get middlenode() {
     return this.appSettingsForm.get('middleNode')
   }
