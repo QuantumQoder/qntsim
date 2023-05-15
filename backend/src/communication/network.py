@@ -347,7 +347,9 @@ class Network:
 
     def _set_parameters(self):
         nodes = self._net_topo.nodes
+        print('node', nodes,self._topology)
         for node in self._topology.get("nodes", []):
+            
             node_obj = nodes.get(node.get("Name"))
             if node.get("Type") in ["service", "end"]:
                 for arg, val in node.get("memory", {}).items():

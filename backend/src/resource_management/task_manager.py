@@ -3,10 +3,10 @@ import logging
 import os
 from logging import config
 
-#from qntsim.conf import LOG_CONFIG_FILE
+from qntsim.conf import LOG_CONFIG_FILE
 
-#print('ll',LOG_CONFIG_FILE,os.getcwd())
-config.fileConfig("/code/web/logging.ini")
+print('ll',LOG_CONFIG_FILE,os.getcwd())
+config.fileConfig(LOG_CONFIG_FILE)
 #from qntsim.utils.log import logger
 
 from typing import TYPE_CHECKING, Callable, List, Tuple

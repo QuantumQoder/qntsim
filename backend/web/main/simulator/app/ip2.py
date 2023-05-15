@@ -11,7 +11,8 @@ from qntsim.communication import (ATTACK_TYPE, Attack, ErrorAnalyzer, Network,
                                   bell_type_state_analyzer, insert_check_bits,
                                   insert_decoy_photons, string_to_binary)
 from qntsim.components.circuit import QutipCircuit
-
+import logging
+logger = logging.getLogger("main_logger." + "ip2")
 # from main.simulator.topology_funcs import network_graph
 
 
@@ -100,6 +101,7 @@ class Sender(Party):
                 qtc.h(0)
             network.manager.run_circuit(qtc, [d])
         logging.info(f"message by {cls.__name__}")
+        logger.info(f"message by {cls.__name__}")
 
         return cls.d_a
 
@@ -120,6 +122,7 @@ class Sender(Party):
         )
         cls.q_a = cls.s_a + cls.i_a + cls.d_a
         logging.info(f"in key-sequence by {cls.__name__}")
+        logger.info(f"in key-sequence by {cls.__name__}")
 
         return cls.d_a
 
@@ -163,6 +166,7 @@ class Receiver(Party):
             network=network, node_index=1, num_decoy_photons=num_decoy_photons
         )
         logging.info(f"keys for epr pairs and decoy photons by {cls.__name__}")
+        logger.info(f"keys for epr pairs and decoy photons by {cls.__name__}")
         cls.d_b = sorted(list(set(cls.d_b) - set(cls.d_a)))
 
         return seq_a, list(seq_a[-len(cls.userID) // 2 :]), cls.d_a
@@ -203,6 +207,7 @@ class Receiver(Party):
             logging.info("failed, err=", 1 - err_prct)
             return
         logging.info(f"passed, messages received: {cls.received_msgs}")
+        logger.info(f"passed, messages received: {cls.received_msgs}")
 
 
 class UTP:
@@ -241,6 +246,7 @@ class UTP:
             # return -1, f'failed between {cls1.__name__} and {cls2.__name__}, err={mean(err)}'
             # os._exit(f'Security of the channel between {cls1.__name__} and {cls2.__name__} is compromised.')
         logging.info(f"passed between {cls1.__name__} and {cls2.__name__}")
+        logger.info(f"passed between {cls1.__name__} and {cls2.__name__}")
 
         return returns
 
@@ -270,12 +276,14 @@ class UTP:
             str(output) if i % 2 else str(output ^ cls1.basis[i // 2])
             for i, output in enumerate(outputs)
         )
+        print("1", outputs)
         if outputs != cls2.userID:
             sys.exit(f"{cls2.__name__} is not authenticated")
             # return -1, f'{cls2.__name__} is not authenticated'
             # os._exit(f'{cls2.__name__} is not authenticated')
         else:
             logging.info(f"{cls2.__name__}, passed!")
+            logger.info(f"{cls2.__name__}, passed!")
         outputs = []
         for c in cls1.c_a:
             state = network.manager.get(c)
@@ -287,11 +295,13 @@ class UTP:
                 )
             )
         outputs = "".join(str(o) for o in outputs)
+        print("2", outputs)
         if outputs != cls1.userID:
             sys.exit(f"{cls1.__name__} is not authenticated")
             # os._exit(f'{cls1.__name__} is not authenticated')
         else:
             logging.info(f"{cls1.__name__}, passed!")
+            logger.info(f"{cls1.__name__}, passed!")
 
         return outputs
 
