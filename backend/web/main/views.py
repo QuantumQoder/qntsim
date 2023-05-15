@@ -296,6 +296,6 @@ def log_view(request):
     # response['Content-Disposition'] = 'attachment; filename="my_log_file.txt"'
     # for handler in logger.handlers:
     #     logger.removeHandler(handler)
-    for handler in logger.handlers:
-        logger.removeHandler(handler)
+    # for handler in logger.handlers:
+    #     logger.removeHandler(handler)
     return response
