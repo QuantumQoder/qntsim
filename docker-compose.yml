@@ -4,7 +4,7 @@ services:
 
   web:
     build: backend
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn --workers=3 --threads=3 QNTSIM.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - ./backend:/code
     ports:
