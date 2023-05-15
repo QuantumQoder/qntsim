@@ -39,7 +39,7 @@ export class ApiServiceService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     const observable = this._http.post(apiUrl + 'run/', data, { headers });
 
-    observable.subscribe(() => this.startStream(apiUrl));
+    // observable.subscribe(() => this.startStream(apiUrl));
     return observable;
   }
 
