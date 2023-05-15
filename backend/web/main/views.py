@@ -27,11 +27,18 @@ from main.simulator.app.ip2 import ip2_run
 from main.simulator.topology_funcs import *
 from rest_framework import generics, mixins
 from rest_framework.views import APIView
+import websocket
+
+
 
 logger = logging.getLogger("main_logger")
 logger.setLevel(logging.DEBUG)
-memory_handler = logging.handlers.MemoryHandler(capacity=1000, flushLevel=logging.WARNING)
+memory_handler = logging.handlers.MemoryHandler(capacity=1, flushLevel=logging.info)
 logger.addHandler(memory_handler)
+
+# websocket_handler = logging.handlers.WebSocketHandler(capacity=1, target=memory_handler)
+# websocket_handler.setLevel(logging.DEBUG)
+# logger.addHandler(memory_handler)
 logger.info('Logging Begins...')
 
 def home(request):
@@ -81,6 +88,7 @@ class RunApp(APIView):
         results = {}
 
         if application == "e91":
+            print("e91 views")
             results = e91(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["keyLength"]))
         elif application == "e2e":
             print('e2e',appSettings["sender"], appSettings["receiver"], appSettings["startTime"], appSettings["size"], appSettings["priority"], appSettings["targetFidelity"], appSettings["timeout"])
@@ -276,6 +284,21 @@ def stream_logs(request):
 
     response = StreamingHttpResponse(generate_response(), content_type='text/plain')
     return response
+# @csrf_exempt
+# def log_view(request):
+    
+#     # def stream_logs():
+#     memory_handler.websocket = websocket.WebSocket()
+#     memory_handler.websocket.connect("http://0.0.0.0:8000/logs")
+#     records = memory_handler.buffer
+#     for record in records:
+#         log = memory_handler.format(record)
+#         memory_handler.websocket.send(json.dumps(log))
+#     # for handler in logger.handlers:
+#     #     logger.removeHandler(handler)
+#     print("Logs ended..")
+#     #return StreamingHttpResponse(stream_logs(), content_type='text/plain')
+
 @csrf_exempt
 def log_view(request):
     def stream_logs():
@@ -292,10 +315,6 @@ def log_view(request):
     response = StreamingHttpResponse(stream_logs(), content_type='text/plain')
     # set the response status code to 200 OK
     response.status_code = 200
-    # # set the Content-Disposition header to force download of the log file
-    # response['Content-Disposition'] = 'attachment; filename="my_log_file.txt"'
-    # for handler in logger.handlers:
-    #     logger.removeHandler(handler)
     for handler in logger.handlers:
         logger.removeHandler(handler)
     return response

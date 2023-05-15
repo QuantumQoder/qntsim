@@ -494,7 +494,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         dst=self.subtask.task.get_reservation().responder
         src=self.subtask.task.get_reservation().initiator
         if (self.own.name==src and self.other==dst) or (self.own.name==dst and self.other==src) :
-            print(f'Entanglement sucessful between {src,dst}')
+            print(f'Entanglement sucessful between (generation) {src,dst}')
             logger.info(f'Entanglement sucessful between {src,dst}')
 
 
