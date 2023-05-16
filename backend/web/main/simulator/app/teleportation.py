@@ -13,6 +13,9 @@ from qiskit.extensions import Initialize
 from qiskit.quantum_info import random_statevector
 import math
 
+import logging
+logger = logging.getLogger("main_logger.application_layer." + "teleportation")
+
 
 
 
@@ -288,11 +291,12 @@ class Teleportation():
 
     def run(self,alice,bob,A_0,A_1):
         crz,crx,case, random_qubit,alice_state=self.alice_measurement(A_0,A_1,alice)
-        logger.info(sender.owner.name + " sent measurement results")
         print("Measurement result of random qubit crz",crz)
+        logger.info(alice.owner.name + " sent measurement results")
+        #print("Measurement result of random qubit crz",crz)
         print("Measurement result of alice qubit crx",crx)
         bob_initial_state, bob_final_state,gatesl = self.bob_gates(crz,crx,case,bob)
-        logger.info(receiver.owner.name + " got the final state")
+        logger.info(bob.owner.name + " received the final state")
         
         # initial entanglement alice_bob_entanglement: alice_bob_entangled_state
         # measurement_result_of_random_qubit near alice's end : meas_rq

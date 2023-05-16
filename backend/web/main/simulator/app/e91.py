@@ -3,6 +3,8 @@ from qntsim.components.circuit import BaseCircuit
 import math
 from qntsim.kernel.quantum_kernel import KetState
 import random
+import logging
+logger = logging.getLogger("main_logger.application_layer." + "e91")
 
 
 _psi_minus = [complex(0) , complex(math.sqrt(1 / 2)), -complex(math.sqrt(1 / 2)), complex(0)]
@@ -22,6 +24,7 @@ class E91():
         sender=alice
         receiver=bob
         print('sender, receiver',sender.owner.name,receiver.owner.name)
+        logger.info('sender, receiver are '+sender.owner.name+" "+receiver.owner.name)
         return self.request_entanglements(sender,receiver,n)
 
     # circuit measurements

@@ -7,6 +7,8 @@ qntsim.egg-info/requires.txt
 qntsim.egg-info/top_level.txt
 src/__init__.py
 src/conf.py
+src/loggers.py
+src/logging.ini
 src/message.py
 src/protocol.py
 src/communication/Error.py
@@ -21,6 +23,7 @@ src/communication/protocol.py
 src/communication/quantum_network.py
 src/communication/security_checks.py
 src/communication/template.py
+src/communication/utils.py
 src/components/DLCZ_bsm.py
 src/components/DLCZ_memory.py
 src/components/__init__.py
