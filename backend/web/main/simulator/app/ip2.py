@@ -5,14 +5,14 @@ import time
 from functools import partial
 from random import sample
 from typing import Any, Dict, List, Tuple
-from numpy import mean
 
+from numpy import mean
 from numpy.random import randint
 from qntsim.communication import (ATTACK_TYPE, Attack, ErrorAnalyzer, Network,
                                   bell_type_state_analyzer, insert_check_bits,
                                   insert_decoy_photons, string_to_binary)
 from qntsim.components.circuit import QutipCircuit
-import logging
+
 logger = logging.getLogger("main_logger." + "ip2")
 # from main.simulator.topology_funcs import network_graph
 
@@ -198,6 +198,7 @@ class Receiver(Party):
             cls1 (_type_): _description_
             threshold (float): _description_
         """
+        if -1 in returns: return returns
         cls.received_msgs = "".join(
             char for i, char in enumerate(returns) if i not in cls1.chk_bts_insrt_lctns
         )
