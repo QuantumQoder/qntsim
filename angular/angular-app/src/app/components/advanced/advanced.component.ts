@@ -83,7 +83,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
   appSettings: any
   nodeKey: any
   spinner: boolean = false
-  e2e: any;
+  e2e = {
+    targetFidelity: 0.5,
+    size: 6
+  };
   graphModel: any
   nodes: any = []
   selectedNode1: any
@@ -427,7 +430,9 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       },
       error: (error) => {
         console.error(`Error: ${error}`);
+
         this.spinner = false;
+        alert(`Error has occurred! Status Code:${error.status} Status Text:${error.statusText}`)
       },
       complete: () => {
         this.spinner = false;
@@ -458,10 +463,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         { propName: "No of Memories", propValue: 500, numericValueOnly: true }
       ],
       memory: [
-        { propName: "Frequency (Hz)", propValue: 2000, numericValueOnly: true },
-        { propName: "Expiry (ms)", propValue: -1, numericValueOnly: true },
-        { propName: "Efficiency", propValue: 1, decimalValueAlso: true },
-        { propName: "Fidelity", propValue: 0.93, decimalValueAlso: true }
+        { propName: "Memory Frequency (Hz)", propValue: 2000, numericValueOnly: true },
+        { propName: "Memory Expiry (s)", propValue: -1, numericValueOnly: true },
+        { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
+        { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
       ]
     };
     this.myDiagram.startTransaction('Add node and link');
@@ -546,7 +551,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     }
     function isDecimalNumber(val: any) {
       const regex = /^\d+(\.\d*)?$/;
-      return regex.test(val);
+      if (regex.test(val)) {
+        val = Number(val)
+        if (val > 1 && val < 0) {
+          return true;
+        }
+      };
+      return false;
     }
 
     var memoryTemplate =
@@ -710,10 +721,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
           { propName: "No of Memories", propValue: 500, numericValueOnly: true }
         ],
         memory: [
-          { propName: "Frequency (Hz)", propValue: 2000, numericValueOnly: true },
-          { propName: "Expiry (ms)", propValue: -1, numericValueOnly: true },
-          { propName: "Efficiency", propValue: 1, decimalValueAlso: true },
-          { propName: "Fidelity", propValue: 0.93, decimalValueAlso: true }
+          { propName: "Memory Frequency (Hz)", propValue: 2000, numericValueOnly: true },
+          { propName: "Memory Expiry (s)", propValue: -1, numericValueOnly: true },
+          { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
+          { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
         ]
       }
     ];

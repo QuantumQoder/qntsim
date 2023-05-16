@@ -5,8 +5,8 @@ import time
 from functools import partial
 from random import sample
 from typing import Any, Dict, List, Tuple
-from numpy import mean
 
+from numpy import mean
 from numpy.random import randint
 from qntsim.communication import (ATTACK_TYPE, Attack, ErrorAnalyzer, Network,
                                   bell_type_state_analyzer, insert_check_bits,
@@ -198,6 +198,7 @@ class Receiver(Party):
             cls1 (_type_): _description_
             threshold (float): _description_
         """
+        if -1 in returns: return returns
         if -1 in returns: return returns
         cls.received_msgs = "".join(
             char for i, char in enumerate(returns) if i not in cls1.chk_bts_insrt_lctns
