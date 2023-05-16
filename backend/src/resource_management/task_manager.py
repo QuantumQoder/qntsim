@@ -2,6 +2,7 @@ import itertools
 import logging
 import os
 from logging import config
+import traceback
 
 from qntsim.conf import LOG_CONFIG_FILE
 
@@ -21,83 +22,13 @@ if TYPE_CHECKING:
     from .memory_manager import MemoryInfo, MemoryManager
     from .resource_manager import ResourceManager
 
-
-# class Task:
-
-# 	id_counter = itertools.count()
-
-# 	"""
-# 		dependencies: list of Tasks that are needed by current task
-# 	"""
-# 	def __init__(self, name, dependencies, timestamp, action: Callable[
-#                      [List["MemoryInfo"]], Tuple["Protocol", List["str"], List[Callable[["Protocol"], bool]]]], args):
-# 		self.id = next(self.id_counter)
-# 		self.name = name
-# 		self.status = 'created'
-# 		self.dependencies = dependencies
-# 		self.action = action
-# 		print(f'type(self.action) : {type(action)}')
-# 		print(f'action:   {self.action}')
-# 		self.protocols = []
-# 		self.creation_time = timestamp
-# 		self.updation_time = ''   #start execution time
-# 		self.completion_time = ''
-# 		self.args = args
-# 		self.protocol_status = {}
-# 		self.task_manager = None
-# 		self.subtasks = []
-
-
-# 	def wait(self):
-# 		self.status = 'waiting'
-
-# 	def wakeup(self, timestamp):
-# 		self.status = 'running'
-# 		self.updation_time = timestamp
-# 		#return self.action, self.args
-
-# 	def complete(self, timestamp):
-# 		self.completion_time = timestamp
-# 		self.status = 'executed'
-	
-# 	def set_reservation(self, reservation: "Reservation") -> None:
-# 		self.reservation = reservation
-	
-# 	def get_reservation(self) -> "Reservation":
-# 		return self.reservation
-
-# 	def update_protocol_status(self, protocol, status):
-# 		self.protocol_status[protocol] = status
-# 		print('updated protocol status to: ',  status, 'for protocol: ', protocol, ' and for task: ', self.name)
-# 		if status == 1:
-# 			self.check_task_completed()
-
-# 		if status == -1:
-# 			#run this task again
-# 			self.task_manager.run_task(self)
-
-
-# 	def check_task_completed(self):
-# 		print('check_task_completed called for task: ', self.name)
-# 		isComplete = True
-# 		for ptcl, status in self.protocol_status.items():
-# 			print(str(ptcl) + ' status is ' + str(status))
-# 			if status == 0:
-# 				isComplete = False
-# 				break
-		
-# 		if isComplete:
-# 			print(self.name + ' has completed successfully')
-# 			self.complete(self.task_manager.owner.timeline.now())
-# 			self.task_manager.check_eligible_tasks(self)
-		
 class Task:
 	id_counter = itertools.count()
 
 	"""
 		dependencies: list of Tasks that are needed by current task
 	"""
-	def __init__(self, name, dependencies, timestamp, action: Callable[
+	def __init__(self, name, dependencies, timestamp, loops, action: Callable[
                      [List["MemoryInfo"]], Tuple["Protocol", List["str"], List[Callable[["Protocol"], bool]]]], task_manager, **kwargs):
 		self.id = next(self.id_counter)
 		self.name = name
@@ -124,6 +55,7 @@ class Task:
 		self.is_vl_final_swap_task= False
 		self.has_already_run = False
 		self.can_run_on_init = False
+		self.loops = loops
 
 	def wait(self):
 		self.status = 'waiting'
@@ -227,11 +159,12 @@ class SubTask:
 		protocol, req_dsts, req_condition_funcs = self.action(self.memories_info)
 		if protocol == True:
 			#print('Purification not needed')
-			self.on_complete(1)
+			self.on_complete(2)
 			return
 		
 		if protocol == None:
 			#print('Could not create protocol instance: ')
+			self.on_complete(3)
 			return 
 
 		#print(f'task.name: {self.task.name}  for node: {self.task.task_manager.owner.name} and memory returned for this: {self.memories_info[0].index}')
@@ -259,14 +192,27 @@ class SubTask:
 			#Failure----We need to go back through the chain of all dependencies that lead to this point and need to retry them again
 			#This has to be handled through the task manager
 			#self.run()
-			#print('reached inside on_complete subtask failure section')
+			print('reached inside on_complete subtask failure section')
 			self.status = 0
 			self.task.on_subtask_failure(self)
-		else:
+		elif completion_status == 1:
 			#Success----Call the dependent subtask if any
 			self.status = 1
+			print('reached inside on_complete subtask success with looping section')
+			if self.task.loops:
+				print(f'Running the subtask again: {self.name}')
+				# traceback.print_stack()
+				self.run()
+				return
 			self.task.on_subtask_success(self)
-		
+		elif completion_status == 2:
+			self.status = 1
+			print('reached inside on_complete subtask success without looping section')
+			self.task.on_subtask_success(self)
+		else:
+			# traceback.print_stack()
+			print('Purification Needed but memory not available --- exiting subtask')
+
 		params = kwargs.get('params')
 		if params != None:
 			#Find memory_info for this memory object and 
@@ -416,80 +362,6 @@ class TaskManager:
 		logging.debug('initial dependencies for this subtask:	'+ str( [i.name for i in subtask.initial_dependency_subtasks]))
 		for init_dep_subtask in subtask.initial_dependency_subtasks:
 			init_dep_subtask.run()
-		
-
-
-	"""
-	def run_task(self, task: "Task"):
-		print('~~~~~~~~~~~~~~~~~~',task.name + ' is running now')
-		task.wakeup(self.owner.timeline.now())
-		memory_info = []
-		for mem_index in task.args:
-			memory_info.append(self.owner.resource_manager.memory_manager.__getitem__(mem_index))
-		
-		print(f'type(task):  {type(task)}')
-		print(f'type(task.action):  {type(task.action)}')
-		#protocols, req_dsts, req_condition_funcs = task.action(memory_info)
-		#task.protocols = protocols
-		#for protocol in protocols:
-		#tuple = task.action(memory_info)
-		tuple = task.action()
-
-		#for protocol, req_dsts, req_condition_funcs in tuple:
-		for protocol, req_dsts, req_condition_funcs, memory_info in tuple:
-			print(f'task.name: {task.name}  for node: {self.owner.name} and memory returned for this: {memory_info[0].index}')
-			task.protocols.append(protocol)
-			protocol.task = task
-			task.update_protocol_status(protocol, 0)
-			for info in memory_info:
-				#if info.state == 'ENTANGLED':
-				#    print('protocol.name, req_dsts, req_condition_funcs', protocol.name, req_dsts, req_condition_funcs)
-				info.memory.detach(info.memory.memory_array)
-				info.memory.attach(protocol)
-			
-			for dst, req_func in zip(req_dsts, req_condition_funcs):
-				self.send_request(protocol, dst, req_func)
-			
-
-		#This gives us action for this task
-		#Now we need to run this task and check for output
-		#If output is success: then only we can check other eligible tasks
-		#Otherwise: we need to run this task again
-
-		#Currently, we schedule this action on event queue
-		#However this exits the control from this function and the execution depends on event scheduler
-		#so we need to be able to get the ACK from  scheduler when this event executes, whther its a success or failure
-
-		#run_task -> pushes task on scheduler
-		#event scheduler should be able to identify that this is not any ordinary event but a task so when it completes
-		#its execution, it should be able to trigger the task manager telling it to update the status
-
-		#return task.wakeup()
-	
-	def update_task_status(self, task: "Task"):
-		#scheduler calls this to update the task status it just executed
-		pass
-
-	def check_eligible_tasks(self, task: "Task"):
-		#Once task is executed
-		#Go through all the tasks of which this is a dependency
-		#Check all other dependency status for these tasks
-		#If this was the last dependency: Run the task
-		#Otherwise exit
-
-		print('check_eligible_tasks called for : ', task.name)
-		dependent_tasks = self.task_map[task]['is_dependecy_of']
-		for t in dependent_tasks:
-			#loop through dependencies of these tasks
-			isRunnable = True
-			for other_dependency in self.task_map[t]['dependencies']:
-				if other_dependency.status != 'executed':
-					isRunnable = False
-
-			#If all dependencies are complete, run this task
-			if isRunnable:
-				self.run_task(t)
-	"""
 
 	def initiate_tasks(self):
 		#Loop over all the tasks and find the ones that don't have any dependencies associated

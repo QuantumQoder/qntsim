@@ -99,7 +99,6 @@ class BBPSSW(EntanglementProtocol):
         self.circuit = Circuit(2)
         self.circuit.cx(0, 1)
         self.circuit.measure(1)
-        print("PURR")
 
     def is_ready(self) -> bool:
         return self.another is not None
@@ -143,6 +142,7 @@ class BBPSSW(EntanglementProtocol):
         kept_memo_ent = self.kept_memo.entangled_memory["node_id"]
         meas_memo_ent = self.meas_memo.entangled_memory["node_id"]
         assert kept_memo_ent == meas_memo_ent, "mismatch of entangled memories {}, {} on node {}".format(kept_memo_ent, meas_memo_ent, self.own.name)
+        print(f'fidelity of -> self.kept_memo.fidelity: {self.kept_memo.fidelity} and self.meas_memo.fidelity: {self.meas_memo.fidelity}')
         assert self.kept_memo.fidelity == self.meas_memo.fidelity > 0.5
 
         self.meas_res = self.own.timeline.quantum_manager.run_circuit(self.circuit, [self.kept_memo.qstate_key,
@@ -154,7 +154,6 @@ class BBPSSW(EntanglementProtocol):
         self.own.message_handler.send_message(dst, message)
 
     def received_message(self, src: str, msg: Message) -> None:
-        print("Purificationnnnnnn")
         """Method to receive messages.
         Args:
             src (str): name of node that sent the message.
@@ -171,10 +170,12 @@ class BBPSSW(EntanglementProtocol):
             self.kept_memo.fidelity = self.improved_fidelity(self.kept_memo.fidelity)
             self.update_resource_manager(self.kept_memo, state="ENTANGLED")
             logger.info("Purification successful between " + self.own.name + " " + self.another.own.name)
+            print("Purification successful between " + self.own.name + " " + self.another.own.name)
         else:
             # #print('receive pur else')
             self.update_resource_manager(self.kept_memo, state="RAW")
             logger.info("Purification failed between " + self.own.name + " " + self.another.own.name)
+            print("Purification failed between " + self.own.name + " " + self.another.own.name)
             
         self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
         
