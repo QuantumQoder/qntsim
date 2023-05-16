@@ -21,7 +21,7 @@ from ..components.circuit import BaseCircuit
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
 import logging
-logger = logging.getLogger("main_logger." + "bk_swapping")
+logger = logging.getLogger("main_logger.link_layer."+ "bk_swapping")
 class BBPSSWMsgType(Enum):
     """Defines possible message types for entanglement purification"""
 
@@ -170,12 +170,14 @@ class BBPSSW(EntanglementProtocol):
             # #print('receive pur if')
             self.kept_memo.fidelity = self.improved_fidelity(self.kept_memo.fidelity)
             self.update_resource_manager(self.kept_memo, state="ENTANGLED")
+            logger.info("Purification successful between " + self.own.name + " " + self.another.own.name)
         else:
             # #print('receive pur else')
             self.update_resource_manager(self.kept_memo, state="RAW")
+            logger.info("Purification failed between " + self.own.name + " " + self.another.own.name)
             
         self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
-        logger.info("Purification Successfull")
+        
 
     def memory_expire(self, memory: "Memory") -> None:
         """Method to receive memory expiration events.

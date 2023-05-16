@@ -24,7 +24,7 @@ from ..components.circuit import BaseCircuit
 from ..utils import log
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 import logging
-logger = logging.getLogger("main_logger." + "bk_generation")
+logger = logging.getLogger("main_logger.link_layer." + "bk_generation")
 class GenerationMsgType(Enum):
     """Defines possible message types for entanglement generation."""
 
@@ -482,6 +482,7 @@ class EntanglementGenerationA(EntanglementProtocol):
     def _entanglement_succeed(self):
         log.logger.info(self.own.name + " successful entanglement of memory {}".format(self.memory))
         #print(self.own.name + " successful entanglement of memory with the node: ",self.other," {} ".format(self.memory))
+        
         self.memory.entangled_memory["node_id"] = self.other
         self.memory.entangled_memory["memo_id"] = self.remote_memo_id
         self.memory.fidelity = self.memory.raw_fidelity
@@ -493,9 +494,10 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.subtask.on_complete(1)
         dst=self.subtask.task.get_reservation().responder
         src=self.subtask.task.get_reservation().initiator
+        logger.info(f'Entanglement sucessful between {self.own.name,self.other}')
         if (self.own.name==src and self.other==dst) or (self.own.name==dst and self.other==src) :
-            print(f'Entanglement sucessful between {src,dst}')
-            logger.info(f'Entanglement sucessful between {src,dst}')
+            print(f'Entanglement sucessful between (generation) {src,dst}')
+            logger.info(f'Entanglement sucessful between {self.own.name,self.other}')
 
 
     def _entanglement_fail(self):

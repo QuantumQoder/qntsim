@@ -11,7 +11,7 @@ import { ApiServiceService } from 'src/services/api-service.service';
 
 import { ConditionsService } from 'src/services/conditions.service';
 import { environment } from 'src/environments/environment';
-import { map } from 'rxjs';
+import { Subscription, map } from 'rxjs';
 
 @Component({
   selector: 'app-advanced',
@@ -27,6 +27,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
   @ViewChild('diagramContainer') private diagramRef: ElementRef;
   private addButtonAdornment: go.Adornment;
   nodeTypeSelect: boolean = false
+  private subscription: Subscription;
+  logs: any
   nodesSelection = {
     sender: '',
     receiver: '',
@@ -51,7 +53,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     timeResolution: 150
   }
   lightSourceProps = {
-    frequency: 80000000,
+    frequency: 193548387096774.2,
     wavelength: 1550,
     bandwidth: 0,
     meanPhotonNum: 0.1,
@@ -81,7 +83,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
   appSettings: any
   nodeKey: any
   spinner: boolean = false
-  e2e: any;
+  e2e = {
+    targetFidelity: 0.5,
+    size: 6
+  };
   graphModel: any
   nodes: any = []
   selectedNode1: any
@@ -348,34 +353,33 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         targetFidelity: this.e2e.targetFidelity,
         timeout: this.appSettingsForm.get('timeout')?.value + 'e12'
       }
-      , 4: {
-        endnode1: this.appSettingsForm.get('endnode1')?.value,
-        endnode2: this.appSettingsForm.get('endnode2')?.value,
-        endnode3: this.appSettingsForm.get('endnode3')?.value,
-        middlenode: this.appSettingsForm.get('middleNode')?.value,
-      }, 3: {
+      , 3: {
         sender: this.nodesSelection.sender,
         receiver: this.nodesSelection.receiver,
         amplitude1: this.appSettingsForm.get('amplitude1')?.value,
         amplitude2: this.appSettingsForm.get('amplitude2')?.value
+      }, 4: {
+        endnode1: this.appSettingsForm.get('endnode1')?.value,
+        endnode2: this.appSettingsForm.get('endnode2')?.value,
+        endnode3: this.appSettingsForm.get('endnode3')?.value,
+        middlenode: this.appSettingsForm.get('middleNode')?.value,
       }, 5:
       {
         sender: this.nodesSelection.sender,
         receiver: this.nodesSelection.receiver,
         sequenceLength: this.appSettingsForm.get('sequenceLength')?.value,
         key: this.appSettingsForm.get('message')?.value
-      }, 7:
-      {
-        sender: this.nodesSelection.sender,
-        receiver: this.nodesSelection.receiver,
-        message: this.appSettingsForm.get('message')?.value
       }, 6:
-
       {
         sender: this.nodesSelection.sender,
         receiver: this.nodesSelection.receiver,
         sequenceLength: this.appSettingsForm.get('sequenceLength')?.value,
         message: this.appSettingsForm.get('message')?.value,
+      }, 7:
+      {
+        sender: this.nodesSelection.sender,
+        receiver: this.nodesSelection.receiver,
+        message: this.appSettingsForm.get('message')?.value
       },
       8:
       {
@@ -395,20 +399,18 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         sender: {
           node: this.nodesSelection.sender,
           message: this.appSettingsForm.get('message')?.value,
-          userID: this.nodesSelection.senderId,
+          userID: `${this.nodesSelection.senderId}`,
           num_check_bits: this.nodesSelection.numCheckBits,
           num_decoy_photons: this.nodesSelection.numDecoy
         },
         receiver: {
           node: this.nodesSelection.receiver,
-          userID: this.nodesSelection.receiverId
+          userID: `${this.nodesSelection.receiverId}`
         },
-
-        bell_type: this.nodesSelection.belltype,
+        bell_type: `${this.nodesSelection.belltype}`,
         error_threshold: this.nodesSelection.errorThreshold,
         attack: this.nodesSelection.attack,
         channel: this.nodesSelection.channel
-
       }
     }
     this.appSettings = appConfig[this.app_id]
@@ -417,18 +419,37 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       "topology": this.topology,
       "appSettings": this.appSettings
     }
-    let url = this.simulator.value == 'version1' ? environment.apiUrl : this.simulator.value == 'version2' ? environment.apiUrlNew : null;
-    this.apiService.runApplication(req, url).subscribe((result: any) => {
-      this.spinner = true;
-      this.con.setResult(result)
-    }, (error) => {
-      this.spinner = false
-      console.error(error)
-      // alert("Error has occurred:" + "" + error.status + "-" + error.statusText)
-    }, () => {
-      this.spinner = false
-      this._route.navigate(['/results'])
-    })
+    // let url = this.simulator.value == 'version1' ? environment.apiUrl : this.simulator.value == 'version2' ? environment.apiUrlNew : null;
+    let url = environment.apiUrlNew;
+    // this.apiService.getStream().subscribe(data => { this.logs = data; });
+    // whatever your request data is
+    this.apiService.advancedRunApplication(req, url).subscribe({
+      next: (response) => {
+        console.log(response);
+        this.con.setResult(response)
+      },
+      error: (error) => {
+        console.error(`Error: ${error}`);
+
+        this.spinner = false;
+        alert(`Error has occurred! Status Code:${error.status} Status Text:${error.statusText}`)
+      },
+      complete: () => {
+        this.spinner = false;
+        this._route.navigate(['/results'])
+      }
+    });
+    // this.apiService.runApplication(req, url).subscribe((result: any) => {
+    //   this.spinner = true;
+    //   this.con.setResult(result)
+    // }, (error) => {
+    //   this.spinner = false
+    //   console.error(error)
+    //   // alert("Error has occurred:" + "" + error.status + "-" + error.statusText)
+    // }, () => {
+    //   this.spinner = false
+    //   this._route.navigate(['/results'])
+    // })
   }
   addNode(nodetype: string) {
     var adornedPart = this.adornedpart
@@ -442,10 +463,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         { propName: "No of Memories", propValue: 500, numericValueOnly: true }
       ],
       memory: [
-        { propName: "Frequency (Hz)", propValue: 2000, numericValueOnly: true },
-        { propName: "Expiry (ms)", propValue: -1, numericValueOnly: true },
-        { propName: "Efficiency", propValue: 1, decimalValueAlso: true },
-        { propName: "Fidelity", propValue: 0.93, decimalValueAlso: true }
+        { propName: "Memory Frequency (Hz)", propValue: 2000, numericValueOnly: true },
+        { propName: "Memory Expiry (s)", propValue: -1, numericValueOnly: true },
+        { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
+        { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
       ]
     };
     this.myDiagram.startTransaction('Add node and link');
@@ -491,7 +512,16 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       this.myDiagram.zoomToFit();
     }
   }
-
+  calculateFrequency() {
+    const speedOfLight = 3e17; // speed of light in nm/s
+    this.lightSourceProps.frequency = speedOfLight / this.lightSourceProps.wavelength;
+    // console.log(this.lightSourceProps.frequency)
+  }
+  calculateWavelength() {
+    const speedOfLight = 3e17; // speed of light in nm/s
+    this.lightSourceProps.wavelength = speedOfLight / this.lightSourceProps.frequency;
+    // console.log(this.lightSourceProps.wavelength)
+  }
   get middlenode() {
     return this.appSettingsForm.get('middleNode')
   }
@@ -521,7 +551,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     }
     function isDecimalNumber(val: any) {
       const regex = /^\d+(\.\d*)?$/;
-      return regex.test(val);
+      if (regex.test(val)) {
+        val = Number(val)
+        if (val > 1 && val < 0) {
+          return true;
+        }
+      };
+      return false;
     }
 
     var memoryTemplate =
@@ -685,10 +721,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
           { propName: "No of Memories", propValue: 500, numericValueOnly: true }
         ],
         memory: [
-          { propName: "Frequency (Hz)", propValue: 2000, numericValueOnly: true },
-          { propName: "Expiry (ms)", propValue: -1, numericValueOnly: true },
-          { propName: "Efficiency", propValue: 1, decimalValueAlso: true },
-          { propName: "Fidelity", propValue: 0.93, decimalValueAlso: true }
+          { propName: "Memory Frequency (Hz)", propValue: 2000, numericValueOnly: true },
+          { propName: "Memory Expiry (s)", propValue: -1, numericValueOnly: true },
+          { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
+          { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
         ]
       }
     ];

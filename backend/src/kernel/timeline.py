@@ -90,7 +90,7 @@ class Timeline:
         """
         log.logger.info("Timeline start simulation")
         
-        logger.info("Timeline start simulation")
+        logger.info("Timeline started simulation ")
         tick = time_ns()
         self.is_running = True
 

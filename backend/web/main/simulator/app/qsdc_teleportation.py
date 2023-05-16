@@ -8,10 +8,14 @@ from qntsim.components.circuit import QutipCircuit
 import numpy as np
 import math
 
+import logging
+logger = logging.getLogger("main_logger.application_layer." + "qsdc_teleportation")
+
 
 class QSDCTeleportation():
     
     def request_entanglements(self,sender,receiver,n):
+        logger.info(sender.owner.name+" requesting entanglement with "+receiver.owner.name)
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.5,5e12)
         source_node_list=[sender.name]
         return sender,receiver,source_node_list
@@ -19,7 +23,8 @@ class QSDCTeleportation():
     def roles(self,alice,bob,n):
         sender=alice
         receiver=bob
-        print('sender, receiver',sender.owner.name,receiver.owner.name)    
+        print('sender, receiver',sender.owner.name,receiver.owner.name)
+        logger.info('sender, receiver are '+sender.owner.name+" "+receiver.owner.name)    
         return self.request_entanglements(sender,receiver,n)
     
     def filter_entanglements(self, nodes, correlated=False):
@@ -166,6 +171,7 @@ class QSDCTeleportation():
         indices, crx, crz = self.teleport(alice, message=message)
         print("indices",indices, crx, crz)
         decoded_msg = self.decode(bob,indices,crx,crz)
+        logger.info("message decoded")
         error =0
         res = {
             "input_message":message,

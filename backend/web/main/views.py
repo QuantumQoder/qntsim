@@ -27,12 +27,11 @@ from main.simulator.app.ip2 import ip2_run
 from main.simulator.topology_funcs import *
 from rest_framework import generics, mixins
 from rest_framework.views import APIView
+import websocket
 
-logger = logging.getLogger("main_logger")
-logger.setLevel(logging.DEBUG)
-memory_handler = logging.handlers.MemoryHandler(capacity=1000, flushLevel=logging.WARNING)
-logger.addHandler(memory_handler)
-logger.info('Logging Begins...')
+
+
+
 
 def home(request):
     context = {
@@ -63,11 +62,23 @@ def fetchAppOptions(request):
     # print(type(context))
     return render(request, f'apps/{app}/config.html', context)
 
+
+
+
 class RunApp(APIView):
 
 
     def post(self,request):
-        
+        logger = logging.getLogger("main_logger")
+        logger.setLevel(logging.DEBUG)
+        memory_handler = logging.handlers.MemoryHandler(capacity=1000,flushLevel=logging.INFO)
+        logger.addHandler(memory_handler)
+
+        # websocket_handler = logging.handlers.WebSocketHandler(capacity=1, target=memory_handler)
+        # websocket_handler.setLevel(logging.DEBUG)
+        # logger.addHandler(memory_handler)
+        #logger.info('Logging Begins...')
+        memory_handler.flush()
         importlib.reload(qntsim)
         print('request', request.data.get('topology'))
         topology = request.data.get('topology')
@@ -81,6 +92,7 @@ class RunApp(APIView):
         results = {}
 
         if application == "e91":
+            print("e91 views")
             results = e91(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["keyLength"]))
         elif application == "e2e":
             print('e2e',appSettings["sender"], appSettings["receiver"], appSettings["startTime"], appSettings["size"], appSettings["priority"], appSettings["targetFidelity"], appSettings["timeout"])
@@ -98,7 +110,7 @@ class RunApp(APIView):
         elif application == "qsdc_teleportation":
             results = qsdc_teleportation(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"], appSettings["attack"])
         elif application == "single_photon_qd":
-            print('inside')
+            
             results = single_photon_qd(topology, appSettings["sender"], appSettings["receiver"], appSettings["message1"],appSettings["message2"], appSettings["attack"])
         elif application == "mdi_qsdc":
             results = mdi_qsdc(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"], appSettings["attack"])
@@ -111,6 +123,33 @@ class RunApp(APIView):
         # graphs = results.get('graph')
         # output = results.get('results')
         output = results
+        
+        records = memory_handler.buffer
+        #print(len(records))
+        logs =[]
+        layer_wise_records = {"link_layer" : [], "network_layer": [], "resource_management":[], "application_layer":[]}
+        
+        for record in records:
+            # format the log record as a string
+            if record.levelname == "INFO":
+                log_message = f"{record.levelname}: {record.getMessage()}"
+                #memory_handler.buffer.remove(record)
+                name = record.name.split(".")
+                
+                layer = name[-2]
+                if layer in layer_wise_records:
+                    layer_wise_records[layer].append(log_message)
+                logs.append(log_message)
+                # else:
+                #     print("Nothing")
+        print("layer_wise_records:", layer_wise_records)
+        output["logs"] = logs#, layer_wise_records]
+        #output["layer_wise_records"] = layer_wise_records
+        
+        memory_handler.flush()
+        #print(memory_handler.buffer)
+        for handler in logger.handlers:
+            logger.removeHandler(handler)
        
         # print('graphs', graphs)
         # print('output', output)
@@ -276,6 +315,21 @@ def stream_logs(request):
 
     response = StreamingHttpResponse(generate_response(), content_type='text/plain')
     return response
+# @csrf_exempt
+# def log_view(request):
+    
+#     # def stream_logs():
+#     memory_handler.websocket = websocket.WebSocket()
+#     memory_handler.websocket.connect("http://0.0.0.0:8000/logs")
+#     records = memory_handler.buffer
+#     for record in records:
+#         log = memory_handler.format(record)
+#         memory_handler.websocket.send(json.dumps(log))
+#     # for handler in logger.handlers:
+#     #     logger.removeHandler(handler)
+#     print("Logs ended..")
+#     #return StreamingHttpResponse(stream_logs(), content_type='text/plain')
+
 @csrf_exempt
 def log_view(request):
     def stream_logs():
@@ -296,6 +350,6 @@ def log_view(request):
     # response['Content-Disposition'] = 'attachment; filename="my_log_file.txt"'
     # for handler in logger.handlers:
     #     logger.removeHandler(handler)
-    for handler in logger.handlers:
-        logger.removeHandler(handler)
+    # for handler in logger.handlers:
+    #     logger.removeHandler(handler)
     return response

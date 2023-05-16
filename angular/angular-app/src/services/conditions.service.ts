@@ -16,16 +16,10 @@ export class ConditionsService {
     this.selectedAppResult.next(value)
   }
   public result: any
-  // = {
-  //   "application": { "sender": [[0, "n1", "n2", 0.85, 1.02025048751, 0.020250487510000026, "ENTANGLED"], [1, "n1", "n2", 0.85, 1.02175051251, 0.02175051250999993, "ENTANGLED"], [2, "n1", "n2", 0.85, 1.03225068751, 0.03225068750999993, "ENTANGLED"], [3, "n1", "n2", 0.85, 1.01575041251, 0.01575041251000009, "ENTANGLED"], [4, "n1", "n2", 0.85, 1.04350133751, 0.04350133750999996, "ENTANGLED"], [5, "n1", "n2", 0.85, 1.03525073751, 0.03525073750999996, "ENTANGLED"]], "receiver": [[0, "n2", "n1", 0.85, 1.02025048751, 0.020250487510000026, "ENTANGLED"], [1, "n2", "n1", 0.85, 1.02175051251, 0.02175051250999993, "ENTANGLED"], [2, "n2", "n1", 0.85, 1.03225068751, 0.03225068750999993, "ENTANGLED"], [3, "n2", "n1", 0.85, 1.01575041251, 0.01575041251000009, "ENTANGLED"], [4, "n2", "n1", 0.85, 1.04350133751, 0.04350133750999996, "ENTANGLED"], [5, "n2", "n1", 0.85, 1.03525073751, 0.03525073750999996, "ENTANGLED"]] }, "graph": { "latency": [-1, 0.03525073750999996, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "fidelity": [-1, 0.85, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], "throughput": { "fully_complete": [0, 100.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "partially_complete": [0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "rejected": [0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] }, "performance": {
-  //     "latency": 0.06975193750999997,
-  //     "fidelity": 0.85,
-  //     "throughput": 100.0,
-  //     "execution_time": 3
-  //   }
-  // }
+
   getResult() {
     return this.result;
+    // return this.dummytext
   }
   setResult(value: any) {
     this.result = value
@@ -59,6 +53,273 @@ export class ConditionsService {
   }
   getMemory() {
     return { "frequency": 2000, "expiry": -1, "efficiency": 1, "fidelity": 0.93 }
+  }
+
+
+  dummytext = {
+
+    "application": {
+
+      "sender": [
+
+        [
+
+          0,
+
+          "n1",
+
+          "n3",
+
+          0.6332,
+
+          1.038,
+
+          2000,
+
+          "ENTANGLED"
+
+        ],
+
+        [
+
+          1,
+
+          "n1",
+
+          "n3",
+
+          0.6332,
+
+          1.118,
+
+          2000,
+
+          "ENTANGLED"
+
+        ],
+
+        [
+
+          2,
+
+          "n1",
+
+          "n3",
+
+          0.6332,
+
+          1.134,
+
+          2000,
+
+          "ENTANGLED"
+
+        ],
+
+        [
+
+          3,
+
+          "n1",
+
+          "n3",
+
+          0.6332,
+
+          1.15,
+
+          2000,
+
+          "ENTANGLED"
+
+        ],
+
+        [
+
+          4,
+
+          "n1",
+
+          "n3",
+
+          0.6332,
+
+          1.102,
+
+          2000,
+
+          "ENTANGLED"
+
+        ]
+
+      ],
+
+      "receiver": [
+
+        [
+
+          0,
+
+          "n3",
+
+          "n1",
+
+          0.6331666666666667,
+
+          1.03800017501,
+
+          2001.03800017501,
+
+          "ENTANGLED"
+
+        ],
+
+        [
+
+          1,
+
+          "n3",
+
+          "n1",
+
+          0.6331666666666667,
+
+          1.11800017501,
+
+          2001.11800017501,
+
+          "ENTANGLED"
+
+        ],
+
+        [
+
+          2,
+
+          "n3",
+
+          "n1",
+
+          0.6331666666666667,
+
+          1.13400017501,
+
+          2001.13400017501,
+
+          "ENTANGLED"
+
+        ],
+
+        [
+
+          3,
+
+          "n3",
+
+          "n1",
+
+          0.6331666666666667,
+
+          1.10200017501,
+
+          2001.10200017501,
+
+          "ENTANGLED"
+
+        ],
+
+        [
+
+          4,
+
+          "n3",
+
+          "n1",
+
+          0.6331666666666667,
+
+          1.15000017501,
+
+          2001.15000017501,
+
+          "ENTANGLED"
+
+        ]
+
+      ]
+
+    },
+
+    "performance": {
+
+      "latency": 0.10200017500999992,
+
+      "fidelity": 0.6331666666666667,
+
+      "throughput": 100.0,
+
+      "execution_time": 5.79
+
+    },
+
+    "logs": [
+
+      "INFO: Logging Begins...",
+
+      "INFO: In e2e",
+
+      "INFO: Creating request...",
+
+      "INFO: Timeline start simulation",
+
+      "INFO: ['n1', 'n2', 'n3']",
+
+      "INFO: Swapping sucessful between ('n1', 'n3')",
+
+      "INFO: Swapping sucessful between ('n1', 'n3')",
+
+      "INFO: Entanglement failed between ('n2', 'n1')",
+
+      "INFO: Entanglement failed between ('n1', 'n2')",
+
+      "INFO: Entanglement failed between ('n3', 'n2')",
+
+      "INFO: Entanglement failed between ('n2', 'n3')",
+
+      "INFO: Entanglement failed between ('n2', 'n1')",
+
+      "INFO: Entanglement failed between ('n1', 'n2')",
+
+      "INFO: Entanglement failed between ('n2', 'n3')",
+
+      "INFO: Entanglement failed between ('n3', 'n2')",
+
+      "INFO: Entanglement failed between ('n2', 'n1')",
+
+      "INFO: Entanglement failed between ('n1', 'n2')",
+
+      "INFO: Entanglement failed between ('n2', 'n3')",
+
+      "INFO: Entanglement failed between ('n3', 'n2')",
+
+      "INFO: Swapping sucessful between ('n1', 'n3')",
+
+      "INFO: Swapping sucessful between ('n1', 'n3')",
+
+      "INFO: Swapping sucessful between ('n1', 'n3')",
+
+      "INFO: Swapping sucessful between ('n1', 'n3')",
+
+      "INFO: Swapping sucessful between ('n1', 'n3')",
+
+      "INFO: Swapping sucessful between ('n1', 'n3')",
+
+      "INFO: Swapping sucessful between ('n1', 'n3')",
+
+      "INFO: Swapping sucessful between ('n1', 'n3')"
+
+    ]
+
   }
 
 }

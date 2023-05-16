@@ -8,6 +8,8 @@ Timeline.bk=True
 from qntsim.topology.topology import Topology
 import numpy as np
 import time
+import logging
+logger = logging.getLogger("main_logger.application_layer." + "ping_pong")
 
 class PingPong():
    
@@ -25,6 +27,7 @@ class PingPong():
     bob=None
     
     def request_entanglements(self,sender,receiver,n):
+        logger.info("Requesting Entanglement...")
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.5,5e12)
         source_node_list=[sender.name]
         return sender,receiver,source_node_list
@@ -33,6 +36,7 @@ class PingPong():
         sender=alice
         receiver=bob
         print('sender, receiver',sender.owner.name,receiver.owner.name)
+        logger.info('sender, receiver',sender.owner.name,receiver.owner.name)
         return self.request_entanglements(sender,receiver,200)
     
     def create_key_lists(self,alice,bob):
@@ -137,6 +141,7 @@ class PingPong():
         qc.measure(1)
         output=qm.run_circuit(qc,keys)
         print("message -> ", x_n)
+        logger.info("message -> "+ x_n)
         print(output)
         return output
 
@@ -205,6 +210,7 @@ class PingPong():
                     return -1
 
             print("Protocol c passes through without trouble! No Eve detected yet")
+            logger.info("Protocol c passes through without trouble! No Eve detected yet")
             draw = random.uniform(0, 1)
             #print("meas_results_alice : ", meas_results_alice)
             #print("meas_results_bob : ", meas_results_bob)
@@ -250,8 +256,9 @@ class PingPong():
             bob_message = bob_message + result
 
         print(f"Message transmitted : {message}")
+        logger.info(f"Message transmitted : {message}")
         print(f"Message recieved : {bob_message}")
-
+        logger.info(f"Message recieved : {bob_message}")
 
         res = {
             "Eve_presence":self.eve_present,

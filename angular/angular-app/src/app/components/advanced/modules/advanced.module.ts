@@ -6,6 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AccordionModule } from 'primeng/accordion';
 import { SliderModule } from 'primeng/slider';
 import { DialogModule } from 'primeng/dialog';
+import { TooltipModule } from 'primeng/tooltip';
 
 @NgModule({
     imports: [
@@ -15,7 +16,8 @@ import { DialogModule } from 'primeng/dialog';
         ReactiveFormsModule,
         AccordionModule,
         SliderModule,
-        DialogModule
+        DialogModule,
+        TooltipModule
     ],
     declarations: [AdvancedComponent]
 })

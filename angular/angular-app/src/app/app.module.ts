@@ -24,6 +24,7 @@ import { JwtInterceptor } from './auth/jwt.interceptor';
 import { SliderModule } from 'primeng/slider';
 import { RouterModule } from '@angular/router';
 import { ResultsComponent } from './components/results/results.component';
+import { TooltipModule } from 'primeng/tooltip';
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA,
     NO_ERRORS_SCHEMA
@@ -57,7 +58,7 @@ import { ResultsComponent } from './components/results/results.component';
     AppRoutingModule,
     StyleClassModule,
     BrowserAnimationsModule,
-    NgbPopoverModule,
+    NgbPopoverModule, TooltipModule
   ],
   providers: [CookieService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }],

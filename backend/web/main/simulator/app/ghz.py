@@ -9,11 +9,15 @@ from qutip.qip.operations import gate_sequence_product
 #from qiskit.ignis.verification import marginal_counts
 from qiskit.quantum_info import random_statevector
 import json
+import logging
+logger = logging.getLogger("main_logger.application_layer." + "ghz")
+
 
 class GHZ():
 
     #Requesting transport manager for entanglements
     def request_entanglements(self,endnode1,endnode2,endnode3,middlenode):
+        logger.info("Requesting three two-party entanglements")
         endnode1.transport_manager.request(middlenode.owner.name, 5e12,1, 20e12, 0 , 0.5,2e12) 
         endnode2.transport_manager.request(middlenode.owner.name, 5e12,1, 20e12, 0 , 0.5,2e12) 
         endnode3.transport_manager.request(middlenode.owner.name, 5e12,1, 20e12, 0 , 0.5,2e12) 
@@ -25,7 +29,8 @@ class GHZ():
         endnode1=alice
         endnode2=bob
         endnode3=charlie
-        print('endnode1,endnode2,endnode3,middle',endnode1.owner.name,endnode2.owner.name,endnode3.owner.name,middlenode.owner.name)
+        logger.info('endnode1 , endnode2, endnode3, middlenode are ',endnode1.owner.name+ ", "+endnode2.owner.name+ ", "+endnode3.owner.name+ ", "+middlenode.owner.name)
+        
         return self.request_entanglements(endnode1,endnode2,endnode3,middlenode)
 
     # Gets alice's entangled memory state
@@ -95,6 +100,7 @@ class GHZ():
         print("Output", output)
         ghz_state = qm_middle.get(middle_key).state
         print("\nGHZ State\n",  qm_middle.get(middle_key).state)
+        logger.info("obtained GHZ state: " + str(qm_middle.get(middle_key).state))
         print("\nGHZ State alice\n",  qm_middle.get(alice_key).state)
         print("\nGHZ State bob\n",  qm_middle.get(bob_key).state)
         print("\nGHZ State charlie\n",  qm_middle.get(charlie_key).state)

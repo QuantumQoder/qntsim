@@ -6,7 +6,8 @@ Timeline.bk=True
 from qntsim.topology.topology import Topology
 from qntsim.components.circuit import QutipCircuit
 import numpy as np
-
+import logging
+logger = logging.getLogger("main_logger.application_layer." + "qsdc1")
 
 class QSDC1():
    
@@ -20,6 +21,7 @@ class QSDC1():
     
     def request_entanglements(self,sender,receiver,n):
         print("sender,receiver,n",sender.name,receiver.name,n)
+        logger.info("requesting entanglement between: "+ sender.name+ " "+receiver.name)
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.5,5e12)
         source_node_list=[sender.name]
         print("sender,receiver,source_node_list",sender,receiver,source_node_list)
@@ -28,7 +30,8 @@ class QSDC1():
     def roles(self,alice,bob,n):
         sender=alice
         receiver=bob
-        print('sender, receiver',sender.owner.name,receiver.owner.name)    
+        print('sender, receiver',sender.owner.name,receiver.owner.name)
+        logger.info('sender, receiver are '+sender.owner.name+" "+receiver.owner.name)     
         return self.request_entanglements(sender,receiver,n)
 
 
@@ -146,6 +149,7 @@ class QSDC1():
         choose_keys = []
         removed_bits=[]
         print("message thrown out because we measure it for eavesdrop check : ", )
+        #logger.info("message thrown out because we measure it for eavesdrop check : " )
         thrown_message = []
         for pos in choose_pos:
             alice_meas.append(self.z_measurement(qm_alice, entangled_keys[pos]))
@@ -173,6 +177,7 @@ class QSDC1():
                 #assert a_val == 1 - b_val
 
         print("eavesdrop check passed!")
+        logger.info("eavesdrop check passed!")
         print(alice_meas, bob_meas)
         return choose_keys,removed_bits
 
@@ -212,10 +217,12 @@ class QSDC1():
             message_received += str(output[keys]) + str(output[alice_bob_keys_dict[keys]])
             c+=2
         final_key = message_received.replace("__", "")
+        logger.info("obtained final key")
         print("message thrown out because we measure it for eavesdrop check : ",removed_bits)
         print(f"key transmitted : {message}")
         print(f"key shared received : {message_received}")
         print(f"Final key : {final_key}")
+        
 
         ###"message thrown out because we measure it for eavesdrop check : ",removed_bits
         ###display_msg : "message thrown out because we measure it for eavesdrop check : "

@@ -11,11 +11,14 @@ from qntsim.topology.topology import Topology
 import string
 import sys
 import numpy as np
+import logging
+logger = logging.getLogger("main_logger.application_layer." + "ip1")
 
 
 class IP1():
 
     def request_entanglements(self,sender,receiver,n=50):
+        logger.info(sender.owner.name+" requesting entanglement with "+receiver.owner.name)
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.5,5e12)
         source_node_list=[sender.name]
         return sender,receiver,source_node_list
@@ -24,6 +27,7 @@ class IP1():
         sender=alice
         receiver=bob
         print('sender, receiver',sender.owner.name,receiver.owner.name)
+        logger.info('sender, receiver are '+sender.owner.name+" "+receiver.owner.name)
         return self.request_entanglements(sender,receiver,n)
 
     def z_measurement(self,qm, keys):
@@ -357,9 +361,10 @@ class IP1():
         
         if Bobs_r == r : 
             display_msg="Bob's r is same as Alice's r! Authentication procedure passed"
+            
         else:
             display_msg="Bob's r is different from Alice's r! Authentication procedure failed!"
-
+        logger.info(display_msg)
         #Bobs_r : Bobs_r that he gets 
         #Alice_r: Alice's encoded r
         res ={

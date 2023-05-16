@@ -26,7 +26,7 @@ from ..utils import log
 from ..components.circuit import BaseCircuit
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 import logging
-logger = logging.getLogger("main_logger." + "bk_swapping")
+logger = logging.getLogger("main_logger.link_layer."+ "bk_swapping")
 class SwappingMsgType(Enum):
     """Defines possible message types for entanglement generation."""
 
@@ -226,13 +226,13 @@ class EntanglementSwappingA(EntanglementProtocol):
                                                 remote_memo=self.left_memo.entangled_memory["memo_id"],
                                                 expire_time=expire_time,
                                                 meas_res=[]) 
-            # logger.log('Entanglement Swapping successful')
+            logger.info('Entanglement Swapping successful between '+ self.left_protocol.own.name + ", " + self.right_protocol.own.name)
             self.subtask.on_complete(1)
         else:
             expire_time = min(self.left_memo.get_expire_time(), self.right_memo.get_expire_time())
             msg_l = Message(MsgRecieverType.PROTOCOL, self.left_protocol.name ,SwappingMsgType.SWAP_RES, left_protocol=self.left_protocol.name, fidelity=0,expire_time=expire_time)
             msg_r = Message(MsgRecieverType.PROTOCOL, self.right_protocol.name,SwappingMsgType.SWAP_RES, right_protocol=self.right_protocol.name, fidelity=0,expire_time=expire_time)
-            # logger.log('Entanglement Swapping failed')
+            logger.info('Entanglement Swapping failed between '+ self.left_protocol.own.name + ", " + self.right_protocol.own.name)
             self.subtask.on_complete(-1)
 
         self.own.message_handler.send_message(self.left_node, msg_l)
@@ -401,7 +401,7 @@ class EntanglementSwappingB(EntanglementProtocol):
             
             if (self.own.name==src and msg.kwargs["remote_node"]==dst) :
                 print(f'Entanglement sucessful between {src,dst}')
-                #logger.info(f'Swapping sucessful between {src,dst}')
+                #logger.info(f'Swapping sucessful between {src,self.other}')
                 #Index | Source node   | Entangled Node   |   Fidelity |   Entanglement Time |   Expire Time | State 
                 for info in self.own.resource_manager.memory_manager:
                     if info.memory==self.memory:
@@ -424,7 +424,7 @@ class EntanglementSwappingB(EntanglementProtocol):
            
             elif (self.own.name==dst and msg.kwargs["remote_node"]==src) :
                 print(f'Entanglement sucessful between {src,dst}')
-                #logger.info(f'Swapping sucessful between {src,dst}')
+                #logger.info(f'Swapping sucessful between {src,self.other}')
                 #Index | Source node   | Entangled Node   |   Fidelity |   Entanglement Time |   Expire Time | State 
                 for info in self.own.resource_manager.memory_manager:
                     if info.memory==self.memory:

@@ -86,6 +86,27 @@
                                         service node.
                                     </p>
                                 </li>
+                                <li>
+                                    <b>
+                                        Memory Frequency
+                                    </b>
+                                    <p>
+                                        The acceptable storage frequency of the quantum memory.
+                                    </p>
+                                </li>
+                                <li>
+                                    <b>Memory Expiry</b>
+                                    <p>Coherence time of Quantum memory beyond which the stored state fidelity
+                                        deteriorates.</p>
+                                </li>
+                                <li>
+                                    <b>Memory Efficiency</b>
+                                    <p>The quantum memory efficiency of reading and writing quantum states.</p>
+                                </li>
+                                <li>
+                                    <b>Memory Fidelity</b>
+                                    <p>The quality of storage offered by the quantum memory ranging between (0-1).</p>
+                                </li>
                             </ul>
                         </p-accordionTab>
                         <p-accordionTab header="Setup Topology Info">
@@ -105,69 +126,89 @@
                     </h5>
                     <p-accordion>
 
-                        <p-accordionTab header="Connection Settings">
+                        <p-accordionTab header="Connection Settings"
+                            pTooltip="Please choose your desired settings to establish the link">
                             <form [formGroup]="toolbox">
                                 <div class="form-group col-8 mx-auto">
-                                    <label for="attenuation" class="form-label mx-auto">Attenuation (dB/km)</label>
+                                    <label for="attenuation" class="form-label mx-auto"
+                                        pTooltip="The loss of photons (signal strength) while travelling through an optical channel. It gives an estimate on the power loss. ">Attenuation
+                                        (dB/m) <i class="fa-solid fa-circle-info fa-xs"
+                                            style="color: #000000;"></i></label>
                                     <input type="number" class="form-control" formControlName="attenuation"
                                         id="attenuation" placeholder="Enter in decimals">
                                 </div>
                                 <div class="form-group col-8 mx-auto">
-                                    <label for="distance" class="form-label mx-auto">Link Length {{distance}}km</label>
+                                    <label for="distance" class="form-label mx-auto"
+                                        pTooltip="The fiber length between any two neighbor nodes.">Link Length
+                                        {{distance}}(m) <i class="fa-solid fa-circle-info fa-xs"
+                                            style="color: #000000;"></i></label>
                                     <input type="number" class="form-control mx-auto" id="distance"
                                         formControlName="distance" placeholder="Enter Distance">
                                 </div>
                                 <br>
                             </form>
                         </p-accordionTab>
-                        <p-accordionTab header="Detector Properties">
+                        <p-accordionTab header="Detector Properties" pTooltip="Set the parameters of photon detector">
                             <div class="mt-1 col-9 mx-auto">
-                                <label for="type" class="form-label font-bold">
-                                    Efficiency
+                                <label for="type" class="form-label font-bold"
+                                    pTooltip="Efficiency of detecting incoming photons. Higher efficiency indicates better detection probabilities.">
+                                    Efficiency <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                 </label>
                                 <input class="form-control" [(ngModel)]="detectorProps.efficiency" />
                             </div>
                             <div class="mt-1 col-9 mx-auto">
-                                <label for="type" class="form-label font-bold">
-                                    Count Rate
+                                <label for="type" class="form-label font-bold"
+                                    pTooltip="The number of photons that can be detected per second.">
+                                    Count Rate <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                 </label>
                                 <input class="form-control" [(ngModel)]="detectorProps.countRate" />
                             </div>
                             <div class="mt-1 col-9 mx-auto">
-                                <label for="type" class="form-label font-bold">
-                                    Time Resolution (ps)
+                                <label for="type" class="form-label font-bold"
+                                    pTooltip="Resolution of detecting two incoming photons separated in time.">
+                                    Time Resolution (ps) <i class="fa-solid fa-circle-info fa-xs"
+                                        style="color: #000000;"></i>
                                 </label>
                                 <input class="form-control" [(ngModel)]="detectorProps.timeResolution" />
                             </div>
                         </p-accordionTab>
-                        <p-accordionTab header="Light Source Properties">
+                        <p-accordionTab header="Light Source Properties"
+                            pTooltip="Set the input parameters for light source.">
                             <div class="mt-1 col-9 mx-auto">
-                                <label for="type" class="form-label font-bold">
-                                    Frequency (Hz)
+                                <label for="type" class="form-label font-bold"
+                                    pTooltip="Set the frequency of light/photons.">
+                                    Frequency (Hz) <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                 </label>
-                                <input class="form-control" [(ngModel)]="lightSourceProps.frequency" />
+                                <input class="form-control" [(ngModel)]="lightSourceProps.frequency"
+                                    (input)="calculateWavelength()" />
                             </div>
                             <div class="mt-1 col-9 mx-auto">
-                                <label for="type" class="form-label font-bold">
-                                    Wavelength (nm)
+                                <label for="type" class="form-label font-bold"
+                                    pTooltip="The wavelength of the light source in nm.">
+                                    Wavelength (nm) <i class="fa-solid fa-circle-info fa-xs"
+                                        style="color: #000000;"></i>
                                 </label>
-                                <input class="form-control" [(ngModel)]="lightSourceProps.wavelength" />
+                                <input class="form-control" (input)="calculateFrequency()"
+                                    [(ngModel)]="lightSourceProps.wavelength" />
                             </div>
                             <div class="mt-1 col-9 mx-auto">
-                                <label for="type" class="form-label font-bold">
-                                    Bandwidth (nm)
+                                <label for="type" class="form-label font-bold"
+                                    pTooltip="Defines the linewidth of source. The narrower the band is the precise is the intended wavelength.">
+                                    Bandwidth (nm) <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                 </label>
                                 <input class="form-control" [(ngModel)]="lightSourceProps.bandwidth" />
                             </div>
                             <div class="mt-1 col-9 mx-auto">
-                                <label for="type" class="form-label font-bold">
-                                    Mean Photon
+                                <label for="type" class="form-label font-bold" pTooltip="Ranges between (0-1) ">
+                                    Mean Photon Number <i class="fa-solid fa-circle-info fa-xs"
+                                        style="color: #000000;"></i>
                                 </label>
                                 <input class="form-control" [(ngModel)]="lightSourceProps.meanPhotonNum" />
                             </div>
                             <div class="mt-1 col-9 mx-auto">
-                                <label for="type" class="form-label font-bold">
-                                    Phase Error
+                                <label for="type" class="form-label font-bold"
+                                    pTooltip="The phase difference between the input qubit and measured qubit (default=0).">
+                                    Phase Error <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                 </label>
                                 <input class="form-control" [(ngModel)]="lightSourceProps.phaseError" />
                             </div>
@@ -185,8 +226,9 @@
                             <p-accordionTab header="Application Parameters" *ngIf="app_id != 10">
                                 <form [formGroup]="appSettingsForm">
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id != 4 && app_id !=10">
-                                        <label for="type" class="form-label font-bold">
-                                            Sender
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The sender node of the quantum message or key.">
+                                            Sender <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                         </label>
                                         <select class="form-control" formControlName="sender"
                                             [(ngModel)]="nodesSelection.sender">
@@ -195,28 +237,23 @@
                                         </select>
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id != 4 && app_id !=10">
-                                        <label for="type" class="form-label font-bold">
-                                            Receiver
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The recipient of the secure quantum message or key.">
+                                            Receiver <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
                                         </label>
                                         <select class="form-control" formControlName="receiver"
                                             [(ngModel)]="nodesSelection.receiver">
                                             <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}
                                             </option>
                                         </select>
-                                        <!-- <div *ngIf="endNodes.length ==0">
-                                                            <p class="text-danger">
-                                                                Please drag a end node and configure it.
-                                                            </p>
-                                                        </div>
-                                                        <div *ngIf="receiver.touched && receiver.invalid">
-                                                            <div *ngIf="receiver.errors.required">
-                                                                <p class="text-danger">Please select an Receiver.</p>
-                                                            </div>
-                                                        </div> -->
+
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 1">
-                                        <label for="type" class="form-label font-bold">
-                                            Key Length
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The desired quantum-distributed key length by the user.">
+                                            Key Length <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
                                         </label>
                                         <input type="number" min="1" oninput="this.value = Math.abs(this.value)"
                                             formControlName="keyLength" class="form-control">
@@ -227,76 +264,88 @@
                                         </div>
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
-                                        <label for="type" class="form-label font-bold">
-                                            Target Fidelity: {{e2e.targetFidelity}}
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The minimum threshold entanglement fidelity which is acceptable to be accounted as successful entanglement distribution.">
+                                                Fidelity: {{e2e.targetFidelity}} <i
+                                                class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                         </label>
                                         <br>
-                                        <p-slider formControlName="targetFidelity" [min]="0" [step]="0.05" [max]="1"
-                                            (onSlideEnd)="e2eChange('target')"></p-slider>
+                                        <p-slider formControlName="targetFidelity" [(ngModel)]="e2e.targetFidelity"
+                                            [min]="0" [step]="0.05" [max]="1"></p-slider>
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
-                                        <label class="form-label">
-                                            Demand Size: {{e2e.size}}
+                                        <label class="form-label"
+                                            pTooltip="Requested number of entanglements at the chosen end nodes.">
+                                            Demand Size: {{e2e.size}} <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
                                         </label>
                                         <br>
-                                        <p-slider formControlName="size" [min]="0" [step]="1" [max]="6"
-                                            (onSlideEnd)="e2eChange('size')"></p-slider>
+                                        <p-slider formControlName="size" [(ngModel)]="e2e.size" [min]="0" [step]="1"
+                                            [max]="6"></p-slider>
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
-                                        <label for="timeout" class="col-12">TimeOut (Seconds)</label>
+                                        <label for="timeout" class="col-12"
+                                            pTooltip="Request timeout of simulation (in secs)">TimeOut (Seconds) <i
+                                                class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i></label>
                                         <input type="text" class="form-control col-12"
                                             aria-label="Amount (to the nearest dollar)" formControlName="timeout">
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 5 || app_id == 6">
                                         <label for="type" class="form-label font-bold">
-                                            Sequence Length
+                                            Sequence Length <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
                                         </label>
                                         <input type="number" min="1" oninput="this.value = Math.abs(this.value)"
                                             formControlName="sequenceLength" class="form-control">
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 3">
-                                        <label for="endNode">Random Qubit Amplitude 1</label>&nbsp;
+                                        <label for="endNode"
+                                            pTooltip="The complex co-efficient of the basis state |0>">Random Qubit
+                                            Amplitude 1 <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i></label>&nbsp;
                                         <input type="text" class="form-control" formControlName="amplitude1">
-                                        <div class="text-muted">Random Single Qubit's amplitude at |0></div>
+
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 3">
-                                        <label for="endNode">Random Qubit Amplitude 1</label>&nbsp;
+                                        <label for="endNode"
+                                            pTooltip="The complex co-efficient of the basis state |1>">Random Qubit
+                                            Amplitude 2 <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i></label>&nbsp;
                                         <input type="text" class="form-control" formControlName="amplitude2">
-                                        <div class="text-muted">Random Single Qubit's amplitude at |0></div>
+
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 4">
-                                        <label for="type" class="form-label font-bold">
-                                            End Node 1
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="One of the three end nodes holding a 3-party GHZ qubit.">
+                                            End Node 1 <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
                                         </label>
                                         <select class="form-control" formControlName="endnode1"
                                             [(ngModel)]="nodesSelection.endNode1">
                                             <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}
                                             </option>
                                         </select>
-                                        <!-- <div *ngIf="node1.touched && node1.invalid">
-                                                            <div *ngIf="node1.errors.required">
-                                                                <p class="text-danger">Please select End Node 1.</p>
-                                                            </div>
-                                                        </div> -->
+
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 4">
-                                        <label for="type" class="form-label font-bold">
-                                            End Node 2
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="One of the three end nodes holding a 3-party GHZ qubit.">
+                                            End Node 2 <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
                                         </label>
                                         <select class="form-control" formControlName="endnode2"
                                             [(ngModel)]="nodesSelection.endNode2">
                                             <option *ngFor="let data of endNodes" [ngValue]="data.Name">{{data.Name}}
                                             </option>
                                         </select>
-                                        <!-- <div *ngIf="node2.touched && node2.invalid">
-                                                            <div *ngIf="node2.errors.required">
-                                                                <p class="text-danger">Please select End Node 2.</p>
-                                                            </div>
-                                                        </div> -->
+
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 4">
-                                        <label for="type" class="form-label font-bold">
-                                            End Node 3
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="One of the three end nodes holding a 3-party GHZ qubit.">
+                                            End Node 3 <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
                                         </label>
                                         <select class="form-control" formControlName="endnode3"
                                             [(ngModel)]="nodesSelection.endNode3">
@@ -305,8 +354,10 @@
                                         </select>
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 4">
-                                        <label for="type" class="form-label font-bold">
-                                            Central Node
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The intermediary node having the GHZ state analyser. It is assumed to be at a central location to the end nodes.">
+                                            Central Node <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
                                         </label>
                                         <select class="form-control" formControlName="middleNode"
                                             [(ngModel)]="nodesSelection.middleNode">
@@ -322,8 +373,10 @@
                                     </div>
 
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 6 || app_id == 5 ||app_id == 7">
-                                        <label for="type" class="form-label font-bold">
-                                            Message
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The classical message string that the sender sends to receiver.">
+                                            Message <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
                                         </label>
                                         <input type="text" (keypress)="allowBitsInput($event)" formControlName="message"
                                             class="form-control" maxLength="8">
@@ -339,8 +392,10 @@
                                         </div>
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 9">
-                                        <label for="type" class="form-label font-bold">
-                                            Input Message
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The classical message of the sender">
+                                            Input Message <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
                                         </label>
                                         <input type="text" formControlName="inputMessage" class="form-control">
                                         <div
@@ -351,8 +406,10 @@
                                         </div>
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 8">
-                                        <label for="type" class="form-label font-bold">
-                                            Sender's Message
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="Sender's message of the dialogue">
+                                            Sender's Message <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
                                         </label>
                                         <input type="text" formControlName="message1" class="form-control">
                                         <div
@@ -363,8 +420,10 @@
                                         </div>
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 8">
-                                        <label for="type" class="form-label font-bold">
-                                            Receiver's Message
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="Receiver's message of the dialogue">
+                                            Receiver's Message <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
                                         </label>
                                         <input type="text" formControlName="message2" class="form-control">
                                         <div
@@ -379,8 +438,9 @@
                             </p-accordionTab>
                             <p-accordionTab header="Sender Parameters" *ngIf="app_id == 10">
                                 <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold">
-                                        Sender
+                                    <label for="type" class="form-label font-bold"
+                                        pTooltip="The sender node of the QSDC protocol.">
+                                        Sender <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                     </label>
                                     <select class="form-control" [(ngModel)]="nodesSelection.sender">
                                         <option *ngFor="let data of endNodes" [ngValue]="data.Name">
@@ -389,30 +449,36 @@
                                     </select>
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold">
-                                        Sender ID
+                                    <label for="type" class="form-label font-bold"
+                                        pTooltip="The QKD Id of the Sender which will be used for authentication.">
+                                        Sender ID <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                     </label>
                                     <input type="number" class="form-control"
                                         oninput="this.value = Math.abs(this.value)"
                                         [(ngModel)]="nodesSelection.senderId">
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold">
-                                        Message
+                                    <label for="type" class="form-label font-bold"
+                                        pTooltip="The classical message of the sender">
+                                        Message <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                     </label>
                                     <input type="text" class="form-control" [(ngModel)]="nodesSelection.message">
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold">
-                                        Number of Decoy Photons
+                                    <label for="type" class="form-label font-bold"
+                                        pTooltip="The number of decoy photons inserted into the quantum message string.">
+                                        Number of Decoy Photons <i class="fa-solid fa-circle-info fa-xs"
+                                            style="color: #000000;"></i>
                                     </label>
                                     <input type="number" class="form-control"
                                         oninput="this.value = Math.abs(this.value)"
                                         [(ngModel)]="nodesSelection.numDecoy">
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold">
-                                        Number of Check Bits
+                                    <label for="type" class="form-label font-bold"
+                                        pTooltip="The trap qubits inserted into the quantum message sequence to analyze channel security.">
+                                        Number of Check Bits <i class="fa-solid fa-circle-info fa-xs"
+                                            style="color: #000000;"></i>
                                     </label>
                                     <input type="number" class="form-control"
                                         oninput="this.value = Math.abs(this.value)"
@@ -421,8 +487,9 @@
                             </p-accordionTab>
                             <p-accordionTab header="Receiver Parameters" *ngIf="app_id == 10">
                                 <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold">
-                                        Receiver
+                                    <label for="type" class="form-label font-bold"
+                                        pTooltip="The recipient node of the quantum secure communication.">
+                                        Receiver <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                     </label>
                                     <select class="form-control" [(ngModel)]="nodesSelection.receiver">
                                         <option *ngFor="let data of endNodes" [ngValue]="data.Name">
@@ -431,8 +498,10 @@
                                     </select>
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold">
-                                        Receiver ID
+                                    <label for="type" class="form-label font-bold"
+                                        pTooltip="The QKD Id of the Receiver which will be used for authentication.">
+                                        Receiver ID <i class="fa-solid fa-circle-info fa-xs"
+                                            style="color: #000000;"></i>
                                     </label>
                                     <input type="number" class="form-control"
                                         oninput="this.value = Math.abs(this.value)"
@@ -441,8 +510,9 @@
                             </p-accordionTab>
                             <p-accordionTab header="Common Parameters" *ngIf="app_id == 10">
                                 <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold">
-                                        Bell Type
+                                    <label for="type" class="form-label font-bold"
+                                        pTooltip="The EPR pair selected out of four possible choices.">
+                                        Bell Type <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                     </label>
                                     <select class="form-control" [(ngModel)]="nodesSelection.bellType">
                                         <option *ngFor="let data of bellTypeOptions" [ngValue]="data">
@@ -451,15 +521,17 @@
                                     </select>
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold">
-                                        Error Threshold
+                                    <label for="type" class="form-label font-bold"
+                                        pTooltip="The maximum acceptable error on the communication, can be decided by user (in %) . The low the error % is, more secure is the communication.">
+                                        Error Threshold <i class="fa-solid fa-circle-info fa-xs"
+                                            style="color: #000000;"></i>
                                     </label>
                                     <input type="number" class="form-control"
                                         [(ngModel)]="nodesSelection.errorthreshold">
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold">
-                                        Attack
+                                    <label for="type" class="form-label font-bold" pTooltip="External Attack Type">
+                                        Attack <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                     </label>
                                     <select class="form-control" [(ngModel)]="nodesSelection.attack">
                                         <option *ngFor="let data of attackOptions" [ngValue]="data">{{data}}
@@ -467,8 +539,9 @@
                                     </select>
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold">
-                                        Channel
+                                    <label for="type" class="form-label font-bold"
+                                        pTooltip="The link connecting two nodes.">
+                                        Channel <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                     </label>
                                     <select class="form-control" [(ngModel)]="nodesSelection.channel">
                                         <option *ngFor="let data of channelOptions" [ngValue]="data">
@@ -476,16 +549,14 @@
                                         </option>
                                     </select>
                                 </div>
-
                             </p-accordionTab>
                         </p-accordion>
                     </ng-container>
-
                     <br>
                     <div class="btn-group col-12 d-flex justify-content-center gap-2">
                         <div>
                             <button class="btn btn-primary btn-custom btn-sm"
-                                (click)="activeIndex('prev')">Previous</button>
+                                (click)="activeindex('prev')">Previous</button>
                         </div>
                         <div>
                             <button class="btn btn-primary btn-custom btn-sm" (click)="parameters()">Run
