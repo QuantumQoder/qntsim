@@ -464,7 +464,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       ],
       memory: [
         { propName: "Memory Frequency (Hz)", propValue: 2000, numericValueOnly: true },
-        { propName: "Memory Expiry (ms)", propValue: -1, numericValueOnly: true },
+        { propName: "Memory Expiry (s)", propValue: -1, numericValueOnly: true },
         { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
         { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
       ]
@@ -722,7 +722,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         ],
         memory: [
           { propName: "Memory Frequency (Hz)", propValue: 2000, numericValueOnly: true },
-          { propName: "Memory Expiry (ms)", propValue: -1, numericValueOnly: true },
+          { propName: "Memory Expiry (s)", propValue: -1, numericValueOnly: true },
           { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
           { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
         ]
