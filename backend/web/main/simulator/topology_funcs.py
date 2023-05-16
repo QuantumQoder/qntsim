@@ -33,6 +33,9 @@ from qntsim.communication.protocol import ProtocolPipeline
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
 import logging
+logger = logging.getLogger("main_logger." + "topology_funs")
+print("TOPP")
+print(logger.handlers)
 
 
 def display_quantum_state(state_vector):
@@ -154,7 +157,8 @@ def eve_e91(network_config, sender, receiver, keyLength):
 
 
 def e91(network_config, sender, receiver, keyLength):
-    print('network config', network_config)
+    logger.info("In e91")
+    print('In e91 network config', network_config)
     start_time = time.time()
     network_config_json, tl, network_topo = load_topology(
         network_config, "Qutip")
@@ -208,8 +212,8 @@ def test_e91():
 test_e91()
 
 def e2e(network_config, sender, receiver, startTime, size, priority, targetFidelity, timeout):
-    logger = logging.getLogger("main_logger." + "e2e")
     logger.info("In e2e")
+    print("E2E")
     # TODO: Integrate Network Graphs
     req_pairs = []
     start_time = time.time()
@@ -265,6 +269,7 @@ def test_e2e():
 # test_e2e()
 
 def ghz(network_config, endnode1, endnode2, endnode3, middlenode):
+    logger.info("In ghz...")
 
     start_time = time.time()
     network_config_json, tl, network_topo = load_topology(
@@ -312,6 +317,7 @@ def ip1(network_config, sender, receiver, message):
 
 
 def ping_pong(network_config, sender, receiver, sequenceLength, message):
+    logger.info("In Ping Pong...")
     start_time = time.time()
     network_config_json, tl, network_topo = load_topology(
         network_config, "Qutip")
@@ -339,6 +345,7 @@ def ping_pong(network_config, sender, receiver, sequenceLength, message):
 
 
 def qsdc1(network_config, sender, receiver, sequenceLength, key):
+    logger.info("In qsdc1...")
     start_time = time.time()
     network_config_json, tl, network_topo = load_topology(
         network_config, "Qutip")
@@ -369,6 +376,7 @@ def qsdc1(network_config, sender, receiver, sequenceLength, key):
 
 
 def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
+    logger.info("In teleportation...")
     start_time = time.time()
     # TODO: Integrate Network Graphs
     print("teleportation running")

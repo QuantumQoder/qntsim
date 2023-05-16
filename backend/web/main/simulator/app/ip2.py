@@ -6,12 +6,14 @@ from functools import partial
 from random import sample
 from typing import Any, Dict, List, Tuple
 
+from numpy import mean
 from numpy.random import randint
 from qntsim.communication import (ATTACK_TYPE, Attack, ErrorAnalyzer, Network,
                                   bell_type_state_analyzer, insert_check_bits,
                                   insert_decoy_photons, string_to_binary)
 from qntsim.components.circuit import QutipCircuit
 
+logger = logging.getLogger("main_logger." + "ip2")
 # from main.simulator.topology_funcs import network_graph
 
 
@@ -100,6 +102,7 @@ class Sender(Party):
                 qtc.h(0)
             network.manager.run_circuit(qtc, [d])
         logging.info(f"message by {cls.__name__}")
+        logger.info(f"message by {cls.__name__}")
 
         return cls.d_a
 
@@ -115,11 +118,13 @@ class Sender(Party):
         Returns:
             cls.d_a: List of memory keys of decoy photons
         """
+        if -1 in returns: return returns
         cls.d_a, cls.photons_a = insert_decoy_photons(
             network=network, node_index=0, num_decoy_photons=num_decoy_photons
         )
         cls.q_a = cls.s_a + cls.i_a + cls.d_a
         logging.info(f"in key-sequence by {cls.__name__}")
+        logger.info(f"in key-sequence by {cls.__name__}")
 
         return cls.d_a
 
@@ -163,6 +168,7 @@ class Receiver(Party):
             network=network, node_index=1, num_decoy_photons=num_decoy_photons
         )
         logging.info(f"keys for epr pairs and decoy photons by {cls.__name__}")
+        logger.info(f"keys for epr pairs and decoy photons by {cls.__name__}")
         cls.d_b = sorted(list(set(cls.d_b) - set(cls.d_a)))
 
         return seq_a, list(seq_a[-len(cls.userID) // 2 :]), cls.d_a
@@ -176,6 +182,7 @@ class Receiver(Party):
         Returns:
             _type_: _description_
         """
+        if -1 in returns: return returns
         outputs = "".join(
             str(output) for outputs in returns for output in outputs.values()
         )
@@ -191,6 +198,7 @@ class Receiver(Party):
             cls1 (_type_): _description_
             threshold (float): _description_
         """
+        if -1 in returns: return returns
         cls.received_msgs = "".join(
             char for i, char in enumerate(returns) if i not in cls1.chk_bts_insrt_lctns
         )
@@ -203,6 +211,7 @@ class Receiver(Party):
             logging.info("failed, err=", 1 - err_prct)
             return
         logging.info(f"passed, messages received: {cls.received_msgs}")
+        logger.info(f"passed, messages received: {cls.received_msgs}")
 
 
 class UTP:
@@ -218,6 +227,7 @@ class UTP:
             cls2 (_type_): _description_
             threshold (float): _description_
         """
+        if -1 in returns: return returns
         print(f"channel_security between {cls1.__name__} and {cls2.__name__}")
         keys = returns if cls1 == Sender or cls2 == Sender else cls2.d_b
         basis = cls2.photons_a if cls1 != cls or cls2 == Sender else cls2.photons_b
@@ -237,10 +247,11 @@ class UTP:
             logging.info(
                 f"failed between {cls1.__name__} and {cls2.__name__}, err={mean_}"
             )
-            sys.exit(f"failed between {cls1.__name__} and {cls2.__name__}, err={mean_}")
-            # return -1, f'failed between {cls1.__name__} and {cls2.__name__}, err={mean(err)}'
+            # sys.exit(f"failed between {cls1.__name__} and {cls2.__name__}, err={mean_}")
+            return {-1:f'failed between {cls1.__name__} and {cls2.__name__}, err={mean(err)}'}
             # os._exit(f'Security of the channel between {cls1.__name__} and {cls2.__name__} is compromised.')
         logging.info(f"passed between {cls1.__name__} and {cls2.__name__}")
+        logger.info(f"passed between {cls1.__name__} and {cls2.__name__}")
 
         return returns
 
@@ -270,12 +281,14 @@ class UTP:
             str(output) if i % 2 else str(output ^ cls1.basis[i // 2])
             for i, output in enumerate(outputs)
         )
+        print("1", outputs)
         if outputs != cls2.userID:
-            sys.exit(f"{cls2.__name__} is not authenticated")
-            # return -1, f'{cls2.__name__} is not authenticated'
+            # sys.exit(f"{cls2.__name__} is not authenticated")
+            return {-1:f'{cls2.__name__} is not authenticated'}
             # os._exit(f'{cls2.__name__} is not authenticated')
         else:
             logging.info(f"{cls2.__name__}, passed!")
+            logger.info(f"{cls2.__name__}, passed!")
         outputs = []
         for c in cls1.c_a:
             state = network.manager.get(c)
@@ -287,11 +300,13 @@ class UTP:
                 )
             )
         outputs = "".join(str(o) for o in outputs)
+        print("2", outputs)
         if outputs != cls1.userID:
             sys.exit(f"{cls1.__name__} is not authenticated")
             # os._exit(f'{cls1.__name__} is not authenticated')
         else:
             logging.info(f"{cls1.__name__}, passed!")
+            logger.info(f"{cls1.__name__}, passed!")
 
         return outputs
 
@@ -305,6 +320,7 @@ class UTP:
         Returns:
             _type_: _description_
         """
+        if -1 in returns: return returns
         outputs = []
         for m in cls.s_a:
             if m in cls.m_a:
@@ -402,6 +418,8 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
     channel = app_settings.get("channel")
     channel = [1 if i == channel else 0 for i in range(3)]
     Network._flow = [
+        partial(Network.draw),
+        partial(Network.dump),
         partial(Sender.input_check_bits),
         partial(Receiver.setup, num_decoy_photons=Sender.num_decoy_photons),
         partial(Sender.encode, receiver=Receiver),
@@ -448,23 +466,25 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
         label=label,
     )
     start_time = time.time()
-    network()
+    err_msg = network()
     end_time = time.time()
-    err_tuple = ErrorAnalyzer._analyse(network=network)
-    print(f"Average error in network:{err_tuple[2]}")
-    print(f"Standard deviation in error in network:{err_tuple[3]}")
-    print(f"Information leaked to the attacker:{err_tuple[4]}")
-    print(f"Fidelity of the message:{err_tuple[5]}")
-    # Network.execute(networks=[network])
-    print('Received messages:', Receiver.received_msgs)
+    if not err_msg:
+        err_tuple = ErrorAnalyzer._analyse(network=network)
+        print(f"Average error in network:{err_tuple[2]}")
+        print(f"Standard deviation in error in network:{err_tuple[3]}")
+        print(f"Information leaked to the attacker:{err_tuple[4]}")
+        print(f"Fidelity of the message:{err_tuple[5]}")
+        # Network.execute(networks=[network])
+        print('Received messages:', Receiver.received_msgs)
 
-    app_settings.update(
-        output_msg=Receiver.received_msgs,
-        avg_err=err_tuple[2],
-        std_dev=err_tuple[3],
-        info_leak=err_tuple[4],
-        msg_fidelity=err_tuple[5],
-    )
+        app_settings.update(
+            output_msg=Receiver.received_msgs,
+            avg_err=err_tuple[2],
+            std_dev=err_tuple[3],
+            info_leak=err_tuple[4],
+            msg_fidelity=err_tuple[5],
+        )
+    else: app_settings.update({"Err_msg":err_msg.get(-1, "Unidentified error.")})
     response = {}
     response["application"] = app_settings
     from main.simulator.topology_funcs import network_graph
@@ -559,7 +579,7 @@ if __name__ == "__main__":
             "num_check_bits": 4,
             "num_decoy_photons": 4,
         },
-        "receiver": {"node": "n3", "userID": "0110"},
+        "receiver": {"node": "n2", "userID": "0110"},
         "error_threshold": 0.4,
         "bell_type": "00",
     }

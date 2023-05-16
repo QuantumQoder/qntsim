@@ -29,6 +29,7 @@ class Teleportation():
         sender=alice
         receiver=bob
         print('sender, receiver',sender.owner.name,receiver.owner.name)
+        logger.info('sender, receiver: '+sender.owner.name+ " " + receiver.owner.name)
         return self.request_entanglements(sender,receiver)
 
 
@@ -287,9 +288,11 @@ class Teleportation():
 
     def run(self,alice,bob,A_0,A_1):
         crz,crx,case, random_qubit,alice_state=self.alice_measurement(A_0,A_1,alice)
+        logger.info(sender.owner.name + " sent measurement results")
         print("Measurement result of random qubit crz",crz)
         print("Measurement result of alice qubit crx",crx)
         bob_initial_state, bob_final_state,gatesl = self.bob_gates(crz,crx,case,bob)
+        logger.info(receiver.owner.name + " got the final state")
         
         # initial entanglement alice_bob_entanglement: alice_bob_entangled_state
         # measurement_result_of_random_qubit near alice's end : meas_rq

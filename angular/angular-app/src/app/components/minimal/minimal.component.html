@@ -22,8 +22,8 @@
             </div>
 
             <div class="mt-2 col-9 mx-auto">
-                <label for="type" class="form-label font-bold">
-                    Type
+                <label for="type" class="form-label font-bold" pTooltip="Choose between Star or Mesh topology.">
+                    Type <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
                 <select class="form-control" formControlName="type" (change)="getType($event)">
                     <option *ngFor="let data of type" [ngValue]="data">{{data}}</option>
@@ -31,8 +31,9 @@
             </div>
 
             <div class="mt-2 col-9 mx-auto">
-                <label for="type" class="form-label font-bold mb-2">
-                    Number of Nodes {{level}}
+                <label for="type" class="form-label font-bold mb-2"
+                    pTooltip="Example topologies counting the number of end nodes.">
+                    Number of Nodes {{level}} <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
                 <div class="row">
                     <div class="col-1">
@@ -50,11 +51,7 @@
             <hr>
             <div class="d-flex justify-content-end mx-2">
                 <div (click)="toggle(1)" id="toggle-button1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                        class="bi bi-caret-up-fill" viewBox="0 0 16 16">
-                        <path
-                            d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z" />
-                    </svg>
+
                 </div>
             </div>
             <div class="d-flex justify-content-center settingTitle">
@@ -62,8 +59,9 @@
             </div>
             <div id="content1">
                 <div class="mt-2 col-9 mx-auto">
-                    <label for="type" class="form-label font-bold mb-2">
-                        Number of Memories
+                    <label for="type" class="form-label font-bold mb-2"
+                        pTooltip="The number of quantum memory cells allotted inside the node. Each memory can store a single qubit state.">
+                        Number of Memories <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                     </label>
                     <input type="number" disabled formControlName="noOfMemories" class="form-control">
                 </div>
@@ -71,11 +69,7 @@
             <hr>
             <div class="d-flex justify-content-end mx-2">
                 <div (click)="toggle(2)" id="toggle-button2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                        class="bi bi-caret-up-fill" viewBox="0 0 16 16">
-                        <path
-                            d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z" />
-                    </svg>
+
                 </div>
             </div>
             <div class="d-flex justify-content-center">
@@ -85,7 +79,7 @@
                 <div class="mt-2 col-9 mx-auto">
                     <label for="type" class="form-label font-bold mb-2"
                         pTooltip="All optical channels in the homogenous network have the same length (in km) connecting two nodes.">
-                        Length {{distance}} km
+                        Length {{distance}} m <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                     </label>
                     <!-- <input type="number" disabled maxlength="3" formControlName="distance" class="form-control"> -->
                     <div class="row">
@@ -100,12 +94,11 @@
                             100
                         </div>
                     </div>
-
                 </div>
                 <div class="mt-2 col-9 mx-auto">
                     <label for="type" class="form-label font-bold mb-2"
                         pTooltip="The optical signal experiences loss (in dB/km) as it travels through the channel due to photon travel.">
-                        Attenuation (dB/km)
+                        Attenuation (dB/km) <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                     </label>
                     <input type="number" disabled formControlName="attenuity" class="form-control">
                 </div>
@@ -127,8 +120,9 @@
             <!-- <h3 class="text-center display-5">Configuration
             </h3> -->
             <div class="mt-2 col-9 mx-auto">
-                <label for="type" class="form-label font-bold">
-                    Application
+                <label for="type" class="form-label font-bold"
+                    pTooltip="Choose the application to run on the simulator.">
+                    Application <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
                 <select class="form-control" formControlName="app" (change)="getApp($event)">
                     <option *ngFor="let data of applist" [ngValue]="data.appId">{{data.appName}}</option>
@@ -153,8 +147,8 @@
             <div *ngIf="appForm.get('app')?.value != '' ">
                 <h5 class="text-center mt-1">Application Settings</h5>
                 <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value != 4">
-                    <label for="type" class="form-label font-bold">
-                        Sender
+                    <label for="type" class="form-label font-bold" pTooltip="The sender node.">
+                        Sender <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                     </label>
                     <select class="form-control" formControlName="sender">
                         <option *ngFor="let data of senderNodes" [ngValue]="data.key">{{data.key}}</option>
@@ -167,8 +161,8 @@
                 </div>
 
                 <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value != 4">
-                    <label for="type" class="form-label font-bold">
-                        Receiver
+                    <label for="type" class="form-label font-bold" pTooltip="The recipient.">
+                        Receiver <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                     </label>
                     <select class="form-control" formControlName="receiver">
                         <option *ngFor="let data of receiverNodes" [ngValue]="data.key">{{data.key}}</option>
@@ -182,8 +176,9 @@
             </div>
 
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 1">
-                <label for="type" class="form-label font-bold">
-                    Key Length
+                <label for="type" class="form-label font-bold"
+                    pTooltip="The desired quantum-distributed key length by the user.">
+                    Key Length <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
                 <input type="number" min="1" oninput="this.value = Math.abs(this.value)" formControlName="keyLength"
                     class="form-control">
@@ -200,8 +195,11 @@
                 </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 2">
-                <label for="type" class="form-label font-bold">
-                    Target Fidelity:{{e2e.targetFidelity}}
+                <label for="type" class="form-label font-bold"
+                    pTooltip="The minimum threshold entanglement fidelity which is acceptable to be accounted as successful entanglement distribution.">
+                    Target Fidelity:{{e2e.targetFidelity}} <i class="fa-solid fa-circle-info fa-xs"
+                        style="color: #000000;"></i>
+
                 </label>
                 <br>
                 <div class="row">
@@ -219,8 +217,10 @@
 
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 2">
-                <label for="type" class="form-label font-bold">
-                    Demand:{{e2e.size}}
+                <label for="type" class="form-label font-bold"
+                    pTooltip="Requested number of entanglements at the chosen end nodes.">
+                    Demand:{{e2e.size}} <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
+
                 </label>
                 <br>
                 <div class="row">
@@ -237,8 +237,10 @@
                 </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
-                <label for="type" class="form-label font-bold">
-                    End Node 1
+                <label for="type" class="form-label font-bold"
+                    pTooltip="One of the three end nodes holding a 3-party GHZ qubit.">
+                    End Node 1 <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
+
                 </label>
                 <select class="form-control" formControlName="endnode1"
                     (change)="endNode(appSettingsForm.get('endnode1').value)">
@@ -254,8 +256,9 @@
                 </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
-                <label for="type" class="form-label font-bold">
-                    End Node 2
+                <label for="type" class="form-label font-bold"
+                    pTooltip="One of the three end nodes holding a 3-party GHZ qubit.">
+                    End Node 2 <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
                 <select class="form-control" autocomplete="off" formControlName="endnode2"
                     (change)="endNode(appSettingsForm.get('endnode2').value)">
@@ -271,8 +274,9 @@
                 </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
-                <label for="type" class="form-label font-bold">
-                    End Node 3
+                <label for="type" class="form-label font-bold"
+                    pTooltip="One of the three end nodes holding a 3-party GHZ qubit.">
+                    End Node 3 <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
                 <select class="form-control" autocomplete="off" formControlName="endnode3"
                     (change)="endNode(appSettingsForm.get('endnode3').value)">
@@ -289,8 +293,9 @@
                 </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 4">
-                <label for="type" class="form-label font-bold">
-                    Central Node
+                <label for="type" class="form-label font-bold"
+                    pTooltip="The intermediary node having the GHZ state analyser. It is assumed to be at a central location to the end nodes.">
+                    Central Node <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
                 <select class="form-control" formControlName="middleNode">
                     <option *ngFor="let data of serviceNodes" [ngValue]="data.key">{{data.key}}</option>
@@ -302,8 +307,9 @@
                 </div> -->
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 5">
-                <label for="type" class="form-label font-bold">
-                    Binary message (only even)
+                <label for="type" class="form-label font-bold"
+                    pTooltip="The Quantum Key or Message that the sender sends to receiver.">
+                    Binary message (only even) <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
                 <input type="text" (keypress)="allowBitsInput($event)" formControlName="key" maxlength="10"
                     class="form-control">
@@ -321,8 +327,9 @@
                 </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 6">
-                <label for="type" class="form-label font-bold">
-                    Message
+                <label for="type" class="form-label font-bold"
+                    pTooltip="The Classical Message that the sender sends to receiver.">
+                    Message <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
                 <input type="text" (keypress)="allowBitsInput($event)" minlength="8" maxlength="10"
                     formControlName="message" class="form-control">
@@ -340,8 +347,9 @@
                 </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 7">
-                <label for="type" class="form-label font-bold">
-                    Message (only binary)
+                <label for="type" class="form-label font-bold"
+                    pTooltip="The classical message string that the sender sends to receiver.">
+                    Message (only binary) <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
                 <input type="text" (keypress)="allowBitsInput($event)" maxlength="10" formControlName="messageIp1"
                     class="form-control">
@@ -359,8 +367,8 @@
                 </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 8">
-                <label for="type" class="form-label font-bold">
-                    Sender's Message
+                <label for="type" class="form-label font-bold" pTooltip="Sender's message of the dialogue.">
+                    Sender's Message <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
                 <input type="text" formControlName="message1" class="form-control">
                 <div *ngIf="appSettingsForm.get('message1').touched && appSettingsForm.get('message1').invalid">
@@ -370,8 +378,8 @@
                 </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 8">
-                <label for="type" class="form-label font-bold">
-                    Receiver's Message
+                <label for="type" class="form-label font-bold" pTooltip="Receiver's message of the dialogue.">
+                    Receiver's Message <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
                 <input type="text" formControlName="message2" class="form-control">
                 <div *ngIf="appSettingsForm.get('message2').touched && appSettingsForm.get('message2').invalid">
@@ -381,8 +389,9 @@
                 </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 9">
-                <label for="type" class="form-label font-bold">
-                    Message
+                <label for="type" class="form-label font-bold"
+                    pTooltip="The classical message string that the sender sends to receiver.">
+                    Message <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
                 <input type="text" formControlName="message" class="form-control">
                 <div *ngIf="appSettingsForm.get('message').touched && appSettingsForm.get('message').invalid">
@@ -392,8 +401,8 @@
                 </div>
             </div>
             <div class="mt-2 col-9 mx-auto" *ngIf="appForm.get('app')?.value == 10">
-                <label for="type" class="form-label font-bold">
-                    Message
+                <label for="type" class="form-label font-bold" pTooltip="The classical message of the sender">
+                    Message <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
                 <input type="text" formControlName="inputMessage" class="form-control">
                 <div *ngIf="appSettingsForm.get('inputMessage').touched && appSettingsForm.get('inputMessage').invalid">
