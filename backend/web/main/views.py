@@ -31,15 +31,7 @@ import websocket
 
 
 
-logger = logging.getLogger("main_logger")
-logger.setLevel(logging.DEBUG)
-memory_handler = logging.handlers.MemoryHandler(capacity=1, flushLevel=logging.info)
-logger.addHandler(memory_handler)
 
-# websocket_handler = logging.handlers.WebSocketHandler(capacity=1, target=memory_handler)
-# websocket_handler.setLevel(logging.DEBUG)
-# logger.addHandler(memory_handler)
-logger.info('Logging Begins...')
 
 def home(request):
     context = {
@@ -74,7 +66,16 @@ class RunApp(APIView):
 
 
     def post(self,request):
-        
+        logger = logging.getLogger("main_logger")
+        logger.setLevel(logging.DEBUG)
+        memory_handler = logging.handlers.MemoryHandler(capacity=1000,flushLevel=logging.INFO)
+        logger.addHandler(memory_handler)
+
+        # websocket_handler = logging.handlers.WebSocketHandler(capacity=1, target=memory_handler)
+        # websocket_handler.setLevel(logging.DEBUG)
+        # logger.addHandler(memory_handler)
+        logger.info('Logging Begins...')
+        memory_handler.flush()
         importlib.reload(qntsim)
         print('request', request.data.get('topology'))
         topology = request.data.get('topology')
@@ -119,6 +120,42 @@ class RunApp(APIView):
         # graphs = results.get('graph')
         # output = results.get('results')
         output = results
+        
+        records = memory_handler.buffer
+        #print(len(records))
+        logs =[]
+        path = "/code/src"
+        for record in records:
+            # format the log record as a string
+            if record.levelname == "INFO":
+                log_message = f"{record.levelname}: {record.getMessage()}"
+                #memory_handler.buffer.remove(record)
+                print(record.module)
+                module_name = record.module + ".py"
+                # module = __import__(module_name)
+                
+                # file_path = inspect.getfile(module)
+
+                # print(file_path)  # Output: The file path of the module
+                # for root, dirs, files in os.walk(path):
+                    
+                #     if module_name in files:
+                #         print(root)
+                #         file_path = os.path.join(root, module_name)
+                #         print(f"File found at: {file_path}")
+                #     else:
+                #     # The file is not found
+                #         print("File not found in the distant directory.")
+                
+                logs.append(log_message)
+                # else:
+                #     print("Nothing")
+        output["logs"] = logs
+        
+        memory_handler.flush()
+        #print(memory_handler.buffer)
+        for handler in logger.handlers:
+            logger.removeHandler(handler)
        
         # print('graphs', graphs)
         # print('output', output)

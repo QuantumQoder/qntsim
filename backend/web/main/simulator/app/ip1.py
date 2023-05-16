@@ -11,11 +11,14 @@ from qntsim.topology.topology import Topology
 import string
 import sys
 import numpy as np
+import logging
+logger = logging.getLogger("main_logger." + "ip1")
 
 
 class IP1():
 
     def request_entanglements(self,sender,receiver,n=50):
+        logger.info("Requesting entanglement")
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.5,5e12)
         source_node_list=[sender.name]
         return sender,receiver,source_node_list

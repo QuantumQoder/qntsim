@@ -24,7 +24,7 @@ from ..components.circuit import BaseCircuit
 from ..utils import log
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 import logging
-logger = logging.getLogger("main_logger." + "bk_generation")
+logger = logging.getLogger("main_logger." + "bk_generation_lol")
 class GenerationMsgType(Enum):
     """Defines possible message types for entanglement generation."""
 

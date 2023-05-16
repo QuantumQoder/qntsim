@@ -177,7 +177,7 @@ class BBPSSW(EntanglementProtocol):
             logger.info("Purification failed between " + self.own.name + " " + self.another.own.name)
             
         self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
-        logger.info("Purification Successfull")
+        
 
     def memory_expire(self, memory: "Memory") -> None:
         """Method to receive memory expiration events.
