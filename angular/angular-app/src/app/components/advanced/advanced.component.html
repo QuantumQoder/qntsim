@@ -86,6 +86,27 @@
                                         service node.
                                     </p>
                                 </li>
+                                <li>
+                                    <b>
+                                        Memory Frequency
+                                    </b>
+                                    <p>
+                                        The acceptable storage frequency of the quantum memory.
+                                    </p>
+                                </li>
+                                <li>
+                                    <b>Memory Expiry</b>
+                                    <p>Coherence time of Quantum memory beyond which the stored state fidelity
+                                        deteriorates.</p>
+                                </li>
+                                <li>
+                                    <b>Memory Efficiency</b>
+                                    <p>The quantum memory efficiency of reading and writing quantum states.</p>
+                                </li>
+                                <li>
+                                    <b>Memory Fidelity</b>
+                                    <p>The quality of storage offered by the quantum memory ranging between (0-1).</p>
+                                </li>
                             </ul>
                         </p-accordionTab>
                         <p-accordionTab header="Setup Topology Info">
@@ -111,7 +132,7 @@
                                 <div class="form-group col-8 mx-auto">
                                     <label for="attenuation" class="form-label mx-auto"
                                         pTooltip="The loss of photons (signal strength) while travelling through an optical channel. It gives an estimate on the power loss. ">Attenuation
-                                        (dB/km) <i class="fa-solid fa-circle-info fa-xs"
+                                        (dB/m) <i class="fa-solid fa-circle-info fa-xs"
                                             style="color: #000000;"></i></label>
                                     <input type="number" class="form-control" formControlName="attenuation"
                                         id="attenuation" placeholder="Enter in decimals">
@@ -249,8 +270,8 @@
                                                 class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                         </label>
                                         <br>
-                                        <p-slider formControlName="targetFidelity" [min]="0" [step]="0.05" [max]="1"
-                                            (onSlideEnd)="e2eChange('target')"></p-slider>
+                                        <p-slider formControlName="targetFidelity" [(ngModel)]="e2e.targetFidelity"
+                                            [min]="0" [step]="0.05" [max]="1"></p-slider>
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
                                         <label class="form-label"
@@ -259,8 +280,8 @@
                                                 style="color: #000000;"></i>
                                         </label>
                                         <br>
-                                        <p-slider formControlName="size" [min]="0" [step]="1" [max]="6"
-                                            (onSlideEnd)="e2eChange('size')"></p-slider>
+                                        <p-slider formControlName="size" [(ngModel)]="e2e.size" [min]="0" [step]="1"
+                                            [max]="6"></p-slider>
                                     </div>
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
                                         <label for="timeout" class="col-12"
@@ -489,7 +510,8 @@
                             </p-accordionTab>
                             <p-accordionTab header="Common Parameters" *ngIf="app_id == 10">
                                 <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold" pTooltip="Bell Type">
+                                    <label for="type" class="form-label font-bold"
+                                        pTooltip="The EPR pair selected out of four possible choices.">
                                         Bell Type <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                     </label>
                                     <select class="form-control" [(ngModel)]="nodesSelection.bellType">
@@ -499,7 +521,8 @@
                                     </select>
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold" pTooltip="Error threshold">
+                                    <label for="type" class="form-label font-bold"
+                                        pTooltip="The maximum acceptable error on the communication, can be decided by user (in %) . The low the error % is, more secure is the communication.">
                                         Error Threshold <i class="fa-solid fa-circle-info fa-xs"
                                             style="color: #000000;"></i>
                                     </label>
@@ -516,7 +539,8 @@
                                     </select>
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold" pTooltip="Channel">
+                                    <label for="type" class="form-label font-bold"
+                                        pTooltip="The link connecting two nodes.">
                                         Channel <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                     </label>
                                     <select class="form-control" [(ngModel)]="nodesSelection.channel">
