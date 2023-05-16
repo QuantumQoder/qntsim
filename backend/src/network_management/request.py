@@ -310,7 +310,7 @@ class MemoryTimeCard():
 
 class ReservationProtocol():     #(Protocol): 
 
-    def __init__(self,node:"QuantumRouter",request:"Request",routing:"Routing"):
+    def __init__(self,node:"QuantumRouter",request:"Request",routing:"RoutingProtocol", es_success_prob = 1, es_degradation = 0.95):
         
         self.node=node
         self.request = request
@@ -318,8 +318,10 @@ class ReservationProtocol():     #(Protocol):
         #self.node=Node
         self.vmemorylist=self.node.vmemory_list
         self.accepted_reservation=[]
-        self.es_succ_prob = 1
-        self.es_degradation = 0.95
+        self.es_succ_prob = es_success_prob
+        self.es_degradation = es_degradation
+        print(f'self.es_succ_prob: {self.es_succ_prob}')
+        print(f'self.es_degradation: {self.es_degradation}')
         self.name = "ReservationProtocol_"+self.node.name+"_R"+str(request.id)
 
     def memories_available(self):
@@ -1213,6 +1215,14 @@ class ReservationProtocol():     #(Protocol):
                     task_swap_middle.can_run_on_init = True
                 
             #task_list.append(curr_task)
+    
+    def set_swapping_success_rate(self, prob: float) -> None:
+        assert 0 <= prob <= 1
+        self.es_succ_prob = prob
+
+    def set_swapping_degradation(self, degradation: float) -> None:
+        assert 0 <= degradation <= 1
+        self.es_degradation = degradation
         
             
 

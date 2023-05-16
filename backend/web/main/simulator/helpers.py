@@ -33,6 +33,8 @@ def load_topology(network_config_json, backend):
         node.memory_array.update_memory_params("coherence_time", node_properties["memory"]["expiry"])
         node.memory_array.update_memory_params("efficiency", node_properties["memory"]["efficiency"])
         node.memory_array.update_memory_params("raw_fidelity", node_properties["memory"]["fidelity"])
+        node.network_manager.set_swap_success(node_properties["swap_success_rate"])
+        node.network_manager.set_swap_degradation(node_properties["swap_degradation"])
     
     #Detector Parameters
     if "detector_properties" in network_config_json:
@@ -50,8 +52,20 @@ def load_topology(network_config_json, backend):
             node.lightsource.bandwidth = network_config_json["light_source_properties"]["bandwidth"]
             node.lightsource.mean_photon_num = network_config_json["light_source_properties"]["mean_photon_num"]
             node.lightsource.phase_error = network_config_json["light_source_properties"]["phase_error"]
-
+    
     return network_config_json,tl,network_topo
+
+def get_entanglement_data(network_topo, src, dst):
+    success_entx_src, success_entx_dst = 0, 0
+    for mem_info in network_topo.nodes[src].resource_manager.memory_manager:
+        if mem_info.state == 'ENTANGLED' and mem_info.remote_node == dst:
+            success_entx_src += 1
+
+    for mem_info in network_topo.nodes[dst].resource_manager.memory_manager:
+        if mem_info.state == 'ENTANGLED' and mem_info.remote_node == src:
+            success_entx_dst += 1
+
+    return min(success_entx_src, success_entx_dst)
 
 
 def get_service_node(nodes):

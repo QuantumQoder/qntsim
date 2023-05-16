@@ -44,27 +44,20 @@ class NetworkManager():
 
         self.name = "network_manager"
         self.owner = owner
-        #self.protocol_stack = protocol_stack
-        #self.load_stack(protocol_stack)
         self.abort = False
         self.requests={}
         self.networkmap={}
         self.tp_id=None
         self.schedule_rtup()
+        self.es_swap_success = 1
+        self.es_swap_degradation = 0.99
         # self.net_id=next(self.id)
+    
+    def set_swap_success(self, es_swap_success):
+        self.es_swap_success = es_swap_success
 
-    def load_stack(self, stack: "List[StackProtocol]"):
-        """Method to load a defined protocol stack.
-        Args:
-            stack (List[StackProtocol]): new protocol stack.
-        """
-
-        self.protocol_stack = stack
-        if len(self.protocol_stack) > 0:
-            self.protocol_stack[0].lower_protocols.append(self)
-            self.protocol_stack[-1].upper_protocols.append(self)
-
-
+    def set_swap_degradation(self, es_swap_degradation):
+        self.es_swap_degradation = es_swap_degradation
 
     def received_message(self, src: str, msg: "Message"):
         """Method to receive transmitted network reservation method.
@@ -123,9 +116,7 @@ class NetworkManager():
                 self.owner.transport_manager.notify_tm(fail_time,value[0],value[1])
                 break
 
-            
-                
-        
+         
         #call transport manager notify
 
     def createvirtualrequest(self, initiator, responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float) -> None:#$$
@@ -155,30 +146,15 @@ class NetworkManager():
     def create_request(self,initiator:str, responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float,priority: int,tp_id: int,congestion_retransmission:int,remaining_demand_size:int):
         
         user_request = Request(initiator,responder,start_time,end_time,memory_size,target_fidelity,priority=priority,tp_id=tp_id,congestion_retransmission=congestion_retransmission)
-
-
         user_request.status='INITIATED'
-
         user_request.remaining_demand_size=remaining_demand_size
-
         self.requests.update({user_request.id:user_request})
-        
-        
         #print("user request id ,tp_id ,src,path,des,size ",user_request.id,user_request.tp_id, user_request.initiator,user_request.path,user_request.responder,user_request.memory_size,memory_size)
-
         routing_protocol=RoutingProtocol(self.owner,initiator,responder,[],self.owner.name)
-
         #nextnode=routing_protocol.next_hop()
-
         ##print(nextnode)
-
-
         resource_reservation_protocol = ReservationProtocol(self.owner,user_request,routing_protocol)
-
         self.owner.reservation_manager.append(resource_reservation_protocol)
-
-       
-
         resource_reservation_protocol.start()
 
     def process_request(self ,msg: "Message"): 
@@ -195,7 +171,7 @@ class NetworkManager():
         ##print("in request temp_path,marker",user_request,self.owner.name,msg.temp_path,msg.marker)
         routing_protocol=RoutingProtocol(self.owner,user_request.initiator,user_request.responder,msg.temp_path,msg.marker)
 
-        resource_reservation_protocol = ReservationProtocol(self.owner,user_request,routing_protocol)
+        resource_reservation_protocol = ReservationProtocol(self.owner,user_request,routing_protocol, self.es_swap_success, self.es_swap_degradation)
 
         self.owner.reservation_manager.append(resource_reservation_protocol)
    
