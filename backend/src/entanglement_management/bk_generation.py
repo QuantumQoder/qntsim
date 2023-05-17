@@ -191,7 +191,7 @@ class EntanglementGenerationA(EntanglementProtocol):
 
         log.logger.info(self.own.name + " protocol start with partner {}".format(self.other))
         #logger.info(self.own.name + " protocol start with partner {}".format(self.other))
-        # print(self.own.name + " Generation protocol start with partner {}".format(self.other),self.name, self.middle)
+        print(self.own.name + " Generation protocol start with partner {}".format(self.other),self.name, self.middle)
         ####print('start protocol',self.other_protocol.name,self.name)
         # to avoid start after remove protocol
         if self not in self.own.protocols:
@@ -490,27 +490,28 @@ class EntanglementGenerationA(EntanglementProtocol):
         # #print(self.own.name + " entanglement success ",self.other, self.name, self.other_protocol.name)
         self.update_resource_manager(self.memory, 'ENTANGLED')
         #print('_entanglement_succeed:  len(self.subtask.protocols): ', len(self.subtask.protocols))
-        self.subtask.on_complete(1)
         dst=self.subtask.task.get_reservation().responder
         src=self.subtask.task.get_reservation().initiator
-        if (self.own.name==src and self.other==dst) or (self.own.name==dst and self.other==src) :
-            print(f'Entanglement sucessful between (generation) {src,dst}')
-            logger.info(f'Entanglement sucessful between {src,dst}')
+        print(f'Entanglement sucessful between (generation) {src,dst} between indices: {self.memory.name, self.remote_memo_id}')
+        # if (self.own.name==src and self.other==dst) or (self.own.name==dst and self.other==src) :
+        #     print(f'Entanglement sucessful between (generation) {src,dst}')
+        #     logger.info(f'Entanglement sucessful between {src,dst}')   
+        self.subtask.on_complete(1)
 
 
     def _entanglement_fail(self):
         for event in self.scheduled_events:
             # ###print('Nemtamgle fieldb ent')
             self.own.timeline.events.remove(event)
-        #print(self.own.name + " entanglement fail  ",self.other, self.name, self.other_protocol.name)
+        print(self.own.name + " entanglement fail  ",self.other, self.name, self.other_protocol.name)
         log.logger.info(self.own.name + " failed entanglement of memory {}".format(self.memory))
         
         # #print(self.own.name + " failed entanglement of memory with the node: ",self.other," {} ".format(self.memory.name))
         # ####print(f'Time of entanglement failure: {self.own.timeline.now()}')
         self.update_resource_manager(self.memory, 'RAW')
         #print('_entanglement_fail:  len(self.subtask.protocols): ', len(self.subtask.protocols))
-        self.subtask.on_complete(-1)
         logger.info(f'Entanglement failed between {self.own.name,self.other}')
+        self.subtask.on_complete(-1)
 
 
 class EntanglementGenerationB(EntanglementProtocol):

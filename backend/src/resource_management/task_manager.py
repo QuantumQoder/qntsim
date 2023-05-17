@@ -177,6 +177,7 @@ class SubTask:
 			info.memory.attach(protocol[0])
 		
 		logging.debug('Running subtask:	' + str(self.name))
+		print('Running subtask:	' + str(self.name))
 		for dst, req_func in zip(req_dsts, req_condition_funcs):
 			self.task.task_manager.send_request(protocol[0], dst, req_func)
 			#print('dst, req_func:	', dst, req_func)
@@ -216,11 +217,12 @@ class SubTask:
 		params = kwargs.get('params')
 		if params != None:
 			#Find memory_info for this memory object and 
-			memory_info = self.task.task_manager.owner.resource_manager.memory_manager.get_info_by_memory(params)
+			for memo in params:
+				memory_info = self.task.task_manager.owner.resource_manager.memory_manager.get_info_by_memory(memo)
 
-			#Find the subtask for this memory_info
-			gen_subtask = self.task.task_manager.memory_to_gen_subtask[memory_info]
-			gen_subtask.run()
+				#Find the subtask for this memory_info
+				gen_subtask = self.task.task_manager.memory_to_gen_subtask[memory_info]
+				gen_subtask.run()
 
 
 	def is_eligible_to_run(self):
@@ -361,6 +363,7 @@ class TaskManager:
 		logging.debug('subtask failed:	' + str(subtask.name))
 		logging.debug('initial dependencies for this subtask:	'+ str( [i.name for i in subtask.initial_dependency_subtasks]))
 		for init_dep_subtask in subtask.initial_dependency_subtasks:
+			print(f'running init_dep_subtask: {init_dep_subtask.name}')
 			init_dep_subtask.run()
 
 	def initiate_tasks(self):

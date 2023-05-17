@@ -260,9 +260,9 @@ def test_e2e():
     sender = "n1"
     receiver = "n4"
     startTime = 1e12
-    size = 10
+    size = 20
     priority = 0
-    targetFidelity = 0.8
+    targetFidelity = 0.97
     timeout = 5e12
     report = e2e(network_config, sender, receiver, startTime, size, priority, targetFidelity, timeout)
     print(report)

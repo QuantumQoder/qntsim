@@ -190,19 +190,8 @@ class EntanglementSwappingA(EntanglementProtocol):
         assert self.left_memo.entangled_memory["node_id"] == self.left_protocol.own.name
         assert self.right_memo.entangled_memory["node_id"] == self.right_protocol.own.name
 
-        #np.random.seed(self.own.random_seed)
-        #x_rand = np.random.rand()
-        #rand = np.random.random_sample(5)
-        #np.random.shuffle(rand)
-        #x_rand = rand[0]
-        #x_rand = np.random.rand()
         x_rand = random()
-        file1 = open(r"logger.txt", "a")
-        #s = 'Seed used -----'+str(self.own.random_seed)+'----Random generated in swap---- '+ str(x_rand)+'\n'
-        s = '----Random generated in swap---- '+ str(x_rand)+'\n'
-        file1.write(s) 
-        file1.close() 
-        #####print('----Random generated in swap----', x_rand)
+        status = 0
         if x_rand < self.success_probability():
 
             fidelity = self.updated_fidelity(self.left_memo.fidelity, self.right_memo.fidelity)
@@ -227,13 +216,15 @@ class EntanglementSwappingA(EntanglementProtocol):
                                                 expire_time=expire_time,
                                                 meas_res=[]) 
             # logger.log('Entanglement Swapping successful')
-            self.subtask.on_complete(1)
+            # self.subtask.on_complete(1)
+            status = 1
         else:
             expire_time = min(self.left_memo.get_expire_time(), self.right_memo.get_expire_time())
             msg_l = Message(MsgRecieverType.PROTOCOL, self.left_protocol.name ,SwappingMsgType.SWAP_RES, left_protocol=self.left_protocol.name, fidelity=0,expire_time=expire_time)
             msg_r = Message(MsgRecieverType.PROTOCOL, self.right_protocol.name,SwappingMsgType.SWAP_RES, right_protocol=self.right_protocol.name, fidelity=0,expire_time=expire_time)
             # logger.log('Entanglement Swapping failed')
-            self.subtask.on_complete(-1)
+            # self.subtask.on_complete(-1)
+            status = -1
 
         self.own.message_handler.send_message(self.left_node, msg_l)
         self.own.message_handler.send_message(self.right_node, msg_r)
@@ -241,7 +232,7 @@ class EntanglementSwappingA(EntanglementProtocol):
             #print("Updated to raw after swapping")
         self.update_resource_manager(self.left_memo, "RAW")
         self.update_resource_manager(self.right_memo, "RAW")
-        #####print("After updating to RAW")
+        self.subtask.on_complete(status)
 
     def success_probability(self) -> float:
         """A simple model for BSM success probability."""
@@ -376,7 +367,7 @@ class EntanglementSwappingB(EntanglementProtocol):
             self.own.name + " protocol received_message from node {}, fidelity={}".format(src, msg.kwargs["fidelity"]))
 
         assert src == self.another.own.name
-
+        status = 0
         if msg.kwargs["fidelity"] > 0 and self.own.timeline.now() < msg.kwargs["expire_time"]:
             if msg.kwargs["meas_res"] == [1, 0]:
                 self.own.timeline.quantum_manager.run_circuit(self.z_cir, [self.memory.qstate_key])
@@ -393,7 +384,8 @@ class EntanglementSwappingB(EntanglementProtocol):
             # #print(f'Entanglement swap successful between {self.own.name, msg.kwargs["remote_node"]}')
             # #print(f'Time of Entanglement swap success: {self.own.timeline.now()}')
             #print(f'Entanglement swap successful between {self.own.name, msg.kwargs["remote_memo"]}')
-            self.subtask.on_complete(1)
+            # self.subtask.on_complete(1)
+            status = 1
             dst=self.subtask.task.get_reservation().responder
             src=self.subtask.task.get_reservation().initiator
             #if (self.own.name==src and msg.kwargs["remote_node"]==dst) or (self.own.name==dst and msg.kwargs["remote_node"]==src) :
@@ -448,9 +440,11 @@ class EntanglementSwappingB(EntanglementProtocol):
             # #print(f'Time of Entanglement swap failure: {self.own.timeline.now()}')
             # self.own.network_manager.notify(status="FAILED")
             self.update_resource_manager(self.memory, "RAW")
-            self.subtask.on_complete(-1)
+            status = -1
+            # self.subtask.on_complete(-1)
             
         self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
+        self.subtask.on_complete(status)
 
     def start(self) -> None:
         log.logger.info(self.own.name + " end protocol start with partner {}".format(self.another.own.name))

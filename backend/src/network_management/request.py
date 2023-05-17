@@ -796,6 +796,7 @@ class ReservationProtocol():     #(Protocol):
                         if (memarg[0].state == "ENTANGLED" and memarg[0].fidelity < reservation.fidelity):
                             for other_mem in self.node.resource_manager.memory_manager:
                                 if other_mem != memarg[0] and other_mem.state == "ENTANGLED" and other_mem.remote_node == memarg[0].remote_node and other_mem.fidelity == memarg[0].fidelity:
+                                # if other_mem != memarg[0] and other_mem.state == "ENTANGLED" and other_mem.remote_node == memarg[0].remote_node:
                                     print(f'found pair of memories to purify')
                                     purify_indices.append(memarg[0])
                                     purify_indices.append(other_mem)
