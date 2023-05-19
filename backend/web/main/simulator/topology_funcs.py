@@ -26,7 +26,7 @@ from .app.qsdc_teleportation import *
 from .app.single_photon_qd import *
 from .app.teleportation import *
 from .app.utils import *
-from helpers import *
+from .helpers import *
 from pyvis.network import Network
 # from qntsim.library.protocol_handler.protocol_handler import Protocol
 from qntsim.communication.protocol import ProtocolPipeline
