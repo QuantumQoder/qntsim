@@ -7,7 +7,7 @@ from qntsim.topology.topology import Topology
 from qntsim.components.circuit import QutipCircuit
 import numpy as np
 import logging
-logger = logging.getLogger("main_logger." + "qsdc1")
+logger = logging.getLogger("main_logger.application_layer." + "qsdc1")
 
 class QSDC1():
    
@@ -31,7 +31,7 @@ class QSDC1():
         sender=alice
         receiver=bob
         print('sender, receiver',sender.owner.name,receiver.owner.name)
-        logger.info('sender, receiver',sender.owner.name+" "+receiver.owner.name)     
+        logger.info('sender, receiver are '+sender.owner.name+" "+receiver.owner.name)     
         return self.request_entanglements(sender,receiver,n)
 
 

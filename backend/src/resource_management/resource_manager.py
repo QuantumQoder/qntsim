@@ -21,7 +21,7 @@ from .rule_manager import RuleManager
 from .memory_manager import MemoryManager
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 import logging
-logger = logging.getLogger("main_logger." + "resource_manager")
+logger = logging.getLogger("main_logger.resource_management"+"resource_manager")
 
 class ResourceManagerMsgType(Enum):
     """Available message types for the ResourceManagerMessage."""

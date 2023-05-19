@@ -62,6 +62,9 @@ def fetchAppOptions(request):
     # print(type(context))
     return render(request, f'apps/{app}/config.html', context)
 
+
+
+
 class RunApp(APIView):
 
 
@@ -74,7 +77,7 @@ class RunApp(APIView):
         # websocket_handler = logging.handlers.WebSocketHandler(capacity=1, target=memory_handler)
         # websocket_handler.setLevel(logging.DEBUG)
         # logger.addHandler(memory_handler)
-        logger.info('Logging Begins...')
+        #logger.info('Logging Begins...')
         memory_handler.flush()
         importlib.reload(qntsim)
         print('request', request.data.get('topology'))
@@ -107,7 +110,7 @@ class RunApp(APIView):
         elif application == "qsdc_teleportation":
             results = qsdc_teleportation(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"], appSettings["attack"])
         elif application == "single_photon_qd":
-            print('inside')
+            
             results = single_photon_qd(topology, appSettings["sender"], appSettings["receiver"], appSettings["message1"],appSettings["message2"], appSettings["attack"])
         elif application == "mdi_qsdc":
             results = mdi_qsdc(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"], appSettings["attack"])
@@ -124,33 +127,24 @@ class RunApp(APIView):
         records = memory_handler.buffer
         #print(len(records))
         logs =[]
-        path = "/code/src"
+        layer_wise_records = {"link_layer" : [], "network_layer": [], "resource_management":[], "application_layer":[]}
+        
         for record in records:
             # format the log record as a string
             if record.levelname == "INFO":
                 log_message = f"{record.levelname}: {record.getMessage()}"
                 #memory_handler.buffer.remove(record)
-                print(record.module)
-                module_name = record.module + ".py"
-                # module = __import__(module_name)
+                name = record.name.split(".")
                 
-                # file_path = inspect.getfile(module)
-
-                # print(file_path)  # Output: The file path of the module
-                # for root, dirs, files in os.walk(path):
-                    
-                #     if module_name in files:
-                #         print(root)
-                #         file_path = os.path.join(root, module_name)
-                #         print(f"File found at: {file_path}")
-                #     else:
-                #     # The file is not found
-                #         print("File not found in the distant directory.")
-                
+                layer = name[-2]
+                if layer in layer_wise_records:
+                    layer_wise_records[layer].append(log_message)
                 logs.append(log_message)
                 # else:
                 #     print("Nothing")
-        output["logs"] = logs
+        print("layer_wise_records:", layer_wise_records)
+        output["logs"] = logs#, layer_wise_records]
+        #output["layer_wise_records"] = layer_wise_records
         
         memory_handler.flush()
         #print(memory_handler.buffer)

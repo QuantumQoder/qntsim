@@ -12,8 +12,8 @@ from qntsim.communication import (ATTACK_TYPE, Attack, ErrorAnalyzer, Network,
                                   bell_type_state_analyzer, insert_check_bits,
                                   insert_decoy_photons, string_to_binary)
 from qntsim.components.circuit import QutipCircuit
-
-logger = logging.getLogger("main_logger." + "ip2")
+import logging
+logger = logging.getLogger("main_logger.application_layer." + "ip2")
 # from main.simulator.topology_funcs import network_graph
 
 
@@ -198,6 +198,7 @@ class Receiver(Party):
             cls1 (_type_): _description_
             threshold (float): _description_
         """
+        if -1 in returns: return returns
         if -1 in returns: return returns
         cls.received_msgs = "".join(
             char for i, char in enumerate(returns) if i not in cls1.chk_bts_insrt_lctns
@@ -386,7 +387,7 @@ def pass_(network: Network, returns: Any):
 
 
 def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
-    message = app_settings.get("sender").pop("message")
+    message = app_settings.get("sender").get("message")
     is_binary = all(char in '01' for char in message)
     message = (
         message
@@ -485,6 +486,7 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
             msg_fidelity=err_tuple[5],
         )
     else: app_settings.update({"Err_msg":err_msg.get(-1, "Unidentified error.")})
+    app_settings.pop("inpit_messages")
     response = {}
     response["application"] = app_settings
     from main.simulator.topology_funcs import network_graph
