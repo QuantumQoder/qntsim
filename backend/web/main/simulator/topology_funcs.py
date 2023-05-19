@@ -15,16 +15,16 @@ from qntsim.communication.protocol import ProtocolPipeline
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
 
-from app.e2e import *
-from app.e91 import *
-# from .app.ghz import *
-# from .app.ip1 import *
-# from .app.mdi_qsdc import *
-# from .app.ping_pong import *
-# from .app.qsdc1 import *
-# from .app.qsdc_teleportation import *
-# from .app.single_photon_qd import *
-# from .app.teleportation import *
+from .app.e2e import *
+from .app.e91 import *
+from .app.ghz import *
+from .app.ip1 import *
+from .app.mdi_qsdc import *
+from .app.ping_pong import *
+from .app.qsdc1 import *
+from .app.qsdc_teleportation import *
+from .app.single_photon_qd import *
+from .app.teleportation import *
 from app.utils import *
 from helpers import *
 from pyvis.network import Network
@@ -157,7 +157,7 @@ def eve_e91(network_config, sender, receiver, keyLength):
 
 
 def e91(network_config, sender, receiver, keyLength):
-    logger.info("In e91")
+    logger.info("E91 Quantum Key Distribution")
     print('In e91 network config', network_config)
     start_time = time.time()
     network_config_json, tl, network_topo = load_topology(
@@ -212,7 +212,7 @@ def test_e91():
 # test_e91()
 
 def e2e(network_config, sender, receiver, startTime, size, priority, targetFidelity, timeout):
-    logger.info("In e2e")
+    logger.info("End-to-End Bell Pair Distribution")
     print("E2E")
     # TODO: Integrate Network Graphs
     req_pairs = []
@@ -270,7 +270,7 @@ def test_e2e():
 test_e2e()
 
 def ghz(network_config, endnode1, endnode2, endnode3, middlenode):
-    logger.info("In ghz...")
+    logger.info("End-to-End GHZ Generation")
 
     start_time = time.time()
     network_config_json, tl, network_topo = load_topology(
@@ -318,7 +318,7 @@ def ip1(network_config, sender, receiver, message):
 
 
 def ping_pong(network_config, sender, receiver, sequenceLength, message):
-    logger.info("In Ping Pong...")
+    logger.info("PingPong QSDC")
     start_time = time.time()
     network_config_json, tl, network_topo = load_topology(
         network_config, "Qutip")
@@ -346,7 +346,7 @@ def ping_pong(network_config, sender, receiver, sequenceLength, message):
 
 
 def qsdc1(network_config, sender, receiver, sequenceLength, key):
-    logger.info("In qsdc1...")
+    logger.info("Seminal QSDC")
     start_time = time.time()
     network_config_json, tl, network_topo = load_topology(
         network_config, "Qutip")
@@ -377,7 +377,8 @@ def qsdc1(network_config, sender, receiver, sequenceLength, key):
 
 
 def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
-    logger.info("In teleportation...")
+    print("Quantum Teleportation...")
+    logger.info("Quantum Teleportation")
     start_time = time.time()
     # TODO: Integrate Network Graphs
     print("teleportation running")
@@ -411,7 +412,7 @@ def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
 
 
 def qsdc_teleportation(network_config, sender, receiver, message, attack):
-
+    logger.info("Teleportation with QSDC")
     start_time = time.time()
 
     # messages = {(1, 2):'hello world'}
@@ -502,7 +503,7 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
 
 
 def single_photon_qd(network_config, sender, receiver, message1, message2, attack):
-
+    logger.info("Single Photon QD")
     start_time = time.time()
     print('sender, receiver, message1, message2',
           sender, receiver, message1, message2, attack)
@@ -668,7 +669,7 @@ def swap_entanglement(network: Network):
 
 
 def mdi_qsdc(network_config, sender, receiver, message, attack):
-
+    logger.info("MDI QSDC with user Authentication")
     # network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
     # # print('network config json', network_config_json)
     # mdi_qsdc = MdiQSDC()

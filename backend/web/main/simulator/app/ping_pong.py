@@ -9,7 +9,7 @@ from qntsim.topology.topology import Topology
 import numpy as np
 import time
 import logging
-logger = logging.getLogger("main_logger." + "ping_pong")
+logger = logging.getLogger("main_logger.application_layer." + "ping_pong")
 
 class PingPong():
    
@@ -27,7 +27,7 @@ class PingPong():
     bob=None
     
     def request_entanglements(self,sender,receiver,n):
-        logger.info("IRequesting Entanglement...")
+        logger.info("Requesting Entanglement...")
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.5,5e12)
         source_node_list=[sender.name]
         return sender,receiver,source_node_list
@@ -258,7 +258,7 @@ class PingPong():
         print(f"Message transmitted : {message}")
         logger.info(f"Message transmitted : {message}")
         print(f"Message recieved : {bob_message}")
-        info(f"Message recieved : {bob_message}")
+        logger.info(f"Message recieved : {bob_message}")
 
         res = {
             "Eve_presence":self.eve_present,

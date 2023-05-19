@@ -21,7 +21,7 @@ from ..components.circuit import BaseCircuit
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
 import logging
-logger = logging.getLogger("main_logger." + "bk_swapping")
+logger = logging.getLogger("main_logger.link_layer."+ "bk_swapping")
 class BBPSSWMsgType(Enum):
     """Defines possible message types for entanglement purification"""
 

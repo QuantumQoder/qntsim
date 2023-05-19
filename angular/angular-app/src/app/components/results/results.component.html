@@ -125,7 +125,7 @@
             </div>
         </div>
         <div *ngIf="app_id==2">
-            <div class="display-5">End to End Entanglement Bell pair Generation</div>
+            <div class="display-5">End to End Bell pair Generation</div>
             <br>
             <br>
             <div class="row">
@@ -197,10 +197,10 @@
                                     pTooltip="The final fidelity of EPR pairs distributed at the end nodes.">Fidelity
                                 </th>
                                 <th class="col table-secondary text-center"
-                                    pTooltip="The simulation time when the entanglement was created at end users node.">
+                                    pTooltip="The simulation time when the entanglement was created at end users node (in secs).">
                                     Entanglement Time</th>
                                 <th class="col table-secondary text-center"
-                                    pTooltip="The time after which the entanglement will expire. This is an optimizable parameter which can be changed according to simulation's need.">
+                                    pTooltip="The time after which the entanglement will expire. This is an optimizable parameter which can be changed according to simulation's need (default=-1 meaning infinite expiry time) (in secs).">
                                     Expiry Time</th>
                                 <th class="col table-secondary text-center"
                                     pTooltip="Returns the status of entanglement generation event at desired end nodes.">
@@ -1061,7 +1061,7 @@
                             Sender's Message
                         </td>
                         <td class="col">
-                            {{data.input_message}}TooltipModule
+                            {{data.input_message}}
                         </td>
                     </tr>
                 </thead>
