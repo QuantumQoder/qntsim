@@ -329,7 +329,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         time_resolution: this.detectorProps.timeResolution
       },
       light_source_properties: {
-        frequency: this.lightSourceProps.frequency,
+        frequency: Number(this.lightSourceProps.frequency),
         wavelength: this.lightSourceProps.wavelength,
         bandwidth: this.lightSourceProps.bandwidth,
         mean_photon_num: this.lightSourceProps.meanPhotonNum,
@@ -463,7 +463,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         { propName: "No of Memories", propValue: 500, numericValueOnly: true }
       ],
       memory: [
-        { propName: "Memory Frequency (Hz)", propValue: 2000, numericValueOnly: true },
+        { propName: "Memory Frequency (Hz)", propValue: 8000000, numericValueOnly: true },
         { propName: "Memory Expiry (s)", propValue: -1, numericValueOnly: true },
         { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
         { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
@@ -721,7 +721,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
           { propName: "No of Memories", propValue: 500, numericValueOnly: true }
         ],
         memory: [
-          { propName: "Memory Frequency (Hz)", propValue: 2000, numericValueOnly: true },
+          { propName: "Memory Frequency (Hz)", propValue: 8000000, numericValueOnly: true },
           { propName: "Memory Expiry (s)", propValue: -1, numericValueOnly: true },
           { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
           { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
