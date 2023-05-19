@@ -791,24 +791,24 @@ class ReservationProtocol():     #(Protocol):
                         #Find another memory that can be used to purify
                         #If memory is available, purify
                         #Otherwise exit without doing anything
-                        print('purify subtask action right')
+                        # print('purify subtask action right')
                         purify_indices = []
                         if (memarg[0].state == "ENTANGLED" and memarg[0].fidelity < reservation.fidelity):
                             for other_mem in self.node.resource_manager.memory_manager:
                                 if other_mem != memarg[0] and other_mem.state == "ENTANGLED" and other_mem.remote_node == memarg[0].remote_node and other_mem.fidelity == memarg[0].fidelity:
                                 # if other_mem != memarg[0] and other_mem.state == "ENTANGLED" and other_mem.remote_node == memarg[0].remote_node:
-                                    print(f'found pair of memories to purify')
+                                    # print(f'found pair of memories to purify')
                                     purify_indices.append(memarg[0])
                                     purify_indices.append(other_mem)
                                     break
                         if len(purify_indices) == 0:
                             #Purification not needed
                             if memarg[0].fidelity >= reservation.fidelity:
-                                print('purification not needed')
+                                # print('purification not needed')
                                 return True, None, None
 
                             #could not find memory to purify so exit
-                            print('No memory found to purify')
+                            # print('No memory found to purify')
                             return None, None, None
                         
 
@@ -879,16 +879,16 @@ class ReservationProtocol():     #(Protocol):
                         return gen_subtask2.dependents
 
                     def purify_subtask_action(memarg):
-                        print('purify subtask action left')
+                        # print('purify subtask action left')
                         purify_indices = []
                         if (memarg[0].state == "ENTANGLED" and memarg[0].fidelity < reservation.fidelity):
                             purify_indices.extend(memarg)
                         
                         if len(purify_indices) == 0:
                             if memarg[0].fidelity >= reservation.fidelity:
-                                print('purification not needed')
+                                # print('purification not needed')
                                 return True, None, None
-                            print('purification needed but memory not available')
+                            # print('purification needed but memory not available')
                             return None, None, None
 
                         memories = [info.memory for info in purify_indices]
@@ -1018,31 +1018,31 @@ class ReservationProtocol():     #(Protocol):
 
                 #Nested Purification Task
                 def ent_purify_action(memories_info: List["MemoryInfo"], **kwargs):
-                    print('inside nested_purify_task_left')
+                    # print('inside nested_purify_task_left')
                     nested_swap_subtask = kwargs['dependency_subtasks'][0]
                     # dependency_subtasks = kwargs.get('dependency_subtasks')
                     # if dependency_subtasks != None:
                     #     gen_subtask = dependency_subtasks[0]
                     if len(nested_swap_subtask.dependents) != 0 and nested_swap_subtask.dependents != None:
                         #Make use of previously mapped purification subtask
-                        print('making use of previously mapped subtask for the nested_swap_subtask_left: ', nested_swap_subtask.name)
+                        # print('making use of previously mapped subtask for the nested_swap_subtask_left: ', nested_swap_subtask.name)
                         return nested_swap_subtask.dependents
 
                     def purify_subtask_action(memarg):
-                        print(f'inside purify_subtask_action left: nPurify_counter-> {nPurify_counter}')
+                        # print(f'inside purify_subtask_action left: nPurify_counter-> {nPurify_counter}')
                         purify_indices = []
                         if (memarg[0].state == "ENTANGLED" and memarg[0].fidelity < reservation.fidelity):
                             purify_indices.extend(memarg)
                         
                         if len(purify_indices) == 0:
                             if memarg[0].fidelity >= reservation.fidelity:
-                                print('purification not needed')
+                                # print('purification not needed')
                                 return True, None, None
-                            print('purification needed but memory not available')
+                            # print('purification needed but memory not available')
                             return None, None, None
 
                         memories = [info.memory for info in purify_indices]
-                        print('inside nested_swap_subtask_left: ', memories[0].name)
+                        # print('inside nested_swap_subtask_left: ', memories[0].name)
                         
                         name = "EP.%s" % (memories[0].name)
                         # print('nested_swap_subtask_left:  ', name)
@@ -1055,10 +1055,10 @@ class ReservationProtocol():     #(Protocol):
                     nested_purify_subtask_left.initial_dependency_subtasks = nested_swap_subtask.initial_dependency_subtasks
                     return nested_swap_subtask.dependents
                 
-                task_nested_purify_left = Task('TaskNestedPurifyLeft'+self.node.name+path[index+1], [last_left_task], self.node.timeline.now(), False, ent_purify_action, self.node.task_manager)
-                self.node.task_manager.add_task(task_nested_purify_left, [last_left_task])
-                task_nested_purify_left.set_reservation(reservation)
-                last_left_task = task_nested_purify_left
+                # task_nested_purify_left = Task('TaskNestedPurifyLeft'+self.node.name+path[index+1], [last_left_task], self.node.timeline.now(), False, ent_purify_action, self.node.task_manager)
+                # self.node.task_manager.add_task(task_nested_purify_left, [last_left_task])
+                # task_nested_purify_left.set_reservation(reservation)
+                # last_left_task = task_nested_purify_left
             
             elif right == self.node.name:
                 
@@ -1131,13 +1131,13 @@ class ReservationProtocol():     #(Protocol):
 
                 #Nested purification task
                 def ent_purify_action(memories_info: List["MemoryInfo"], **kwargs):
-                    print('inside nested_purify_task_right')
+                    # print('inside nested_purify_task_right')
                     #print(self.name)
                     nested_swap_subtask_right = kwargs['dependency_subtasks'][0]
                     #print('len(gen_subtask.dependents): ', len(gen_subtask.dependents))
                     if len(nested_swap_subtask_right.dependents) != 0 and nested_swap_subtask_right.dependents != None:
                         #Make use of previously mapped purification subtask
-                        print('making use of previously mapped subtask for the nested_swap_subtask_right: ', nested_swap_subtask_right.name)
+                        # print('making use of previously mapped subtask for the nested_swap_subtask_right: ', nested_swap_subtask_right.name)
                         return nested_swap_subtask_right.dependents
 
                     #print('Not Making use of previously mapped purification subtask')
@@ -1145,7 +1145,7 @@ class ReservationProtocol():     #(Protocol):
                         #Find another memory that can be used to purify
                         #If memory is available, purify
                         #Otherwise exit without doing anything
-                        print(f'nested purify subtask action right: nPurify_counter-> {nPurify_counter}')
+                        # print(f'nested purify subtask action right: nPurify_counter-> {nPurify_counter}')
                         purify_indices = []
                         
                         if (memarg[0].state == "ENTANGLED" and memarg[0].fidelity < reservation.fidelity):
@@ -1158,11 +1158,11 @@ class ReservationProtocol():     #(Protocol):
                         if len(purify_indices) == 0:
                             #Purification not needed
                             if memarg[0].fidelity >= reservation.fidelity:
-                                print(f'purification not needed right: target_fidelity -> {reservation.fidelity}')
+                                # print(f'purification not needed right: target_fidelity -> {reservation.fidelity}')
                                 return True, None, None
 
                             #could not find memory to purify so exit
-                            print('No memory found to purify right')
+                            # print('No memory found to purify right')
                             return None, None, None
                         
 
@@ -1200,7 +1200,7 @@ class ReservationProtocol():     #(Protocol):
                             return _protocols[0]
 
                         name = "EP.%s.%s" % (memories[0].name, memories[1].name)
-                        print('nested_purification_subtask_right:  ', name)
+                        # print('nested_purification_subtask_right:  ', name)
                         protocol = BBPSSW(None, name, memories[0], memories[1])
                         dsts = [purify_indices[0].remote_node]
                         req_funcs = [req_func]
@@ -1213,10 +1213,10 @@ class ReservationProtocol():     #(Protocol):
                     # print('newly created purification subtask for the gen subtask: ', gen_subtask.name)
                     return nested_swap_subtask_right.dependents
 
-                task_nested_purify_right = Task('TaskNestedPurifyRight'+self.node.name+path[index-1], [last_right_task], self.node.timeline.now(), False, ent_purify_action, self.node.task_manager)
-                self.node.task_manager.add_task(task_nested_purify_right, [last_right_task])
-                task_nested_purify_right.set_reservation(reservation)
-                last_right_task = task_nested_purify_right
+                # task_nested_purify_right = Task('TaskNestedPurifyRight'+self.node.name+path[index-1], [last_right_task], self.node.timeline.now(), False, ent_purify_action, self.node.task_manager)
+                # self.node.task_manager.add_task(task_nested_purify_right, [last_right_task])
+                # task_nested_purify_right.set_reservation(reservation)
+                # last_right_task = task_nested_purify_right
             
             elif mid == self.node.name:
                 left_m = left

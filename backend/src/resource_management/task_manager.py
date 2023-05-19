@@ -177,7 +177,7 @@ class SubTask:
 			info.memory.attach(protocol[0])
 		
 		logging.debug('Running subtask:	' + str(self.name))
-		print('Running subtask:	' + str(self.name))
+		# print('Running subtask:	' + str(self.name))
 		for dst, req_func in zip(req_dsts, req_condition_funcs):
 			self.task.task_manager.send_request(protocol[0], dst, req_func)
 			#print('dst, req_func:	', dst, req_func)
@@ -193,22 +193,22 @@ class SubTask:
 			#Failure----We need to go back through the chain of all dependencies that lead to this point and need to retry them again
 			#This has to be handled through the task manager
 			#self.run()
-			print('reached inside on_complete subtask failure section')
+			# print('reached inside on_complete subtask failure section')
 			self.status = 0
 			self.task.on_subtask_failure(self)
 		elif completion_status == 1:
 			#Success----Call the dependent subtask if any
 			self.status = 1
-			print('reached inside on_complete subtask success with looping section')
+			# print('reached inside on_complete subtask success with looping section')
 			if self.task.loops:
-				print(f'Running the subtask again: {self.name}')
+				# print(f'Running the subtask again: {self.name}')
 				# traceback.print_stack()
 				self.run()
 				return
 			self.task.on_subtask_success(self)
 		elif completion_status == 2:
 			self.status = 1
-			print('reached inside on_complete subtask success without looping section')
+			# print('reached inside on_complete subtask success without looping section')
 			self.task.on_subtask_success(self)
 		else:
 			# traceback.print_stack()
@@ -363,7 +363,7 @@ class TaskManager:
 		logging.debug('subtask failed:	' + str(subtask.name))
 		logging.debug('initial dependencies for this subtask:	'+ str( [i.name for i in subtask.initial_dependency_subtasks]))
 		for init_dep_subtask in subtask.initial_dependency_subtasks:
-			print(f'running init_dep_subtask: {init_dep_subtask.name}')
+			# print(f'running init_dep_subtask: {init_dep_subtask.name}')
 			init_dep_subtask.run()
 
 	def initiate_tasks(self):
