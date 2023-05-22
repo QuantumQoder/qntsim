@@ -240,7 +240,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
   }
   parameters() {
     this.app_id = localStorage.getItem('app_id')
-    if (this.app_id == 5 || this.app_id == 6 || this.app_id == 10 || this.app_id == 7) {
+    if (this.app_id == 5 || this.app_id == 6 || this.app_id == 7) {
       if (this.appSettingsForm.get('message')?.value.length % 2 != 0) {
         alert("Message length should be even ");
         // this.spinner = false
@@ -265,6 +265,12 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       else if (this.nodesSelection.sender == this.nodesSelection.receiver) {
         alert("Sender and Receiver cannot be same node");
         return;
+      }
+    }
+    if (this.app_id == 10) {
+      if ((this.lightSourceProps.meanPhotonNum >= 0) && !(this.lightSourceProps.meanPhotonNum <= 1)) {
+        alert("Mean Photon Number should be between 0 and 1");
+        return
       }
     }
     if (this.app_id == 4) {

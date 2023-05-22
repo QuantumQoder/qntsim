@@ -91,13 +91,14 @@
                                         Memory Frequency
                                     </b>
                                     <p>
-                                        The acceptable storage frequency of the quantum memory.
+                                        Maximum excitation frequency of quantum memory (default: 80e6) (in Hz).
                                     </p>
                                 </li>
                                 <li>
                                     <b>Memory Expiry</b>
                                     <p>Coherence time of Quantum memory beyond which the stored state fidelity
-                                        deteriorates.</p>
+                                        deteriorates and is not usable (default: -1
+                                        infinite) (in secs).</p>
                                 </li>
                                 <li>
                                     <b>Memory Efficiency</b>
@@ -176,7 +177,7 @@
                             pTooltip="Set the input parameters for light source.">
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold"
-                                    pTooltip="Set the frequency of light/photons.">
+                                    pTooltip="Rate at which photons are created (default: 80e6) (in Hz)">
                                     Frequency (Hz) <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                 </label>
                                 <input class="form-control" [(ngModel)]="lightSourceProps.frequency" />
@@ -191,13 +192,14 @@
                             </div>
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold"
-                                    pTooltip="Defines the linewidth of source. The narrower the band is the precise is the intended wavelength.">
+                                    pTooltip="Defines the linewidth of source. The narrower the band is the precise is the intended wavelength (in nm).">
                                     Bandwidth (nm) <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                 </label>
                                 <input class="form-control" [(ngModel)]="lightSourceProps.bandwidth" />
                             </div>
                             <div class="mt-1 col-9 mx-auto">
-                                <label for="type" class="form-label font-bold" pTooltip="Ranges between (0-1) ">
+                                <label for="type" class="form-label font-bold"
+                                    pTooltip="Mean number of photons emitted each period. Ranges between (0-1)">
                                     Mean Photon Number <i class="fa-solid fa-circle-info fa-xs"
                                         style="color: #000000;"></i>
                                 </label>
