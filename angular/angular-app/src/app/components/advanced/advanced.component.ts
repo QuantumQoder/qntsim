@@ -444,7 +444,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     this.apiService.advancedRunApplication(req, url).subscribe({
       next: (response) => {
         console.log(response);
-        this.con.setResult(response)
+        this.con.setResult(response);
+        if (response.application.Err_msg) {
+          alert(`Error has occurred!! ${response.application.Err_msg}`)
+        }
       },
       error: (error) => {
         console.error(`Error: ${error}`);
@@ -454,7 +457,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       },
       complete: () => {
         this.spinner = false;
-        this._route.navigate(['/results'])
+        if (!!!this.con.getResult().application.Err_msg)
+          this._route.navigate(['/results'])
       }
     });
     // this.apiService.runApplication(req, url).subscribe((result: any) => {
@@ -571,7 +575,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       const regex = /^\d+(\.\d*)?$/;
       if (regex.test(val)) {
         val = Number(val)
-        if (val > 1 && val < 0) {
+        if (val >= 0 && val <= 1) {
           return true;
         }
       };
