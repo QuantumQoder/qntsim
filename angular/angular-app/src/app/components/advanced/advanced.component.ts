@@ -5,13 +5,13 @@ import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import * as go from 'gojs'
-import { ConfirmationService, MenuItem, Message, MessageService } from 'primeng/api';
+import * as go from 'gojs';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { ApiServiceService } from 'src/services/api-service.service';
 
-import { ConditionsService } from 'src/services/conditions.service';
-import { environment } from 'src/environments/environment';
 import { Subscription, map } from 'rxjs';
+import { environment } from 'src/environments/environment';
+import { ConditionsService } from 'src/services/conditions.service';
 
 @Component({
   selector: 'app-advanced',
@@ -177,6 +177,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
           'expiry': nodesArray[i].memory[1].propValue,
           'efficiency': nodesArray[i].memory[2].propValue,
           'fidelity': nodesArray[i].memory[3].propValue
+        },
+        "lightSource": {
+          "frequency": this.lightSourceProps.frequency,
+          "wavelength": this.lightSourceProps.wavelength,
+          "bandwidth": this.lightSourceProps.bandwidth,
+          "mean_photon_num": this.lightSourceProps.meanPhotonNum,
+          "phase_error": this.lightSourceProps.phaseError,
         }
       };
       this.nodesData[nodesArray[i].key] = nodereq;
@@ -306,7 +313,17 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     this.nodes = []
     console.log(this.nodesData)
     for (const [key, value] of Object.entries(this.nodesData)) {
+      console.log(value)
+      value['lightSource'] = {
+        frequency: this.lightSourceProps.frequency,
+        wavelength: this.lightSourceProps.wavelength,
+        bandwidth: this.lightSourceProps.bandwidth,
+        mean_photon_num: this.lightSourceProps.meanPhotonNum,
+        phase_error: this.lightSourceProps.phaseError,
+      }
+      console.log(value)
       this.nodes.push(value)
+      console.log(this.nodes)
     }
 
     this.spinner = true;
@@ -323,17 +340,17 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       nodes: this.nodes,
       quantum_connections: this.links,
       classical_connections: this.cc,
-      detector_properties: {
+      detector: {
         efficiency: this.detectorProps.efficiency,
         count_rate: this.detectorProps.countRate,
         time_resolution: this.detectorProps.timeResolution
-      },
-      light_source_properties: {
-        frequency: Number(this.lightSourceProps.frequency),
-        wavelength: this.lightSourceProps.wavelength,
-        bandwidth: this.lightSourceProps.bandwidth,
-        mean_photon_num: this.lightSourceProps.meanPhotonNum,
-        phase_error: this.lightSourceProps.phaseError,
+        // },
+        // lightSource: {
+        //   frequency: this.lightSourceProps.frequency,
+        //   wavelength: this.lightSourceProps.wavelength,
+        //   bandwidth: this.lightSourceProps.bandwidth,
+        //   mean_photon_num: this.lightSourceProps.meanPhotonNum,
+        //   phase_error: this.lightSourceProps.phaseError,
       }
     }
     const appConfig =
@@ -420,7 +437,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       "appSettings": this.appSettings
     }
     // let url = this.simulator.value == 'version1' ? environment.apiUrl : this.simulator.value == 'version2' ? environment.apiUrlNew : null;
-    let url = environment.apiUrlNew;
+    let url = this.app_id != 2 ? environment.apiUrl : this.simulator.value == 'version1' ? environment.apiUrl : environment.apiUrlNew;
+    // let url = environment.apiUrlNew;
     // this.apiService.getStream().subscribe(data => { this.logs = data; });
     // whatever your request data is
     this.apiService.advancedRunApplication(req, url).subscribe({
@@ -463,7 +481,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         { propName: "No of Memories", propValue: 500, numericValueOnly: true }
       ],
       memory: [
-        { propName: "Memory Frequency (Hz)", propValue: 8000000, numericValueOnly: true },
+        { propName: "Memory Frequency (Hz)", propValue: 8e7, numericValueOnly: true },
         { propName: "Memory Expiry (s)", propValue: -1, numericValueOnly: true },
         { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
         { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
@@ -512,16 +530,16 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       this.myDiagram.zoomToFit();
     }
   }
-  calculateFrequency() {
-    const speedOfLight = 3e17; // speed of light in nm/s
-    this.lightSourceProps.frequency = speedOfLight / this.lightSourceProps.wavelength;
-    // console.log(this.lightSourceProps.frequency)
-  }
-  calculateWavelength() {
-    const speedOfLight = 3e17; // speed of light in nm/s
-    this.lightSourceProps.wavelength = speedOfLight / this.lightSourceProps.frequency;
-    // console.log(this.lightSourceProps.wavelength)
-  }
+  // calculateFrequency() {
+  //   const speedOfLight = 3e17; // speed of light in nm/s
+  //   this.lightSourceProps.frequency = speedOfLight / this.lightSourceProps.wavelength;
+  //   // console.log(this.lightSourceProps.frequency)
+  // }
+  // calculateWavelength() {
+  //   const speedOfLight = 3e17; // speed of light in nm/s
+  //   this.lightSourceProps.wavelength = speedOfLight / this.lightSourceProps.frequency;
+  //   // console.log(this.lightSourceProps.wavelength)
+  // }
   get middlenode() {
     return this.appSettingsForm.get('middleNode')
   }
@@ -721,7 +739,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
           { propName: "No of Memories", propValue: 500, numericValueOnly: true }
         ],
         memory: [
-          { propName: "Memory Frequency (Hz)", propValue: 8000000, numericValueOnly: true },
+          { propName: "Memory Frequency (Hz)", propValue: 8e7, numericValueOnly: true },
           { propName: "Memory Expiry (s)", propValue: -1, numericValueOnly: true },
           { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
           { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
