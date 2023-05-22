@@ -327,7 +327,7 @@
                 <thead class="table-primary">
                     <tr>
                         <td class="col"
-                            pTooltip="Quantum state of receiver's qubit of the pre-shared EPR pair as a result of the joint measurement performed at Alice's end. ">
+                            pTooltip="Quantum state of receiver's qubit of the pre-shared EPR pair as a result of the joint measurement performed at Alice's end.">
                             Quantum state of Receiver's qubit
                         </td>
                         <td class="col">{{data.bob_initial_state}}</td>
@@ -414,7 +414,7 @@
                                 <th class="col" pTooltip="The recipient node requesting a multi-qubit entanglement.">
                                     Node 1
                                 </th>
-                                <th class="col" pTooltip="The quantum states of the EPR and GHZ qubits. ">Quantum State
+                                <th class="col" pTooltip="The quantum states of the EPR and GHZ qubits.">Quantum State
                                 </th>
                             </tr>
                         </thead>
@@ -440,7 +440,7 @@
                                 <th class="col" pTooltip="The recipient node requesting a multi-qubit entanglement.">
                                     Node 2
                                 </th>
-                                <th class="col" pTooltip="The quantum states of the EPR and GHZ qubits. ">Quantum State
+                                <th class="col" pTooltip="The quantum states of the EPR and GHZ qubits.">Quantum State
                                 </th>
                             </tr>
                         </thead>
@@ -466,7 +466,7 @@
                                 <th class="col" pTooltip="The recipient node requesting a multi-qubit entanglement.">
                                     Node 3
                                 </th>
-                                <th class="col" pTooltip="The quantum states of the EPR and GHZ qubits. ">Quantum State
+                                <th class="col" pTooltip="The quantum states of the EPR and GHZ qubits.">Quantum State
                                 </th>
                             </tr>
                         </thead>
@@ -665,7 +665,7 @@
                 <tbody>
                     <tr class="table-secondary">
                         <td class="col"
-                            pTooltip="True: if eavesdropping is detected, False: if no eavesdropping is detected. ">
+                            pTooltip="True: if eavesdropping is detected, False: if no eavesdropping is detected.">
                             Eavesdropping
                         </td>
                         <td class="col">
@@ -674,7 +674,7 @@
                     </tr>
                     <tr class="table-secondary">
                         <td class="col"
-                            pTooltip="This is used for security checking where the final two bits from the end of the generated quantum keys are checked. ">
+                            pTooltip="This is used for security checking where the final two bits from the end of the generated quantum keys are checked.">
                             Check Bits used for Eve Detection<i class="fa-solid fa-circle-info"
                                 style="color: #000000;"></i>
                         </td>
@@ -1042,8 +1042,6 @@
                     </thead>
                     <tbody>
                         <tr>
-
-
                             <td class="col text-center">{{performance.execution_time}}&nbsp;secs</td>
                             <td class="col text-center">{{performance.fidelity}}</td>
                             <td class="col text-center">{{performance.throughput}}%</td>
@@ -1054,14 +1052,17 @@
             </div>
             <br>
             <table class="table table-bordered">
+
                 <thead class="table-primary">
+
                     <tr>
+
                         <td class="col"
                             pTooltip="The message string that the user intends to send its node to a remote node.">
                             Sender's Message
                         </td>
                         <td class="col">
-                            {{data.input_message}}
+                            {{data.sender.message}}
                         </td>
                     </tr>
                 </thead>
@@ -1076,14 +1077,14 @@
                         </td>
                     </tr>
                     <tr class="table-secondary">
-                        <td class="col" pTooltip="The sender's authentication ID shared via QKD.">Sender's Id<i
-                                class="fa-solid fa-circle-info" style="color: #000000;"></i></td>
-                        <td class="col">{{data.alice_id}}</td>
+                        <td class="col" pTooltip="The sender's authentication ID shared via QKD.">Sender's
+                            Id<i class="fa-solid fa-circle-info" style="color: #000000;"></i></td>
+                        <td class="col">{{data.sender.userID}}</td>
                     </tr>
                     <tr class="table-secondary">
-                        <td class="col" pTooltip="The receiver's authentication ID shared via QKD.">Receiver's Id<i
-                                class="fa-solid fa-circle-info" style="color: #000000;"></i></td>
-                        <td class="col">{{data.bob_id}}</td>
+                        <td class="col" pTooltip="The receiver's authentication ID shared via QKD.">
+                            Receiver's Id<i class="fa-solid fa-circle-info" style="color: #000000;"></i></td>
+                        <td class="col">{{data.receiver.userID}}</td>
                     </tr>
                     <tr class="table-secondary">
                         <td class="col"

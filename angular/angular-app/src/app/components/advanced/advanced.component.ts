@@ -43,7 +43,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     message: 'hello',
     senderId: 1010,
     receiverId: 1011,
-    belltype: 10,
+    bellType: "10",
     channel: 1,
 
   }
@@ -53,10 +53,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     timeResolution: 150
   }
   lightSourceProps = {
-    frequency: 193548387096774.2,
+    frequency: 8000000,
     wavelength: 1550,
-    bandwidth: 0,
-    meanPhotonNum: 0.1,
+    bandwidth: 50,
+    meanPhotonNum: 0.5,
     phaseError: 0
   }
   simulator = {
@@ -407,7 +407,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
           node: this.nodesSelection.receiver,
           userID: `${this.nodesSelection.receiverId}`
         },
-        bell_type: `${this.nodesSelection.belltype}`,
+        bell_type: `${this.nodesSelection.bellType}`,
         error_threshold: this.nodesSelection.errorThreshold,
         attack: this.nodesSelection.attack,
         channel: this.nodesSelection.channel

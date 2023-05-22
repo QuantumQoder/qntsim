@@ -179,8 +179,7 @@
                                     pTooltip="Set the frequency of light/photons.">
                                     Frequency (Hz) <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                 </label>
-                                <input class="form-control" [(ngModel)]="lightSourceProps.frequency"
-                                    (input)="calculateWavelength()" />
+                                <input class="form-control" [(ngModel)]="lightSourceProps.frequency" />
                             </div>
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold"
@@ -188,8 +187,7 @@
                                     Wavelength (nm) <i class="fa-solid fa-circle-info fa-xs"
                                         style="color: #000000;"></i>
                                 </label>
-                                <input class="form-control" (input)="calculateFrequency()"
-                                    [(ngModel)]="lightSourceProps.wavelength" />
+                                <input class="form-control" [(ngModel)]="lightSourceProps.wavelength" />
                             </div>
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold"
@@ -266,8 +264,8 @@
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
                                         <label for="type" class="form-label font-bold"
                                             pTooltip="The minimum threshold entanglement fidelity which is acceptable to be accounted as successful entanglement distribution.">
-                                                Fidelity: {{e2e.targetFidelity}} <i
-                                                class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
+                                            Fidelity: {{e2e.targetFidelity}} <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
                                         </label>
                                         <br>
                                         <p-slider formControlName="targetFidelity" [(ngModel)]="e2e.targetFidelity"
@@ -527,7 +525,7 @@
                                             style="color: #000000;"></i>
                                     </label>
                                     <input type="number" class="form-control"
-                                        [(ngModel)]="nodesSelection.errorthreshold">
+                                        [(ngModel)]="nodesSelection.errorThreshold">
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
                                     <label for="type" class="form-label font-bold" pTooltip="External Attack Type">
