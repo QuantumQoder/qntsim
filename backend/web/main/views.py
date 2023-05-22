@@ -15,6 +15,7 @@ import time
 
 import matplotlib.pyplot as plt
 import qntsim
+import websocket
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.shortcuts import render
 from django.template import loader
@@ -27,10 +28,6 @@ from main.simulator.app.ip2 import ip2_run
 from main.simulator.topology_funcs import *
 from rest_framework import generics, mixins
 from rest_framework.views import APIView
-import websocket
-
-
-
 
 
 def home(request):
@@ -86,6 +83,7 @@ class RunApp(APIView):
         appSettings = request.data.get('appSettings')
         # Add check for getting application id and extracting name.
         print('application id', application_id)
+        # print(Applications.objects.all())
         application = Applications.objects.filter(id = application_id).values("name").first().get('name')
         print(f"Running applications: {application}", appSettings)
         print('request user', request.user.username, request.user.id)
@@ -142,7 +140,7 @@ class RunApp(APIView):
                 logs.append(log_message)
                 # else:
                 #     print("Nothing")
-        print("layer_wise_records:", layer_wise_records)
+        #print("layer_wise_records:", layer_wise_records)
         output["logs"] = logs#, layer_wise_records]
         #output["layer_wise_records"] = layer_wise_records
         
@@ -156,7 +154,7 @@ class RunApp(APIView):
         # print('request user', request.user)
         # res = Results.objects.create(user = request.user, topology = topology, app_name = application, input =appSettings, output = output,graphs = graphs)
         # res.save()
-
+        
         return JsonResponse(output, safe = False)
 
 
