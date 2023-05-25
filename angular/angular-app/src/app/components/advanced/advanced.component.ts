@@ -311,8 +311,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         linkarray.push(to);
         let linkData = {
           Nodes: linkarray,
-          Attenuation: 0.1,
-          Distance: 70
+          Attenuation: this.toolbox.get('attenuation')?.value,
+          Distance: this.toolbox.get('distance')?.value
         }
         this.links.push(linkData)
       }
