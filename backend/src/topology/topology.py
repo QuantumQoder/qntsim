@@ -296,6 +296,10 @@ class Topology():
                 #nodeObj.memory_array.update_memory_params("coherence_time", node["memory"]["expiry"])
                 #nodeObj.memory_array.update_memory_params("efficiency", node["memory"]["efficiency"])
                 #nodeObj.memory_array.update_memory_params("raw_fidelity", node["memory"]["fidelity"])
+                for arg, val in node.get("memory", {}).items():
+                    nodeObj.memory_array.update_memory_params(arg, val)
+                for arg, val in node.get("lightSource", {}).items():
+                    setattr(nodeObj.lightsource, arg, val)
                 self.add_node(nodeObj)
             
             
@@ -328,12 +332,15 @@ class Topology():
         #print('self.nx_graph',self.nx_graph,self.name)
         
         #-------------------------------
-        for node in self.nodes.values():
-            if type(node) != BSMNode:
-                node.all_pair_shortest_dist = all_pair_dist
-                node.nx_graph=self.nx_graph
-                node.delay_graph=self.cc_delay_graph
-                node.neighbors = list(G.neighbors(node.name))
+        for nodeObj in self.nodes.values():
+            if type(nodeObj) != BSMNode:
+                nodeObj.all_pair_shortest_dist = all_pair_dist
+                nodeObj.nx_graph=self.nx_graph
+                nodeObj.delay_graph=self.cc_delay_graph
+                nodeObj.neighbors = list(G.neighbors(nodeObj.name))
+            else:
+                for arg, val in config.get("detector", {}).items():
+                    setattr(nodeObj.bsm, arg, val)
         
         
         

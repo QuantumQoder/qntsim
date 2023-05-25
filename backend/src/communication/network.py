@@ -20,7 +20,7 @@ from ..topology.topology import Topology
 from .circuits import bell_type_state_analyzer
 from .noise import ERROR_TYPE
 from .NoiseModel import noise_model
-from .utils import string_to_binary
+from .utils import to_binary, to_string
 
 Timeline.bk = True
 Timeline.DLCZ = False
@@ -222,6 +222,7 @@ class Network:
         priority: int = 0,
         target_fidelity: float = 0.5,
         timeout: int = 10e12,
+        require_entanglement:bool = True,
         **kwds,
     ) -> None:
         self.__name = name
@@ -235,11 +236,7 @@ class Network:
         self._target_fidelity = target_fidelity
         self._timeout = timeout
         self.messages = messages
-        self._bin_msgs = (
-            list(messages.values())
-            if all(char in "01" for message in messages.values() for char in message)
-            else string_to_binary(messages=messages)
-        )
+        self._is_binary, self._bin_msgs = to_binary(messages=list(messages.values()))
         self.__dict__.update(**kwds)
         if not hasattr(self, "size"):
             self.size = len(self._bin_msgs[0])
@@ -264,7 +261,7 @@ class Network:
                 level=logging.INFO,
                 format="%(pathname)s %(threadName)s %(module)s %(funcName)s %(message)s",
             )
-        self._initiate()
+        self._initiate(require_entanglement=require_entanglement)
         self.get_keys(
             node_index=self.keys_of if hasattr(self, "keys_of") else 0,
             info_state="ENTANGLED",
@@ -294,7 +291,7 @@ class Network:
         """
         return self.nodes[item]
 
-    def _initiate(self):
+    def _initiate(self, require_entanglement:bool=True):
         """
         Initializes the quantum network by creating a timeline and topology,
         setting parameters, and identifying end nodes. If there are multiple end nodes,
@@ -314,7 +311,7 @@ class Network:
         #     self._net_topo.load_config(self._topology)
 
         # Set parameters for the quantum network
-        self._set_parameters()
+        # self._set_parameters()
 
         # Identify the end nodes in the network
         self.nodes = self._net_topo.get_nodes_by_type("EndNode")
@@ -328,7 +325,7 @@ class Network:
         self._bell_pairs = {}
 
         # If there are multiple end nodes, request entanglements and rectify entanglements
-        if len(self.nodes) > 1:
+        if require_entanglement:
             self._request_entanglements()
             self._timeline.init()
             self._timeline.run()
@@ -345,20 +342,19 @@ class Network:
         else:
             self._initialize_photons()
 
-    def _set_parameters(self):
-        nodes = self._net_topo.nodes
-        print('node', nodes,self._topology)
-        for node in self._topology.get("nodes", []):
-            
-            node_obj = nodes.get(node.get("Name"))
-            if node.get("Type") in ["service", "end"]:
-                for arg, val in node.get("memory", {}).items():
-                    node_obj.memory_array.update_memory_params(arg, val)
-                for arg, val in node.get("lightSource", {}).items():
-                    setattr(node_obj.lightsource, arg, val)
-            elif node.get("Type")=="bsm":
-                for arg, val in node.get("detector", {}).items():
-                    setattr(node_obj.bsm, arg, val)
+    # def _set_parameters(self):
+    #     nodes = self._net_topo.nodes
+    #     print('node', nodes,self._topology)
+    #     for node in self._topology.get("nodes", []):
+    #         node_obj = nodes.get(node.get("Name"))
+    #         if node.get("Type") in ["service", "end"]:
+    #             for arg, val in node.get("memory", {}).items():
+    #                 node_obj.memory_array.update_memory_params(arg, val)
+    #             for arg, val in node.get("lightSource", {}).items():
+    #                 setattr(node_obj.lightsource, arg, val)
+    #         elif node.get("Type")=="bsm":
+    #             for arg, val in node.get("detector", {}).items():
+    #                 setattr(node_obj.bsm, arg, val)
         # # Read the parameter data from the file
         # with open(self._parameters, "r") as file:
         #     data = json.load(file)
@@ -714,12 +710,8 @@ class Network:
                 self._strings.append(string)
         else:
             self._strings = ["".join(str(*output.values()) for output in self._outputs)]
-        self.recv_msgs = {
-            rec[1:]: "".join(
-                chr(int(string[j * 8 : -~j * 8], 2)) for j in range(len(string) // 8)
-            )
-            for rec, string in zip(list(self.messages)[::-1], self._strings)
-        }
+        self._strings = to_string(strings=self._strings, _was_binary=self._is_binary)
+        self.recv_msgs = {rec[1:]:message for rec, message in zip(list(self.messages)[::-1], self._strings)}
         for k, v in self.recv_msgs.items():
             logging.info(f"Received message {k}: {v}")
 

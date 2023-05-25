@@ -256,7 +256,7 @@ class ProtocolPipeline:
         )
 
         # Add an attack to the flow if one was specified
-        if attack := self.__kwds.get("attack", ""):
+        if (attack := self.__kwds.get("attack", "")) in ATTACK_TYPE.__members__:
             self.__funcs.append(
                 partial(Attack.implement, attack=ATTACK_TYPE[attack].value)
             )
