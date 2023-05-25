@@ -171,12 +171,12 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       const nodereq = {
         "Name": nodesArray[i].name,
         "Type": nodesArray[i].properties[0].propValue.toLowerCase(),
-        "noOfMemory": nodesArray[i].properties[1].propValue,
+        "noOfMemory": Number(nodesArray[i].properties[1].propValue),
         "memory": {
-          'frequency': nodesArray[i].memory[0].propValue,
-          'expiry': nodesArray[i].memory[1].propValue,
-          'efficiency': nodesArray[i].memory[2].propValue,
-          'fidelity': nodesArray[i].memory[3].propValue
+          'frequency': Number(nodesArray[i].memory[0].propValue),
+          'expiry': Number(nodesArray[i].memory[1].propValue),
+          'efficiency': Number(nodesArray[i].memory[2].propValue),
+          'fidelity': Number(nodesArray[i].memory[3].propValue)
         },
         "lightSource": {
           "frequency": this.lightSourceProps.frequency,
@@ -492,7 +492,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       ],
       memory: [
         { propName: "Memory Frequency (Hz)", propValue: 8e7, numericValueOnly: true },
-        { propName: "Memory Expiry (s)", propValue: -1, numericValueOnly: true },
+        { propName: "Memory Expiry (s)", propValue: 100, numericValueOnly: true },
         { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
         { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
       ]
@@ -750,7 +750,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         ],
         memory: [
           { propName: "Memory Frequency (Hz)", propValue: 8e7, numericValueOnly: true },
-          { propName: "Memory Expiry (s)", propValue: -1, numericValueOnly: true },
+          { propName: "Memory Expiry (s)", propValue: 100, numericValueOnly: true },
           { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
           { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
         ]
