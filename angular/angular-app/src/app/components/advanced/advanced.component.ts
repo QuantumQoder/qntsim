@@ -167,6 +167,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     this.serviceNodes = [];
     this.endNodes = [];
     this.nodes = [];
+    this.nodesData = {}
     for (let i = 0; i < nodesArray.length; i++) {
       const nodereq = {
         "Name": nodesArray[i].name,
@@ -539,6 +540,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       diagram.commitTransaction('delete node');
       this.myDiagram.zoomToFit();
     }
+    this.updateNodes()
   }
   // calculateFrequency() {
   //   const speedOfLight = 3e17; // speed of light in nm/s
