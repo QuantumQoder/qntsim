@@ -13,7 +13,7 @@
             "appId": 3
         },
         {
-            "appName": "E91 QKD",
+            "appName": "Ekert 91 QKD",
             "appId": 1
         },
         {
@@ -25,7 +25,7 @@
             "appId": 6
         },
         {
-            "appName": "Arbitrary basis QSDC",
+            "appName": "Arbitrary Basis QSDC with user authentication",
             "appId": 7
         },
         {
@@ -33,7 +33,7 @@
             "appId": 8
         },
         {
-            "appName": "QSDC with Telportation",
+            "appName": "QSDC with Teleportation",
             "appId": 9
         },
         {

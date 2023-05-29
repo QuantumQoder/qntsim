@@ -441,16 +441,15 @@
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
                                     <label for="type" class="form-label font-bold"
-                                        pTooltip="The QKD Id of the Sender which will be used for authentication.">
+                                        pTooltip="The QKD Id of the Sender which will be used for authentication(even nos.).">
                                         Sender ID <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                     </label>
-                                    <input type="number" class="form-control"
-                                        oninput="this.value = Math.abs(this.value)"
+                                    <input type="text" (keydown)="numericOnly($event)" class="form-control"
                                         [(ngModel)]="nodesSelection.senderId">
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
                                     <label for="type" class="form-label font-bold"
-                                        pTooltip="The classical message of the sender">
+                                        pTooltip="The classical message of the sender (enter binary string).">
                                         Message <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                     </label>
                                     <input type="text" class="form-control" [(ngModel)]="nodesSelection.message">
@@ -467,7 +466,7 @@
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
                                     <label for="type" class="form-label font-bold"
-                                        pTooltip="The trap qubits inserted into the quantum message sequence to analyze channel security.">
+                                        pTooltip="The trap qubits inserted into the quantum message sequence to analyze channel security (even nos.).">
                                         Number of Check Bits <i class="fa-solid fa-circle-info fa-xs"
                                             style="color: #000000;"></i>
                                     </label>
@@ -490,11 +489,11 @@
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
                                     <label for="type" class="form-label font-bold"
-                                        pTooltip="The QKD Id of the Receiver which will be used for authentication.">
+                                        pTooltip="The QKD Id of the Receiver which will be used for authentication(even nos.).">
                                         Receiver ID <i class="fa-solid fa-circle-info fa-xs"
                                             style="color: #000000;"></i>
                                     </label>
-                                    <input type="number" class="form-control"
+                                    <input type="text" (keydown)="numericOnly($event)" class="form-control"
                                         oninput="this.value = Math.abs(this.value)"
                                         [(ngModel)]="nodesSelection.receiverId">
                                 </div>

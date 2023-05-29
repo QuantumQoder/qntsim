@@ -646,16 +646,21 @@ export class MinimalComponent implements OnInit, AfterViewInit {
         attack: ''
       },
       10: {
-        alice_attrs: {
-          sender: this.appSettingsForm.get('sender')?.value,
-          receiver: this.appSettingsForm.get('receiver')?.value,
+        sender: {
+          node: this.appSettingsForm.get('sender')?.value,
           message: this.appSettingsForm.get('inputMessage')?.value,
-          id: "1011",
-          check_bits: 4,
+          userID: "1011",
+          num_check_bits: 4,
+          num_decoy_photons: 4
         },
-        threshold: 0.2,
-        num_decoy: 4,
-        bob_id: "0111"
+        receiver: {
+          node: this.appSettingsForm.get('receiver')?.value,
+          userID: "1010"
+        },
+        bell_type: "10",
+        error_threshold: 0.5,
+        attack: 'none',
+        channel: 1
       },
     }
     this.appConfig = appConfigMap[app_id];
