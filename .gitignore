@@ -1,12 +1,15 @@
+.gitignore
 env
 data
 server2.pem
 \angular\angular-app\.angular
 /angular/angular-app/.angular
 angular/angular-app/node_modules/__ngcc_entry_points__.json
-angular/angular-app/node_modules/__ngcc_entry_points__.json
 *.txt
 *.log
 *.pyc
 build/
 qntsim.egg-info/
+angular/angular-app/package-lock.json
+backend/qntsim.egg-info/PKG-INFO
+angular
