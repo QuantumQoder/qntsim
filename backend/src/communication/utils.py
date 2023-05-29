@@ -31,10 +31,3 @@ def to_string(strings:List[str], _was_binary:bool):
     logging.info("converted back")
 
     return messages
-
-def network_function(func):
-    def wrapper(*args, **kwargs):
-        return func(*args, **kwargs)
-    return wrapper
-
-@staticmethod

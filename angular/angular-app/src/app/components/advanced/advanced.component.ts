@@ -474,7 +474,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       complete: () => {
         this.spinner = false;
         sessionStorage.setItem("saved_model", this.myDiagram.model)
-        if (!!this.con.getResult().application.Err_msg)
+        // if (!!this.con.getResult().application.Err_msg)
           this._route.navigate(['/results'])
       }
     });

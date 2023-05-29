@@ -6,7 +6,7 @@ import os
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial, reduce
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 from IPython.display import clear_output
@@ -503,7 +503,7 @@ class Network:
             f"Initialized {self.size} photons with initial states {self._initials}"
         )
 
-    def get_keys(self, node_index: int, info_state: str = "ENTANGLED"):
+    def get_keys(self, _:Optional[None], node_index: int, info_state: str = "ENTANGLED"):
         """Retrives the keys of a node, of a specific state. Updates the 'keys' attribute with the required keys.
 
         Args:
@@ -573,7 +573,7 @@ class Network:
                         _ = qtc.x(0) if i else qtc.z(0)
                     self.manager.run_circuit(qtc, [key])
 
-    def encode(self, returns: Any, msg_index: int, node_index: int = 0):
+    def encode(self, _: Any, msg_index: int, node_index: int = 0):
         """Encodes the classical bits as unitary gates on single photons. 0 & 1 are mapped to I and iY gates, respectively.
 
         Args:
@@ -595,7 +595,7 @@ class Network:
                 self.manager.run_circuit(qtc, [key])
         logging.info("message bits into qubits")
 
-    def superdense_code(self, returns: Any, msg_index: int, node_index: int = 0):
+    def superdense_code(self, _: Any, msg_index: int, node_index: int = 0):
         """Encodes 2-bit classical information through superdense coding.
 
         Args:
@@ -618,7 +618,7 @@ class Network:
             self.manager.run_circuit(qtc, [key])
         logging.info("message bits into the channel")
 
-    def teleport(self, returns: Any, node_index: int = 0, msg_index: int = 0):
+    def teleport(self, _: Any, node_index: int = 0, msg_index: int = 0):
         """Encodes message bit as superposed states and then teleports the state over the entangled channel. 0's and 1's are encoded as '+' and '-' quantum states, respectively.
 
         Args:
@@ -641,7 +641,7 @@ class Network:
             self._corrections[keys] = [outputs.get(new_key), outputs.get(key)]
         logging.info("message states")
 
-    def measure(self, returns: Any):
+    def measure(self, _: Any):
         """Measures the qubits and stores the output for decoding the message
 
         Args:
@@ -695,7 +695,7 @@ class Network:
 
     # @delayed
     # @wrap_non_picklable_objects
-    def _decode(self, *args):
+    def _decode(self, *_):
         self._strings = []
         if hasattr(self, "_initials"):
             node = self.nodes[0]
@@ -734,7 +734,7 @@ class Network:
         # return [job.result() for job in  jobs]
         # return Parallel(n_jobs=-1, prefer='threads')(network._decode(network=network, *args) for network in networks)
 
-    def dump(self, returns: Any, node_name: str = "", info_state: str = ""):
+    def dump(self, _: Any, node_name: str = "", info_state: str = ""):
         """Logs the current memory state of the nodes in the network
 
         Args:
@@ -760,7 +760,7 @@ class Network:
                 dataframe = DataFrame({"keys": keys, "states": states})
         logging.info(dataframe.to_string())
 
-    def draw(self, returns: Any):
+    def draw(self, _: Any):
         """_summary_
 
         Args:
