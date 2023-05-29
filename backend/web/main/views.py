@@ -77,20 +77,20 @@ class RunApp(APIView):
         #logger.info('Logging Begins...')
         memory_handler.flush()
         importlib.reload(qntsim)
-        print('request', request.data.get('topology'))
+        #print('request', request.data.get('topology'))
         topology = request.data.get('topology')
         application_id = request.data.get('application')
         appSettings = request.data.get('appSettings')
         # Add check for getting application id and extracting name.
-        print('application id', application_id)
+        #print('application id', application_id)
         # print(Applications.objects.all())
         application = Applications.objects.filter(id = application_id).values("name").first().get('name')
-        print(f"Running applications: {application}", appSettings)
-        print('request user', request.user.username, request.user.id)
+        #print(f"Running applications: {application}", appSettings)
+        #print('request user', request.user.username, request.user.id)
         results = {}
 
         if application == "e91":
-            print("e91 views")
+            #print("e91 views")
             results = e91(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["keyLength"]))
         elif application == "e2e":
             print('e2e',appSettings["sender"], appSettings["receiver"], appSettings["startTime"], appSettings["size"], appSettings["priority"], appSettings["targetFidelity"], appSettings["timeout"])

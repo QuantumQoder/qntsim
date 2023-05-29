@@ -69,6 +69,7 @@ src/resource_management/task_manager.py
 src/topology/__init__.py
 src/topology/message_queue_handler.py
 src/topology/node.py
+src/topology/test.py
 src/topology/topology.py
 src/transport_layer/__init__.py
 src/transport_layer/transport_manager.py

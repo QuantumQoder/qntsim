@@ -120,6 +120,7 @@ class Topology():
          # generate forwarding tables
         #-------------------------------
         all_pair_dist, G = self.all_pair_shortest_dist()
+        print("Returned")
         self.nx_graph=G
         self.all_pair_shortest_distance=all_pair_dist
         # self.djiktras_path=self.djiktras()
@@ -526,12 +527,7 @@ class Topology():
         self.cc_delay_graph[node.name]={}
 
     def add_quantum_connection(self, node1: str, node2: str, **kwargs) -> None:
-        """Method to add a two-way quantum channel connection between nodes.
-        NOTE: kwargs are passed to constructor for quantum channel, may be used to specify channel parameters.
-        Args:
-            node1 (str): first node in pair to connect.
-            node2 (str): second node in pair to connect.
-        """
+        kwargs["distance"] =  float(kwargs["distance"])
         # print('add quantum connection', node1, node2)
         assert node1 in self.nodes, node1 + " not a valid node"
         assert node2 in self.nodes, node2 + " not a valid node"
@@ -541,8 +537,8 @@ class Topology():
             (type(self.nodes[node1]) == ServiceNode) and (type(self.nodes[node2]) == EndNode) or
             (type(self.nodes[node1]) == ServiceNode) and (type(self.nodes[node2]) == ServiceNode)):
             # update non-middle graph
-            self.graph_no_middle[node1][node2] = kwargs["distance"]
-            self.graph_no_middle[node2][node1] = kwargs["distance"]
+            self.graph_no_middle[node1][node2] = float(kwargs["distance"])
+            self.graph_no_middle[node2][node1] = float(kwargs["distance"])
 
             # add middle node
             name_middle = "_".join(["middle", node1, node2])
@@ -550,7 +546,8 @@ class Topology():
             self.add_node(middle)
 
             # update distance param
-            kwargs["distance"] = kwargs["distance"] / 2
+            print("type:", type(kwargs["distance"]))
+            kwargs["distance"] = float(kwargs["distance"]) / 2
 
             # add quantum channels
             for node in [node1, node2]:
@@ -576,6 +573,7 @@ class Topology():
             self.add_quantum_channel(node2, node1, **kwargs)
 
     def add_quantum_channel(self, node1: str, node2: str, **kwargs) -> None:
+        kwargs["distance"] =  float(kwargs["distance"])
         """Method to add a one-way quantum channel connection.
         NOTE: kwargs are passed to constructor for quantum channel, may be used to specify channel parameters.
         Args:
@@ -589,9 +587,9 @@ class Topology():
         self.qchannels.append(qchannel)
 
         # edit graph
-        self.graph[node1][node2] = kwargs["distance"]
+        self.graph[node1][node2] = float(kwargs["distance"])
         if type(self.nodes[node1]) != BSMNode and type(self.nodes[node2]) != BSMNode:
-            self.graph_no_middle[node1][node2] = kwargs["distance"]
+            self.graph_no_middle[node1][node2] = float(kwargs["distance"])
 
     def add_classical_connection(self, node1: str, node2: str, **kwargs) -> None:
         """Method to add a two-way classical channel between nodes.
@@ -692,7 +690,7 @@ class Topology():
                 ###print('------------distance-------------', type(distance))
                 G.add_node(node)                
                 G.add_edge(node, neighbor, color='blue', weight=distance)  
-        print("G",G)    
+        print("G",G, type(G))    
         return G
 
 
@@ -704,8 +702,13 @@ class Topology():
     #     return nx.dijkstra_path(G)
 
     def all_pair_shortest_dist(self):
+        print("Calling...")
         G = self.generate_nx_graph()
-        return nx.floyd_warshall(G), G
+        
+        print("Returned...")
+        short_distance = nx.floyd_warshall(G)
+        print(short_distance)
+        return short_distance, G
 
     def get_virtual_graph(self):
         #Plotting virtual graph
