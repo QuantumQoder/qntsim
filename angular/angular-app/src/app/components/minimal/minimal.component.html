@@ -25,8 +25,8 @@
                 <label for="type" class="form-label font-bold" pTooltip="Choose between Star or Mesh topology.">
                     Type <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                 </label>
-                <select class="form-control" formControlName="type" (change)="getType($event)">
-                    <option *ngFor="let data of type" [ngValue]="data">{{data}}</option>
+                <select class="form-control" formControlName="type" [(ngModel)]="type" (change)="getType($event)">
+                    <option *ngFor="let data of typeOptions" [ngValue]="data">{{data}}</option>
                 </select>
             </div>
 

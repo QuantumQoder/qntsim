@@ -1,8 +1,6 @@
 import { HoldingDataService } from 'src/services/holding-data.service';
-import { transition } from '@angular/animations';
 import { CookieService } from 'ngx-cookie-service';
 import { ApiServiceService } from './../../../services/api-service.service';
-
 import { AfterViewInit, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import * as go from 'gojs'
@@ -10,6 +8,7 @@ import { map } from 'rxjs';
 import { ConditionsService } from 'src/services/conditions.service';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
+import { DiagramStorageService } from 'src/services/diagram-storage.service';
 
 @Component({
   selector: 'app-minimal',
@@ -17,8 +16,8 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./minimal.component.less'],
   encapsulation: ViewEncapsulation.None
 })
-
 export class MinimalComponent implements OnInit, AfterViewInit {
+  type: any = 'Star'
   data: string = '|1\\rangle'
   equation: any = [{
     header: '/assets/images/amplitude/1.jpg', value: 1,
@@ -70,7 +69,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   nodes: any
   distance: number = 100
   appSettingsForm: any
-  type = ['Star', 'Mesh'];
+  typeOptions = ['Star', 'Mesh'];
   level: number = 2
   cc: any[] = []
   appSettingsResult: any
@@ -91,11 +90,17 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   ;
   endNode3: any[] = ['node4'];;
 
-  constructor(private fb: FormBuilder, private service: ConditionsService, private route: Router, private holdingData: HoldingDataService, private api: ApiServiceService, private cookie: CookieService) { }
+  constructor(private fb: FormBuilder, private service: ConditionsService, private route: Router, private holdingData: HoldingDataService,
+    private api: ApiServiceService, private diagramStorage: DiagramStorageService) { }
   ngAfterViewInit(): void {
-
-
-    let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value, this.level);
+    let diagramData = this.diagramStorage.getMinimalValues()
+    if (diagramData) {
+      this.level = diagramData.level
+      this.type = diagramData.type
+      // this.topologyData.nodes = diagramData.topology.nodeDataArray
+      // this.topologyData.links = diagramData.topology.linkDataArray
+    }
+    let urlData = this.service.jsonUrl(this.type, this.level);
     this.service.getJson(urlData.url, urlData.type).subscribe((result) => {
       this.topologyData = result;
       for (var i = 0; i < this.topologyData.nodes.length; i++) {
@@ -139,7 +144,6 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.holdingData.setRoute('minimal');
     this.route.navigate([`/${url}`])
   }
-
   setSettings(formData: any) {
     let form = {}
     this.appSettingsForm = null
@@ -309,6 +313,10 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.topology.model = new go.GraphLinksModel(
       nodes, links
     )
+    this.topology.addDiagramListener("Modified", () => {
+      this.diagramStorage.setMinimalValues({ topology: this.topology.model, type: this.type, level: this.level })
+      // console.log(this.diagramStorage.getAdvancedDiagramModel())
+    });
   }
 
   getAppropriateContextMenu(appId: any) {
@@ -653,11 +661,11 @@ export class MinimalComponent implements OnInit, AfterViewInit {
     this.appConfig = appConfigMap[app_id];
   }
   updateJson() {
-    let type = this.topologyForm.get('type')?.value.toLowerCase();
+    let type = this.type.toLowerCase();
     if (type === this.lastValue.type && this.level == this.lastValue.level) {
       return;
     }
-    let urlData = this.service.jsonUrl(this.topologyForm.get('type')?.value.toLowerCase(), this.level);
+    let urlData = this.service.jsonUrl(this.type.toLowerCase(), this.level);
     this.service.getJson(urlData.url, urlData.type).subscribe((result: any) => {
       this.topologyData = result;
       for (var i = 0; i < this.topologyData.nodes.length; i++) {

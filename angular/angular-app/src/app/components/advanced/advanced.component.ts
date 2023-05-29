@@ -1,17 +1,15 @@
 import { HoldingDataService } from 'src/services/holding-data.service';
 
-import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
 import * as go from 'gojs';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { ApiServiceService } from 'src/services/api-service.service';
-
 import { Subscription, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { ConditionsService } from 'src/services/conditions.service';
+import { DiagramStorageService } from 'src/services/diagram-storage.service';
 
 @Component({
   selector: 'app-advanced',
@@ -20,7 +18,7 @@ import { ConditionsService } from 'src/services/conditions.service';
   providers: [MessageService, ConfirmationService],
   encapsulation: ViewEncapsulation.None
 })
-export class AdvancedComponent implements OnInit, AfterViewInit {
+export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   app: any
   adornedpart: any
   routeFrom: string
@@ -45,7 +43,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     receiverId: 1011,
     bellType: "10",
     channel: 1,
-
   }
   detectorProps = {
     efficiency: 1,
@@ -141,14 +138,26 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     'errorthreshold': []
   })
   app_data: { 1: string; 2: string; 3: string; 4: string; 5: string; 6: string; 7: string; 8: string; 9: string; 10: string; };
-  constructor(private fb: FormBuilder, private con: ConditionsService, private messageService: MessageService, private apiService: ApiServiceService, private holdingData: HoldingDataService, private _route: Router, private modal: NgbModal, private confirmationService: ConfirmationService) {
+  constructor(private fb: FormBuilder, private con: ConditionsService, private apiService: ApiServiceService, private holdingData: HoldingDataService, private _route: Router, private diagramStorage: DiagramStorageService) {
+  }
+  ngOnDestroy(): void {
+
   }
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
     this.step = 0;
   }
   ngAfterViewInit(): void {
+    // if (sessionStorage) {
+
+    //   this.savedModel = sessionStorage.getItem("saved_model")
+    //   this.load()
+    // } else {
     this.initDiagram();
+    // this.myDiagram.model.addEventListener("change", () => {
+    //   sessionStorage.setItem("saved_model", this.myDiagram.model)
+    // })
+    // }
     this.updateNodes()
   }
 
@@ -227,6 +236,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     this.simulator.options = this.app == 2 ? [{ header: 'Version 1', value: 'version1' }, { header: 'Version 2', value: 'version2' }] : [{
       header: 'Version 1', value: 'version1'
     }]
+
   }
   changeApp() {
     localStorage.setItem("app_id", this.app)
@@ -234,7 +244,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     this.simulator.options = this.app == 2 ? [{ header: 'Version 1', value: 'version1' }, { header: 'Version 2', value: 'version2' }] : [{
       header: 'Version 1', value: 'version1'
     }]
-
   }
   routeTo() {
     this._route.navigate(['/minimal'])
@@ -292,12 +301,11 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     }
     for (let i = 0; i < this.myDiagram.model.nodeDataArray.length; i++) {
       if (!((this.myDiagram.model.nodeDataArray[i] as any).key in this.nodesData)) {
-
         alert("Please configure the node named:" + (this.myDiagram.model.nodeDataArray[i] as any).text);
         return;
       };
     }
-    this.myDiagram.model.modelData.position = go.Point.stringify(this.myDiagram.position);
+    this.myDiagram.model.modelData['position'] = go.Point.stringify(this.myDiagram.position);
     this.savedModel = this.myDiagram.model;
     this.graphModel = this.myDiagram.model.nodeDataArray
     this.links = []
@@ -443,6 +451,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       "topology": this.topology,
       "appSettings": this.appSettings
     }
+    // sessionStorage.setItem("saved_model", this.myDiagram.model)
     // let url = this.simulator.value == 'version1' ? environment.apiUrl : this.simulator.value == 'version2' ? environment.apiUrlNew : null;
     let url = this.app_id != 2 ? environment.apiUrl : this.simulator.value == 'version1' ? environment.apiUrl : environment.apiUrlNew;
     // let url = environment.apiUrlNew;
@@ -464,7 +473,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
       },
       complete: () => {
         this.spinner = false;
-        if (!!!this.con.getResult().application.Err_msg)
+        sessionStorage.setItem("saved_model", this.myDiagram.model)
+        if (!!this.con.getResult().application.Err_msg)
           this._route.navigate(['/results'])
       }
     });
@@ -496,7 +506,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         { propName: "Memory Expiry (s)", propValue: 100, numericValueOnly: true },
         { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
         { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
-      ]
+      ], isVisible: false
     };
     this.myDiagram.startTransaction('Add node and link');
     this.myDiagram.model.addNodeData(newNode);
@@ -511,7 +521,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
     this.loadDiagramProperties();  // do this after the Model.modelData has been brought into memory
   }
   loadDiagramProperties() {
-    var pos = this.myDiagram.model.modelData.position;
+    var pos = this.myDiagram.model.modelData["position"];
     if (pos) this.myDiagram.initialPosition = go.Point.parse(pos);
     this.myDiagram.contentAlignment = go.Spot["Center"];
   }
@@ -683,10 +693,11 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
               defaultAlignment: go.Spot.Left, background: "lightblue",
               itemTemplate: memoryTemplate
             },
-            new go.Binding("background", "color")
+            new go.Binding("background", "color"),
+            new go.Binding("visible", "isVisible")
           ),
           $("PanelExpanderButton", "MEMORY",
-            { row: 2, column: 1, alignment: go.Spot.Right, visible: false },
+            { row: 2, column: 1, alignment: go.Spot.TopRight, visible: true },
             new go.Binding("visible", "memory", arr => arr.length > 0)),
           $(go.Panel, 'Spot',
             {
@@ -741,26 +752,42 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         $(go.Shape),
         $(go.Shape, { toArrow: 'Standard' })
       );
-    var nodeDataArray = [
-      {
-        key: 1,
-        name: "node1",
-        color: "lightblue",
-        properties: [
-          { propName: "Type", propValue: "End", nodeType: true },
-          { propName: "No of Memories", propValue: 500, numericValueOnly: true }
-        ],
-        memory: [
-          { propName: "Memory Frequency (Hz)", propValue: 8e7, numericValueOnly: true },
-          { propName: "Memory Expiry (s)", propValue: 100, numericValueOnly: true },
-          { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
-          { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
-        ]
-      }
-    ];
+    var nodeDataArray
+    var linkDataArray
+    if (this.diagramStorage.getAdvancedDiagramModel()) {
+      nodeDataArray = this.diagramStorage.advancedDiagramModel.nodeDataArray
+      linkDataArray = this.diagramStorage.advancedDiagramModel.linkDataArray
+    } else {
+
+      nodeDataArray = [
+        {
+          key: 1,
+          name: "node1",
+          color: "lightblue",
+          properties: [
+            { propName: "Type", propValue: "End", nodeType: true },
+            { propName: "No of Memories", propValue: 500, numericValueOnly: true }
+          ],
+          memory: [
+            { propName: "Memory Frequency (Hz)", propValue: 8e7, numericValueOnly: true },
+            { propName: "Memory Expiry (s)", propValue: 100, numericValueOnly: true },
+            { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
+            { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
+          ], isVisible: false
+        }
+      ];
+      linkDataArray = []
+    }
 
 
-    this.myDiagram.model = new go.GraphLinksModel(nodeDataArray, []);
+    this.myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+    this.myDiagram.addDiagramListener("LayoutCompleted", (e) => {
+      this.myDiagram.findTopLevelGroups().each((g) => {
+        if (g.findObject("MEMORY")) {
+          g.findObject("MEMORY").collapsePanel();
+        }
+      });
+    });
     this.myDiagram.addDiagramListener("TextEdited", (e: any) => {
       const tb = e.subject;
       const nodeData = tb.part && tb.part.data;
@@ -791,6 +818,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit {
         }
       }
       this.updateNodes()
+    });
+    this.myDiagram.addDiagramListener("Modified", () => {
+      this.diagramStorage.setAdvancedDiagramModel(this.myDiagram.model)
+      console.log(this.diagramStorage.getAdvancedDiagramModel())
     });
   }
   public zoomIn() {
