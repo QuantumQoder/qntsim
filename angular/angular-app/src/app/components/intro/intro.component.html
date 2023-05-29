@@ -70,7 +70,7 @@
             <br>
         </div>
         <div *ngIf="app=='2'" class="col-11">
-            <h1 class="display-1">E2E Protocol</h1>
+            <h1 class="display-1">End-to-end EPR pair distribution</h1>
             <br>
             <div class="row">
                 <p class="col-11">E2E (End to End entanglement) application is related to generate n-entangled pair of a
@@ -607,12 +607,9 @@
             <br>
         </div>
         <div *ngIf="app=='10'" class="col-12">
-            <h1 class="display-4">Measurement Device Independent QSDC</h1>
-            <h6 class="display-4 text-center">
-                with User Authentication
-            </h6>
+            <h1 class="display-4">Measurement Device Independent QSDC with User Authentication</h1>
             <div class="row">
-                <p class="text-justify col-12">This is a new theoretical scheme for measurement device independent
+                <p class="text-justify col-12 mb-2">This is a new theoretical scheme for measurement device independent
                     quantum secure direct communication (MDI-QSDC) with
                     user authentication, where both the sender and the receiver first check the authenticity of the
                     other party and then
@@ -621,10 +618,8 @@
                     Link: <a href=""
                         (click)="quant_ph('https://link.springer.com/article/10.1007/s11128-022-03572-z')">https://link.springer.com/article/10.1007/s11128-022-03572-z</a>
                     <br>
-
-
                 </p>
-                <div class="btn-group col-12 d-flex justify-content-center gap-2">
+                <div class="btn-group col-12 d-flex justify-content-center gap-2 mb-2">
                     <div>
                         <button class="btn btn-primary btn-custom" routerLink="/advanced">Launch Application</button>
                     </div>
@@ -634,13 +629,10 @@
                             Minimal</button>
                     </div>
                 </div>
-
                 <p class="text-justify text-center col-12">
                     Let Alice (Identity IdA = 1011) be the sender and Bob (Identity IdB = 0111) be the receiver of the
                     secret message.
-
                 </p>
-
                 <br>
                 <div class="row">
                     <div class="col-11">
@@ -654,13 +646,10 @@
                     <h3 class="display-4 text-center text-uppercase">
                         Initialisation
                     </h3>
-
                     <img style="margin-left:10vh;" class="img-fluid" src="assets/images/ip2_pd/ip2_1.jpg" alt="...">
                     <hr>
                     <img style="margin-left:10vh;" class="img-fluid" src="assets/images/ip2_pd/ip2_2.jpg" alt="...">
                     <img style="margin-left:10vh;" class="img-fluid" src="assets/images/ip2_pd/ip2_3.jpg" alt="...">
-
-
                     <p class="text-justify">
                         Let the secret message of Alice be “Hello”. In the initialisation phase, Alice converts her
                         message into binary
@@ -736,7 +725,7 @@
             </div>
         </div>
         <br>
-        <!-- </div> -->
+
         <div class="d-flex justify-content-center button-group ">
             <button type="button" *ngIf="app!=7 && activeIndex==1 || app!=7 && activeIndex==2"
                 class="btn btn-primary btn-custom mx-2" (click)="previous()">Previous</button>

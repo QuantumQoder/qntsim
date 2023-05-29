@@ -21,7 +21,6 @@ export class IntroComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.holding.setRoute('')
   }
-
   ngOnInit(): void {
     this.routeFrom = this.holding.getRoute();
     console.log(this.routeFrom)
