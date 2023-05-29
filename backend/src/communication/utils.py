@@ -37,4 +37,3 @@ def network_function(func):
         return func(*args, **kwargs)
     return wrapper
 
-@staticmethod
