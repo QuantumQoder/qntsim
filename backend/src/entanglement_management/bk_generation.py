@@ -493,15 +493,16 @@ class EntanglementGenerationA(EntanglementProtocol):
         #print('_entanglement_succeed:  len(self.subtask.protocols): ', len(self.subtask.protocols))
         dst=self.subtask.task.get_reservation().responder
         src=self.subtask.task.get_reservation().initiator
-        # print(f'Entanglement sucessful between (generation) {src,dst} between indices: {self.memory.name, self.remote_memo_id}')
+        # print(f'Entanglement 
+        # between (generation) {src,dst} between indices: {self.memory.name, self.remote_memo_id}')
         # if (self.own.name==src and self.other==dst) or (self.own.name==dst and self.other==src) :
-        #     print(f'Entanglement sucessful between (generation) {src,dst}')
-        #     logger.info(f'Entanglement sucessful between {src,dst}')   
+        #     print(f'Entanglement successful between (generation) {src,dst}')
+        #     logger.info(f'Entanglement successful between {src,dst}')   
         self.subtask.on_complete(1)
-        logger.info(f'Entanglement sucessful between {self.own.name,self.other}')
+        logger.info(f'Entanglement successful between {self.own.name,self.other}')
         if (self.own.name==src and self.other==dst) or (self.own.name==dst and self.other==src) :
-            print(f'Entanglement sucessful between (generation) {src,dst}')
-            logger.info(f'Entanglement sucessful between {self.own.name,self.other}')
+            print(f'Entanglement successful between (generation) {src,dst}')
+            logger.info(f'Entanglement successful between {self.own.name,self.other}')
 
 
     def _entanglement_fail(self):

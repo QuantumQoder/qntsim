@@ -358,7 +358,7 @@ class EntanglementSwappingB(EntanglementProtocol):
             dst=self.subtask.task.get_reservation().responder
             src=self.subtask.task.get_reservation().initiator
             if (self.own.name==src and msg.kwargs["remote_node"]==dst) or (self.own.name==dst and msg.kwargs["remote_node"]==src) :
-                print(f'Entanglement sucessful between {src,dst}')
+                print(f'Entanglement successful between {src,dst}')
 
         else:
             # case if swapping fails

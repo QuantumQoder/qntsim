@@ -391,11 +391,11 @@ class EntanglementSwappingB(EntanglementProtocol):
             dst=self.subtask.task.get_reservation().responder
             src=self.subtask.task.get_reservation().initiator
             #if (self.own.name==src and msg.kwargs["remote_node"]==dst) or (self.own.name==dst and msg.kwargs["remote_node"]==src) :
-                #print(f'Entanglement sucessful between {src,dst}')
+                #print(f'Entanglement successful between {src,dst}')
             
             if (self.own.name==src and msg.kwargs["remote_node"]==dst) :
-                print(f'Entanglement sucessful between {src,dst}')
-                #logger.info(f'Swapping sucessful between {src,self.other}')
+                print(f'Entanglement successful between {src,dst}')
+                #logger.info(f'Swapping successful between {src,self.other}')
                 #Index | Source node   | Entangled Node   |   Fidelity |   Entanglement Time |   Expire Time | State 
                 for info in self.own.resource_manager.memory_manager:
                     if info.memory==self.memory:
@@ -417,8 +417,8 @@ class EntanglementSwappingB(EntanglementProtocol):
 
            
             elif (self.own.name==dst and msg.kwargs["remote_node"]==src) :
-                print(f'Entanglement sucessful between {src,dst}')
-                #logger.info(f'Swapping sucessful between {src,self.other}')
+                print(f'Entanglement successful between {src,dst}')
+                #logger.info(f'Swapping successful between {src,self.other}')
                 #Index | Source node   | Entangled Node   |   Fidelity |   Entanglement Time |   Expire Time | State 
                 for info in self.own.resource_manager.memory_manager:
                     if info.memory==self.memory:
