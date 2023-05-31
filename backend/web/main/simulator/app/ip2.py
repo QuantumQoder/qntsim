@@ -418,7 +418,7 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
     error_threshold = app_settings.get("error_threshold")
     attack = app_settings.get("attack")
     channel = app_settings.get("channel")
-    channel = [1 if i == channel-1 else 0 for i in range(3)]
+    channel = [1 if i+1 == channel else 0 for i in range(3)]
     print(attack, channel)
     Network._flow = [
         # partial(Network.draw),
