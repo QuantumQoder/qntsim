@@ -5,9 +5,9 @@ import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as go from 'gojs';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
-import { ApiServiceService } from 'src/services/api-service.service';
 import { Subscription, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { ApiServiceService } from 'src/services/api-service.service';
 import { ConditionsService } from 'src/services/conditions.service';
 import { DiagramStorageService } from 'src/services/diagram-storage.service';
 
@@ -430,7 +430,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       {
         sender: {
           node: this.nodesSelection.sender,
-          message: this.appSettingsForm.get('message')?.value,
+          message: this.nodesSelection.message,
           userID: `${this.nodesSelection.senderId}`,
           num_check_bits: this.nodesSelection.numCheckBits,
           num_decoy_photons: this.nodesSelection.numDecoy
@@ -475,7 +475,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         this.spinner = false;
         sessionStorage.setItem("saved_model", this.myDiagram.model)
         // if (!!this.con.getResult().application.Err_msg)
-          this._route.navigate(['/results'])
+        this._route.navigate(['/results'])
       }
     });
     // this.apiService.runApplication(req, url).subscribe((result: any) => {
