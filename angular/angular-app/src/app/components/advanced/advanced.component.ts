@@ -38,7 +38,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     numDecoy: 4,
     numCheckBits: 4,
     errorThreshold: 0.5,
-    message: 'hello',
+    message: '001100',
     senderId: 1010,
     receiverId: 1011,
     bellType: "10",
