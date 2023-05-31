@@ -573,7 +573,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   numericOnly(event): boolean {
     const charCode = (event.which) ? event.which : event.keyCode;
-    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+    if (charCode !== 48 && charCode !== 49 && charCode !== 96 && charCode !== 97 && charCode !== 8 && charCode !== 9) {
       return false;
     }
     return true;
