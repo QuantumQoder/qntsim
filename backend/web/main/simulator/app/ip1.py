@@ -314,6 +314,7 @@ class IP1():
         return "".join(Bob_final_message)
 
 
+    # TODO: qd_sp transmission
     def copy_Q5A(self,Q5A_keys, alice, bob):
         qm_alice = alice.timeline.quantum_manager
         qm_bob = bob.timeline.quantum_manager

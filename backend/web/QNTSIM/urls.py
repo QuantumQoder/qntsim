@@ -15,9 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from main.views import (ApplicationList, ApplicationResult,  # ,log_view
+                        PastResultsList, RunApp, stream_logs)
 from rest_framework_simplejwt import views as jwt_views
 from users.views import UserSignup
-from main.views import RunApp, ApplicationList,PastResultsList,ApplicationResult,stream_logs,log_view
 
 urlpatterns = [
     path('api/token/',jwt_views.TokenObtainPairView.as_view(),name ='token_obtain_pair'),
@@ -30,5 +31,5 @@ urlpatterns = [
     path('application_list/',ApplicationList.as_view()),
     path('result_list/', PastResultsList.as_view()),
     path('result/',ApplicationResult.as_view()),
-    path('logs/', log_view, name='logs')
+    # path('logs/', log_view, name='logs')
 ]
