@@ -112,7 +112,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private fb: FormBuilder, private con: ConditionsService, private apiService: ApiServiceService, private holdingData: HoldingDataService, private _route: Router, private diagramStorage: DiagramStorageService) {
   }
   ngOnDestroy(): void {
-    this.diagramStorage.setAppSettingsFormDataAdvanced({ app_id: this.app_id, nodesSelection: this.nodesSelection, appSettingsForm: this.appSettingsForm, e2e: this.e2e, activeIndex: this.activeIndex })
+    this.diagramStorage.setAppSettingsFormDataAdvanced({ app_id: this.app_id, nodesSelection: this.nodesSelection, appSettingsForm: this.appSettingsForm, e2e: this.e2e, activeIndex: this.activeIndex });
+    this.subscription.unsubscribe()
   }
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
@@ -131,9 +132,16 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     // }
     this.updateNodes();
     const appSettingsBackup = this.diagramStorage.getAppSettingsFormDataAdvanced()
-    this.e2e = appSettingsBackup.e2e;
-    this.nodesSelection = appSettingsBackup.nodesSelection
-    this.activeIndex = appSettingsBackup.activeIndex
+    // if (appSettingsBackup.e2e) {
+    //   console.log(appSettingsBackup.e2e)
+    //   this.e2e = appSettingsBackup.e2e;
+
+    // }
+    if (appSettingsBackup) {
+
+      this.nodesSelection = appSettingsBackup.nodesSelection
+      this.activeIndex = appSettingsBackup.activeIndex
+    }
     // this.appSettingsForm = appSettingsBackup.appSettingForm
   }
 

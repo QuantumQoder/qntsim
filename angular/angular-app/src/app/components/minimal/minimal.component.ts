@@ -94,7 +94,8 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private fb: FormBuilder, private service: ConditionsService, private route: Router, private holdingData: HoldingDataService,
     private api: ApiServiceService, private diagramStorage: DiagramStorageService) { }
   ngOnDestroy(): void {
-    this.diagramStorage.updateMinimalFormData({ appForm: this.appForm, appSettingsForm: this.appSettingsForm })
+    this.diagramStorage.updateMinimalFormData({ appForm: this.appForm, appSettingsForm: this.appSettingsForm });
+    this.subscription.unsubscribe()
   }
   ngAfterViewInit(): void {
     let diagramData = this.diagramStorage.getMinimalValues();

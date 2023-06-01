@@ -38,7 +38,7 @@ export class DiagramStorageService {
         this.minimalValues = minimalValues
     }
 
-    advancedAppSettingsFormData: { app_id, nodesSelection, appSettingForm: FormGroup, e2e, activeIndex: number }
+    advancedAppSettingsFormData: { app_id, nodesSelection, appSettingForm: FormGroup, e2e: any, activeIndex: number }
 
     getAppSettingsFormDataAdvanced() {
         return this.advancedAppSettingsFormData
