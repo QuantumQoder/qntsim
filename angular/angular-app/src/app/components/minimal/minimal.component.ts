@@ -158,7 +158,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
       'level': [2, Validators.required],
       'noOfMemories': [500, Validators.required],
       'distance': [100, [Validators.required]],
-      'attenuity': [0.1, Validators.required]
+      'attenuity': [0.0001, Validators.required]
     });
     this.appForm = this.fb.group({
       'app': ['', Validators.required]

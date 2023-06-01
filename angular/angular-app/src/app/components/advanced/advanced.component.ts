@@ -92,7 +92,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   position: string;
   node: any = {};
   toolbox = this.fb.group({
-    'attenuation': new FormControl('0.1'),
+    'attenuation': new FormControl('0.0001'),
     'distance': new FormControl('70')
   })
   attackOptions = ['DoS', "EM", "IR", "none"]
@@ -123,8 +123,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     'endnode2': new FormControl(''),
     'endnode3': new FormControl(''),
     'middleNode': new FormControl(''),
-    'message1': new FormControl(''),
-    'message2': new FormControl(''),
+    'message1': new FormControl('hello'),
+    'message2': new FormControl('world'),
     'num_photons': new FormControl(''),
     'inputMessage': new FormControl(''),
     'ip2message': new FormControl(''),
@@ -209,17 +209,16 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     console.log(this.endNodes)
-    // this.appSettingsForm.reset()
-    this.nodesSelection.sender = this.endNodes[0].Name
-    this.nodesSelection.receiver = this.endNodes.length > 1 ? this.endNodes[1].Name : this.endNodes[0].Name
-    this.nodesSelection.endNode1 = this.endNodes[0].Name
-    this.nodesSelection.endNode2 = this.endNodes.length > 1 ? this.endNodes[1].Name : this.endNodes[0].Name
-    this.nodesSelection.endNode3 = this.endNodes.length > 2 ? this.endNodes[2].Name : this.endNodes.length == 2 ? this.endNodes[1].Name : this.endNodes[0].Name
-    this.nodesSelection.middleNode = this.serviceNodes.length > 0 ? this.serviceNodes[0].Name : ''
-    // this.appSettingsForm.get('sender')?.reset()
-    // this.appSettingsForm.get('receiver')?.reset()
-    // this.appSettingsForm.get('receiver')?.patchValue(this.endNodes[1])
-
+    if (this.endNodes.length != 0) {
+      this.nodesSelection.sender = this.endNodes.length > 0 ? this.endNodes[0].Name : ""
+      this.nodesSelection.receiver = this.endNodes.length > 1 ? this.endNodes[1].Name : this.endNodes[0].Name
+      this.nodesSelection.endNode1 = this.endNodes.length > 0 ? this.endNodes[0].Name : ""
+      this.nodesSelection.endNode2 = this.endNodes.length > 1 ? this.endNodes[1].Name : this.endNodes[0].Name
+      this.nodesSelection.endNode3 = this.endNodes.length > 2 ? this.endNodes[2].Name : this.endNodes.length == 2
+        ? this.endNodes[1].Name : this.endNodes[0].Name
+    }
+    if (this.serviceNodes.length! = 0)
+      this.nodesSelection.middleNode = this.serviceNodes.length > 0 ? this.serviceNodes[0].Name : ''
   }
   ngOnInit(): void {
     this.e2e = {
@@ -606,6 +605,19 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       };
       return false;
     }
+    function isFloat(val: any) {
+      const regex = /^\d+(\.\d*)?$/;
+      return regex.test(val) ? true : false
+    }
+    function typeOfNode(val: any) {
+      if (val != 'service' && val != 'end' && val != 'Service' && val != 'End') {
+        return false
+      }
+      return true
+    }
+    function capitalizeFirstLetter(word) {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }
 
     var memoryTemplate =
       $(go.Panel, "Horizontal",
@@ -777,7 +789,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
           ],
           memory: [
             { propName: "Memory Frequency (Hz)", propValue: 8e7, numericValueOnly: true },
-            { propName: "Memory Expiry (s)", propValue: 100, numericValueOnly: true },
+            { propName: "Memory Expiry (s)", propValue: 100, float: true },
             { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
             { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
           ], isVisible: false
@@ -800,19 +812,26 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       const nodeData = tb.part && tb.part.data;
       if (nodeData && nodeData.properties) {
         const editedProperty = nodeData.properties.find((prop: any) => prop.propValue.toString() === tb.text);
+        console.log(editedProperty)
         if (editedProperty && editedProperty.numericValueOnly) {
           if (!isPositiveNumber(tb.text)) {
             tb.text = e.parameter; // Revert to the previous text value
           }
         }
         if (editedProperty && editedProperty.nodeType) {
-          if (tb.text != 'Service' || tb.text != 'End') {
+          if (typeOfNode(tb.text)) {
+            tb.text = capitalizeFirstLetter(tb.text)
+            const color = tb.text.toLowerCase() == 'service' ? "lightsalmon" : tb.text.toLowerCase() === 'end' ? 'lightblue' : ''
+            this.myDiagram.model.setDataProperty(nodeData, "color", color);
+          }
+          else {
             tb.text = e.parameter
           }
         }
       }
       if (nodeData && nodeData.memory) {
         const editedProperty = nodeData.memory.find((prop: any) => prop.propValue.toString() === tb.text);
+        // console.log(editedProperty)
         if (editedProperty && editedProperty.decimalValueAlso) {
           if (!isDecimalNumber(tb.text)) {
             tb.text = e.parameter; // Revert to the previous text value
@@ -821,6 +840,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         if (editedProperty && editedProperty.numericValueOnly) {
           if (!isPositiveNumber(tb.text)) {
             tb.text = e.parameter; // Revert to the previous text value
+          }
+        }
+        if (editedProperty && editedProperty.float) {
+          // console.log("Is float:" + isFloat(tb.text))
+          if (!isFloat(tb.text)) {
+            // console.log("Text:" + tb.text)
+            tb.text = e.parameter;
           }
         }
       }
@@ -842,7 +868,15 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     const zoom = diagram.commandHandler.zoomFactor;
     diagram.commandHandler.zoomTo(Math.max(zoom - 0.1, 0.1), diagram.lastInput.documentPoint);
   }
-
+  restoreAppSettings() {
+    const appConfig = this.diagramStorage.getAppParameters(this.app_id, this.nodesSelection, this.appSettingsForm, this.e2e)
+    switch (this.app_id) {
+      case 1:
+        this.nodesSelection.sender = appConfig[this.app_id].sender
+        this.nodesSelection.receiver = appConfig[this.app_id].receiver
+        this.appSettingsForm.get('keyLength')
+    }
+  }
 }
 function evenLengthValidator(control: FormControl) {
   const value = control.value;

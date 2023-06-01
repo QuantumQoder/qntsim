@@ -68,9 +68,7 @@
             </div>
             <hr>
             <div class="d-flex justify-content-end mx-2">
-                <div (click)="toggle(2)" id="toggle-button2">
-
-                </div>
+                <div (click)="toggle(2)" id="toggle-button2"></div>
             </div>
             <div class="d-flex justify-content-center">
                 <h5 class="mx-auto">Quantum Connections</h5>
@@ -100,7 +98,8 @@
                         pTooltip="The optical signal experiences loss (in dB/km) as it travels through the channel due to photon travel.">
                         Attenuation (dB/m) <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                     </label>
-                    <input type="number" disabled formControlName="attenuity" class="form-control">
+                    <input type="number" oninput="this.value = Math.abs(this.value)" disabled
+                        formControlName="attenuity" class="form-control">
                 </div>
             </div>
         </form>

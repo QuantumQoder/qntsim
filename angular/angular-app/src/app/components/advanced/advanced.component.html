@@ -65,7 +65,7 @@
                                 <li>
                                     <b>Sender</b>
                                     <p>Entanglement-swapping nodes (similar to classical routers) connect non-neighbor
-                                        nodes\n but don't support request
+                                        nodes but don't support request
                                         creation or application hosting.</p>
                                 </li>
                                 <li>
@@ -144,9 +144,12 @@
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold"
                                     pTooltip="Efficiency of detecting incoming photons. Higher efficiency indicates better detection probabilities.">
-                                    Efficiency <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
+                                    Efficiency<i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>:
+                                    {{detectorProps.efficiency}}
                                 </label>
-                                <input class="form-control" [(ngModel)]="detectorProps.efficiency" />
+                                <p-slider [(ngModel)]="detectorProps.efficiency" [min]="0" [step]="0.05"
+                                    [max]="1"></p-slider>
+                                <!-- <input class="form-control" [(ngModel)]="detectorProps.efficiency" /> -->
                             </div>
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold"
@@ -274,14 +277,14 @@
                                         <p-slider formControlName="size" [(ngModel)]="e2e.size" [min]="0" [step]="1"
                                             [max]="6"></p-slider>
                                     </div>
-                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
+                                    <!-- <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 2">
                                         <label for="timeout" class="col-12"
                                             pTooltip="Request timeout of simulation (in secs)">TimeOut (Seconds) <i
                                                 class="fa-solid fa-circle-info fa-xs"
                                                 style="color: #000000;"></i></label>
                                         <input type="text" class="form-control col-12"
                                             aria-label="Amount (to the nearest dollar)" formControlName="timeout">
-                                    </div>
+                                    </div> -->
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 5 || app_id == 6">
                                         <label for="type" class="form-label font-bold">
                                             Sequence Length <i class="fa-solid fa-circle-info fa-xs"
