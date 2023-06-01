@@ -185,6 +185,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     console.log(this.endNodes)
+    console.log(this.serviceNodes)
     if (this.endNodes.length != 0) {
       this.nodesSelection.sender = this.endNodes.length > 0 ? this.endNodes[0].Name : ""
       this.nodesSelection.receiver = this.endNodes.length > 1 ? this.endNodes[1].Name : this.endNodes[0].Name
@@ -193,7 +194,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       this.nodesSelection.endNode3 = this.endNodes.length > 2 ? this.endNodes[2].Name : this.endNodes.length == 2
         ? this.endNodes[1].Name : this.endNodes[0].Name
     }
-    if (this.serviceNodes.length! = 0)
+    if (this.serviceNodes.length != 0)
       this.nodesSelection.middleNode = this.serviceNodes.length > 0 ? this.serviceNodes[0].Name : ''
   }
   ngOnInit(): void {
