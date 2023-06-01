@@ -16,7 +16,7 @@ import { DiagramStorageService } from 'src/services/diagram-storage.service';
   templateUrl: './advanced.component.html',
   styleUrls: ['./advanced.component.less'],
   providers: [MessageService, ConfirmationService],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.Emulated
 })
 export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   app: any
@@ -83,7 +83,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   e2e = {
     targetFidelity: 0.5,
     size: 6
-  };
+  }
   graphModel: any
   nodes: any = []
   selectedNode1: any
@@ -106,42 +106,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   public savedModel: any
   links: any = [];
   application: any;
-  activeIndex: number;
-  appSettingsForm = this.fb.group({
-    'sender': ['', Validators.required],
-    'receiver': ['', Validators.required],
-    'startTime': new FormControl('1'),
-    'size': new FormControl('6'),
-    'targetFidelity': new FormControl('0.5'),
-    'timeout': new FormControl('1'),
-    'keyLength': new FormControl('5'),
-    'message': new FormControl('10011100', evenLengthValidator),
-    'sequenceLength': new FormControl('2'),
-    'amplitude1': new FormControl('0.70710678118+0j'),
-    'amplitude2': new FormControl('0-0.70710678118j'),
-    'endnode1': new FormControl(''),
-    'endnode2': new FormControl(''),
-    'endnode3': new FormControl(''),
-    'middleNode': new FormControl(''),
-    'message1': new FormControl('hello'),
-    'message2': new FormControl('world'),
-    'num_photons': new FormControl(''),
-    'inputMessage': new FormControl(''),
-    'ip2message': new FormControl(''),
-    'senderId': new FormControl('1010'),
-    'receiverId': new FormControl('1011'),
-    'numCheckBits': new FormControl(''),
-    'numDecoy': new FormControl(''),
-    'attack': new FormControl(''),
-    'belltype': [],
-    'channel': [],
-    'errorthreshold': []
-  })
+  activeIndex: number = 0;
+  appSettingsForm
   app_data: { 1: string; 2: string; 3: string; 4: string; 5: string; 6: string; 7: string; 8: string; 9: string; 10: string; };
   constructor(private fb: FormBuilder, private con: ConditionsService, private apiService: ApiServiceService, private holdingData: HoldingDataService, private _route: Router, private diagramStorage: DiagramStorageService) {
   }
   ngOnDestroy(): void {
-
+    this.diagramStorage.setAppSettingsFormDataAdvanced({ app_id: this.app_id, nodesSelection: this.nodesSelection, appSettingsForm: this.appSettingsForm, e2e: this.e2e, activeIndex: this.activeIndex })
   }
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
@@ -158,7 +129,12 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     //   sessionStorage.setItem("saved_model", this.myDiagram.model)
     // })
     // }
-    this.updateNodes()
+    this.updateNodes();
+    const appSettingsBackup = this.diagramStorage.getAppSettingsFormDataAdvanced()
+    this.e2e = appSettingsBackup.e2e;
+    this.nodesSelection = appSettingsBackup.nodesSelection
+    this.activeIndex = appSettingsBackup.activeIndex
+    // this.appSettingsForm = appSettingsBackup.appSettingForm
   }
 
   allowBitsInput($event: any) {
@@ -221,12 +197,9 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       this.nodesSelection.middleNode = this.serviceNodes.length > 0 ? this.serviceNodes[0].Name : ''
   }
   ngOnInit(): void {
-    this.e2e = {
-      targetFidelity: 0.5,
-      size: 6
-    }
+
     // init for these samples -- you don't need to call this
-    this.activeIndex = 0
+
     this.con.getAppList().pipe(map((d: any) => d.appList)).subscribe((result: any) => this.app_data = result);
     this.app_id = localStorage.getItem('app_id')
     this.application = localStorage.getItem('app')
@@ -235,6 +208,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     this.simulator.options = this.app == 2 ? [{ header: 'Version 1', value: 'version1' }, { header: 'Version 2', value: 'version2' }] : [{
       header: 'Version 1', value: 'version1'
     }]
+    this.subscription = this.diagramStorage.currentAdvancedFormData.subscribe(formData => {
+      if (formData) {
+        this.appSettingsForm = formData;
+      } else {
+        this.initForm();
+      }
+    });
 
   }
   changeApp() {
@@ -868,14 +848,37 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     const zoom = diagram.commandHandler.zoomFactor;
     diagram.commandHandler.zoomTo(Math.max(zoom - 0.1, 0.1), diagram.lastInput.documentPoint);
   }
-  restoreAppSettings() {
-    const appConfig = this.diagramStorage.getAppParameters(this.app_id, this.nodesSelection, this.appSettingsForm, this.e2e)
-    switch (this.app_id) {
-      case 1:
-        this.nodesSelection.sender = appConfig[this.app_id].sender
-        this.nodesSelection.receiver = appConfig[this.app_id].receiver
-        this.appSettingsForm.get('keyLength')
-    }
+  initForm() {
+    this.appSettingsForm = this.fb.group({
+      'sender': ['', Validators.required],
+      'receiver': ['', Validators.required],
+      'startTime': new FormControl('1'),
+      'size': new FormControl('6'),
+      'targetFidelity': new FormControl('0.5'),
+      'timeout': new FormControl('1'),
+      'keyLength': new FormControl('5'),
+      'message': new FormControl('10011100', evenLengthValidator),
+      'sequenceLength': new FormControl('2'),
+      'amplitude1': new FormControl('0.70710678118+0j'),
+      'amplitude2': new FormControl('0-0.70710678118j'),
+      'endnode1': new FormControl(''),
+      'endnode2': new FormControl(''),
+      'endnode3': new FormControl(''),
+      'middleNode': new FormControl(''),
+      'message1': new FormControl('hello'),
+      'message2': new FormControl('world'),
+      'num_photons': new FormControl(''),
+      'inputMessage': new FormControl(''),
+      'ip2message': new FormControl(''),
+      'senderId': new FormControl('1010'),
+      'receiverId': new FormControl('1011'),
+      'numCheckBits': new FormControl(''),
+      'numDecoy': new FormControl(''),
+      'attack': new FormControl(''),
+      'belltype': [],
+      'channel': [],
+      'errorthreshold': []
+    })
   }
 }
 function evenLengthValidator(control: FormControl) {

@@ -1,7 +1,7 @@
 import { HoldingDataService } from 'src/services/holding-data.service';
 import { CookieService } from 'ngx-cookie-service';
 import { ApiServiceService } from './../../../services/api-service.service';
-import { AfterViewInit, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import * as go from 'gojs'
 import { map } from 'rxjs';
@@ -14,9 +14,9 @@ import { DiagramStorageService } from 'src/services/diagram-storage.service';
   selector: 'app-minimal',
   templateUrl: './minimal.component.html',
   styleUrls: ['./minimal.component.less'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.Emulated
 })
-export class MinimalComponent implements OnInit, AfterViewInit {
+export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
   type: any = 'Star'
   data: string = '|1\\rangle'
   equation: any = [{
@@ -64,7 +64,7 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   request: Request
   spinner: boolean = false
   topologyForm: any
-  appForm: any
+  appForm
   applist: any
   nodes: any
   distance: number = 100
@@ -87,13 +87,23 @@ export class MinimalComponent implements OnInit, AfterViewInit {
   nodeTemplateCopy: any;
   contextMenuVersion1: any;
   contextMenuVersion2: any;
+  subscription: any;
   ;
   endNode3: any[] = ['node4'];;
 
   constructor(private fb: FormBuilder, private service: ConditionsService, private route: Router, private holdingData: HoldingDataService,
     private api: ApiServiceService, private diagramStorage: DiagramStorageService) { }
+  ngOnDestroy(): void {
+    this.diagramStorage.updateMinimalFormData({ appForm: this.appForm, appSettingsForm: this.appSettingsForm })
+  }
   ngAfterViewInit(): void {
-    let diagramData = this.diagramStorage.getMinimalValues()
+    let diagramData = this.diagramStorage.getMinimalValues();
+    this.subscription = this.diagramStorage.currentMinimalFormData.subscribe(formData => {
+      if (formData) {
+        this.appForm = formData.appForm;
+        this.appSettingsForm = formData.appSettingsForm
+      }
+    });
     if (diagramData) {
       this.level = diagramData.level
       this.type = diagramData.type
