@@ -1,15 +1,18 @@
 from qntsim.kernel.timeline import Timeline
+
 Timeline.DLCZ=False
 Timeline.bk=True
-from qntsim.topology.topology import Topology
-from tabulate import tabulate
-from qntsim.components.circuit import QutipCircuit
-from qiskit import *
-from qutip.qip.operations import gate_sequence_product
-#from qiskit.ignis.verification import marginal_counts
-from qiskit.quantum_info import random_statevector
 import json
 import logging
+
+from qiskit import *
+#from qiskit.ignis.verification import marginal_counts
+from qiskit.quantum_info import random_statevector
+from qntsim.components.circuit import QutipCircuit
+from qntsim.topology.topology import Topology
+from qutip.qip.operations import gate_sequence_product
+from tabulate import tabulate
+
 logger = logging.getLogger("main_logger.application_layer." + "ghz")
 
 
@@ -29,7 +32,7 @@ class GHZ():
         endnode1=alice
         endnode2=bob
         endnode3=charlie
-        logger.info('endnode1 , endnode2, endnode3, middlenode are ',endnode1.owner.name+ ", "+endnode2.owner.name+ ", "+endnode3.owner.name+ ", "+middlenode.owner.name)
+        logger.info('endnode1 , endnode2, endnode3, middlenode are '+endnode1.owner.name+ ", "+endnode2.owner.name+ ", "+endnode3.owner.name+ ", "+middlenode.owner.name)
         
         return self.request_entanglements(endnode1,endnode2,endnode3,middlenode)
 

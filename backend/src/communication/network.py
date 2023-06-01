@@ -263,6 +263,7 @@ class Network:
             )
         self._initiate(require_entanglement=require_entanglement)
         self.get_keys(
+            _=None,
             node_index=self.keys_of if hasattr(self, "keys_of") else 0,
             info_state="ENTANGLED",
         )

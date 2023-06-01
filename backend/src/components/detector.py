@@ -6,10 +6,10 @@ QSDetector is defined as an abstract template and as implementaions for polariza
 """
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Dict
-
 #from numpy import random
 from random import random
+from typing import TYPE_CHECKING, Any, Dict
+
 import numpy as np
 
 if TYPE_CHECKING:
@@ -18,10 +18,10 @@ if TYPE_CHECKING:
     from typing import List
 
 from ..components.beam_splitter import BeamSplitter
-from ..components.switch import Switch
 from ..components.interferometer import Interferometer
-from ..kernel.entity import Entity
+from ..components.switch import Switch
 from ..kernel._event import Event
+from ..kernel.entity import Entity
 from ..utils.encoding import time_bin
 
 
