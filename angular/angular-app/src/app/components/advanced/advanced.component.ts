@@ -138,7 +138,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // }
     if (appSettingsBackup) {
-
+      this.e2e = appSettingsBackup.e2e
       this.nodesSelection = appSettingsBackup.nodesSelection
       this.activeIndex = appSettingsBackup.activeIndex
     }
