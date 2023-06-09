@@ -503,7 +503,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         { propName: "Memory Frequency (Hz)", propValue: 8e7, numericValueOnly: true },
         { propName: "Memory Expiry (s)", propValue: 100, numericValueOnly: true },
         { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
-        { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
+        { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true },
+        { propName: "Swap Success", propValue: 1, decimalValueAlso: true }
       ], isVisible: false
     };
     const newLink = {
@@ -805,7 +806,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
             { propName: "Memory Frequency (Hz)", propValue: 8e7, numericValueOnly: true },
             { propName: "Memory Expiry (s)", propValue: 100, float: true },
             { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
-            { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
+            { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true },
+            { propName: "Swap Success", propValue: 1, decimalValueAlso: true }
           ], isVisible: false
         }
       ];
