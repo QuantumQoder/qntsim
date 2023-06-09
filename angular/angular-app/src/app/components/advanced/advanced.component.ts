@@ -47,7 +47,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   detectorProps = {
     efficiency: 1,
     countRate: 25000000,
-    timeResolution: 150
+    timeResolution: 150,
+    powerLoss: 1
   }
   lightSourceProps = {
     frequency: 8000000,
@@ -65,6 +66,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       header: 'Version 2', value: 'version2'
     }]
   };
+  isLinkParameters: boolean = false
+  linksProps = {
+    distance: 70,
+    attenuation: 0.0001,
+    keySelected: 1
+  }
+  linkData: any = {}
   link_array: any = []
   app_id: any
   checked: boolean = false;
@@ -91,10 +99,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   items: MenuItem[];
   position: string;
   node: any = {};
-  toolbox = this.fb.group({
-    'attenuation': new FormControl('0.0001'),
-    'distance': new FormControl('70')
-  })
+
   attackOptions = ['DoS', "EM", "IR", "none"]
   bellTypeOptions = ["00", "01", "10", "11"];
   channelOptions = [1, 2, 3]
@@ -298,21 +303,21 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     this.graphModel = this.myDiagram.model.nodeDataArray
     this.links = []
     var linkarray: any[]
-    if (this.savedModel.linkDataArray.length > this.links.length) {
-      for (var i = 0; i < this.savedModel.linkDataArray.length; i++) {
-        linkarray = []
-        var from = this.myDiagram.model.findNodeDataForKey(this.savedModel.linkDataArray[i].from).name
-        var to = this.myDiagram.model.findNodeDataForKey(this.savedModel.linkDataArray[i].to).name
-        linkarray.push(from);
-        linkarray.push(to);
-        let linkData = {
-          Nodes: linkarray,
-          Attenuation: this.toolbox.get('attenuation')?.value,
-          Distance: this.toolbox.get('distance')?.value
-        }
-        this.links.push(linkData)
+    // if (this.savedModel.linkDataArray.length > this.links.length) {
+    for (var i = 0; i < this.savedModel.linkDataArray.length; i++) {
+      linkarray = []
+      var from = this.myDiagram.model.findNodeDataForKey(this.savedModel.linkDataArray[i].from).name
+      var to = this.myDiagram.model.findNodeDataForKey(this.savedModel.linkDataArray[i].to).name
+      linkarray.push(from);
+      linkarray.push(to);
+      let linkData = {
+        Nodes: linkarray,
+        Attenuation: this.savedModel.linkDataArray[i].attenuation,
+        Distance: this.savedModel.linkDataArray[i].distance
       }
+      this.links.push(linkData)
     }
+    // }
     this.nodes = []
     console.log(this.nodesData)
     for (const [key, value] of Object.entries(this.nodesData)) {
@@ -455,7 +460,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (error) => {
         console.error(`Error: ${error}`);
-
         this.spinner = false;
         alert(`Error has occurred! Status Code:${error.status} Status Text:${error.statusText}`)
       },
@@ -466,21 +470,27 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         this._route.navigate(['/results'])
       }
     });
-    // this.apiService.runApplication(req, url).subscribe((result: any) => {
-    //   this.spinner = true;
-    //   this.con.setResult(result)
-    // }, (error) => {
-    //   this.spinner = false
-    //   console.error(error)
-    //   // alert("Error has occurred:" + "" + error.status + "-" + error.statusText)
-    // }, () => {
-    //   this.spinner = false
-    //   this._route.navigate(['/results'])
-    // })
+  }
+  linkClicked(link: any) {
+    console.log(link.data.key)
+    this.linksProps.keySelected = link.data.key
+    this.linksProps.attenuation = this.linkData[this.linksProps.keySelected].attenuation
+    this.linksProps.distance = this.linkData[this.linksProps.keySelected].distance
+    this.isLinkParameters = true
+    console.log("linkClicked", this.linkData)
+  }
+  linkSaved() {
+    console.log("link Saved", this.linksProps.keySelected)
+    // this.linkData[this.linksProps.keySelected] = { distance: this.linksProps.distance, attenuation: this.linksProps.distance, ...this.linkData[this.linksProps.keySelected] }
+    this.linkData[this.linksProps.keySelected].distance = this.linksProps.distance
+    this.linkData[this.linksProps.keySelected].attenuation = this.linksProps.attenuation
+    console.log("LinkSaved", this.linkData)
+    this.isLinkParameters = false
   }
   addNode(nodetype: string) {
     var adornedPart = this.adornedpart
     const newKey = this.myDiagram.model.nodeDataArray[this.myDiagram.model.nodeDataArray.length - 1].key
+    let linkKey = this.myDiagram.model.linkDataArray.length > 0 ? this.myDiagram.model.linkDataArray[this.myDiagram.model.linkDataArray.length - 1].key : 0;
     const newNode = {
       key: newKey + 1,
       name: `node${newKey + 1}`,
@@ -496,10 +506,20 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
       ], isVisible: false
     };
+    const newLink = {
+      key: linkKey + 1,
+      from: adornedPart.data.key,
+      to: newNode.key,
+      distance: 70,
+      attenuation: 0.0001
+    };
     this.myDiagram.startTransaction('Add node and link');
     this.myDiagram.model.addNodeData(newNode);
-    this.myDiagram.model.addLinkData({ from: adornedPart.data.key, to: newNode.key });
+    this.myDiagram.model.addLinkData(newLink);
     this.myDiagram.commitTransaction('Add node and link');
+    this.linkData[newLink.key] = newLink
+    console.log(this.myDiagram.model.nodeDataArray)
+    console.log(this.myDiagram.model.linkDataArray)
     this.myDiagram.zoomToFit();
     this.nodeTypeSelect = false
     this.updateNodes()
@@ -577,7 +597,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       'allowZoom': true, // Disables zooming
       layout: $(go.ForceDirectedLayout)
     });
-
 
     function isPositiveNumber(val: any) {
       console.log(val)
@@ -757,9 +776,15 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     this.myDiagram.linkTemplate =
       $(go.Link,
+        {
+          click: (e, link) => {  // click event handler
+            this.linkClicked(link);
+          }
+        },
         $(go.Shape),
         $(go.Shape, { toArrow: 'Standard' })
       );
+
     var nodeDataArray
     var linkDataArray
     if (this.diagramStorage.getAdvancedDiagramModel()) {
@@ -845,6 +870,12 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       this.diagramStorage.setAdvancedDiagramModel(this.myDiagram.model)
       console.log(this.diagramStorage.getAdvancedDiagramModel())
     });
+    // this.myDiagram.addDiagramListener("ObjectSingleClicked", function (e) {
+    //   var part = e.subject.part;
+    //   if (part instanceof go.Link) {
+    //     console.log(part)
+    //   }
+    // });
   }
   public zoomIn() {
     const diagram = this.myDiagram;
@@ -897,5 +928,4 @@ function evenLengthValidator(control: FormControl) {
   }
   return null;
 }
-
 
