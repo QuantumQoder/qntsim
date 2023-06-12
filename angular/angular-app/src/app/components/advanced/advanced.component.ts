@@ -26,7 +26,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   private addButtonAdornment: go.Adornment;
   nodeTypeSelect: boolean = false
   private subscription: Subscription;
-  logs: any
   nodesSelection = {
     sender: '',
     receiver: '',
@@ -75,18 +74,14 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   linkData: any = {}
   link_array: any = []
   app_id: any
-  checked: boolean = false;
   nodesData: any = {}
   serviceNodes: any[] = []
   endNodes: any[] = []
   step: any
-  popover2: string = "Click on component's name to modify its name."
   cc: any = []
-  nodeWithKey: any
-  paramsSet = new Map()
   topology: any
   appSettings: any
-  nodeKey: any
+
   spinner: boolean = false
   e2e = {
     targetFidelity: 0.5,
@@ -95,15 +90,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   graphModel: any
   nodes: any = []
   selectedNode1: any
-  displayPosition: boolean;
   items: MenuItem[];
-  position: string;
-  node: any = {};
-
   attackOptions = ['DoS', "EM", "IR", "none"]
   bellTypeOptions = ["00", "01", "10", "11"];
   channelOptions = [1, 2, 3]
-  breadcrumbItems: MenuItem[]
   public selectedNode: any;
   public selectedLink: any
   public myDiagram: any
@@ -125,23 +115,9 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     this.step = 0;
   }
   ngAfterViewInit(): void {
-    // if (sessionStorage) {
-
-    //   this.savedModel = sessionStorage.getItem("saved_model")
-    //   this.load()
-    // } else {
     this.initDiagram();
-    // this.myDiagram.model.addEventListener("change", () => {
-    //   sessionStorage.setItem("saved_model", this.myDiagram.model)
-    // })
-    // }
     this.updateNodes();
     const appSettingsBackup = this.diagramStorage.getAppSettingsFormDataAdvanced()
-    // if (appSettingsBackup.e2e) {
-    //   console.log(appSettingsBackup.e2e)
-    //   this.e2e = appSettingsBackup.e2e;
-
-    // }
     if (appSettingsBackup) {
       this.e2e = appSettingsBackup.e2e
       this.nodesSelection = appSettingsBackup.nodesSelection
@@ -150,7 +126,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     // this.appSettingsForm = appSettingsBackup.appSettingForm
   }
 
-  allowBitsInput($event: any) {
+  allowBitsInput($event: any): void {
     if ($event.key.match(/[0-1]*/)['0']) { }
     else {
       $event.preventDefault();
@@ -211,9 +187,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       this.nodesSelection.middleNode = this.serviceNodes.length > 0 ? this.serviceNodes[0].Name : ''
   }
   ngOnInit(): void {
-
-    // init for these samples -- you don't need to call this
-
     this.con.getAppList().pipe(map((d: any) => d.appList)).subscribe((result: any) => this.app_data = result);
     this.app_id = localStorage.getItem('app_id')
     this.application = localStorage.getItem('app')
@@ -341,7 +314,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.spinner = true;
-    this.displayPosition = false
+    // this.displayPosition = false
     this.app_id = localStorage.getItem('app_id')
     if (!this.app_id) {
       this._route.navigate(['/applications'])
@@ -358,13 +331,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         efficiency: this.detectorProps.efficiency,
         count_rate: this.detectorProps.countRate,
         time_resolution: this.detectorProps.timeResolution
-        // },
-        // lightSource: {
-        //   frequency: this.lightSourceProps.frequency,
-        //   wavelength: this.lightSourceProps.wavelength,
-        //   bandwidth: this.lightSourceProps.bandwidth,
-        //   mean_photon_num: this.lightSourceProps.meanPhotonNum,
-        //   phase_error: this.lightSourceProps.phaseError,
       }
     }
     const appConfig =
@@ -452,13 +418,18 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     // sessionStorage.setItem("saved_model", this.myDiagram.model)
     // let url = this.simulator.value == 'version1' ? environment.apiUrl : this.simulator.value == 'version2' ? environment.apiUrlNew : null;
-    let url = this.app_id != 2 ? environment.apiUrl : this.simulator.value == 'version1' ? environment.apiUrl : environment.apiUrlNew;
+    let url = this.app_id != 2
+      ? environment.apiUrl
+      : this.simulator.value == 'version1'
+        ? environment.apiUrl
+        : environment.apiUrlNew;
     // let url = environment.apiUrlNew;
     // this.apiService.getStream().subscribe(data => { this.logs = data; });
     // whatever your request data is
+    // The API service is used to send the request to the backend
     this.apiService.advancedRunApplication(req, url).subscribe({
       next: (response) => {
-        console.log(response);
+        console.log(response); // Logs the response to the console
         this.con.setResult(response);
         if (response.application.Err_msg) {
           alert(`Error has occurred!! ${response.application.Err_msg}`)
@@ -478,12 +449,16 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
   linkClicked(link: any) {
+    if (!link || !link.data || !link.data.key) {
+      console.error("Invalid link detected: ", link);
+      return;
+    }
     console.log(link.data.key)
-    this.linksProps.keySelected = link.data.key
-    this.linksProps.attenuation = this.linkData[this.linksProps.keySelected].attenuation
-    this.linksProps.distance = this.linkData[this.linksProps.keySelected].distance
-    this.isLinkParameters = true
-    console.log("linkClicked", this.linkData)
+    this.linksProps.keySelected = link.data.key;
+    this.linksProps.attenuation = this.linkData[this.linksProps.keySelected].attenuation;
+    this.linksProps.distance = this.linkData[this.linksProps.keySelected].distance;
+    this.isLinkParameters = true;
+    console.log("linkClicked", this.linkData);
   }
   linkSaved() {
     console.log("link Saved", this.linksProps.keySelected)
@@ -537,16 +512,20 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   loadDiagramProperties() {
     var pos = this.myDiagram.model.modelData["position"];
-    if (pos) this.myDiagram.initialPosition = go.Point.parse(pos);
+    if (pos) {
+      this.myDiagram.initialPosition = go.Point.parse(pos);
+    }
     this.myDiagram.contentAlignment = go.Spot["Center"];
   }
 
-  activeindex(data: any) {
+  activeindex(data: string) {
+    // if the data is 'next' then the active index is incremented by 1
     if (data == 'next') {
       if (this.activeIndex <= 1) {
         this.activeIndex++;
       }
 
+      // if the data is 'prev' then the active index is decremented by 1
     } else if (data == 'prev') {
       if (this.activeIndex >= 1) {
         this.activeIndex--;
@@ -608,7 +587,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       e.diagram.currentTool = tool;
       tool.doActivate();
     }
-    function isDecimalNumber(val: any) {
+    function isDecimalNumber(val: any): boolean {
       const regex = /^\d+(\.\d*)?$/;
       if (regex.test(val)) {
         val = Number(val)
@@ -618,17 +597,20 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       };
       return false;
     }
-    function isFloat(val: any) {
+    function isFloat(val: any): boolean {
       const regex = /^\d+(\.\d*)?$/;
       return regex.test(val) ? true : false
     }
-    function typeOfNode(val: any) {
+    function typeOfNode(val: string): boolean {
+      // if val is not equal to 'service' AND val is not equal to 'end' AND val is not equal to 'Service' AND val is not equal to 'End'
       if (val != 'service' && val != 'end' && val != 'Service' && val != 'End') {
+        // return false
         return false
       }
+      // return true
       return true
     }
-    function capitalizeFirstLetter(word) {
+    function capitalizethefirstletter(word) {
       return word.charAt(0).toUpperCase() + word.slice(1);
     }
 
@@ -780,24 +762,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
           )
         )
       );
-    // this.myDiagram.nodeTemplate.selectionAdornmentTemplate =
-    //   $(go.Adornment, "Spot",
-    //     $(go.Panel, "Auto",
-    //       $(go.Shape, { stroke: "dodgerblue", strokeWidth: 2, fill: null }),
-    //       $(go.Placeholder)
-    //     ),
-    //     $(go.Panel, "Horizontal",
-    //       { alignment: go.Spot.Right, alignmentFocus: go.Spot.Bottom },
-    //       $("Button",
-    //         { // drawLink is defined below, to support interactively drawing new links
-    //           click: drawLink,  // click on Button and then click on target node
-    //           actionMove: drawLink  // drag from Button to the target node
-    //         },
-    //         $(go.Shape,
-    //           { geometryString: "M0 0 L8 0 8 12 14 12 M12 10 L14 12 12 14" })
-    //       )
-    //     )
-    //   );
+    // define the Link template
     this.myDiagram.linkTemplate =
       $(go.Link,
         {
@@ -873,9 +838,9 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
     this.myDiagram.addDiagramListener("LayoutCompleted", (e) => {
-      this.myDiagram.findTopLevelGroups().each((g) => {
-        if (g.findObject("MEMORY")) {
-          g.findObject("MEMORY").collapsePanel();
+      this.myDiagram.findTopLevelGroups().each((group) => {
+        if (group.findObject("MEMORY")) {
+          group.findObject("MEMORY").collapse();
         }
       });
     });
@@ -897,7 +862,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         // If the property is a node type and the edited text is not a valid node type, revert the text to the previous value
         if (editedProperty && editedProperty.nodeType) {
           if (typeOfNode(tb.text)) {
-            tb.text = capitalizeFirstLetter(tb.text)
+            tb.text = capitalizethefirstletter(tb.text)
             const color = tb.text.toLowerCase() == 'service' ? "lightsalmon" : tb.text.toLowerCase() === 'end' ? 'lightblue' : ''
             this.myDiagram.model.setDataProperty(nodeData, "color", color);
           }
