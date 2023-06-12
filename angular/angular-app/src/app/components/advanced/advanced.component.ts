@@ -292,6 +292,12 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
     }
+    if (this.myDiagram.model.nodeDataArray.length > 2) {
+      if (this.myDiagram.model.nodeDataArray.every(obj => obj.properties[0].propValue === "End")) {
+        alert("All elements are of type End");
+        return;
+      }
+    }
     for (let i = 0; i < this.myDiagram.model.nodeDataArray.length; i++) {
       if (!((this.myDiagram.model.nodeDataArray[i] as any).key in this.nodesData)) {
         alert("Please configure the node named:" + (this.myDiagram.model.nodeDataArray[i] as any).text);
@@ -561,16 +567,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.updateNodes()
   }
-  // calculateFrequency() {
-  //   const speedOfLight = 3e17; // speed of light in nm/s
-  //   this.lightSourceProps.frequency = speedOfLight / this.lightSourceProps.wavelength;
-  //   // console.log(this.lightSourceProps.frequency)
-  // }
-  // calculateWavelength() {
-  //   const speedOfLight = 3e17; // speed of light in nm/s
-  //   this.lightSourceProps.wavelength = speedOfLight / this.lightSourceProps.frequency;
-  //   // console.log(this.lightSourceProps.wavelength)
-  // }
+
   get middlenode() {
     return this.appSettingsForm.get('middleNode')
   }
@@ -589,12 +586,12 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   initDiagram() {
     const $ = go.GraphObject.make;
-
-
     this.myDiagram = $(go.Diagram, this.diagramRef.nativeElement, {
       initialContentAlignment: go.Spot.Center,
       'undoManager.isEnabled': true,
       'initialAutoScale': go.Diagram.Uniform, // Ensures the myDiagram fits the viewport
+      "linkingTool.isEnabled": false,  // invoked explicitly by drawLink function, below
+      "linkingTool.direction": go.LinkingTool.ForwardsOnly,  // only draw "from" towards "to"
       'allowZoom': true, // Disables zooming
       layout: $(go.ForceDirectedLayout)
     });
@@ -603,6 +600,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       console.log(val)
       const regex = /^\d+$/;
       return regex.test(val);
+    }
+    function drawLink(e, button) {
+      var node = button.part.adornedPart;
+      var tool = e.diagram.toolManager.linkingTool;
+      tool.startObject = node.port;
+      e.diagram.currentTool = tool;
+      tool.doActivate();
     }
     function isDecimalNumber(val: any) {
       const regex = /^\d+(\.\d*)?$/;
@@ -695,6 +699,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
               isMultiline: false, editable: true
             },
             new go.Binding("text", "name").makeTwoWay()),
+
           // properties
           $(go.TextBlock, "Properties",
             { row: 1, font: "italic 10pt sans-serif" },
@@ -775,6 +780,24 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
           )
         )
       );
+    // this.myDiagram.nodeTemplate.selectionAdornmentTemplate =
+    //   $(go.Adornment, "Spot",
+    //     $(go.Panel, "Auto",
+    //       $(go.Shape, { stroke: "dodgerblue", strokeWidth: 2, fill: null }),
+    //       $(go.Placeholder)
+    //     ),
+    //     $(go.Panel, "Horizontal",
+    //       { alignment: go.Spot.Right, alignmentFocus: go.Spot.Bottom },
+    //       $("Button",
+    //         { // drawLink is defined below, to support interactively drawing new links
+    //           click: drawLink,  // click on Button and then click on target node
+    //           actionMove: drawLink  // drag from Button to the target node
+    //         },
+    //         $(go.Shape,
+    //           { geometryString: "M0 0 L8 0 8 12 14 12 M12 10 L14 12 12 14" })
+    //       )
+    //     )
+    //   );
     this.myDiagram.linkTemplate =
       $(go.Link,
         {
@@ -782,37 +805,70 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
             this.linkClicked(link);
           }
         },
+        new go.Binding("routing", "routing"),
         $(go.Shape),
         $(go.Shape, { toArrow: 'Standard' })
       );
 
     var nodeDataArray
     var linkDataArray
+    // if advancedDiagramModel is defined then we want to use that model to 
+    // render the diagram
     if (this.diagramStorage.getAdvancedDiagramModel()) {
       nodeDataArray = this.diagramStorage.advancedDiagramModel.nodeDataArray
       linkDataArray = this.diagramStorage.advancedDiagramModel.linkDataArray
     } else {
-
+      // otherwise we want to use a basic model
       nodeDataArray = [
         {
           key: 1,
           name: "node1",
           color: "lightblue",
           properties: [
-            { propName: "Type", propValue: "End", nodeType: true },
-            { propName: "No of Memories", propValue: 500, numericValueOnly: true }
+            {
+              propName: "Type",
+              propValue: "End",
+              nodeType: true
+            },
+            {
+              propName: "No of Memories",
+              propValue: 500,
+              numericValueOnly: true
+            }
           ],
           memory: [
-            { propName: "Memory Frequency (Hz)", propValue: 8e7, numericValueOnly: true },
-            { propName: "Memory Expiry (s)", propValue: 100, float: true },
-            { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
-            { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true },
-            { propName: "Swap Success", propValue: 1, decimalValueAlso: true }
-          ], isVisible: false
+            {
+              propName: "Memory Frequency (Hz)",
+              propValue: 8e7,
+              numericValueOnly: true
+            },
+            {
+              propName: "Memory Expiry (s)",
+              propValue: 100,
+              float: true
+            },
+            {
+              propName: "Memory Efficiency",
+              propValue: 1,
+              decimalValueAlso: true
+            },
+            {
+              propName: "Memory Fidelity",
+              propValue: 0.93,
+              decimalValueAlso: true
+            },
+            {
+              propName: "Swap Success",
+              propValue: 1,
+              decimalValueAlso: true
+            }
+          ],
+          isVisible: false
         }
-      ];
+      ]
       linkDataArray = []
     }
+
 
 
     this.myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
@@ -823,17 +879,22 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
     });
+    // When a user edits a text block, check if the text block belongs to a node
+    // and if the node has properties or memory
     this.myDiagram.addDiagramListener("TextEdited", (e: any) => {
       const tb = e.subject;
       const nodeData = tb.part && tb.part.data;
       if (nodeData && nodeData.properties) {
+        // If the node has properties, check if the edited text matches the text of a property
         const editedProperty = nodeData.properties.find((prop: any) => prop.propValue.toString() === tb.text);
         console.log(editedProperty)
+        // If the property is numeric and the edited text is not a positive number, revert the text to the previous value
         if (editedProperty && editedProperty.numericValueOnly) {
           if (!isPositiveNumber(tb.text)) {
             tb.text = e.parameter; // Revert to the previous text value
           }
         }
+        // If the property is a node type and the edited text is not a valid node type, revert the text to the previous value
         if (editedProperty && editedProperty.nodeType) {
           if (typeOfNode(tb.text)) {
             tb.text = capitalizeFirstLetter(tb.text)
@@ -845,19 +906,23 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         }
       }
+      // If the node has memory, check if the edited text matches the text of a memory property
       if (nodeData && nodeData.memory) {
         const editedProperty = nodeData.memory.find((prop: any) => prop.propValue.toString() === tb.text);
         // console.log(editedProperty)
+        // If the property is decimal and the edited text is not a decimal, revert the text to the previous value
         if (editedProperty && editedProperty.decimalValueAlso) {
           if (!isDecimalNumber(tb.text)) {
             tb.text = e.parameter; // Revert to the previous text value
           }
         }
+        // If the property is numeric and the edited text is not a positive number, revert the text to the previous value
         if (editedProperty && editedProperty.numericValueOnly) {
           if (!isPositiveNumber(tb.text)) {
             tb.text = e.parameter; // Revert to the previous text value
           }
         }
+        // If the property is a float and the edited text is not a float, revert the text to the previous value
         if (editedProperty && editedProperty.float) {
           // console.log("Is float:" + isFloat(tb.text))
           if (!isFloat(tb.text)) {
@@ -870,7 +935,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.myDiagram.addDiagramListener("Modified", () => {
       this.diagramStorage.setAdvancedDiagramModel(this.myDiagram.model)
-      console.log(this.diagramStorage.getAdvancedDiagramModel())
     });
     // this.myDiagram.addDiagramListener("ObjectSingleClicked", function (e) {
     //   var part = e.subject.part;
@@ -923,11 +987,19 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     })
   }
 }
+// This code is used to validate that the length of a string is even.
+// It is used in the form to ensure that the length of the first name is even.
+// It is used in the form to ensure that the length of the last name is even.
+
+// create a validator function
 function evenLengthValidator(control: FormControl) {
+  // get the value of the control
   const value = control.value;
+  // if the value is not even, return an object with an error name
   if (value.length % 2 !== 0) {
     return { evenLength: true };
   }
+  // otherwise, return null (no error)
   return null;
 }
 
