@@ -14,7 +14,6 @@ import { DiagramStorageService } from 'src/services/diagram-storage.service';
 import * as go from 'gojs';
 import { DiagramBuilderService } from 'src/services/diagram-builder.service';
 
-
 @Component({
   selector: 'app-advanced',
   templateUrl: './advanced.component.html',
@@ -92,7 +91,16 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   cc: any = []
   topology: any
   appSettings: any
-
+  debug = {
+    loggingLevel: {
+      name: 'INFO', value: 'info'
+    },
+    modules: []
+  }
+  debugOptions = {
+    moduleOptions: [],
+    loggingLevelOptions: []
+  }
   spinner: boolean = false
   e2e = {
     targetFidelity: 0.5,
@@ -207,6 +215,34 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     this.simulator.options = this.app == 2 ? [{ header: 'Version 1', value: 'version1' }, { header: 'Version 2', value: 'version2' }] : [{
       header: 'Version 1', value: 'version1'
     }]
+    this.debugOptions.moduleOptions = [
+      {
+        name: 'NETWORK', value: 'network'
+      },
+      {
+        name: 'PHYSICAL', value: 'physical'
+      },
+      {
+        name: 'LINK', value: 'link'
+      }, {
+        name: 'TRANSPORT', value: 'transport'
+      },
+
+      {
+        name: 'APPLICATION', value: 'application'
+      },
+      {
+        name: 'EVENT SIMULATION', value: 'eventSimulation'
+      }
+    ]
+    this.debugOptions.loggingLevelOptions = [
+      {
+        name: 'DEBUG', value: 'debug'
+      },
+      {
+        name: 'INFO', value: 'info'
+      }
+    ]
     this.subscription = this.diagramStorage.currentAdvancedFormData.subscribe(formData => {
       if (formData) {
         this.appSettingsForm = formData;
@@ -214,7 +250,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         this.initForm();
       }
     });
-
   }
   changeApp() {
     localStorage.setItem("app_id", this.app)
@@ -408,10 +443,16 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     this.appSettings = appConfig[this.app_id]
+    this.debug.modules = this.debug.modules.map(module => module.value);
+
     var req = {
       "application": this.app_id,
       "topology": this.topology,
-      "appSettings": this.appSettings
+      "appSettings": this.appSettings,
+      "debug": {
+        "modules": this.debug.modules,
+        "logLevel": this.debug.loggingLevel.value,
+      }
     }
     let url = this.app_id != 2
       ? environment.apiUrl

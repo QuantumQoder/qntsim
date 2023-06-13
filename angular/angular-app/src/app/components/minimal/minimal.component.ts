@@ -19,31 +19,17 @@ import { DiagramStorageService } from 'src/services/diagram-storage.service';
 export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
   type: any = 'Star'
   data: string = '|1\\rangle'
-  equation: any = [{
-    header: '/assets/images/amplitude/1.jpg', value: 1,
-  },
-  {
-    header: '/assets/images/amplitude/2.jpg', value: 2,
-  },
-  {
-    header: '/assets/images/amplitude/3.jpg', value: 3,
-  },
-  {
-    header: '/assets/images/amplitude/4.jpg', value: 4,
-  }];
+  debug = {
+    loggingLevel: {
+      name: 'INFO', value: 'info'
+    },
+    modules: []
+  }
+  debugOptions = {
+    moduleOptions: [],
+    loggingLevelOptions: []
+  }
 
-  equation1: any = [{
-    header: '|1\\rangle', value: 1,
-  },
-  {
-    header: '\\frac{|0\\rangle + |1\\rangle}{\\sqrt{2}}', value: 2,
-  },
-  {
-    header: '\\frac{|0\\rangle - |1\\rangle}{\\sqrt{2}}', value: 3,
-  },
-  {
-    header: '|0\\rangle', value: 4,
-  }];
   radio = {
     1: true,
     2: false,
@@ -182,6 +168,34 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
       // 'amplitude': ['', Validators.required],
 
     })
+    this.debugOptions.moduleOptions = [
+      {
+        name: 'NETWORK', value: 'network'
+      },
+      {
+        name: 'PHYSICAL', value: 'physical'
+      },
+      {
+        name: 'LINK', value: 'link'
+      }, {
+        name: 'TRANSPORT', value: 'transport'
+      },
+
+      {
+        name: 'APPLICATION', value: 'application'
+      },
+      {
+        name: 'EVENT SIMULATION', value: 'eventSimulation'
+      }
+    ]
+    this.debugOptions.loggingLevelOptions = [
+      {
+        name: 'DEBUG', value: 'debug'
+      },
+      {
+        name: 'INFO', value: 'info'
+      }
+    ]
     // this.appSettingsForm
     this.app_data = this.holdingData.getAppData()
     this.service.getAppList().pipe(map((d: any) => d.appList)).subscribe((result: any) => this.applist = result);
@@ -519,10 +533,16 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.getAppSetting(this.appForm.get('app')?.value)
     console.log(this.appConfig)
+    this.debug.modules = this.debug.modules.map(module => module.value);
+
     var request = {
       application: this.appForm.get('app')?.value,
       topology: topology,
-      appSettings: this.appConfig
+      appSettings: this.appConfig,
+      "debug": {
+        "modules": this.debug.modules,
+        "logLevel": this.debug.loggingLevel.value,
+      }
     }
 
     this.api.runApplication(request, environment.apiUrl).subscribe((result) => {

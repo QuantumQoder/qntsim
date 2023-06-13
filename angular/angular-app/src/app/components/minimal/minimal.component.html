@@ -114,7 +114,7 @@
                 Application</button>
         </div>
     </div>
-    <div class="col p-0 bg-white">
+    <div class="col p-0 bg-white configuration">
         <form [formGroup]="appForm">
             <!-- <h3 class="text-center display-5">Configuration
             </h3> -->
@@ -411,6 +411,25 @@
                 </div>
             </div>
         </form>
+        <br>
+        <p-accordion *ngIf="appForm.get('app')?.value != '' ">
+            <p-accordionTab header="Debug Settings">
+
+                <div class="mt-1 col-9 mx-auto">
+                    <label for="type" class="form-label font-bold" pTooltip="Logging Level">
+                        Logging Level <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i></label>
+                    <p-dropdown styleClass="form-control" [options]="debugOptions.loggingLevelOptions"
+                        [(ngModel)]="debug.loggingLevel" optionLabel="name"></p-dropdown>
+                </div>
+                <div class="mt-1 col-9 mx-auto">
+                    <label for="type" class="form-label font-bold" pTooltip="Modules">
+                        Modules <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i></label>
+                    <p-multiSelect styleClass="form-control" [options]="debugOptions.moduleOptions"
+                        [(ngModel)]="debug.modules" defaultLabel="Select Modules" optionLabel="name"></p-multiSelect>
+                </div>
+            </p-accordionTab>
+
+        </p-accordion>
         <div *ngIf="app.dirty && appForm.get('app')?.value != ''">
             <p class="text-black text-center">
                 For More Settings,<br>

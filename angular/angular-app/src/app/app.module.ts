@@ -27,6 +27,9 @@ import { ResultsComponent } from './components/results/results.component';
 import { CtrlClickDirective } from './directives/ctrl-click';
 import { FooterComponent } from './utilities/footer/footer.component';
 import { NavbarComponent } from './utilities/navbar/navbar.component';
+import { ConditionsService } from 'src/services/conditions.service';
+import { HoldingDataService } from 'src/services/holding-data.service';
+import { ApiServiceService } from 'src/services/api-service.service';
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA,
     NO_ERRORS_SCHEMA
@@ -65,6 +68,9 @@ import { NavbarComponent } from './utilities/navbar/navbar.component';
   providers: [CookieService,
     DiagramStorageService,
     DiagramBuilderService,
+    ConditionsService,
+    HoldingDataService,
+    ApiServiceService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })

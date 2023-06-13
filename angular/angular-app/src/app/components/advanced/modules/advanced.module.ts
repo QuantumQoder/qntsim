@@ -7,7 +7,8 @@ import { AccordionModule } from 'primeng/accordion';
 import { SliderModule } from 'primeng/slider';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
-
+import { MultiSelectModule } from 'primeng/multiselect';
+import { DropdownModule } from 'primeng/dropdown';
 @NgModule({
     imports: [
         CommonModule,
@@ -17,7 +18,9 @@ import { TooltipModule } from 'primeng/tooltip';
         AccordionModule,
         SliderModule,
         DialogModule,
-        TooltipModule
+        TooltipModule,
+        MultiSelectModule,
+        DropdownModule
     ],
     declarations: [AdvancedComponent]
 })
