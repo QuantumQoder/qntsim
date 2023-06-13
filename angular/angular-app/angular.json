@@ -79,13 +79,13 @@
               "namedChunks": false
             },
             "development": {
-              "buildOptimizer": true,
-              "aot": true,
-              "optimization": true,
+              "buildOptimizer": false,
+              "aot": false,
+              "optimization": false,
               "vendorChunk": true,
               "extractLicenses": false,
-              "sourceMap": false,
-              "namedChunks": false
+              "sourceMap": true,
+              "namedChunks": true
             }
           },
           "defaultConfiguration": "production"

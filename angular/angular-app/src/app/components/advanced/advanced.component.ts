@@ -1,15 +1,19 @@
-import { HoldingDataService } from 'src/services/holding-data.service';
-
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { environment } from 'src/environments/environment';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import * as go from 'gojs';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Subscription, map } from 'rxjs';
-import { environment } from 'src/environments/environment';
+
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+
+import { HoldingDataService } from 'src/services/holding-data.service';
 import { ApiServiceService } from 'src/services/api-service.service';
 import { ConditionsService } from 'src/services/conditions.service';
 import { DiagramStorageService } from 'src/services/diagram-storage.service';
+
+import * as go from 'gojs';
+import { DiagramBuilderService } from 'src/services/diagram-builder.service';
+
 
 @Component({
   selector: 'app-advanced',
@@ -22,6 +26,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   app: any
   adornedpart: any
   routeFrom: string
+  linkConnection = {
+    key: -1,
+    from: -1,
+    to: -1,
+    distance: 70,
+    attenuation: 0.0001
+  }
   @ViewChild('diagramContainer') private diagramRef: ElementRef;
   private addButtonAdornment: go.Adornment;
   nodeTypeSelect: boolean = false
@@ -47,7 +58,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     efficiency: 1,
     countRate: 25000000,
     timeResolution: 150,
-    powerLoss: 1
+    powerLoss: 0
   }
   lightSourceProps = {
     frequency: 8000000,
@@ -87,24 +98,24 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     targetFidelity: 0.5,
     size: 6
   }
-  graphModel: any
   nodes: any = []
-  selectedNode1: any
-  items: MenuItem[];
   attackOptions = ['DoS', "EM", "IR", "none"]
   bellTypeOptions = ["00", "01", "10", "11"];
   channelOptions = [1, 2, 3]
-  public selectedNode: any;
   public selectedLink: any
   public myDiagram: any
-  public myPalette: go.Palette
-  public savedModel: any
   links: any = [];
   application: any;
   activeIndex: number = 0;
   appSettingsForm
   app_data: { 1: string; 2: string; 3: string; 4: string; 5: string; 6: string; 7: string; 8: string; 9: string; 10: string; };
-  constructor(private fb: FormBuilder, private con: ConditionsService, private apiService: ApiServiceService, private holdingData: HoldingDataService, private _route: Router, private diagramStorage: DiagramStorageService) {
+  constructor(private fb: FormBuilder,
+    private con: ConditionsService,
+    private apiService: ApiServiceService,
+    private holdingData: HoldingDataService,
+    private _route: Router,
+    private diagramStorage: DiagramStorageService,
+    private diagramBuilder: DiagramBuilderService) {
   }
   ngOnDestroy(): void {
     this.diagramStorage.setAppSettingsFormDataAdvanced({ app_id: this.app_id, nodesSelection: this.nodesSelection, appSettingsForm: this.appSettingsForm, e2e: this.e2e, activeIndex: this.activeIndex });
@@ -151,7 +162,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
           'frequency': Number(nodesArray[i].memory[0].propValue),
           'expiry': Number(nodesArray[i].memory[1].propValue),
           'efficiency': Number(nodesArray[i].memory[2].propValue),
-          'fidelity': Number(nodesArray[i].memory[3].propValue)
+          'fidelity': Number(nodesArray[i].memory[3].propValue),
+          'swapSuccess': Number(nodesArray[i].memory[4].propValue)
         },
         "lightSource": {
           "frequency": this.lightSourceProps.frequency,
@@ -173,8 +185,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         this.serviceNodes.push(value)
       }
     }
-    console.log(this.endNodes)
-    console.log(this.serviceNodes)
+    //this.endNodes)
+    //this.serviceNodes)
     if (this.endNodes.length != 0) {
       this.nodesSelection.sender = this.endNodes.length > 0 ? this.endNodes[0].Name : ""
       this.nodesSelection.receiver = this.endNodes.length > 1 ? this.endNodes[1].Name : this.endNodes[0].Name
@@ -215,6 +227,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     this._route.navigate(['/minimal'])
   }
   parameters() {
+
     this.app_id = localStorage.getItem('app_id')
     if (this.app_id == 5 || this.app_id == 6 || this.app_id == 7) {
       if (this.appSettingsForm.get('message')?.value.length % 2 != 0) {
@@ -251,9 +264,9 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     if (this.app_id == 4) {
       let middleNode = this.appSettingsForm.get('middleNode')?.value
-      console.log(this.nodesSelection.endNode1)
-      console.log(this.nodesSelection.endNode2)
-      console.log(this.nodesSelection.endNode3)
+      //this.nodesSelection.endNode1)
+      //this.nodesSelection.endNode2)
+      //this.nodesSelection.endNode3)
       if (this.nodesSelection.endNode1 == '' || this.nodesSelection.endNode2 == '' || this.nodesSelection.endNode3 == '' || middleNode == '') {
         alert('Please select End Nodes.')
         return;
@@ -278,50 +291,34 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       };
     }
     this.myDiagram.model.modelData['position'] = go.Point.stringify(this.myDiagram.position);
-    this.savedModel = this.myDiagram.model;
-    this.graphModel = this.myDiagram.model.nodeDataArray
-    this.links = []
-    var linkarray: any[]
-    // if (this.savedModel.linkDataArray.length > this.links.length) {
-    for (var i = 0; i < this.savedModel.linkDataArray.length; i++) {
-      linkarray = []
-      var from = this.myDiagram.model.findNodeDataForKey(this.savedModel.linkDataArray[i].from).name
-      var to = this.myDiagram.model.findNodeDataForKey(this.savedModel.linkDataArray[i].to).name
-      linkarray.push(from);
-      linkarray.push(to);
-      let linkData = {
-        Nodes: linkarray,
-        Attenuation: this.savedModel.linkDataArray[i].attenuation,
-        Distance: this.savedModel.linkDataArray[i].distance
-      }
-      this.links.push(linkData)
-    }
-    // }
+    this.links = this.diagramBuilder.getQuantumConnections(this.myDiagram.model)
     this.nodes = []
-    console.log(this.nodesData)
     for (const [key, value] of Object.entries(this.nodesData)) {
-      console.log(value)
-      value['lightSource'] = {
-        frequency: this.lightSourceProps.frequency,
-        wavelength: this.lightSourceProps.wavelength,
-        bandwidth: this.lightSourceProps.bandwidth,
-        mean_photon_num: this.lightSourceProps.meanPhotonNum,
-        phase_error: this.lightSourceProps.phaseError,
-      }
-      console.log(value)
       this.nodes.push(value)
-      console.log(this.nodes)
     }
+    const fromNode = this.myDiagram.model.nodeDataArray.find(node => node.name == this.nodesSelection.sender);
+    console.log(fromNode)
+    const toNode = this.myDiagram.model.nodeDataArray.find(node => node.name == this.nodesSelection.receiver);
+    console.log(toNode);
+    const links = this.myDiagram.model.linkDataArray;
+    console.log(links)
+    const hasRoutes = links.some(link => link.from === fromNode.key && link.to === toNode.key);
+
+
+    let path = this.diagramBuilder.findRouteBFS(fromNode, toNode, this.myDiagram);
+    path = path.filter(link => link.from != null && link.to != null)
+    console.log(path);
+    // } else {
+    //   console.log("There are no routes between the nodes");
+    // }
 
     this.spinner = true;
-    // this.displayPosition = false
     this.app_id = localStorage.getItem('app_id')
     if (!this.app_id) {
       this._route.navigate(['/applications'])
     }
     this.app_id = Number(this.app_id)
     this.cc = []
-    console.log(this.nodes)
     this.cc = this.holdingData.getClassicalConnections(this.nodes)
     this.topology = {
       nodes: this.nodes,
@@ -416,8 +413,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       "topology": this.topology,
       "appSettings": this.appSettings
     }
-    // sessionStorage.setItem("saved_model", this.myDiagram.model)
-    // let url = this.simulator.value == 'version1' ? environment.apiUrl : this.simulator.value == 'version2' ? environment.apiUrlNew : null;
     let url = this.app_id != 2
       ? environment.apiUrl
       : this.simulator.value == 'version1'
@@ -429,7 +424,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     // The API service is used to send the request to the backend
     this.apiService.advancedRunApplication(req, url).subscribe({
       next: (response) => {
-        console.log(response); // Logs the response to the console
         this.con.setResult(response);
         if (response.application.Err_msg) {
           alert(`Error has occurred!! ${response.application.Err_msg}`)
@@ -443,7 +437,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       complete: () => {
         this.spinner = false;
         sessionStorage.setItem("saved_model", this.myDiagram.model)
-        // if (!!this.con.getResult().application.Err_msg)
         this._route.navigate(['/results'])
       }
     });
@@ -453,78 +446,71 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       console.error("Invalid link detected: ", link);
       return;
     }
-    console.log(link.data.key)
     this.linksProps.keySelected = link.data.key;
     this.linksProps.attenuation = this.linkData[this.linksProps.keySelected].attenuation;
     this.linksProps.distance = this.linkData[this.linksProps.keySelected].distance;
     this.isLinkParameters = true;
-    console.log("linkClicked", this.linkData);
   }
   linkSaved() {
-    console.log("link Saved", this.linksProps.keySelected)
+    //"link Saved", this.linksProps.keySelected)
     // this.linkData[this.linksProps.keySelected] = { distance: this.linksProps.distance, attenuation: this.linksProps.distance, ...this.linkData[this.linksProps.keySelected] }
     this.linkData[this.linksProps.keySelected].distance = this.linksProps.distance
     this.linkData[this.linksProps.keySelected].attenuation = this.linksProps.attenuation
-    console.log("LinkSaved", this.linkData)
+    //"LinkSaved", this.linkData)
     this.isLinkParameters = false
   }
   addNode(nodetype: string) {
     var adornedPart = this.adornedpart
     const newKey = this.myDiagram.model.nodeDataArray[this.myDiagram.model.nodeDataArray.length - 1].key
     let linkKey = this.myDiagram.model.linkDataArray.length > 0 ? this.myDiagram.model.linkDataArray[this.myDiagram.model.linkDataArray.length - 1].key : 0;
-    const newNode = {
-      key: newKey + 1,
-      name: `node${newKey + 1}`,
-      color: nodetype == 'Service' ? 'lightsalmon' : nodetype == 'End' ? 'lightblue' : null,
-      properties: [
-        { propName: "Type", propValue: nodetype, nodeType: true },
-        { propName: "No of Memories", propValue: 500, numericValueOnly: true }
-      ],
-      memory: [
-        { propName: "Memory Frequency (Hz)", propValue: 8e7, numericValueOnly: true },
-        { propName: "Memory Expiry (s)", propValue: 100, numericValueOnly: true },
-        { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
-        { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true },
-        { propName: "Swap Success", propValue: 1, decimalValueAlso: true }
-      ], isVisible: false
-    };
-    const newLink = {
-      key: linkKey + 1,
-      from: adornedPart.data.key,
-      to: newNode.key,
-      distance: 70,
-      attenuation: 0.0001
-    };
+    const newNode = this.diagramBuilder.addNewNode(nodetype, newKey)
+    const newLink = this.diagramBuilder.addNewLink(linkKey, adornedPart, newNode)
     this.myDiagram.startTransaction('Add node and link');
     this.myDiagram.model.addNodeData(newNode);
-    this.myDiagram.model.addLinkData(newLink);
+    this.myDiagram.model.addLinkData(this.diagramBuilder.addNewLink(linkKey, adornedPart, newNode));
     this.myDiagram.commitTransaction('Add node and link');
     this.linkData[newLink.key] = newLink
-    console.log(this.myDiagram.model.nodeDataArray)
-    console.log(this.myDiagram.model.linkDataArray)
     this.myDiagram.zoomToFit();
     this.nodeTypeSelect = false
     this.updateNodes()
   }
-  load() {
-    this.myDiagram.model = go.Model.fromJson(this.savedModel)
-    this.loadDiagramProperties();  // do this after the Model.modelData has been brought into memory
-  }
-  loadDiagramProperties() {
-    var pos = this.myDiagram.model.modelData["position"];
-    if (pos) {
-      this.myDiagram.initialPosition = go.Point.parse(pos);
+  drawLink(e, part) {
+    var node = part;
+    console.log("drawLink", node)
+    if (this.linkConnection.key == -1) {
+      let linkKey = this.myDiagram.model.linkDataArray.length > 0 ? this.myDiagram.model.linkDataArray.at(-1).key : 0;
+      this.linkConnection.key = linkKey + 1
     }
-    this.myDiagram.contentAlignment = go.Spot["Center"];
+    if (this.linkConnection.from == -1) {
+      this.linkConnection.from = node.data.key
+      console.log("added from node")
+    }
+    if (this.linkConnection.to == -1 && this.linkConnection.from != node.data.key) {
+      this.linkConnection.to = node.data.key
+      console.log("added to node")
+    }
+    if (this.linkConnection.from != -1 && this.linkConnection.to != -1) {
+      this.myDiagram.startTransaction('Add link');
+      this.myDiagram.model.addLinkData(this.linkConnection);
+      this.myDiagram.commitTransaction('Add link');
+      this.myDiagram.zoomToFit();
+      this.linkConnection = {
+        key: -1,
+        from: -1,
+        to: -1,
+        distance: 70,
+        attenuation: 0.0001
+      }
+      console.log("link Added!!!", this.linkConnection)
+    }
+    console.log(this.linkConnection)
   }
-
   activeindex(data: string) {
     // if the data is 'next' then the active index is incremented by 1
     if (data == 'next') {
       if (this.activeIndex <= 1) {
         this.activeIndex++;
       }
-
       // if the data is 'prev' then the active index is decremented by 1
     } else if (data == 'prev') {
       if (this.activeIndex >= 1) {
@@ -574,18 +560,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       'allowZoom': true, // Disables zooming
       layout: $(go.ForceDirectedLayout)
     });
-
     function isPositiveNumber(val: any) {
-      console.log(val)
+      //val)
       const regex = /^\d+$/;
       return regex.test(val);
-    }
-    function drawLink(e, button) {
-      var node = button.part.adornedPart;
-      var tool = e.diagram.toolManager.linkingTool;
-      tool.startObject = node.port;
-      e.diagram.currentTool = tool;
-      tool.doActivate();
     }
     function isDecimalNumber(val: any): boolean {
       const regex = /^\d+(\.\d*)?$/;
@@ -666,7 +644,16 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         {
           locationSpot: go.Spot.Center,
           fromSpot: go.Spot.AllSides,
-          toSpot: go.Spot.AllSides
+          toSpot: go.Spot.AllSides,
+          selectionAdornmentTemplate:
+            $(go.Adornment, "Spot",
+              $(go.Panel, "Auto",
+                $(go.Shape, { stroke: "dodgerblue", strokeWidth: 2, fill: null }),
+                $(go.Placeholder)
+              )
+            ),
+
+          click: (event, node: any) => { if (this.linkConnection.from !== -1) this.drawLink(event, node); }
         },
         $(go.Shape, "RoundedRectangle", { strokeWidth: 1, stroke: "black" },
           // Shape.fill is bound to Node.data.color
@@ -762,6 +749,25 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
           )
         )
       );
+    this.myDiagram.nodeTemplate.selectionAdornmentTemplate =
+      $(go.Adornment, "Spot",
+        $(go.Panel, "Auto",
+          $(go.Shape, { stroke: "dodgerblue", strokeWidth: 2, fill: null }),
+          $(go.Placeholder)
+        ),
+        $(go.Panel, "Horizontal",
+          { alignment: go.Spot.Right, alignmentFocus: go.Spot.Bottom },
+
+          $("Button",
+            { // drawLink is defined below, to support interactively drawing new links
+              click: (event, button: any) => { this.drawLink(event, button.part.adornedPart) },  // click on Button and then click on target node
+              // actionMove: drawLink  // drag from Button to the target node
+            },
+            $(go.Shape,
+              { geometryString: "M0 0 L8 0 8 12 14 12 M12 10 L14 12 12 14" })
+          )
+        )
+      );
     // define the Link template
     this.myDiagram.linkTemplate =
       $(go.Link,
@@ -823,7 +829,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
               decimalValueAlso: true
             },
             {
-              propName: "Swap Success",
+              propName: "Swap Success Probability",
               propValue: 1,
               decimalValueAlso: true
             }
@@ -833,8 +839,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       ]
       linkDataArray = []
     }
-
-
 
     this.myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
     this.myDiagram.addDiagramListener("LayoutCompleted", (e) => {
@@ -852,7 +856,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       if (nodeData && nodeData.properties) {
         // If the node has properties, check if the edited text matches the text of a property
         const editedProperty = nodeData.properties.find((prop: any) => prop.propValue.toString() === tb.text);
-        console.log(editedProperty)
+        //editedProperty)
         // If the property is numeric and the edited text is not a positive number, revert the text to the previous value
         if (editedProperty && editedProperty.numericValueOnly) {
           if (!isPositiveNumber(tb.text)) {
@@ -874,7 +878,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       // If the node has memory, check if the edited text matches the text of a memory property
       if (nodeData && nodeData.memory) {
         const editedProperty = nodeData.memory.find((prop: any) => prop.propValue.toString() === tb.text);
-        // console.log(editedProperty)
+        // //editedProperty)
         // If the property is decimal and the edited text is not a decimal, revert the text to the previous value
         if (editedProperty && editedProperty.decimalValueAlso) {
           if (!isDecimalNumber(tb.text)) {
@@ -889,9 +893,9 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         // If the property is a float and the edited text is not a float, revert the text to the previous value
         if (editedProperty && editedProperty.float) {
-          // console.log("Is float:" + isFloat(tb.text))
+          // //"Is float:" + isFloat(tb.text))
           if (!isFloat(tb.text)) {
-            // console.log("Text:" + tb.text)
+            // //"Text:" + tb.text)
             tb.text = e.parameter;
           }
         }
@@ -901,9 +905,11 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     this.myDiagram.addDiagramListener("Modified", () => {
       this.diagramStorage.setAdvancedDiagramModel(this.myDiagram.model)
     });
+
+
     // this.myDiagram.addDiagramListener("ObjectSingleClicked", function (e) {
     //   var part = e.subject.part;
-    //   if (part instanceof go.Link) {
+    //   if (part instanceof go.Node) {
     //     console.log(part)
     //   }
     // });

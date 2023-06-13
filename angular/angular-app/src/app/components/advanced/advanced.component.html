@@ -171,9 +171,11 @@
                             </div>
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold" pTooltip="Power Loss.">
-                                    Power Loss (%) <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
+                                    Power Loss: {{detectorProps.powerLoss}} <i class="fa-solid fa-circle-info fa-xs"
+                                        style="color: #000000;"></i>
                                 </label>
-                                <input type="text" class="form-control" [(ngModel)]="detectorProps.powerLoss" />
+                                <p-slider [(ngModel)]="detectorProps.powerLoss" [min]="0" [step]="0.05"
+                                    [max]="1"></p-slider>
                             </div>
                         </p-accordionTab>
                         <p-accordionTab header="Light Source Properties"

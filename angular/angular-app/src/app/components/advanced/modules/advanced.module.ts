@@ -7,6 +7,7 @@ import { AccordionModule } from 'primeng/accordion';
 import { SliderModule } from 'primeng/slider';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { DiagramBuilderService } from 'src/services/diagram-builder.service';
 
 @NgModule({
     imports: [
@@ -19,6 +20,6 @@ import { TooltipModule } from 'primeng/tooltip';
         DialogModule,
         TooltipModule
     ],
-    declarations: [AdvancedComponent]
+    declarations: [AdvancedComponent], providers: [DiagramBuilderService]
 })
 export class AdvancedModule { }
