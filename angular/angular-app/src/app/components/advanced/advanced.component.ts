@@ -296,18 +296,18 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     for (const [key, value] of Object.entries(this.nodesData)) {
       this.nodes.push(value)
     }
-    const fromNode = this.myDiagram.model.nodeDataArray.find(node => node.name == this.nodesSelection.sender);
-    console.log(fromNode)
-    const toNode = this.myDiagram.model.nodeDataArray.find(node => node.name == this.nodesSelection.receiver);
-    console.log(toNode);
-    const links = this.myDiagram.model.linkDataArray;
-    console.log(links)
-    const hasRoutes = links.some(link => link.from === fromNode.key && link.to === toNode.key);
+    // const fromNode = this.myDiagram.model.nodeDataArray.find(node => node.name == this.nodesSelection.sender);
+    // console.log(fromNode)
+    // const toNode = this.myDiagram.model.nodeDataArray.find(node => node.name == this.nodesSelection.receiver);
+    // console.log(toNode);
+    // const links = this.myDiagram.model.linkDataArray;
+    // console.log(links)
+    // const hasRoutes = links.some(link => link.from === fromNode.key && link.to === toNode.key);
 
 
-    let path = this.diagramBuilder.findRouteBFS(fromNode, toNode, this.myDiagram);
-    path = path.filter(link => link.from != null && link.to != null)
-    console.log(path);
+    // let path = this.diagramBuilder.findRouteBFS(fromNode, toNode, this.myDiagram);
+    // path = path.filter(link => link.from != null && link.to != null)
+    // console.log(path);
     // } else {
     //   console.log("There are no routes between the nodes");
     // }
