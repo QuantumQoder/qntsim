@@ -1,0 +1,103 @@
+import { Injectable } from "@angular/core";
+
+@Injectable()
+export class DiagramBuilderService {
+
+
+    addNewNode(nodetype: string, newKey: any) {
+        return {
+            key: newKey + 1,
+            name: `node${newKey + 1}`,
+            color: nodetype == 'Service' ? 'lightsalmon' : nodetype == 'End' ? 'lightblue' : null,
+            properties: [
+                { propName: "Type", propValue: nodetype, nodeType: true },
+                { propName: "No of Memories", propValue: 500, numericValueOnly: true }
+            ],
+            memory: [
+                { propName: "Memory Frequency (Hz)", propValue: 8e7, numericValueOnly: true },
+                { propName: "Memory Expiry (s)", propValue: 100, numericValueOnly: true },
+                { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
+                { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true },
+                { propName: "Swap Success Probability", propValue: 1, decimalValueAlso: true }
+            ], isVisible: false
+        };
+    }
+    addNewLink(linkKey, adornedPart, newNode) {
+        return {
+            key: linkKey + 1,
+            from: adornedPart.data.key,
+            to: newNode.key,
+            distance: 70,
+            attenuation: 0.0001
+        };
+    }
+    getQuantumConnections(diagramModel) {
+        var linkarray: any[]
+        let links = []
+        for (var i = 0; i < diagramModel.linkDataArray.length; i++) {
+            linkarray = []
+            var from = diagramModel.findNodeDataForKey(diagramModel.linkDataArray[i].from).name
+            var to = diagramModel.findNodeDataForKey(diagramModel.linkDataArray[i].to).name
+            linkarray.push(from);
+            linkarray.push(to);
+            let linkData = {
+                Nodes: linkarray,
+                Attenuation: diagramModel.linkDataArray[i].attenuation,
+                Distance: diagramModel.linkDataArray[i].distance
+            }
+            links.push(linkData)
+        }
+        return links
+    }
+
+    getNodeElement() {
+
+    }
+
+    buildPath(parents, targetNode) {
+        const path = [];
+        let currentNode = targetNode;
+        while (currentNode) {
+            path.unshift(currentNode);
+            currentNode = parents.get(currentNode);
+        }
+        return path;
+    }
+    findRouteBFS(startNode, targetNode, myDiagram) {
+        const queue = [];
+        const visited = new Set();
+        const routes = new Map();
+
+        // Enqueue the start node
+        queue.push([{ from: null, to: startNode.key }]);
+        visited.add(startNode.key);
+
+        while (queue.length > 0) {
+            const currentRoute = queue.shift();
+            const currentLink = currentRoute[currentRoute.length - 1];
+            const currentNodeKey = currentLink.to;
+
+            // Check if the current node is the target node
+            if (currentNodeKey === targetNode.key) {
+                return currentRoute;
+            }
+
+            // Iterate over the links of the current node
+            const links = myDiagram.model.linkDataArray.filter(link => link.from === currentNodeKey);
+            for (const link of links) {
+                const connectedNodeKey = link.to;
+
+                // Check if the connected node has not been visited
+                if (!visited.has(connectedNodeKey)) {
+                    const newRoute = [...currentRoute, link];
+                    queue.push(newRoute);
+                    visited.add(connectedNodeKey);
+                    routes.set(connectedNodeKey, newRoute);
+                }
+            }
+        }
+
+        // If the target node was not found, return null
+        return null;
+    }
+}
