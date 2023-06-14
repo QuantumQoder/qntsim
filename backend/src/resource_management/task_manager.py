@@ -1,12 +1,12 @@
 import itertools
 import logging
 import os
-from logging import config
 import traceback
+from logging import config
 
 from qntsim.conf import LOG_CONFIG_FILE
 
-print('ll',LOG_CONFIG_FILE,os.getcwd())
+print(__name__,LOG_CONFIG_FILE,os.getcwd())
 config.fileConfig(LOG_CONFIG_FILE)
 #from qntsim.utils.log import logger
 

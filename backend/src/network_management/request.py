@@ -1,36 +1,41 @@
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from pyparsing import Path
-
 
 if TYPE_CHECKING:
     from ..topology.node import QuantumRouter,Node
 
-from enum import Enum,auto
-from ..message import Message
+from enum import Enum, auto
+
 #from ..network_management.network_manager import NetworkManagerMessage
 import networkx as nx
-from ..resource_management.rule_manager import Rule
+
 from ..kernel._event import Event
 from ..kernel.timeline import Timeline
+from ..message import Message
+from ..resource_management.rule_manager import Rule
+
 if Timeline.DLCZ:
-    from ..entanglement_management.DLCZ_generation import EntanglementGenerationA
+    from ..entanglement_management.DLCZ_generation import \
+        EntanglementGenerationA
     from ..entanglement_management.DLCZ_purification import BBPSSW
-    from ..entanglement_management.DLCZ_swapping import EntanglementSwappingA, EntanglementSwappingB
+    from ..entanglement_management.DLCZ_swapping import (EntanglementSwappingA,
+                                                         EntanglementSwappingB)
 elif Timeline.bk:
     from ..entanglement_management.bk_generation import EntanglementGenerationA
     from ..entanglement_management.bk_purification import BBPSSW
     from ..entanglement_management.bk_swapping import EntanglementSwappingA, EntanglementSwappingB
-from ..resource_management.memory_manager import MemoryManager, MemoryInfo
+
 import itertools
 import json
-import math
-from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
-from ..resource_management.task_manager import TaskManager
-from ..resource_management.task_manager import Task
-from ..resource_management.task_manager import SubTask
-
 import logging
+import math
+
+from ..resource_management.memory_manager import MemoryInfo, MemoryManager
+from ..resource_management.task_manager import SubTask, Task, TaskManager
+from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
+                                              ProtocolType)
+
 logger = logging.getLogger("main_logger.network_layer." + "request")
 #from ..transport_layer.transport_manager import CongestionMsgType
 
@@ -418,12 +423,13 @@ class ReservationProtocol():     #(Protocol):
 
     def start(self):
 
-        # print("start",self.node.name)
+        print("start",self.node.name)
             #if RESOURCES AVAILABLE:
         if self.memories_available() :
 
             if (self.request.responder!=self.node.name):
 
+                print("start!",self.request.responder)
                 next_node=self.routing.tempnexthop()
                 #msgr=RRMessage(RRPMsgType.RESERVE,next_node,self.request) #msg_type="RESERVE"
                 
@@ -440,6 +446,7 @@ class ReservationProtocol():     #(Protocol):
              
             if (self.request.responder==self.node.name):
                 
+                print("start",self.request.responder)
                 #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
                 # print ("destination",self.node.name)
                 self.request.path.append(self.node)
@@ -625,7 +632,7 @@ class ReservationProtocol():     #(Protocol):
         self.own.timeline.schedule(event)"""
 
 
-    def set_dependencies_subtask(self, path: List[str], reservation: "Reservation"):
+    def set_dependencies_subtask(self, path: List[str], reservation: "Request"):
         
         #print('setting dependencies')
         

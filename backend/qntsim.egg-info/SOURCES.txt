@@ -23,6 +23,8 @@ src/communication/protocol.py
 src/communication/quantum_network.py
 src/communication/security_checks.py
 src/communication/template.py
+src/communication/un.py
+src/communication/up.py
 src/communication/utils.py
 src/components/DLCZ_bsm.py
 src/components/DLCZ_memory.py
@@ -36,6 +38,7 @@ src/components/interferometer.py
 src/components/light_source.py
 src/components/optical_channel.py
 src/components/photon.py
+src/components/polarization_measurement.py
 src/components/spdc_lens.py
 src/components/switch.py
 src/components/waveplates.py
@@ -76,4 +79,6 @@ src/transport_layer/transport_manager.py
 src/utils/__init__.py
 src/utils/encoding.py
 src/utils/log.py
+src/utils/party.py
 src/utils/quantum_state.py
+tests/test_topology.py
