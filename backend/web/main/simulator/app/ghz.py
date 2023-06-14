@@ -103,7 +103,7 @@ class GHZ():
         print("Output", output)
         ghz_state = qm_middle.get(middle_key).state
         print("\nGHZ State\n",  qm_middle.get(middle_key).state)
-        logger.info("obtained GHZ state: " + str(qm_middle.get(middle_key).state))
+        logger.info("obtained GHZ state: " + str(qm_middle.get(alice_key).state))
         print("\nGHZ State alice\n",  qm_middle.get(alice_key).state)
         print("\nGHZ State bob\n",  qm_middle.get(bob_key).state)
         print("\nGHZ State charlie\n",  qm_middle.get(charlie_key).state)
@@ -120,7 +120,7 @@ class GHZ():
             "charlie_state":qm_middle.get(charlie_key).state,
             "ghz_state" : ghz_state
         }
-        #print(res)
+        print(res)
         return res
         # print("Output", output, qm_middle.get(alice_key))
 
