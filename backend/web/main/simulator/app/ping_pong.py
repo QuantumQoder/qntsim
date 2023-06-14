@@ -1,14 +1,17 @@
 from random import choices
-from numpy import random
 
-from qntsim.components.circuit import  QutipCircuit
+from numpy import random
+from qntsim.components.circuit import QutipCircuit
 from qntsim.kernel.timeline import Timeline
+
 Timeline.DLCZ=False
 Timeline.bk=True
-from qntsim.topology.topology import Topology
-import numpy as np
-import time
 import logging
+import time
+
+import numpy as np
+from qntsim.topology.topology import Topology
+
 logger = logging.getLogger("main_logger.application_layer." + "ping_pong")
 
 class PingPong():
@@ -36,7 +39,7 @@ class PingPong():
         sender=alice
         receiver=bob
         print('sender, receiver',sender.owner.name,receiver.owner.name)
-        logger.info('sender, receiver',sender.owner.name,receiver.owner.name)
+        logger.info(f'sender, receiver: {sender.owner.name}, {receiver.owner.name}')
         return self.request_entanglements(sender,receiver,200)
     
     def create_key_lists(self,alice,bob):
