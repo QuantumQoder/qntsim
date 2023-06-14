@@ -125,6 +125,11 @@
                                     <b>Memory Fidelity</b>
                                     <p>The quality of storage offered by the quantum memory ranging between (0-1).</p>
                                 </li>
+                                <li>
+                                    <b>Swap Success</b>
+                                    <p>The probability of a successful entanglement swapping operation at the repeater
+                                        nodes.</p>
+                                </li>
                             </ul>
                         </p-accordionTab>
                         <p-accordionTab header="Setup Topology Info">
@@ -134,6 +139,10 @@
                                 </li>
                                 <li>
                                     Click "-" button to delete the selected node.
+                                </li>
+                                <li>
+                                    Click Link button on the first node and click on any node to add a connection
+                                    between those particular nodes.
                                 </li>
                             </ul>
                         </p-accordionTab>
@@ -464,7 +473,7 @@
                                 </div>
                                 <div class="mt-1 col-9 mx-auto">
                                     <label for="type" class="form-label font-bold"
-                                        pTooltip="The classical message of the sender (enter binary string).">
+                                        pTooltip="The classical message of the sender (enter binary string, only even nos.)">
                                         Message <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                     </label>
                                     <input type="text" class="form-control" (keydown)="numericOnly($event)"

@@ -5,7 +5,7 @@ export class DiagramBuilderService {
 
 
     addNewNode(nodetype: string, newKey: any) {
-        return {
+        const newNode = {
             key: newKey + 1,
             name: `node${newKey + 1}`,
             color: nodetype == 'Service' ? 'lightsalmon' : nodetype == 'End' ? 'lightblue' : null,
@@ -18,9 +18,13 @@ export class DiagramBuilderService {
                 { propName: "Memory Expiry (s)", propValue: 100, numericValueOnly: true },
                 { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
                 { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true },
-                { propName: "Swap Success Probability", propValue: 1, decimalValueAlso: true }
+
             ], isVisible: false
         };
+        if (nodetype == 'Service') {
+            newNode.memory.push({ propName: "Swap Success Probability", propValue: 0.99, decimalValueAlso: true })
+        }
+        return newNode
     }
     addNewLink(linkKey, adornedPart, newNode) {
         return {

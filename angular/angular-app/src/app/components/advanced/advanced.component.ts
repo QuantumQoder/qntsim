@@ -171,7 +171,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
           'expiry': Number(nodesArray[i].memory[1].propValue),
           'efficiency': Number(nodesArray[i].memory[2].propValue),
           'fidelity': Number(nodesArray[i].memory[3].propValue),
-          'swapSuccess': Number(nodesArray[i].memory[4].propValue)
+          'swapSuccess': nodesArray[i].properties[0].propValue.toLowerCase() == 'service' ? Number(nodesArray[i].memory[4].propValue) : 0.99
         },
         "lightSource": {
           "frequency": this.lightSourceProps.frequency,
@@ -262,7 +262,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     this._route.navigate(['/minimal'])
   }
   parameters() {
-
     this.app_id = localStorage.getItem('app_id')
     if (this.app_id == 5 || this.app_id == 6 || this.app_id == 7) {
       if (this.appSettingsForm.get('message')?.value.length % 2 != 0) {
@@ -887,11 +886,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
             {
               propName: "Memory Fidelity",
               propValue: 0.93,
-              decimalValueAlso: true
-            },
-            {
-              propName: "Swap Success Probability",
-              propValue: 1,
               decimalValueAlso: true
             }
           ],
