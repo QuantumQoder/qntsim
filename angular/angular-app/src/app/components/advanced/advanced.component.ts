@@ -531,20 +531,26 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       console.log("added to node")
     }
     if (this.linkConnection.from != -1 && this.linkConnection.to != -1) {
-      this.myDiagram.startTransaction('Add link');
-      this.myDiagram.model.addLinkData(this.linkConnection);
-      this.myDiagram.commitTransaction('Add link');
-      this.myDiagram.zoomToFit();
-      this.linkConnection = {
-        key: -1,
-        from: -1,
-        to: -1,
-        distance: 70,
-        attenuation: 0.0001
+      if (this.diagramBuilder.isDirectLinkExists(this.linkConnection.from, this.linkConnection.to, this.myDiagram)) {
+        this.myDiagram.startTransaction('Add link');
+        this.myDiagram.model.addLinkData(this.linkConnection);
+        this.myDiagram.commitTransaction('Add link');
+        this.myDiagram.zoomToFit();
+        this.linkConnection = {
+          key: -1,
+          from: -1,
+          to: -1,
+          distance: 70,
+          attenuation: 0.0001
+        }
+        console.log("link Added!!!")
       }
-      console.log("link Added!!!", this.linkConnection)
+      else {
+        alert("Link already exists!!");
+        return;
+      }
     }
-    console.log(this.linkConnection)
+    // console.log(this.linkConnection)
   }
   activeindex(data: string) {
     // if the data is 'next' then the active index is incremented by 1

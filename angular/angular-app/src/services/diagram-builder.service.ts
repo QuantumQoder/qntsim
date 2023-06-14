@@ -100,4 +100,21 @@ export class DiagramBuilderService {
         // If the target node was not found, return null
         return null;
     }
+    isDirectLinkExists(fromNodekey, toNodekey, myDiagram) {
+        console.log("LinkDataArray", myDiagram.model.linkDataArray)
+        const node1 = this.findNodeWithKey(fromNodekey, myDiagram);
+        console.log("node1", node1)
+        const node2 = this.findNodeWithKey(toNodekey, myDiagram);
+        console.log("node2", node2)
+        const newLinkArray = myDiagram.model.linkDataArray.filter(link => (link.from === node1.key && link.to === node2.key) || (link.from === node2.key && link.to === node1.key));
+        console.log("newLinkArray", newLinkArray)
+        if (newLinkArray.length == 0) {
+            return true;
+        }
+        return false;
+    }
+    findNodeWithKey(key, myDiagram) {
+        return myDiagram.model.nodeDataArray.find(node => node.key == key);
+    }
+
 }
