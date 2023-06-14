@@ -834,7 +834,25 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         {
           click: (e, link) => {  // click event handler
             this.linkClicked(link);
-          }
+          },
+          selectionAdorned: false,
+          contextMenu: $(
+            go.Adornment,
+            "Vertical",
+            $(
+              "ContextMenuButton",
+              $(go.TextBlock, "Delete"),
+              {
+                click: (e, obj: any) => {
+                  const link = obj.part.adornedPart;
+                  if (link instanceof go.Link) {
+                    this.myDiagram.model.removeLinkData(link.data);
+                  }
+                },
+              }
+            )
+          ),
+
         },
         new go.Binding("routing", "routing"),
         $(go.Shape),
