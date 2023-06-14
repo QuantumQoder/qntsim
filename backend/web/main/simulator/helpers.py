@@ -36,8 +36,8 @@ def load_topology(network_config_json, backend):
         node.memory_array.update_memory_params("coherence_time", node_properties["memory"]["expiry"])
         node.memory_array.update_memory_params("efficiency", node_properties["memory"]["efficiency"])
         node.memory_array.update_memory_params("raw_fidelity", node_properties["memory"]["fidelity"])
-        # node.network_manager.set_swap_success(node_properties["swap_success_rate"])
-        # node.network_manager.set_swap_degradation(node_properties["swap_degradation"])
+        node.network_manager.set_swap_success(node_properties["swap_success_rate"])
+        node.network_manager.set_swap_degradation(node_properties["swap_degradation"])
     
     #Detector Parameters
     if "detector_properties" in network_config_json:

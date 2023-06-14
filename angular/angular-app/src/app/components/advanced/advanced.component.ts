@@ -1,15 +1,15 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { environment } from 'src/environments/environment';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subscription, map } from 'rxjs';
+import { map, Subscription } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
-import { HoldingDataService } from 'src/services/holding-data.service';
 import { ApiServiceService } from 'src/services/api-service.service';
 import { ConditionsService } from 'src/services/conditions.service';
 import { DiagramStorageService } from 'src/services/diagram-storage.service';
+import { HoldingDataService } from 'src/services/holding-data.service';
 
 import * as go from 'gojs';
 import { DiagramBuilderService } from 'src/services/diagram-builder.service';
@@ -171,8 +171,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
           'expiry': Number(nodesArray[i].memory[1].propValue),
           'efficiency': Number(nodesArray[i].memory[2].propValue),
           'fidelity': Number(nodesArray[i].memory[3].propValue),
-          'swapSuccess': nodesArray[i].properties[0].propValue.toLowerCase() == 'service' ? Number(nodesArray[i].memory[4].propValue) : 0.99
+
         },
+        "swap_success_rate": nodesArray[i].properties[0].propValue.toLowerCase() == 'service' ? Number(nodesArray[i].memory[4].propValue) : 0.99,
+        "swap_degradation": 0,
         "lightSource": {
           "frequency": this.lightSourceProps.frequency,
           "wavelength": this.lightSourceProps.wavelength,
