@@ -275,6 +275,23 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         alert("Message is required");
         return
       }
+      if (this.appSettingsForm.get('inputMessage')?.value.length % 2 != 0) {
+        alert("Message length should be even ");
+        // this.spinner = false
+        return
+      }
+    }
+    if (this.app_id == 8) {
+      if (this.appSettingsForm.get('message1')?.value.length % 2 != 0) {
+        alert("Message1 length should be even ");
+        // this.spinner = false
+        return
+      }
+      if (this.appSettingsForm.get('message2')?.value.length % 2 != 0) {
+        alert("Message2 length should be even ");
+        // this.spinner = false
+        return
+      }
     }
     if (this.app_id != 4) {
       if (this.nodesSelection.sender == '') {
@@ -852,7 +869,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
               }
             )
           ),
-
         },
         new go.Binding("routing", "routing"),
         $(go.Shape),

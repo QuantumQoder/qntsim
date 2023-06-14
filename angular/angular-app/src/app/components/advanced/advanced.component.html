@@ -396,7 +396,7 @@
                                             Message <i class="fa-solid fa-circle-info fa-xs"
                                                 style="color: #000000;"></i>
                                         </label>
-                                        <input type="text" (keypress)="allowBitsInput($event)" formControlName="message"
+                                        <input type="text" (keydown)="numericOnly($event)" formControlName="message"
                                             class="form-control" maxLength="8">
                                         <div
                                             *ngIf="appSettingsForm.get('message').touched && appSettingsForm.get('message').invalid">
@@ -412,10 +412,11 @@
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 9">
                                         <label for="type" class="form-label font-bold"
                                             pTooltip="The classical message of the sender">
-                                            Input Message <i class="fa-solid fa-circle-info fa-xs"
+                                            Message <i class="fa-solid fa-circle-info fa-xs"
                                                 style="color: #000000;"></i>
                                         </label>
-                                        <input type="text" formControlName="inputMessage" class="form-control">
+                                        <input type="text" formControlName="inputMessage"
+                                            (keydown)="numericOnly($event)" class="form-control">
                                         <div
                                             *ngIf="appSettingsForm.get('inputMessage').touched && appSettingsForm.get('inputMessage').invalid">
                                             <div *ngIf="appSettingsForm.get('inputMessage').errors.required">
@@ -429,7 +430,8 @@
                                             Sender's Message <i class="fa-solid fa-circle-info fa-xs"
                                                 style="color: #000000;"></i>
                                         </label>
-                                        <input type="text" formControlName="message1" class="form-control">
+                                        <input type="text" formControlName="message1" (keydown)="numericOnly($event)"
+                                            class="form-control">
                                         <div
                                             *ngIf="appSettingsForm.get('message1').touched && appSettingsForm.get('message1').invalid">
                                             <div *ngIf="appSettingsForm.get('message1').errors.required">
@@ -443,7 +445,8 @@
                                             Receiver's Message <i class="fa-solid fa-circle-info fa-xs"
                                                 style="color: #000000;"></i>
                                         </label>
-                                        <input type="text" formControlName="message2" class="form-control">
+                                        <input type="text" formControlName="message2" (keydown)="numericOnly($event)"
+                                            class="form-control">
                                         <div
                                             *ngIf="appSettingsForm.get('message2').touched && appSettingsForm.get('message2').invalid">
                                             <div *ngIf="appSettingsForm.get('message2').errors.required">
