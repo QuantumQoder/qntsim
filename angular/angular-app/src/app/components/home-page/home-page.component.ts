@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { ConditionsService } from 'src/services/conditions.service';
-import Globe from 'globe.gl';
 import * as D3 from 'd3';
+import Globe from 'globe.gl';
+import { ConditionsService } from 'src/services/conditions.service';
 import * as _ from 'underscore';
 
 @Component({
