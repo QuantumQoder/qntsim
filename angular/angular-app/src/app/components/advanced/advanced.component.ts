@@ -546,6 +546,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         console.log("link Added!!!")
       }
       else {
+        this.linkConnection = {
+          key: -1,
+          from: -1,
+          to: -1,
+          distance: 70,
+          attenuation: 0.0001
+        }
         alert("Link already exists!!");
         return;
       }
@@ -700,11 +707,18 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
               )
             ),
 
-          click: (event, node: any) => { if (this.linkConnection.from !== -1) this.drawLink(event, node); }
+          click: (event, node: any) => { if (this.linkConnection.from !== -1) this.drawLink(event, node); },
+          mouseEnter: function (e, node: any) {
+            node.isSelected = true;
+          },
+          mouseLeave: function (e, node: any) {
+            setTimeout(() => { node.isSelected = false; }, 2000)
+          },
         },
         $(go.Shape, "RoundedRectangle", { strokeWidth: 1, stroke: "black" },
           // Shape.fill is bound to Node.data.color
-          new go.Binding("fill", "color")),
+          new go.Binding("fill", "color"),
+        ),
         $(go.Panel, "Table",
           { defaultRowSeparatorStroke: "black" },
           // header

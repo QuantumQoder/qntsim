@@ -115,7 +115,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         lng: 78.4867,
       }];
 
-      // myGlobe.controls().autoRotate = true;
+      myGlobe.controls().autoRotate = true;
       // myGlobe.position.y = -1000
       myGlobe
         .polygonsData(cuntData)
