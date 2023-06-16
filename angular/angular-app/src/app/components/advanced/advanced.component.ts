@@ -57,7 +57,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     efficiency: 1,
     countRate: 25000000,
     timeResolution: 150,
-    powerLoss: 0
+    powerLoss: 0,
+    swapSuccess: 0.99
   }
   lightSourceProps = {
     frequency: 8000000,
@@ -126,7 +127,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     private diagramBuilder: DiagramBuilderService) {
   }
   ngOnDestroy(): void {
-    this.diagramStorage.setAppSettingsFormDataAdvanced({ app_id: this.app_id, nodesSelection: this.nodesSelection, appSettingsForm: this.appSettingsForm, e2e: this.e2e, activeIndex: this.activeIndex });
+    this.diagramStorage.setAppSettingsFormDataAdvanced({ app_id: this.app_id, nodesSelection: this.nodesSelection, appSettingsForm: this.appSettingsForm, e2e: this.e2e, activeIndex: this.activeIndex, detectorProps: this.detectorProps, lightSourceProps: this.lightSourceProps });
     this.subscription.unsubscribe()
   }
   @HostListener('window:resize', ['$event'])
@@ -140,7 +141,9 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     if (appSettingsBackup) {
       this.e2e = appSettingsBackup.e2e
       this.nodesSelection = appSettingsBackup.nodesSelection
-      this.activeIndex = appSettingsBackup.activeIndex
+      this.activeIndex = appSettingsBackup.activeIndex,
+        this.detectorProps = appSettingsBackup.detectorProps
+      this.lightSourceProps = appSettingsBackup.lightSourceProps
     }
     // this.appSettingsForm = appSettingsBackup.appSettingForm
   }
@@ -173,8 +176,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
           'fidelity': Number(nodesArray[i].memory[3].propValue),
 
         },
-        "swap_success_rate": nodesArray[i].properties[0].propValue.toLowerCase() == 'service' ? Number(nodesArray[i].memory[4].propValue) : 0.99,
-        "swap_degradation": 0,
+        "swap_success_rate": 0.99,
+        "swap_degradation": 1,
         "lightSource": {
           "frequency": this.lightSourceProps.frequency,
           "wavelength": this.lightSourceProps.wavelength,
@@ -195,8 +198,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         this.serviceNodes.push(value)
       }
     }
-    //this.endNodes)
-    //this.serviceNodes)
+    console.log("End Nodes:", this.endNodes)
+    console.log("Service Nodes:", this.serviceNodes)
     if (this.endNodes.length != 0) {
       this.nodesSelection.sender = this.endNodes.length > 0 ? this.endNodes[0].Name : ""
       this.nodesSelection.receiver = this.endNodes.length > 1 ? this.endNodes[1].Name : this.endNodes[0].Name
@@ -380,7 +383,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       detector: {
         efficiency: this.detectorProps.efficiency,
         count_rate: this.detectorProps.countRate,
-        time_resolution: this.detectorProps.timeResolution
+        time_resolution: this.detectorProps.timeResolution,
+        powerLoss: this.detectorProps.powerLoss
       }
     }
     const appConfig =
@@ -651,7 +655,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       const regex = /^\d+(\.\d*)?$/;
       return regex.test(val) ? true : false
     }
-    function typeOfNode(val: string): boolean {
+    function isNodeTypeValid(val: string): boolean {
       // if val is not equal to 'service' AND val is not equal to 'end' AND val is not equal to 'Service' AND val is not equal to 'End'
       if (val != 'service' && val != 'end' && val != 'Service' && val != 'End') {
         // return false
@@ -938,6 +942,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
           group.findObject("MEMORY").collapse();
         }
       });
+      this.updateNodes()
     });
     // When a user edits a text block, check if the text block belongs to a node
     // and if the node has properties or memory
@@ -956,10 +961,35 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         }
         // If the property is a node type and the edited text is not a valid node type, revert the text to the previous value
         if (editedProperty && editedProperty.nodeType) {
-          if (typeOfNode(tb.text)) {
+          if (isNodeTypeValid(tb.text)) {
             tb.text = capitalizethefirstletter(tb.text)
             const color = tb.text.toLowerCase() == 'service' ? "lightsalmon" : tb.text.toLowerCase() === 'end' ? 'lightblue' : ''
+
             this.myDiagram.model.setDataProperty(nodeData, "color", color);
+            // this.myDiagram.model.setDataProperty(nodeData, "color", color);
+            // if (tb.text.toLowerCase() === 'service') {
+            //   // tb.text = capitalizethefirstletter(tb.text)
+            //   const nodeIndex = this.myDiagram.model.nodeDataArray.findIndex((node: any) => node.key == nodeData.key)
+            //   let modifiedNodeData = this.diagramBuilder.addSwapSuccessInMemory(nodeData, this.myDiagram)
+
+            //   console.log("Replace Node", nodeData)
+            //   this.myDiagram.startTransaction("replaceNode");
+            //   this.myDiagram.model.nodeDataArray[nodeIndex] = modifiedNodeData;
+            //   this.myDiagram.commitTransaction("replaceNode");
+            //   // this.myDiagram.model.setDataProperty(newNode, "color", color);
+            //   console.log("Replace Node Completed", this.myDiagram.model.nodeDataArray[nodeIndex])
+            // }
+            // else if (tb.text.toLowerCase() === 'end') {
+            //   // tb.text = capitalizethefirstletter(tb.text)
+            //   const nodeIndex = this.myDiagram.model.nodeDataArray.findIndex((node: any) => node.key == nodeData.key)
+            //   let modifiedNodeData = this.diagramBuilder.removeSwapSuccessInMemory(nodeData, this.myDiagram)
+            //   console.log("Replace Node")
+            //   this.myDiagram.startTransaction("replaceNode");
+            //   this.myDiagram.model.nodeDataArray[nodeIndex] = modifiedNodeData;
+            //   this.myDiagram.commitTransaction("replaceNode");
+            //   // this.myDiagram.model.setDataProperty(newNode, "color", color);
+            //   console.log("Replace Node Completed")
+            // }
           }
           else {
             tb.text = e.parameter
@@ -995,6 +1025,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.myDiagram.addDiagramListener("Modified", () => {
       this.diagramStorage.setAdvancedDiagramModel(this.myDiagram.model)
+      this.updateNodes
     });
 
 

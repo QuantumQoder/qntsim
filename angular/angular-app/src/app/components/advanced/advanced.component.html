@@ -155,6 +155,19 @@
                         Configure Topology
                     </h5>
                     <p-accordion>
+                        <p-accordionTab header="Memory Parameters">
+                            <div class="mt-1 col-9 mx-auto">
+                                <label for="type" class="form-label font-bold" pTooltip="The probability of a successful entanglement swapping operation at the repeater
+                                                                nodes.">
+                                    Swap Success:
+                                    {{detectorProps.swapSuccess}} <i class="fa-solid fa-circle-info fa-xs"
+                                        style="color: #000000;"></i>
+                                </label>
+                                <p-slider [(ngModel)]="detectorProps.swapSuccess" [min]="0" [step]="0.05"
+                                    [max]="1"></p-slider>
+                                <!-- <input class="form-control" [(ngModel)]="detectorProps.efficiency" /> -->
+                            </div>
+                        </p-accordionTab>
                         <p-accordionTab header="Detector Properties" pTooltip="Set the parameters of photon detector">
                             <div class="mt-1 col-9 mx-auto">
                                 <label for="type" class="form-label font-bold"
@@ -191,6 +204,7 @@
                                     [max]="1"></p-slider>
                             </div>
                         </p-accordionTab>
+
                         <p-accordionTab header="Light Source Properties"
                             pTooltip="Set the input parameters for light source.">
                             <div class="mt-1 col-9 mx-auto">
@@ -458,117 +472,128 @@
                                 </form>
                             </p-accordionTab>
                             <p-accordionTab header="Sender Parameters" *ngIf="app_id == 10">
-                                <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold"
-                                        pTooltip="The sender node of the QSDC protocol.">
-                                        Sender <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
-                                    </label>
-                                    <select class="form-control" [(ngModel)]="nodesSelection.sender">
-                                        <option *ngFor="let data of endNodes" [ngValue]="data.Name">
-                                            {{data.Name}}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold"
-                                        pTooltip="The QKD Id of the Sender which will be used for authentication (even nos.).">
-                                        Sender ID <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
-                                    </label>
-                                    <input type="text" (keydown)="numericOnly($event)" class="form-control"
-                                        [(ngModel)]="nodesSelection.senderId">
-                                </div>
-                                <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold"
-                                        pTooltip="The classical message of the sender (enter binary string, only even nos.)">
-                                        Message <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
-                                    </label>
-                                    <input type="text" class="form-control" (keydown)="numericOnly($event)"
-                                        [(ngModel)]="nodesSelection.message">
-                                </div>
-                                <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold"
-                                        pTooltip="The number of decoy photons inserted into the quantum message string.">
-                                        Number of Decoy Photons <i class="fa-solid fa-circle-info fa-xs"
-                                            style="color: #000000;"></i>
-                                    </label>
-                                    <input type="number" class="form-control"
-                                        oninput="this.value = Math.abs(this.value)"
-                                        [(ngModel)]="nodesSelection.numDecoy">
-                                </div>
-                                <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold"
-                                        pTooltip="The trap qubits inserted into the quantum message sequence to analyze channel security (even nos.).">
-                                        Number of Check Bits <i class="fa-solid fa-circle-info fa-xs"
-                                            style="color: #000000;"></i>
-                                    </label>
-                                    <input type="number" class="form-control"
-                                        oninput="this.value = Math.abs(this.value)"
-                                        [(ngModel)]="nodesSelection.numCheckBits">
+                                <div class="col-9 mx-auto">
+                                    <div class="mt-1 ">
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The sender node of the QSDC protocol.">
+                                            Sender <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
+                                        </label>
+                                        <select class="form-control" [(ngModel)]="nodesSelection.sender">
+                                            <option *ngFor="let data of endNodes" [ngValue]="data.Name">
+                                                {{data.Name}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="mt-1">
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The QKD Id of the Sender which will be used for authentication (even nos.).">
+                                            Sender ID <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
+                                        </label>
+                                        <input type="text" (keydown)="numericOnly($event)" class="form-control"
+                                            [(ngModel)]="nodesSelection.senderId">
+                                    </div>
+                                    <div class="mt-1">
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The classical message of the sender (enter binary string, only even nos.)">
+                                            Message <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
+                                        </label>
+                                        <input type="text" class="form-control" (keydown)="numericOnly($event)"
+                                            [(ngModel)]="nodesSelection.message">
+                                    </div>
+                                    <div class="mt-1">
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The number of decoy photons inserted into the quantum message string.">
+                                            Number of Decoy Photons <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
+                                        </label>
+                                        <input type="number" class="form-control"
+                                            oninput="this.value = Math.abs(this.value)"
+                                            [(ngModel)]="nodesSelection.numDecoy">
+                                    </div>
+                                    <div class="mt-1">
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The trap qubits inserted into the quantum message sequence to analyze channel security (even nos.).">
+                                            Number of Check Bits <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
+                                        </label>
+                                        <input type="number" class="form-control"
+                                            oninput="this.value = Math.abs(this.value)"
+                                            [(ngModel)]="nodesSelection.numCheckBits">
+                                    </div>
                                 </div>
                             </p-accordionTab>
                             <p-accordionTab header="Receiver Parameters" *ngIf="app_id == 10">
-                                <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold"
-                                        pTooltip="The recipient node of the quantum secure communication.">
-                                        Receiver <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
-                                    </label>
-                                    <select class="form-control" [(ngModel)]="nodesSelection.receiver">
-                                        <option *ngFor="let data of endNodes" [ngValue]="data.Name">
-                                            {{data.Name}}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold"
-                                        pTooltip="The QKD Id of the Receiver which will be used for authentication (even nos.).">
-                                        Receiver ID <i class="fa-solid fa-circle-info fa-xs"
-                                            style="color: #000000;"></i>
-                                    </label>
-                                    <input type="text" (keydown)="numericOnly($event)" class="form-control"
-                                        oninput="this.value = Math.abs(this.value)"
-                                        [(ngModel)]="nodesSelection.receiverId">
+                                <div class="col-9 mx-auto">
+                                    <div class="mt-1 ">
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The recipient node of the quantum secure communication.">
+                                            Receiver <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
+                                        </label>
+                                        <select class="form-control" [(ngModel)]="nodesSelection.receiver">
+                                            <option *ngFor="let data of endNodes" [ngValue]="data.Name">
+                                                {{data.Name}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="mt-1">
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The QKD Id of the Receiver which will be used for authentication (even nos.).">
+                                            Receiver ID <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
+                                        </label>
+                                        <input type="text" (keydown)="numericOnly($event)" class="form-control"
+                                            oninput="this.value = Math.abs(this.value)"
+                                            [(ngModel)]="nodesSelection.receiverId">
+                                    </div>
                                 </div>
                             </p-accordionTab>
                             <p-accordionTab header="Common Parameters" *ngIf="app_id == 10">
-                                <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold"
-                                        pTooltip="The EPR pair selected out of four possible choices.">
-                                        Bell Type <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
-                                    </label>
-                                    <select class="form-control" [(ngModel)]="nodesSelection.bellType">
-                                        <option *ngFor="let data of bellTypeOptions" [ngValue]="data">
-                                            {{data}}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold"
-                                        pTooltip="The maximum acceptable error on the communication, can be decided by user (in %) . The low the error % is, more secure is the communication.">
-                                        Error Threshold <i class="fa-solid fa-circle-info fa-xs"
-                                            style="color: #000000;"></i>
-                                    </label>
-                                    <input type="number" class="form-control"
-                                        [(ngModel)]="nodesSelection.errorThreshold">
-                                </div>
-                                <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold" pTooltip="External Attack Type">
-                                        Attack <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
-                                    </label>
-                                    <select class="form-control" [(ngModel)]="nodesSelection.attack">
-                                        <option *ngFor="let data of attackOptions" [ngValue]="data">{{data}}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="mt-1 col-9 mx-auto">
-                                    <label for="type" class="form-label font-bold"
-                                        pTooltip="The link connecting two nodes.">
-                                        Channel <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
-                                    </label>
-                                    <select class="form-control" [(ngModel)]="nodesSelection.channel">
-                                        <option *ngFor="let data of channelOptions" [ngValue]="data">
-                                            {{data}}
-                                        </option>
-                                    </select>
+                                <div class="col-9 mx-auto">
+                                    <div class="mt-1">
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The EPR pair selected out of four possible choices.">
+                                            Bell Type <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
+                                        </label>
+                                        <select class="form-control" [(ngModel)]="nodesSelection.bellType">
+                                            <option *ngFor="let data of bellTypeOptions" [ngValue]="data">
+                                                {{data}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="mt-1">
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The maximum acceptable error on the communication, can be decided by user (in %) . The low the error % is, more secure is the communication.">
+                                            Error Threshold <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
+                                        </label>
+                                        <input type="number" class="form-control"
+                                            [(ngModel)]="nodesSelection.errorThreshold">
+                                    </div>
+                                    <div class="mt-1">
+                                        <label for="type" class="form-label font-bold" pTooltip="External Attack Type">
+                                            Attack <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
+                                        </label>
+                                        <select class="form-control" [(ngModel)]="nodesSelection.attack">
+                                            <option *ngFor="let data of attackOptions" [ngValue]="data">{{data}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="mt-1">
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The link connecting two nodes.">
+                                            Channel <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
+                                        </label>
+                                        <select class="form-control" [(ngModel)]="nodesSelection.channel">
+                                            <option *ngFor="let data of channelOptions" [ngValue]="data">
+                                                {{data}}
+                                            </option>
+                                        </select>
+                                    </div>
                                 </div>
                             </p-accordionTab>
                             <p-accordionTab header="Troubleshooting & Debugging">

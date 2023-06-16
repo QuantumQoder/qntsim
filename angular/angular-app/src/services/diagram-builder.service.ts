@@ -18,11 +18,11 @@ export class DiagramBuilderService {
                 { propName: "Memory Expiry (s)", propValue: 100, numericValueOnly: true },
                 { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
                 { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true },
-
+                { propName: "Swap Success Probability", propValue: 0.99, decimalValueAlso: true }
             ], isVisible: false
         };
-        if (nodetype == 'Service') {
-            newNode.memory.push({ propName: "Swap Success Probability", propValue: 0.99, decimalValueAlso: true })
+        if (nodetype == 'End') {
+            newNode.memory.splice(4, 1)
         }
         return newNode
     }
@@ -57,7 +57,22 @@ export class DiagramBuilderService {
     getNodeElement() {
 
     }
+    addSwapSuccessInMemory(newNode, diagramModel) {
+        console.log("NodeDataArray-before", diagramModel.model.nodeDataArray)
+        let node = diagramModel.model.nodeDataArray.find(node => node.key == newNode.key);
+        node.memory.push({ propName: "Swap Success Probability", propValue: 0.99, decimalValueAlso: true })
 
+        // diagramModel.set(node)
+        return node
+    }
+    removeSwapSuccessInMemory(newNode, diagramModel) {
+        console.log("NodeDataArray", diagramModel.model.nodeDataArray)
+        let node = diagramModel.model.nodeDataArray.find(node => node.key == newNode.key);
+        node.memory.pop()
+        console.log("NodeDataArray", diagramModel.model.nodeDataArray)
+        // diagramModel.set(node)
+        return node
+    }
     buildPath(parents, targetNode) {
         const path = [];
         let currentNode = targetNode;
