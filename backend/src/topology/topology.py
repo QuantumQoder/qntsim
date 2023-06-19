@@ -8,18 +8,20 @@ from typing import TYPE_CHECKING
 
 import json5
 
-
 if TYPE_CHECKING:
     from ..kernel.timeline import Timeline
 
-from .node import *
-from ..components.optical_channel import QuantumChannel, ClassicalChannel
-from ..network_management.reservation import Reservation
+import webbrowser
+
+import matplotlib.pyplot as plt
 #----------------------------
 import networkx as nx
-import matplotlib.pyplot as plt
 from pyvis.network import Network
-import webbrowser
+
+from ..components.optical_channel import ClassicalChannel, QuantumChannel
+from ..network_management.reservation import Reservation
+from .node import *
+
 #----------------------------
 
 
@@ -302,7 +304,7 @@ class Topology():
                 for arg, val in node.get("lightSource", {}).items():
                     setattr(nodeObj.lightsource, arg, val)
                 nodeObj.network_manager.set_swap_success(es_swap_success=node.get("swap_success_rate", 1))
-                nodeObj.network_manager.set_swap_degradation(es_swap_success=node.get("swap_degradation", 0))
+                nodeObj.network_manager.set_swap_degradation(es_swap_degradation=node.get("swap_degradation", 0))
                 self.add_node(nodeObj)
             
             
