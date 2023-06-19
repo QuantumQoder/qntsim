@@ -102,7 +102,7 @@ class QuantumChannel(OpticalChannel):
 
     def init(self) -> None:
         """Implementation of Entity interface (see base class)."""
-        print("type next:", type(self.distance), type(self.attenuation))
+        # print("type next:", type(self.distance), type(self.attenuation))
         self.delay = round(self.distance / float(self.light_speed))
         self.loss = 1 - 10 ** (self.distance * float(self.attenuation) / -10)
 

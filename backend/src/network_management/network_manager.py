@@ -153,7 +153,7 @@ class NetworkManager():
         user_request.status='INITIATED'
         user_request.remaining_demand_size=remaining_demand_size
         self.requests.update({user_request.id:user_request})
-        print("user request id ,tp_id ,src,path,des,size ",user_request.id,user_request.tp_id, user_request.initiator,user_request.path,user_request.responder,user_request.memory_size,memory_size)
+        # print("user request id ,tp_id ,src,path,des,size ",user_request.id,user_request.tp_id, user_request.initiator,user_request.path,user_request.responder,user_request.memory_size,memory_size)
         routing_protocol=RoutingProtocol(self.owner,initiator,responder,[],self.owner.name)
         #nextnode=routing_protocol.next_hop()
         ##print(nextnode)
