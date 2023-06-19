@@ -306,7 +306,6 @@ class Network:
         # Load the configuration for the network topology
         load_topo = self._net_topo.load_config_json if "nodes" in self._topology else self._net_topo.load_config
         load_topo(self._topology)
-        print(__name__, "Entities1", self._timeline.entities)
 
         # Set parameters for the quantum network
         # self._set_parameters()
