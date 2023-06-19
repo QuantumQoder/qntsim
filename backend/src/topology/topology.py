@@ -301,6 +301,8 @@ class Topology():
                     nodeObj.memory_array.update_memory_params(arg, val)
                 for arg, val in node.get("lightSource", {}).items():
                     setattr(nodeObj.lightsource, arg, val)
+                nodeObj.network_manager.set_swap_success(es_swap_success=node.get("swap_success_rate", 1))
+                nodeObj.network_manager.set_swap_degradation(es_swap_success=node.get("swap_degradation", 0))
                 self.add_node(nodeObj)
             
             
