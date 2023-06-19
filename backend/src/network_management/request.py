@@ -423,13 +423,13 @@ class ReservationProtocol():     #(Protocol):
 
     def start(self):
 
-        print("start",self.node.name)
+        # print("start",self.node.name)
             #if RESOURCES AVAILABLE:
         if self.memories_available() :
 
             if (self.request.responder!=self.node.name):
 
-                print("start!",self.request.responder)
+                # print("start!",self.request.responder)
                 next_node=self.routing.tempnexthop()
                 #msgr=RRMessage(RRPMsgType.RESERVE,next_node,self.request) #msg_type="RESERVE"
                 
@@ -446,7 +446,7 @@ class ReservationProtocol():     #(Protocol):
              
             if (self.request.responder==self.node.name):
                 
-                print("start",self.request.responder)
+                # print("start",self.request.responder)
                 #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
                 # print ("destination",self.node.name)
                 self.request.path.append(self.node)
@@ -703,7 +703,7 @@ class ReservationProtocol():     #(Protocol):
         if index > 0:
             #To accept virtual links, we skip the generation step when a non physical neighbor is found
             if path[index - 1] in self.node.neighbors:
-                mem_indices = memory_indices[ last_virtual_index+1 : reservation.memory_size]
+                mem_indices = memory_indices[ last_virtual_index+1 : int(reservation.memory_size)]
     
                 
                 task_EG_right = Task('TaskEntGen_'+self.node.name+'_'+path[index - 1], [], self.node.timeline.now(), False, None, self.node.task_manager, mem_indices = mem_indices)
