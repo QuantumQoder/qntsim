@@ -85,7 +85,7 @@
                 </div>
 
                 <div id="step2" *ngIf="activeIndex == 0">
-                    <p-accordion [activeIndex]=1>
+                    <p-accordion>
                         <p-accordionTab header="General Information">
                             <ul>
                                 <li>
@@ -486,7 +486,7 @@
                                             </option>
                                         </select>
                                     </div>
-                                    <div class="mt-1" ngIf="app_id == 10 || app_id == 7">
+                                    <div class="mt-1" *ngIf="app_id == 10 || app_id == 7">
                                         <label for="type" class="form-label font-bold"
                                             pTooltip="The QKD Id of the Sender which will be used for authentication (even nos.).">
                                             Sender ID <i class="fa-solid fa-circle-info fa-xs"
@@ -524,6 +524,18 @@
                                             oninput="this.value = Math.abs(this.value)"
                                             [(ngModel)]="nodesSelection.numCheckBits">
                                     </div>
+                                    <div class="mt-1" *ngIf="app_id == 6">
+                                        <label for="type" class="form-label font-bold" pTooltip="Switch Probability">
+                                            Switch Probability <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
+                                            {{nodesSelection.switchProb}}
+                                        </label>
+
+                                        <p-slider [(ngModel)]="nodesSelection.switchProb" [min]="0" [step]="0.05"
+                                            [max]="1"></p-slider>
+
+                                    </div>
+
                                 </div>
                             </p-accordionTab>
                             <p-accordionTab header="Receiver Parameters"
@@ -554,7 +566,7 @@
                                 </div>
                             </p-accordionTab>
                             <p-accordionTab header="Common Parameters"
-                                *ngIf="app_id == 10 || app_id == 9 || app_id == 7 || app_id == 6">
+                                *ngIf="app_id == 10 || app_id == 9 || app_id == 7">
                                 <div class="col-9 mx-auto">
                                     <div class="mt-1" *ngIf=" app_id == 9 || app_id == 7 || app_id == 10">
                                         <label for="type" class="form-label font-bold"

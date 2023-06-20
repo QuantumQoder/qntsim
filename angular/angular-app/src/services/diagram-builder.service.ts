@@ -17,13 +17,10 @@ export class DiagramBuilderService {
                 { propName: "Memory Frequency (Hz)", propValue: 8e7, numericValueOnly: true },
                 { propName: "Memory Expiry (s)", propValue: 100, numericValueOnly: true },
                 { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
-                { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true },
-                { propName: "Swap Success Probability", propValue: 0.99, decimalValueAlso: true }
+                { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
             ], isVisible: false
         };
-        if (nodetype == 'End') {
-            newNode.memory.splice(4, 1)
-        }
+
         return newNode
     }
     addNewLink(linkKey, adornedPart, newNode) {

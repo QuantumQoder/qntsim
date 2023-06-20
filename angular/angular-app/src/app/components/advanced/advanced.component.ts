@@ -52,6 +52,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     receiverId: 1011,
     bellType: "10",
     channel: 1,
+    switchProb: 0
   }
   detectorProps = {
     efficiency: 1,
@@ -268,7 +269,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   parameters() {
     this.app_id = localStorage.getItem('app_id')
-    if (this.app_id == 5 || this.app_id == 6 || this.app_id == 7) {
+    if (this.app_id == 5) {
       if (this.appSettingsForm.get('message')?.value.length % 2 != 0) {
         alert("Message length should be even ");
         // this.spinner = false
@@ -283,6 +284,16 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.appSettingsForm.get('inputMessage')?.value.length % 2 != 0) {
         alert("Message length should be even ");
         // this.spinner = false
+        return
+      }
+    }
+    if (this.app_id == 10 || this.app_id == 9 || this.app_id == 7 || this.app_id == 6) {
+      if (this.nodesSelection.message == '') {
+        alert("Please select a message")
+        return
+      }
+      if (this.nodesSelection.message.length % 2 != 0) {
+        alert("Message length should be even ");
         return
       }
     }
@@ -422,15 +433,30 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         key: this.appSettingsForm.get('message')?.value
       }, 6:
       {
-        sender: this.nodesSelection.sender,
-        receiver: this.nodesSelection.receiver,
+
+        sender: {
+          node: this.nodesSelection.sender,
+          message: this.appSettingsForm.get('message')?.value,
+        },
+        receiver: {
+          node: this.nodesSelection.receiver,
+        },
         sequenceLength: this.appSettingsForm.get('sequenceLength')?.value,
-        message: this.appSettingsForm.get('message')?.value,
       }, 7:
       {
-        sender: this.nodesSelection.sender,
-        receiver: this.nodesSelection.receiver,
-        message: this.appSettingsForm.get('message')?.value
+        sender: {
+          node: this.nodesSelection.sender,
+          message: this.nodesSelection.message,
+          userID: `${this.nodesSelection.senderId}`,
+          num_check_bits: this.nodesSelection.numCheckBits,
+          num_decoy_photons: this.nodesSelection.numDecoy
+        },
+        receiver: {
+          node: this.nodesSelection.receiver,
+          userID: `${this.nodesSelection.receiverId}`
+        },
+        bell_type: `${this.nodesSelection.bellType}`,
+        attack: this.nodesSelection.attack,
       },
       8:
       {
@@ -441,10 +467,16 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         attack: ''
       }, 9:
       {
-        sender: this.nodesSelection.sender,
-        receiver: this.nodesSelection.receiver,
-        message: this.appSettingsForm.get('inputMessage')?.value,
-        attack: this.appSettingsForm.get('attack')?.value
+        sender: {
+          node: this.nodesSelection.sender,
+          message: this.nodesSelection.message,
+        },
+        receiver: {
+          node: this.nodesSelection.receiver,
+        },
+        bell_type: `${this.nodesSelection.bellType}`,
+        attack: this.nodesSelection.attack,
+
       }, 10:
       {
         sender: {
