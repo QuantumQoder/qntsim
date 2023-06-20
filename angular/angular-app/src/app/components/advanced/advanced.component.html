@@ -255,7 +255,8 @@
                     <ng-container>
                         <p-accordion [activeIndex]="0">
 
-                            <p-accordionTab header="Application Parameters" *ngIf="app_id != 10">
+                            <p-accordionTab header="Application Parameters"
+                                *ngIf="app_id != 10 && app_id != 9 &&  app_id != 7 && app_id != 6">
                                 <form [formGroup]="appSettingsForm">
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id != 4 && app_id !=10">
                                         <label for="type" class="form-label font-bold"
@@ -471,7 +472,8 @@
 
                                 </form>
                             </p-accordionTab>
-                            <p-accordionTab header="Sender Parameters" *ngIf="app_id == 10">
+                            <p-accordionTab header="Sender Parameters"
+                                *ngIf="app_id == 10 || app_id == 9 || app_id == 7 || app_id == 6">
                                 <div class="col-9 mx-auto">
                                     <div class="mt-1 ">
                                         <label for="type" class="form-label font-bold"
@@ -484,7 +486,7 @@
                                             </option>
                                         </select>
                                     </div>
-                                    <div class="mt-1">
+                                    <div class="mt-1" ngIf="app_id == 10 || app_id == 7">
                                         <label for="type" class="form-label font-bold"
                                             pTooltip="The QKD Id of the Sender which will be used for authentication (even nos.).">
                                             Sender ID <i class="fa-solid fa-circle-info fa-xs"
@@ -502,7 +504,7 @@
                                         <input type="text" class="form-control" (keydown)="numericOnly($event)"
                                             [(ngModel)]="nodesSelection.message">
                                     </div>
-                                    <div class="mt-1">
+                                    <div class="mt-1" *ngIf="app_id == 10 || app_id == 7">
                                         <label for="type" class="form-label font-bold"
                                             pTooltip="The number of decoy photons inserted into the quantum message string.">
                                             Number of Decoy Photons <i class="fa-solid fa-circle-info fa-xs"
@@ -512,7 +514,7 @@
                                             oninput="this.value = Math.abs(this.value)"
                                             [(ngModel)]="nodesSelection.numDecoy">
                                     </div>
-                                    <div class="mt-1">
+                                    <div class="mt-1" *ngIf="app_id == 10 || app_id == 7">
                                         <label for="type" class="form-label font-bold"
                                             pTooltip="The trap qubits inserted into the quantum message sequence to analyze channel security (even nos.).">
                                             Number of Check Bits <i class="fa-solid fa-circle-info fa-xs"
@@ -524,7 +526,8 @@
                                     </div>
                                 </div>
                             </p-accordionTab>
-                            <p-accordionTab header="Receiver Parameters" *ngIf="app_id == 10">
+                            <p-accordionTab header="Receiver Parameters"
+                                *ngIf="app_id == 10 || app_id == 9 || app_id == 7 || app_id == 6">
                                 <div class="col-9 mx-auto">
                                     <div class="mt-1 ">
                                         <label for="type" class="form-label font-bold"
@@ -538,7 +541,7 @@
                                             </option>
                                         </select>
                                     </div>
-                                    <div class="mt-1">
+                                    <div class="mt-1" *ngIf="app_id == 10 || app_id == 7">
                                         <label for="type" class="form-label font-bold"
                                             pTooltip="The QKD Id of the Receiver which will be used for authentication (even nos.).">
                                             Receiver ID <i class="fa-solid fa-circle-info fa-xs"
@@ -550,9 +553,10 @@
                                     </div>
                                 </div>
                             </p-accordionTab>
-                            <p-accordionTab header="Common Parameters" *ngIf="app_id == 10">
+                            <p-accordionTab header="Common Parameters"
+                                *ngIf="app_id == 10 || app_id == 9 || app_id == 7 || app_id == 6">
                                 <div class="col-9 mx-auto">
-                                    <div class="mt-1">
+                                    <div class="mt-1" *ngIf=" app_id == 9 || app_id == 7 || app_id == 10">
                                         <label for="type" class="form-label font-bold"
                                             pTooltip="The EPR pair selected out of four possible choices.">
                                             Bell Type <i class="fa-solid fa-circle-info fa-xs"
@@ -564,7 +568,7 @@
                                             </option>
                                         </select>
                                     </div>
-                                    <div class="mt-1">
+                                    <div class="mt-1" *ngIf="app_id == 10">
                                         <label for="type" class="form-label font-bold"
                                             pTooltip="The maximum acceptable error on the communication, can be decided by user (in %) . The low the error % is, more secure is the communication.">
                                             Error Threshold <i class="fa-solid fa-circle-info fa-xs"
@@ -573,7 +577,7 @@
                                         <input type="number" class="form-control"
                                             [(ngModel)]="nodesSelection.errorThreshold">
                                     </div>
-                                    <div class="mt-1">
+                                    <div class="mt-1" *ngIf=" app_id == 9 || app_id == 7 || app_id == 10">
                                         <label for="type" class="form-label font-bold" pTooltip="External Attack Type">
                                             Attack <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                         </label>
@@ -582,7 +586,7 @@
                                             </option>
                                         </select>
                                     </div>
-                                    <div class="mt-1">
+                                    <div class="mt-1" *ngIf="app_id == 10">
                                         <label for="type" class="form-label font-bold"
                                             pTooltip="The link connecting two nodes.">
                                             Channel <i class="fa-solid fa-circle-info fa-xs"
