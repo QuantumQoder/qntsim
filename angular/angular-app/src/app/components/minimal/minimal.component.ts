@@ -521,8 +521,11 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
       "detector_properties": {
         "efficiency": 1,
         "count_rate": 25e6,
-        "time_resolution": 150
+        "time_resolution": 150,
+        "powerLoss": 0
       },
+      "swap_success_rate": 0.99,
+      "swap_degradation": 1,
       "light_source_properties": {
         "frequency": 2000,
         "wavelength": 1550,

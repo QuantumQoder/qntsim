@@ -11,3 +11,4 @@ backend/web/qd_sp.log
 backend/web/qsdc_tel.log
 backend/web/parameters.json
 backend/web/parameters.txt
+.vscode/extensions.json
