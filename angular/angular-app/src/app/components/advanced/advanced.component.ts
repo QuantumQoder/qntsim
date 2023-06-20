@@ -436,12 +436,11 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
 
         sender: {
           node: this.nodesSelection.sender,
-          message: this.appSettingsForm.get('message')?.value,
+          message: this.nodesSelection.message,
         },
         receiver: {
           node: this.nodesSelection.receiver,
-        },
-        sequenceLength: this.appSettingsForm.get('sequenceLength')?.value,
+        }
       }, 7:
       {
         sender: {
