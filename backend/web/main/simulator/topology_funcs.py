@@ -23,7 +23,7 @@ from .app.e91 import *
 from .app.ghz import *
 from .app.ip1 import *
 from .app.mdi_qsdc import *
-from .app.ping_pong import *
+from .app.ping_pong import ping_pong
 from .app.qsdc1 import *
 from .app.qsdc_teleportation import *
 from .app.single_photon_qd import *
@@ -353,32 +353,32 @@ def ip1(network_config, sender, receiver, message):
     return report
 
 
-def ping_pong(network_config, sender, receiver, sequenceLength, message):
-    logger.info("PingPong QSDC")
-    start_time = time.time()
-    network_config_json, tl, network_topo = load_topology(
-        network_config, "Qutip")
-    if len(message) <= 9:
-        n = int(sequenceLength*len(message))
-        alice = network_topo.nodes[sender]
-        bob = network_topo.nodes[receiver]
-        pp = PingPong()
-        alice, bob, source_node_list = pp.roles(alice, bob, n)
-        tl.init()
-        tl.run()
-        pp.create_key_lists(alice, bob)
-        results = pp.run(sequenceLength, message)
-        report = {}
-        report["application"] = results
-        end_time = time.time()
-        execution_time = end_time-start_time
-        report = network_graph(network_topo, source_node_list, report)
-        report["performance"]["execution_time"] = execution_time
-        print(report)
-        return report
-    else:
-        print("message should be less than or equal to 9")
-        return None
+# def ping_pong(network_config, sender, receiver, sequenceLength, message):
+#     logger.info("PingPong QSDC")
+#     start_time = time.time()
+#     network_config_json, tl, network_topo = load_topology(
+#         network_config, "Qutip")
+#     if len(message) <= 9:
+#         n = int(sequenceLength*len(message))
+#         alice = network_topo.nodes[sender]
+#         bob = network_topo.nodes[receiver]
+#         pp = PingPong()
+#         alice, bob, source_node_list = pp.roles(alice, bob, n)
+#         tl.init()
+#         tl.run()
+#         pp.create_key_lists(alice, bob)
+#         results = pp.run(sequenceLength, message)
+#         report = {}
+#         report["application"] = results
+#         end_time = time.time()
+#         execution_time = end_time-start_time
+#         report = network_graph(network_topo, source_node_list, report)
+#         report["performance"]["execution_time"] = execution_time
+#         print(report)
+#         return report
+#     else:
+#         print("message should be less than or equal to 9")
+#         return None
 
 
 def qsdc1(network_config, sender, receiver, sequenceLength, key):
