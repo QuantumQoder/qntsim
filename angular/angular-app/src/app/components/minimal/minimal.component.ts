@@ -494,7 +494,8 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
       const linkData = {
         Nodes: [link.from, link.to],
         Attenuation: this.topologyForm.get('attenuity')?.value,
-        Distance: this.topologyForm.get('distance')?.value
+        Distance: this.topologyForm.get('distance')?.value,
+        "powerLoss": 0
       };
       linkRequestArray.push(linkData);
     }
@@ -521,8 +522,11 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
       "detector_properties": {
         "efficiency": 1,
         "count_rate": 25e6,
-        "time_resolution": 150
+        "time_resolution": 150,
+
       },
+      "swap_success_rate": 0.99,
+      "swap_degradation": 1,
       "light_source_properties": {
         "frequency": 2000,
         "wavelength": 1550,
@@ -658,9 +662,19 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
         message: this.appSettingsForm.get('message')?.value
       },
       7: {
-        sender: this.appSettingsForm.get('sender')?.value,
-        receiver: this.appSettingsForm.get('receiver')?.value,
-        message: this.appSettingsForm.get('messageIp1')?.value
+        sender: {
+          node: this.appSettingsForm.get('sender')?.value,
+          message: this.appSettingsForm.get('messageIp1')?.value,
+          userID: "1010",
+          num_check_bits: 4,
+          num_decoy_photons: 4
+        },
+        receiver: {
+          node: this.appSettingsForm.get('receiver')?.value,
+          userID: "1011",
+        },
+        bell_type: "10",
+        attack: 'none'
       },
       8: {
         sender: this.appSettingsForm.get('sender')?.value,
@@ -671,10 +685,16 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
         attack: ''
       },
       9: {
-        sender: this.appSettingsForm.get('sender')?.value,
-        receiver: this.appSettingsForm.get('receiver')?.value,
-        message: this.appSettingsForm.get('message')?.value,
-        attack: ''
+        sender: {
+          node: this.appSettingsForm.get('sender')?.value,
+          message: this.appSettingsForm.get('message')?.value,
+        },
+        receiver: {
+          node: this.appSettingsForm.get('receiver')?.value,
+        },
+        bell_type: "10",
+        attack: 'none',
+
       },
       10: {
         sender: {

@@ -391,5 +391,7 @@ class ProtocolPipeline:
         return string
 
     @staticmethod
-    def execute():
-        pass
+    def execute(topology:Dict, app_settings:Dict):
+        response = {}
+        
+        protocol = ProtocolPipeline()

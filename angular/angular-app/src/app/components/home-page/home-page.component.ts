@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { ConditionsService } from 'src/services/conditions.service';
-import Globe from 'globe.gl';
 import * as D3 from 'd3';
+import Globe from 'globe.gl';
+import { ConditionsService } from 'src/services/conditions.service';
 import * as _ from 'underscore';
 
 @Component({
@@ -115,7 +115,7 @@ export class HomePageComponent implements OnInit, AfterViewInit {
         lng: 78.4867,
       }];
 
-      // myGlobe.controls().autoRotate = true;
+      myGlobe.controls().autoRotate = true;
       // myGlobe.position.y = -1000
       myGlobe
         .polygonsData(cuntData)

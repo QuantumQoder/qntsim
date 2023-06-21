@@ -1,11 +1,11 @@
 import { Injectable } from "@angular/core";
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class DiagramBuilderService {
 
 
     addNewNode(nodetype: string, newKey: any) {
-        return {
+        const newNode = {
             key: newKey + 1,
             name: `node${newKey + 1}`,
             color: nodetype == 'Service' ? 'lightsalmon' : nodetype == 'End' ? 'lightblue' : null,
@@ -17,10 +17,11 @@ export class DiagramBuilderService {
                 { propName: "Memory Frequency (Hz)", propValue: 8e7, numericValueOnly: true },
                 { propName: "Memory Expiry (s)", propValue: 100, numericValueOnly: true },
                 { propName: "Memory Efficiency", propValue: 1, decimalValueAlso: true },
-                { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true },
-                { propName: "Swap Success Probability", propValue: 1, decimalValueAlso: true }
+                { propName: "Memory Fidelity", propValue: 0.93, decimalValueAlso: true }
             ], isVisible: false
         };
+
+        return newNode
     }
     addNewLink(linkKey, adornedPart, newNode) {
         return {
@@ -31,7 +32,7 @@ export class DiagramBuilderService {
             attenuation: 0.0001
         };
     }
-    getQuantumConnections(diagramModel) {
+    getQuantumConnections(diagramModel, powerLoss) {
         var linkarray: any[]
         let links = []
         for (var i = 0; i < diagramModel.linkDataArray.length; i++) {
@@ -43,7 +44,8 @@ export class DiagramBuilderService {
             let linkData = {
                 Nodes: linkarray,
                 Attenuation: diagramModel.linkDataArray[i].attenuation,
-                Distance: diagramModel.linkDataArray[i].distance
+                Distance: diagramModel.linkDataArray[i].distance,
+                powerLoss: powerLoss
             }
             links.push(linkData)
         }
@@ -53,7 +55,22 @@ export class DiagramBuilderService {
     getNodeElement() {
 
     }
+    addSwapSuccessInMemory(newNode, diagramModel) {
+        console.log("NodeDataArray-before", diagramModel.model.nodeDataArray)
+        let node = diagramModel.model.nodeDataArray.find(node => node.key == newNode.key);
+        node.memory.push({ propName: "Swap Success Probability", propValue: 0.99, decimalValueAlso: true })
 
+        // diagramModel.set(node)
+        return node
+    }
+    removeSwapSuccessInMemory(newNode, diagramModel) {
+        console.log("NodeDataArray", diagramModel.model.nodeDataArray)
+        let node = diagramModel.model.nodeDataArray.find(node => node.key == newNode.key);
+        node.memory.pop()
+        console.log("NodeDataArray", diagramModel.model.nodeDataArray)
+        // diagramModel.set(node)
+        return node
+    }
     buildPath(parents, targetNode) {
         const path = [];
         let currentNode = targetNode;

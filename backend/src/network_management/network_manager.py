@@ -4,7 +4,8 @@ Also included in this module is the message type used by the network manager and
 """
 import itertools
 from enum import Enum
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING, List
+
 if TYPE_CHECKING:
     from ..topology.node import QuantumRouter
     from ..protocol import StackProtocol
@@ -13,14 +14,17 @@ if TYPE_CHECKING:
     from .request import RoutingProtocol 
     from .request import ReservationProtocol
 
-from ..message import Message
-from .routing import StaticRoutingProtocol,NewRoutingProtocol,RoutingTableUpdateProtocol
-from .reservation import ResourceReservationProtocol, RSVPMsgType, Reservation
-from ..transport_layer.transport_manager import TransportProtocol
-from ..resource_management.resource_manager import ResourceManagerMsgType
-from ..kernel._event import Event
-from .request import Request ,RoutingProtocol,ReservationProtocol,RRPMsgType
 import logging
+
+from ..kernel._event import Event
+from ..message import Message
+from ..resource_management.resource_manager import ResourceManagerMsgType
+from ..transport_layer.transport_manager import TransportProtocol
+from .request import Request, ReservationProtocol, RoutingProtocol, RRPMsgType
+from .reservation import Reservation, ResourceReservationProtocol, RSVPMsgType
+from .routing import (NewRoutingProtocol, RoutingTableUpdateProtocol,
+                      StaticRoutingProtocol)
+
 logger = logging.getLogger("main_logger." + "network_manager")
 
 
@@ -149,7 +153,7 @@ class NetworkManager():
         user_request.status='INITIATED'
         user_request.remaining_demand_size=remaining_demand_size
         self.requests.update({user_request.id:user_request})
-        #print("user request id ,tp_id ,src,path,des,size ",user_request.id,user_request.tp_id, user_request.initiator,user_request.path,user_request.responder,user_request.memory_size,memory_size)
+        # print("user request id ,tp_id ,src,path,des,size ",user_request.id,user_request.tp_id, user_request.initiator,user_request.path,user_request.responder,user_request.memory_size,memory_size)
         routing_protocol=RoutingProtocol(self.owner,initiator,responder,[],self.owner.name)
         #nextnode=routing_protocol.next_hop()
         ##print(nextnode)

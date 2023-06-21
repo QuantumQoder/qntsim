@@ -16,6 +16,7 @@ class ErrorAnalyzer:
     def _analyse(network: Network, i: int = 0):
         err_list = np.zeros(len(network._bin_msgs[0]))
         lk_list = np.zeros(len(network._bin_msgs[0]))
+        print(network._bin_msgs, network._strings)
         for bin_msg, string in zip(network._bin_msgs, network._strings[::-1]):
             err_list += np.array([int(m) ^ int(s) for m, s in zip(bin_msg, string)])
             lk_list += np.array(
