@@ -96,8 +96,8 @@ class IP1():
     def get_IDs(self):
         sender_id = "0011"
         receiver_id = "0110"
-        logger.info("sender_id: ", sender_id)
-        logger.info("receiver_id: ", receiver_id)
+        logger.info("sender_id: "+str( sender_id))
+        logger.info("receiver_id: "+str(receiver_id))
         return sender_id, receiver_id
         
 
@@ -357,6 +357,7 @@ class IP1():
 
 
     def run(self,alice,bob,message ):
+        print("IP1")
         qm_alice=alice.timeline.quantum_manager
         qm_bob=bob.timeline.quantum_manager
         IdA, IdB = self.get_IDs()
