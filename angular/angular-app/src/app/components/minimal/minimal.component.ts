@@ -494,7 +494,8 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
       const linkData = {
         Nodes: [link.from, link.to],
         Attenuation: this.topologyForm.get('attenuity')?.value,
-        Distance: this.topologyForm.get('distance')?.value
+        Distance: this.topologyForm.get('distance')?.value,
+        "powerLoss": 0
       };
       linkRequestArray.push(linkData);
     }
@@ -522,7 +523,7 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
         "efficiency": 1,
         "count_rate": 25e6,
         "time_resolution": 150,
-        "powerLoss": 0
+
       },
       "swap_success_rate": 0.99,
       "swap_degradation": 1,

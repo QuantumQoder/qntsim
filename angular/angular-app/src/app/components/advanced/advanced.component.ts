@@ -358,7 +358,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       };
     }
     this.myDiagram.model.modelData['position'] = go.Point.stringify(this.myDiagram.position);
-    this.links = this.diagramBuilder.getQuantumConnections(this.myDiagram.model)
+    this.links = this.diagramBuilder.getQuantumConnections(this.myDiagram.model, this.detectorProps.powerLoss)
     this.nodes = []
     for (const [key, value] of Object.entries(this.nodesData)) {
       this.nodes.push(value)
@@ -395,7 +395,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         efficiency: this.detectorProps.efficiency,
         count_rate: this.detectorProps.countRate,
         time_resolution: this.detectorProps.timeResolution,
-        powerLoss: this.detectorProps.powerLoss
+
       }
     }
     const appConfig =

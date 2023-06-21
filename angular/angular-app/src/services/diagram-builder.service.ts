@@ -32,7 +32,7 @@ export class DiagramBuilderService {
             attenuation: 0.0001
         };
     }
-    getQuantumConnections(diagramModel) {
+    getQuantumConnections(diagramModel, powerLoss) {
         var linkarray: any[]
         let links = []
         for (var i = 0; i < diagramModel.linkDataArray.length; i++) {
@@ -44,7 +44,8 @@ export class DiagramBuilderService {
             let linkData = {
                 Nodes: linkarray,
                 Attenuation: diagramModel.linkDataArray[i].attenuation,
-                Distance: diagramModel.linkDataArray[i].distance
+                Distance: diagramModel.linkDataArray[i].distance,
+                powerLoss: powerLoss
             }
             links.push(linkData)
         }
