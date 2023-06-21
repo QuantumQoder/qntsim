@@ -556,7 +556,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   addNode(nodetype: string) {
     var adornedPart = this.adornedpart
     const newKey = this.myDiagram.model.nodeDataArray[this.myDiagram.model.nodeDataArray.length - 1].key
-    let linkKey = this.myDiagram.model.linkDataArray.length > 0 ? this.myDiagram.model.linkDataArray[this.myDiagram.model.linkDataArray.length - 1].key : 0;
+    const linkKey = this.myDiagram.model.linkDataArray.length > 0 ? this.myDiagram.model.linkDataArray[this.myDiagram.model.linkDataArray.length - 1].key : 0;
     const newNode = this.diagramBuilder.addNewNode(nodetype, newKey)
     const newLink = this.diagramBuilder.addNewLink(linkKey, adornedPart, newNode)
     this.myDiagram.startTransaction('Add node and link');

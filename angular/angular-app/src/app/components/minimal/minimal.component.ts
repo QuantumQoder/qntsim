@@ -661,9 +661,19 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
         message: this.appSettingsForm.get('message')?.value
       },
       7: {
-        sender: this.appSettingsForm.get('sender')?.value,
-        receiver: this.appSettingsForm.get('receiver')?.value,
-        message: this.appSettingsForm.get('messageIp1')?.value
+        sender: {
+          node: this.appSettingsForm.get('sender')?.value,
+          message: this.appSettingsForm.get('messageIp1')?.value,
+          userID: "1010",
+          num_check_bits: 4,
+          num_decoy_photons: 4
+        },
+        receiver: {
+          node: this.appSettingsForm.get('receiver')?.value,
+          userID: "1011",
+        },
+        bell_type: "10",
+        attack: 'none'
       },
       8: {
         sender: this.appSettingsForm.get('sender')?.value,
@@ -674,10 +684,16 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
         attack: ''
       },
       9: {
-        sender: this.appSettingsForm.get('sender')?.value,
-        receiver: this.appSettingsForm.get('receiver')?.value,
-        message: this.appSettingsForm.get('message')?.value,
-        attack: ''
+        sender: {
+          node: this.appSettingsForm.get('sender')?.value,
+          message: this.appSettingsForm.get('message')?.value,
+        },
+        receiver: {
+          node: this.appSettingsForm.get('receiver')?.value,
+        },
+        bell_type: "10",
+        attack: 'none',
+
       },
       10: {
         sender: {
