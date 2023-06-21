@@ -703,6 +703,7 @@ class ReservationProtocol():     #(Protocol):
         if index > 0:
             #To accept virtual links, we skip the generation step when a non physical neighbor is found
             if path[index - 1] in self.node.neighbors:
+                print("type(reservation.memory_size): ", type(reservation.memory_size))
                 mem_indices = memory_indices[ last_virtual_index+1 : int(reservation.memory_size)]
     
                 
