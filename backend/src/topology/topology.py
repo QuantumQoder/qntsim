@@ -305,7 +305,7 @@ class Topology():
                 for arg, val in node.get("lightSource", {}).items():
                     setattr(nodeObj.lightsource, arg, val)
                 nodeObj.network_manager.set_swap_success(es_swap_success=node.get("swap_success_rate", 1))
-                nodeObj.network_manager.set_swap_degradation(es_swap_degradation=node.get("swap_degradation", 0))
+                nodeObj.network_manager.set_swap_degradation(es_swap_degradation=node.get("swap_degradation", 0.99))
                 self.add_node(nodeObj)
             
             
