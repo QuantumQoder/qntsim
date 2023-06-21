@@ -7,6 +7,8 @@ from qntsim.kernel.timeline import Timeline
 from qntsim.topology.topology import Topology
 
 from .constants import *
+# Do Not Remove the following commented imports - this is for local testing purpose
+# from constants import *
 
 logger = logging.getLogger("main." + "helpers")
 

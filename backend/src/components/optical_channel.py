@@ -102,7 +102,6 @@ class QuantumChannel(OpticalChannel):
 
     def init(self) -> None:
         """Implementation of Entity interface (see base class)."""
-        print("type next:", type(self.distance), type(self.attenuation))
         self.delay = round(self.distance / float(self.light_speed))
         self.loss = 1 - 10 ** (self.distance * float(self.attenuation) / -10)
 
@@ -111,7 +110,7 @@ class QuantumChannel(OpticalChannel):
         self.receiver = receiver
         sender.assign_qchannel(self, receiver.name)
 
-    def transmit(self, qubit: "Photon", source: "Node") -> None:
+    def transmit(self, _from:str, qubit: "Photon", dst:str, app:str, source: "Node") -> None:
         """Method to transmit photon-encoded qubits.
 
         Args:
@@ -147,7 +146,7 @@ class QuantumChannel(OpticalChannel):
             future_time = self.timeline.now() + self.delay
             #process = Process(self.receiver, "receive_qubit", [source.name, qubit])
             #event = Event(future_time, process)
-            event = Event(future_time, self.receiver, "receive_qubit", [source.name, qubit])
+            event = Event(future_time, self.receiver, "receive_qubit", [_from, dst, app, qubit])
             #self.timeline.schedule(event)
             self.timeline.schedule_counter += 1
             self.timeline.events.push(event)

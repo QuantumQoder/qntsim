@@ -129,6 +129,7 @@ class Topology():
             # #print('nodes',type(node))
             if type(node) != BSMNode:
                 node.all_pair_shortest_dist = all_pair_dist
+                # print(node.all_pair_shortest_dist)
                 node.nx_graph=self.nx_graph
                 node.delay_graph=self.cc_delay_graph
                 # #print('delay graph',node.name)
@@ -336,6 +337,7 @@ class Topology():
         for nodeObj in self.nodes.values():
             if type(nodeObj) != BSMNode:
                 nodeObj.all_pair_shortest_dist = all_pair_dist
+                # print(nodeObj.all_pair_shortest_dist)
                 nodeObj.nx_graph=self.nx_graph
                 nodeObj.delay_graph=self.cc_delay_graph
                 nodeObj.neighbors = list(G.neighbors(nodeObj.name))
@@ -536,6 +538,12 @@ class Topology():
             (type(self.nodes[node1]) == EndNode) and (type(self.nodes[node2]) == ServiceNode) or
             (type(self.nodes[node1]) == ServiceNode) and (type(self.nodes[node2]) == EndNode) or
             (type(self.nodes[node1]) == ServiceNode) and (type(self.nodes[node2]) == ServiceNode)):
+            
+            #Add direct channel between node1 and node2
+            #Since these are one way channels we add another channel from node2 to node1
+            self.add_quantum_channel(node1, node2, **kwargs)
+            self.add_quantum_channel(node2, node1, **kwargs)
+            
             # update non-middle graph
             self.graph_no_middle[node1][node2] = float(kwargs["distance"])
             self.graph_no_middle[node2][node1] = float(kwargs["distance"])
