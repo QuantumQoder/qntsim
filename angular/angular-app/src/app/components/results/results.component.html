@@ -755,12 +755,12 @@
                             Sender message
                         </td>
                         <td class="col">
-                            {{data.message_transmitted}}
+                            {{data.sender.message}}
                         </td>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="table-secondary">
+                    <!-- <tr class="table-secondary">
                         <td class="col"
                             pTooltip="True: if eavesdropping is detected, False: if no eavesdropping is detected.">
                             Eavesdropping check
@@ -780,14 +780,14 @@
                     </tr>
                     <tr class="table-secondary">
                         <td colspan="2">(If Impurities present: Then display accuracy of transmission)​</td>
-                    </tr>
+                    </tr> -->
                     <tr class="table-primary">
                         <td class="col"
                             pTooltip="The received message at the user end after the QSDC protocol is executed.">
                             Received message
                         </td>
                         <td class="col">
-                            {{data.message_received}}
+                            {{data.output_msg}}
                         </td>
                     </tr>
 
