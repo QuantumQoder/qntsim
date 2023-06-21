@@ -100,7 +100,7 @@ class RunApp(APIView):
         elif application == "ip1":
             results = ip1(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"] )
         elif application == "ping_pong":
-            results = ping_pong(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["sequenceLength"]), appSettings["message"] )
+            results = ping_pong(topology=topology, app_settings=appSettings)
         elif application == "qsdc1":
             results = qsdc1(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["sequenceLength"]), appSettings["key"] )
         elif application == "teleportation":
