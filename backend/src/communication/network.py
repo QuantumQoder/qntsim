@@ -393,17 +393,18 @@ class Network:
 
     def _request_entanglements(self):
         # Loop through each sequence of keys in messages
-        for key_sequence in self.messages:
+        for node_sequence in self.messages:
             # Loop through each consecutive pair of keys in the sequence
-            for source_key, dest_key in itertools.pairwise(key_sequence):
+            for source_name, dest_name in itertools.pairwise(node_sequence):
                 # Get the source and destination nodes for the entanglement request
-                source_node = self._net_topo.nodes[source_key]
-                dest_node = self._net_topo.nodes[dest_key]
+                source_node = self._net_topo.nodes[source_name]
+                # dest_node = self._net_topo.nodes[dest_name]
+                print(f"Requesting {self.size} entanglements between {source_name} and {dest_name}")
 
                 # Get the transport manager for the source node and send the entanglement request
                 transport_manager = source_node.transport_manager
                 transport_manager.request(
-                    dest_node.name,
+                    dest_name,
                     size=self.size,
                     start_time=self._start_time,
                     end_time=self._end_time,
@@ -729,7 +730,7 @@ class Network:
             List[Dict[int, str]]: The decoded messages for all the 'networks'
         """
         logging.info("messages")
-        return [network._decode(*args) for network in networks]
+        return [network._decode(*arg) for network, arg in zip(networks, args)]
         # executor = ThreadPoolExecutor(max_workers=len(networks))
         # jobs = [executor.submit(network._decode, network, *args) for network in networks]
         # return [job.result() for job in  jobs]

@@ -327,12 +327,13 @@ class ProtocolPipeline:
         logging.info("generated all networks")
 
         # Execute the network flow for all networks in parallel
-        _ = Network.execute(networks=self.networks)
+        returns_list = Network.execute(networks=self.networks)
 
         # If the network flow was not provided as an argument, use the default flow and attempt to decode received messages
         if Network._flow == self.__funcs:
             self.recv_msgs_list = kwds.get("decode", Network.decode)(
-                networks=self.networks
+                networks=self.networks,
+                all_returns=returns_list
             )
 
         # Log the completion time
