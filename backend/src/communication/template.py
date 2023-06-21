@@ -1,13 +1,16 @@
 from abc import ABC, abstractclassmethod
 from typing import Any, Dict, Tuple
-from qntsim.library import Network
+
+from qntsim.communication import Network
+
 
 class Party(ABC):
     """Abstract base class for a party in a communication network."""
 
-    id = str
-    messages = Dict[Tuple, str]
-    rcvd_msgs = Dict[int, str]
+    node: str = None
+    input_messages: Dict[Tuple, str] = None
+    userID: str = None
+    received_msgs: Dict[int, str] = None
     
     @abstractclassmethod
     def encode(cls, network: Network, returns: Any):
@@ -50,3 +53,8 @@ class Party(ABC):
             The measurement outcomes.
         """
         pass
+
+    @classmethod
+    def update_params(cls, **kwargs):
+        for var, val in kwargs.items():
+            setattr(cls, var, val)
