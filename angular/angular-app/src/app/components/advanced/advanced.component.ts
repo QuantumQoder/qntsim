@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { map, Subscription } from 'rxjs';
+import { Subscription, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -430,7 +430,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         receiver: {
           node: this.nodesSelection.receiver,
-        }
+        },
+        error_threshold: this.nodesSelection.errorThreshold,
       }, 7:
       {
         sender: {
