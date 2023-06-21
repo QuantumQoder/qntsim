@@ -79,6 +79,4 @@ src/transport_layer/transport_manager.py
 src/utils/__init__.py
 src/utils/encoding.py
 src/utils/log.py
-src/utils/party.py
 src/utils/quantum_state.py
-tests/test_topology.py
