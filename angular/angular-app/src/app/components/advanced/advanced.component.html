@@ -566,9 +566,10 @@
                                 </div>
                             </p-accordionTab>
                             <p-accordionTab header="Common Parameters"
-                                *ngIf="app_id == 10 || app_id == 9 || app_id == 7">
+                                *ngIf="app_id == 10 || app_id == 9 || app_id == 7 || app_id == 6">
                                 <div class="col-9 mx-auto">
-                                    <div class="mt-1" *ngIf=" app_id == 9 || app_id == 7 || app_id == 10">
+                                    <div class="mt-1"
+                                        *ngIf=" app_id == 9 || app_id == 7 || app_id == 10 || app_id == 6">
                                         <label for="type" class="form-label font-bold"
                                             pTooltip="The EPR pair selected out of four possible choices.">
                                             Bell Type <i class="fa-solid fa-circle-info fa-xs"
@@ -589,7 +590,8 @@
                                         <input type="number" class="form-control"
                                             [(ngModel)]="nodesSelection.errorThreshold">
                                     </div>
-                                    <div class="mt-1" *ngIf=" app_id == 9 || app_id == 7 || app_id == 10">
+                                    <div class="mt-1"
+                                        *ngIf=" app_id == 9 || app_id == 7 || app_id == 10 || app_id == 6">
                                         <label for="type" class="form-label font-bold" pTooltip="External Attack Type">
                                             Attack <i class="fa-solid fa-circle-info fa-xs" style="color: #000000;"></i>
                                         </label>

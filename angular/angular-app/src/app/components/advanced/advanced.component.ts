@@ -427,11 +427,14 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         sender: {
           node: this.nodesSelection.sender,
           message: this.nodesSelection.message,
+          switchProb: this.nodesSelection.switchProb
         },
         receiver: {
           node: this.nodesSelection.receiver,
         },
         error_threshold: this.nodesSelection.errorThreshold,
+        bell_type: `${this.nodesSelection.bellType}`,
+        attack: this.nodesSelection.attack,
       }, 7:
       {
         sender: {
