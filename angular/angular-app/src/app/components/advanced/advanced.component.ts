@@ -276,17 +276,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         return
       }
     }
-    if (this.app_id == 9) {
-      if (this.appSettingsForm.get('inputMessage')?.value == '') {
-        alert("Message is required");
-        return
-      }
-      if (this.appSettingsForm.get('inputMessage')?.value.length % 2 != 0) {
-        alert("Message length should be even ");
-        // this.spinner = false
-        return
-      }
-    }
+
     if (this.app_id == 10 || this.app_id == 9 || this.app_id == 7 || this.app_id == 6) {
       if (this.nodesSelection.message == '') {
         alert("Please select a message")
