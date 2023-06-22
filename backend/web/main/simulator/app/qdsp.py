@@ -29,12 +29,21 @@ def qdsp(topology:Dict, app_settings:Dict):
                       2:basis[1][0],
                       3:basis[1][1]}
     photons = [Photon(name=state, quantum_state=_quantum_state[state]) for state in initial_states]
+    # print("photons", photons)
     hwp = HalfWaveplate(name=np.pi/2, timeline=simulator)
     for photon, msg in zip(photons, messages[0]):
+        print(msg)
         src_node.send_qubit(dst=dst_node.name, qubit=hwp.apply(qubit=photon) if int(msg) else photon)
-    simulator.init()
+        simulator.init()
+        photons = dst_node.qubit_buffer.get(1, [])
+        print("photons,", photons)
+    for event in simulator.events.data_list:
+        print(event.owner, event.activation, event.act_params)
+    # print(simulator.events.data_list)
     simulator.run()
-    photons = dst_node.receive_qubit(src=src_node.name)
+    # print(dst_node.qubit_buffer)
+    photons = dst_node.qubit_buffer.get(1, [])
+    print("photons,", photons)
     results = [Photon.measure(basis=basis[photon.name//2], photon=hwp.apply(qubit=photon) if int(msg) else photon) for photon, msg in zip(photons, messages[1])]
     strings = ["".join([str(result^int(char)) for result, char in zip(results, message)]) for message in messages]
     recv_msgs = to_string(strings=strings, _was_binary=_is_binary)
@@ -44,8 +53,102 @@ def qdsp(topology:Dict, app_settings:Dict):
     end_time = time.time()
     app_settings.update(output_msg=recv_msgs[0], avg_err=err_prct, std_dev=err_sd, info_leak=info_lk, msg_fidelity=msg_fidelity)
     response["application"] = app_settings
+    print("response", response)
     from main.simulator.topology_funcs import network_graph
     response = network_graph(network_topo=configuration, source_node_list=[src_node.name], report=response)
     response["performance"]["execution_time"] = end_time - start_time
 
     return response
+
+
+if __name__=="__main__":
+    topology = {
+        'nodes': [
+            {
+                'Name': 'node1',
+                'Type': 'end',
+                'noOfMemory': 500,
+                'memory': {
+                    'frequency': 80000000,
+                    'expiry': -1,
+                    'efficiency': 1,
+                    'fidelity': 0.93
+                    },
+                'lightSource': {
+                    'frequency': 80000000,
+                    'wavelength': 1550,
+                    'bandwidth': 0,
+                    'mean_photon_num': 0.1,
+                    'phase_error': 0
+                    }
+                },
+            {
+                'Name': 'node2',
+                'Type': 'end',
+                'noOfMemory': 500,
+                'memory': {
+                    'frequency': 80000000,
+                    'expiry': -1,
+                    'efficiency': 1,
+                    'fidelity': 0.93
+                    },
+                'lightSource': {
+                    'frequency': 80000000,
+                    'wavelength': 1550,
+                    'bandwidth': 0,
+                    'mean_photon_num': 0.1,
+                    'phase_error': 0
+                    }
+                }
+            ],
+        'quantum_connections': [
+            {
+                'Nodes': ['node1', 'node2'],
+                'Attenuation': 0.1,
+                'Distance': 70
+                }
+            ],
+        'classical_connections': [
+            {
+                'Nodes': ['node1', 'node1'],
+                'Delay': 0,
+                'Distance': 0
+                },
+            {
+                'Nodes': ['node1', 'node2'],
+                'Delay': 10000000000,
+                'Distance': 1000
+                },
+            {
+                'Nodes': ['node2', 'node1'],
+                'Delay': 10000000000,
+                'Distance': 1000
+                },
+            {
+                'Nodes': ['node2', 'node2'],
+                'Delay': 0,
+                'Distance': 0
+                }
+            ],
+        'detector': {
+            'efficiency': 1,
+            'count_rate': 25000000,
+            'time_resolution': 150
+            }
+        }
+    app_settings = \
+        {
+            "sender":
+                {
+                    "node":"node1",
+                    "message":"1011",
+                },
+            "receiver":
+                {
+                    "node":"node2",
+                    "message":"1001",
+                },
+            "backend":"Qutip",
+            "stoptime":1e12
+        }
+    print("response", qdsp(topology=topology, app_settings=app_settings))

@@ -1,10 +1,10 @@
 """Models simulation of wavepleates (half and quarter)"""
 
 import heapq as hq
-from typing import TYPE_CHECKING
-
 #from numpy import random
 from random import random
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 if TYPE_CHECKING:
@@ -13,8 +13,8 @@ if TYPE_CHECKING:
     from ..components.photon import Photon
     from ..message import Message
 
-from ..kernel.entity import Entity
 from ..kernel._event import Event
+from ..kernel.entity import Entity
 
 
 class Waveplate(Entity):
@@ -44,6 +44,15 @@ class Waveplate(Entity):
         self.power_loss = power_loss
         self.extinction_ratio = extinction_ratio 
 
+    def init(self):
+        """Method to initialize entity.
+
+        Entity `init` methods are invoked for all timeline entities when the timeline is initialized.
+        This method can be used to perform any necessary functions before simulation.
+        """
+
+        pass
+
 
     def apply(self, qubit: "Photon") -> None:
         """Method to apply waveplate transformations to a photon
@@ -68,7 +77,7 @@ class Waveplate(Entity):
         else:
             return None
 
-    def rotate(self,qubit: Photon) -> None:
+    def rotate(self,qubit: "Photon") -> None:
         
         cost = np.cos(self.angle*np.pi/180)
         sint = np.sin(self.angle*np.pi/180)

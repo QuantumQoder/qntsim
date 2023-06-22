@@ -10,27 +10,6 @@ from tokenize import String
 
 import numpy as np
 import pandas as pd
-from pyvis.network import Network
-# from qntsim.library.protocol_handler.protocol_handler import Protocol
-# from qntsim.library.protocol_handler.protocol_handler import Protocol
-from qntsim.communication.protocol import ProtocolPipeline
-from qntsim.topology.topology import Topology
-from tabulate import tabulate
-from qntsim.components.photon import Photon
-
-from .app.e2e import *
-from .app.e91 import *
-from .app.ghz import *
-from .app.ip1 import *
-from .app.mdi_qsdc import *
-from .app.ping_pong import ping_pong
-from .app.qsdc1 import *
-from .app.qsdc_teleportation import *
-from .app.single_photon_qd import *
-from .app.teleportation import *
-from .app.utils import *
-from .helpers import *
-
 # Do Not Remove the following commented imports - this is for local testing purpose
 # from app.e2e import *
 # from app.e91 import *
@@ -44,6 +23,26 @@ from .helpers import *
 # from app.teleportation import *
 # from app.utils import *
 # from helpers import *
+from pyvis.network import Network
+# from qntsim.library.protocol_handler.protocol_handler import Protocol
+# from qntsim.library.protocol_handler.protocol_handler import Protocol
+from qntsim.communication.protocol import ProtocolPipeline
+from qntsim.components.photon import Photon
+from qntsim.topology.topology import Topology
+from tabulate import tabulate
+
+from .app.e2e import *
+from .app.e91 import *
+from .app.ghz import *
+from .app.ip1 import *
+from .app.mdi_qsdc import *
+from .app.ping_pong import ping_pong
+from .app.qsdc1 import *
+from .app.qsdc_teleportation import *
+from .app.single_photon_qd import *
+from .app.teleportation import *
+from .app.utils import *
+from .helpers import *
 
 logger = logging.getLogger("main_logger." + "topology_funs")
 print("TOPP")
@@ -303,7 +302,7 @@ def test_direct_transmission():
     print(f'Buffer at n3:{network_topo.nodes["n3"].qubit_buffer}')
     print(f'Buffer at n4:{network_topo.nodes["n4"].qubit_buffer}')
 
-test_direct_transmission()
+# test_direct_transmission()
 
 def ghz(network_config, endnode1, endnode2, endnode3, middlenode):
     logger.info("End-to-End GHZ Generation")
