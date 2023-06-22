@@ -32,6 +32,8 @@ def qdsp(topology:Dict, app_settings:Dict):
     hwp = HalfWaveplate(name=np.pi/2, timeline=simulator)
     for photon, msg in zip(photons, messages[0]):
         src_node.send_qubit(dst=dst_node.name, qubit=hwp.apply(qubit=photon) if int(msg) else photon)
+    simulator.init()
+    simulator.run()
     photons = dst_node.receive_qubit(src=src_node.name)
     results = [Photon.measure(basis=basis[photon.name//2], photon=hwp.apply(qubit=photon) if int(msg) else photon) for photon, msg in zip(photons, messages[1])]
     strings = ["".join([str(result^int(char)) for result, char in zip(results, message)]) for message in messages]

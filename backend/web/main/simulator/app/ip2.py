@@ -11,6 +11,8 @@ from numpy.random import randint
 from qntsim.communication import (ATTACK_TYPE, Attack, ErrorAnalyzer, Network,
                                   bell_type_state_analyzer, insert_check_bits,
                                   insert_decoy_photons, to_binary, to_string)
+from qntsim.communication.template import Party
+from qntsim.communication.utils import pass_
 from qntsim.components.circuit import QutipCircuit
 
 logger = logging.getLogger("main_logger.application_layer." + "ip2")
@@ -418,7 +420,7 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
     Sender.update_params(**(app_settings.get("sender")))
     Receiver.update_params(**(app_settings.get("receiver")))
     label = app_settings.get("bell_type", "00")
-    error_threshold = app_settings.get("error_threshold")
+    error_threshold = app_settings.get("error_threshold", 0.5)
     attack = app_settings.get("attack")
     channel = app_settings.get("channel")
     channel = [1 if i+1 == channel else 0 for i in range(3)]
@@ -497,6 +499,7 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
     # app_settings.get("receiver")["userID"] = to_string(strings=[app_settings.get("receiver").get("userID")], _was_binary=_is_receiver)[0]
     response = {}
     response["application"] = app_settings
+    print(response)
     from main.simulator.topology_funcs import network_graph
 
     # from ..topology_funcs import network_graph

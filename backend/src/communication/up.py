@@ -1,11 +1,11 @@
 from typing import Any, Dict
 
-from ..kernel.entity import Entity
+from ..kernel._event import Event
 
 
 class CONetR:
-    def __init__(self, name:str, topology:Dict) -> None:
-        self.__name = name or self.__name__
+    def __init__(self, topology:Dict, name:str=None) -> None:
+        self.__name = name or self.__class__.__name__
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         pass

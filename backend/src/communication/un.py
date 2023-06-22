@@ -88,7 +88,7 @@ class Network(Entity):
         self.timeline.run()
         num_epr = sum([1 for info in src_node.memory_array if info.state == "ENTANGLED"])
         if num_epr < demand_size:
-            self._request_entanglements(src_node=src_node, dst_node=dst_node, demand_size=demand_size-num_epr)
+            self._request_entanglements(src_node=src_node, dst_node=dst_node, demand_size=demand_size-num_epr, start_time=self.timeline.now())
 
     def _apply_noise(self, noise:str, qtc:QutipCircuit, keys:List[int]=None):
         model = noise_model()
