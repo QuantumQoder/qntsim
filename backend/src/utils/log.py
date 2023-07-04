@@ -6,7 +6,7 @@ Modules will use the `logger` attribute as a normal logging system, saving log o
 If a file is not set, no output will be recorded.
 
 Attributes:
-    logger (Logger): logger object used for logging by qntsim modules.
+    logger (Logger): logger object used for logging by sequence modules.
     LOG_FORMAT (str): formatting string for logging as '{real time}\t{simulation time}\t%{log level}\t{module name}\t{message}'.
     _log_modules (List[str]): modules to track with logging (given as list of names)
 """
@@ -14,43 +14,66 @@ Attributes:
 import logging
 
 
-def _init_logger():
-    lg = logging.getLogger(__name__)
-    lg.addHandler(logging.NullHandler())
-    return lg
+# def _init_logger():
+#     lg = logging.getLogger(__name__)
+#     lg.addHandler(logging.NullHandler())
+#     return lg
 
 
-logger = _init_logger()
-LOG_FORMAT = '%(asctime)-15s\t%(simtime)s\t%(levelname)-8s\t%(module)s:\t%(message)s'
+# logger = _init_logger()
+LOG_FORMAT = '%(asctime)-15s\t%(levelname)-8s\t%(module)s:\t%(message)s'
 _log_modules = []
 
 
-def set_logger(name: str, timeline, logfile="out.log"):
+def set_logger(name: str, logfile=None):
     """Function to link logger to output file.
 
     The provided timeline is used to add simulation timestamps to the logs.
 
     Args:
         name (str): name to use for the logger.
-        timeline (Timeline): timeline to use for simulation timestamps.
         logfile (str): file to use in recording log output (default "out.log")
     """
 
     global logger
     logger = logging.getLogger(name)
-
-    handler = logging.FileHandler(logfile)
+    # logger.setLevel(logging.DEBUG)
+    if logfile:
+        handler = logging.FileHandler(logfile)
+    else:
+        handler = logging.handlers.MemoryHandler(capacity=1000, flushLevel=logging.WARNING)
+        
     fmt = logging.Formatter(LOG_FORMAT)
-    f = ContextFilter(timeline)
-
+    f = ContextFilter()
+  
     handler.setFormatter(fmt)
     logger.addHandler(handler)
     logger.addFilter(f)
 
     # reset logging
-    open(logfile, 'w').close()
+    if logfile:
+        open(logfile, 'w').close()
     
-
+def read_from_memory(logger, level="INFO"):
+    print("level:",level)
+    log_level = logging.getLevelName(level)
+    print("log_level:", log_level)
+    memory_handlers = logger.handlers
+    # all_memory_logs = []
+    logs =[]
+    for handler in memory_handlers:
+        records = handler.buffer
+        
+        
+        for record in records:
+            # format the log record as a string
+            if record.levelno >= log_level:
+               
+                log_message = f"{record.levelname}: {record.getMessage()}"
+                logs.append(log_message)
+        
+    return logs
+    
 def set_logger_level(level: str):
     """Function to set output level of logger without requiring logging import.
 
@@ -80,11 +103,9 @@ def remove_module(module_name: str):
 class ContextFilter(logging.Filter):
     """Custom filter class to use for the logger."""
 
-    def __init__(self, timeline):
+    def __init__(self):
         super().__init__()
-        self.timeline = timeline
 
     def filter(self, record):
         global _log_modules
-        record.simtime = self.timeline.now()
         return record.module in _log_modules

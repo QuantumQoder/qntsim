@@ -21,7 +21,7 @@ from ..components.circuit import BaseCircuit
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
 import logging
-logger = logging.getLogger("main_logger.link_layer."+ "bk_swapping")
+# logger = logging.getLogger("main_logger.link_layer."+ "bk_swapping")
 class BBPSSWMsgType(Enum):
     """Defines possible message types for entanglement purification"""
 
@@ -162,7 +162,7 @@ class BBPSSW(EntanglementProtocol):
             Will call `update_resource_manager` method.
         """
 
-        #log.logger.info(self.own.name + " received result message, succeeded: {}".format(self.meas_res == msg.meas_res))
+        log.logger.info(self.own.name + " received result message, succeeded: {}".format(self.meas_res == msg.meas_res))
         assert src == self.another.own.name
         self.update_resource_manager(self.meas_memo, "RAW")
         rerun_memo = [self.meas_memo]
@@ -171,15 +171,15 @@ class BBPSSW(EntanglementProtocol):
             # #print('receive pur if')
             self.kept_memo.fidelity = self.improved_fidelity(self.kept_memo.fidelity)
             self.update_resource_manager(self.kept_memo, state="ENTANGLED")
-            logger.info("Purification successful between " + self.own.name + " " + self.another.own.name)
-            # print("Purification successful between " + self.own.name + " " + self.another.own.name + "at timestep" + str(self.kept_memo.timeline.time))
+            # logger.info("Purification successful between " + self.own.name + " " + self.another.own.name)
+            log.logger.debug("Purification successful between " + self.own.name + " " + self.another.own.name + "at timestep" + str(self.kept_memo.timeline.time))
             # self.subtask.on_complete(1)
             status = 1
         else:
             # #print('receive pur else')
             self.update_resource_manager(self.kept_memo, state="RAW")
-            logger.info("Purification failed between " + self.own.name + " " + self.another.own.name)
-            # print("Purification failed between " + self.own.name + " " + self.another.own.name + "at timestep" + str(self.kept_memo.timeline.time))
+            # logger.info("Purification failed between " + self.own.name + " " + self.another.own.name)
+            log.logger.debug("Purification failed between " + self.own.name + " " + self.another.own.name + "at timestep" + str(self.kept_memo.timeline.time))
             # self.subtask.on_complete(-1)
             status = -1
             

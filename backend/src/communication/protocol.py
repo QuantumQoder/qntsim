@@ -330,6 +330,7 @@ class ProtocolPipeline:
         returns_list = Network.execute(networks=self.networks)
 
         # If the network flow was not provided as an argument, use the default flow and attempt to decode received messages
+        print(Network._flow, self.__funcs)
         if Network._flow == self.__funcs:
             self.recv_msgs_list = kwds.get("decode", Network.decode)(
                 networks=self.networks,

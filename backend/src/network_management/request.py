@@ -35,8 +35,9 @@ from ..resource_management.memory_manager import MemoryInfo, MemoryManager
 from ..resource_management.task_manager import SubTask, Task, TaskManager
 from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
                                               ProtocolType)
+from ..utils import log
 
-logger = logging.getLogger("main_logger.network_layer." + "request")
+# logger = logging.getLogger("main_logger.network_layer." + "request")
 #from ..transport_layer.transport_manager import CongestionMsgType
 
 
@@ -451,9 +452,9 @@ class ReservationProtocol():     #(Protocol):
                 # print ("destination",self.node.name)
                 self.request.path.append(self.node)
                 self.request.pathnames.append(self.node.name)
-                logger.info("Resources reserved")
+                # logger.info("Resources reserved")
                 #print("Request ID:", self.requst.id)
-                logger.info("Finalized path"+str(self.request.pathnames))
+                log.logger.info("Finalized path"+str(self.request.pathnames))
                 index=self.request.path.index(self.node)
                 prev_node=self.request.path[index-1]
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.CREATE_TASKS,request=self.request)

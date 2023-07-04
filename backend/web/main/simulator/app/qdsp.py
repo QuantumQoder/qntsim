@@ -35,12 +35,12 @@ def qdsp(topology:Dict, app_settings:Dict):
         print(msg)
         src_node.send_qubit(dst=dst_node.name, qubit=hwp.apply(qubit=photon) if int(msg) else photon)
         simulator.init()
+        simulator.run()
         photons = dst_node.qubit_buffer.get(1, [])
         print("photons,", photons)
     for event in simulator.events.data_list:
         print(event.owner, event.activation, event.act_params)
     # print(simulator.events.data_list)
-    simulator.run()
     # print(dst_node.qubit_buffer)
     photons = dst_node.qubit_buffer.get(1, [])
     print("photons,", photons)

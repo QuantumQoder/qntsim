@@ -26,7 +26,7 @@ from ..utils import log
 from ..components.circuit import BaseCircuit
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 import logging
-logger = logging.getLogger("main_logger.link_layer."+ "bk_swapping")
+# logger = logging.getLogger("main_logger.link_layer."+ "bk_swapping")
 class SwappingMsgType(Enum):
     """Defines possible message types for entanglement generation."""
 
@@ -218,7 +218,7 @@ class EntanglementSwappingA(EntanglementProtocol):
             # logger.log('Entanglement Swapping successful')
             # self.subtask.on_complete(1)
             status = 1
-            logger.info('Entanglement Swapping successful between '+ self.left_protocol.own.name + ", " + self.right_protocol.own.name)
+            # logger.info('Entanglement Swapping successful between '+ self.left_protocol.own.name + ", " + self.right_protocol.own.name)
         else:
             expire_time = min(self.left_memo.get_expire_time(), self.right_memo.get_expire_time())
             msg_l = Message(MsgRecieverType.PROTOCOL, self.left_protocol.name ,SwappingMsgType.SWAP_RES, left_protocol=self.left_protocol.name, fidelity=0,expire_time=expire_time)
@@ -226,7 +226,7 @@ class EntanglementSwappingA(EntanglementProtocol):
             # logger.log('Entanglement Swapping failed')
             # self.subtask.on_complete(-1)
             status = -1
-            logger.info('Entanglement Swapping failed between '+ self.left_protocol.own.name + ", " + self.right_protocol.own.name)
+            # logger.info('Entanglement Swapping failed between '+ self.left_protocol.own.name + ", " + self.right_protocol.own.name)
 
         self.own.message_handler.send_message(self.left_node, msg_l)
         self.own.message_handler.send_message(self.right_node, msg_r)

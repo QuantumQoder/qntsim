@@ -439,7 +439,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 8">
+                                    <!-- <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 8">
                                         <label for="type" class="form-label font-bold"
                                             pTooltip="Sender's message of the dialogue">
                                             Sender's Message <i class="fa-solid fa-circle-info fa-xs"
@@ -468,12 +468,12 @@
                                                 <p class="text-danger">Receiver's Message is required.</p>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
 
                                 </form>
                             </p-accordionTab>
                             <p-accordionTab header="Sender Parameters"
-                                *ngIf="app_id == 10 || app_id == 9 || app_id == 7 || app_id == 6">
+                                *ngIf="app_id == 10 || app_id == 9 || app_id == 7 || app_id == 6 || app_id == 8">
                                 <div class="col-9 mx-auto">
                                     <div class="mt-1 ">
                                         <label for="type" class="form-label font-bold"
@@ -494,6 +494,15 @@
                                         </label>
                                         <input type="text" (keydown)="numericOnly($event)" class="form-control"
                                             [(ngModel)]="nodesSelection.senderId">
+                                    </div>
+                                    <div class="mt-1" *ngIf="app_id == 8">
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The classical message of the sender (enter binary string, only even nos.)">
+                                            Message <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
+                                        </label>
+                                        <input type="text" class="form-control" (keydown)="numericOnly($event)"
+                                            [(ngModel)]="nodesSelection.message1">
                                     </div>
                                     <div class="mt-1">
                                         <label for="type" class="form-label font-bold"
@@ -525,7 +534,8 @@
                                             [(ngModel)]="nodesSelection.numCheckBits">
                                     </div>
                                     <div class="mt-1" *ngIf="app_id == 6">
-                                        <label for="type" class="form-label font-bold" pTooltip="Switch Probability">
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="Switching Probability between service and control mode in the protocol.">
                                             Switch Probability <i class="fa-solid fa-circle-info fa-xs"
                                                 style="color: #000000;"></i>
                                             {{nodesSelection.switchProb}}
@@ -539,7 +549,7 @@
                                 </div>
                             </p-accordionTab>
                             <p-accordionTab header="Receiver Parameters"
-                                *ngIf="app_id == 10 || app_id == 9 || app_id == 7 || app_id == 6">
+                                *ngIf="app_id == 10 || app_id == 9 || app_id == 7 || app_id == 6 || app_id == 8">
                                 <div class="col-9 mx-auto">
                                     <div class="mt-1 ">
                                         <label for="type" class="form-label font-bold"
@@ -552,6 +562,15 @@
                                                 {{data.Name}}
                                             </option>
                                         </select>
+                                    </div>
+                                    <div class="mt-1" *ngIf="app_id == 8">
+                                        <label for="type" class="form-label font-bold"
+                                            pTooltip="The classical message of the receiver(enter binary string, only even nos.)">
+                                            Message <i class="fa-solid fa-circle-info fa-xs"
+                                                style="color: #000000;"></i>
+                                        </label>
+                                        <input type="text" class="form-control" (keydown)="numericOnly($event)"
+                                            [(ngModel)]="nodesSelection.message2">
                                     </div>
                                     <div class="mt-1" *ngIf="app_id == 10 || app_id == 7">
                                         <label for="type" class="form-label font-bold"

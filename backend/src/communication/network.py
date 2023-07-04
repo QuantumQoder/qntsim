@@ -713,6 +713,7 @@ class Network:
                 self._strings.append(string)
         else:
             self._strings = ["".join(str(*output.values()) for output in self._outputs)]
+        print(self._strings)
         self.recv_msgs = {rec[1:]:message for rec, message in zip(list(self.messages)[::-1], to_string(strings=self._strings, _was_binary=self._is_binary))}
         for k, v in self.recv_msgs.items():
             logging.info(f"Received message {k}: {v}")
@@ -720,7 +721,7 @@ class Network:
         return self.recv_msgs
 
     @staticmethod
-    def decode(networks: List["Network"], *args):
+    def decode(networks: List["Network"], all_returns:Any, *args):
         """Decodes the received message from the meaured outputs
 
         Args:
@@ -730,7 +731,7 @@ class Network:
             List[Dict[int, str]]: The decoded messages for all the 'networks'
         """
         logging.info("messages")
-        return [network._decode(*arg) for network, arg in zip(networks, args)]
+        return [network._decode(return_, *arg) for network, return_, arg in zip(networks, all_returns, args)]
         # executor = ThreadPoolExecutor(max_workers=len(networks))
         # jobs = [executor.submit(network._decode, network, *args) for network in networks]
         # return [job.result() for job in  jobs]

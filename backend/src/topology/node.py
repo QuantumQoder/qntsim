@@ -25,6 +25,8 @@ elif Timeline.bk:
     from ..components.bk_memory import Memory, MemoryArray
     from ..components.bk_bsm import SingleAtomBSM
     print("bk node")
+from ..utils import log
+
 
 from ..kernel.entity import Entity
 
@@ -79,6 +81,7 @@ class Node(Entity):
         self.qubit_buffer = {1: []}
         self.all_pair_shortest_dist = None
         self.neighbors = None
+        log.logger.debug("Node")
 
     def init(self) -> None:
         pass

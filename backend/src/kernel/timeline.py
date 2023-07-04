@@ -21,7 +21,7 @@ from ..utils import log
 from .quantum_kernel import QuantumKernel
 from .quantum_manager import QuantumManagerDensity
 import logging
-logger = logging.getLogger("main_logger." + "timeline")
+# logger = logging.getLogger("main_logger." + "timeline")
 
 """
 ch=input("Enter 0 for DLCZ ,1 for barettkok")
@@ -90,7 +90,7 @@ class Timeline:
         """
         log.logger.info("Timeline start simulation")
         
-        logger.info("Timeline started simulation ")
+        # logger.info("Timeline started simulation ")
         tick = time_ns()
         self.is_running = True
 

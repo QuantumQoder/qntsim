@@ -5,7 +5,7 @@ from ..kernel._event import Event
 
 class CONetR:
     def __init__(self, topology:Dict, name:str=None) -> None:
-        self.__name = name or self.__class__.__name__
+        self.__name = name or __class__.__name__
 
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         pass

@@ -5,7 +5,7 @@ from collections import defaultdict
 from aenum import Enum
 # from ..entanglement_management.generation import GenerationMsgType
 import logging
-logger = logging.getLogger("main_logger." + "bk_swapping")
+# logger = logging.getLogger("main_logger." + "bk_swapping")
 
 class MsgRecieverType(Enum):
 

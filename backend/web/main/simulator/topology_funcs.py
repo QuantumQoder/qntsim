@@ -459,6 +459,7 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     print('network config json', network_topo)
     with open("topology.json", "w") as outfile:
         json.dump(topo_json, outfile)
+    print("messages ", sender, receiver, message)
     messages = {(sender, receiver): message}
     # attack=None
     topology = '/code/web/topology.json'

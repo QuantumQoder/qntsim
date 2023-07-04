@@ -24,7 +24,7 @@ from ..components.circuit import BaseCircuit
 from ..utils import log
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 import logging
-logger = logging.getLogger("main_logger.link_layer." + "bk_generation")
+# logger = logging.getLogger("main_logger.link_layer." + "bk_generation")
 class GenerationMsgType(Enum):
     """Defines possible message types for entanglement generation."""
 
@@ -499,10 +499,10 @@ class EntanglementGenerationA(EntanglementProtocol):
         #     print(f'Entanglement successful between (generation) {src,dst}')
         #     logger.info(f'Entanglement successful between {src,dst}')   
         self.subtask.on_complete(1)
-        logger.info(f'Entanglement successful between {self.own.name,self.other}')
+        # log.logger.info(f'Entanglement successful between {self.own.name,self.other}')
         if (self.own.name==src and self.other==dst) or (self.own.name==dst and self.other==src) :
             print(f'Entanglement successful between (generation) {src,dst}')
-            logger.info(f'Entanglement successful between {self.own.name,self.other}')
+            # log.logger.info(f'Entanglement successful between {self.own.name,self.other}')
 
 
     def _entanglement_fail(self):
@@ -516,7 +516,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         # ####print(f'Time of entanglement failure: {self.own.timeline.now()}')
         self.update_resource_manager(self.memory, 'RAW')
         #print('_entanglement_fail:  len(self.subtask.protocols): ', len(self.subtask.protocols))
-        logger.info(f'Entanglement failed between {self.own.name,self.other}')
+        # logger.info(f'Entanglement failed between {self.own.name,self.other}')
         self.subtask.on_complete(-1)
 
 

@@ -25,7 +25,7 @@ from .reservation import Reservation, ResourceReservationProtocol, RSVPMsgType
 from .routing import (NewRoutingProtocol, RoutingTableUpdateProtocol,
                       StaticRoutingProtocol)
 
-logger = logging.getLogger("main_logger." + "network_manager")
+# logger = logging.getLogger("main_logger." + "network_manager")
 
 
 class NetworkManager():

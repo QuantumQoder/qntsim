@@ -48,6 +48,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     numCheckBits: 4,
     errorThreshold: 0.5,
     message: '001100',
+    message1: '0100',
+    message2: '1011',
     senderId: 1010,
     receiverId: 1011,
     bellType: "10",
@@ -453,10 +455,20 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       8:
       {
-        sender: this.nodesSelection.sender,
-        receiver: this.nodesSelection.receiver,
-        message1: this.appSettingsForm.get('message1')?.value,
-        message2: this.appSettingsForm.get('message2')?.value,
+        sender: {
+          node: this.nodesSelection.sender,
+          message: this.nodesSelection.message
+          // num_check_bits: this.nodesSelection.numCheckBits,
+          // num_decoy_photons: this.nodesSelection.numDecoy
+        },
+        receiver: {
+          node: this.nodesSelection.receiver,
+          message: this.nodesSelection.message
+        },
+        // sender: this.nodesSelection.sender,
+        // receiver: this.nodesSelection.receiver,
+        // message1: this.appSettingsForm.get('message1')?.value,
+        // message2: this.appSettingsForm.get('message2')?.value,
         attack: ''
       }, 9:
       {

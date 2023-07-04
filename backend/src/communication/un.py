@@ -24,7 +24,7 @@ class Network(Entity):
         self.__dict__.update(kwargs)
         # if hasattr(self, "size"):
         #     if 
-        Entity(name=name or self.__class__.__name__, timeline=Timeline(stop_time=stop_time, backend=backend, formalism=formalism))
+        Entity(name=name or __class__.__name__, timeline=Timeline(stop_time=stop_time, backend=backend, formalism=formalism))
         self.owner = self
         self.__configuration = Topology(name=self.name, timeline=self.timeline)
         load_topology = self.__configuration.load_config_json if "nodes" in topology else self.__configuration.load_config
