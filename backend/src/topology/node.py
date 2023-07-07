@@ -6,40 +6,43 @@ Node types can be used to collect all the necessary hardware and software for a 
 
 from math import inf
 from time import monotonic_ns
-from typing import TYPE_CHECKING, Any , List
+from typing import TYPE_CHECKING, Any, List
 
 if TYPE_CHECKING:
     #from ..kernel.timeline import Timeline
+    from ..components.optical_channel import ClassicalChannel, QuantumChannel
     from ..message import Message
+    from ..network_management.reservation import Reservation
     from ..protocol import StackProtocol
     from ..resource_management.memory_manager import MemoryInfo
-    from ..network_management.reservation import Reservation
-    from ..components.optical_channel import QuantumChannel, ClassicalChannel
 #from ..kernel.timeline import DLCZ ,bk
 from ..kernel.timeline import Timeline
+
 if Timeline.DLCZ:
-    from ..components.DLCZ_memory import Memory,MemoryArray
     from ..components.DLCZ_bsm import SingleAtomBSM
+    from ..components.DLCZ_memory import Memory, MemoryArray
     print("DLCZ node")
 elif Timeline.bk:
-    from ..components.bk_memory import Memory, MemoryArray
     from ..components.bk_bsm import SingleAtomBSM
+    from ..components.bk_memory import Memory, MemoryArray
     print("bk node")
 from ..utils import log
 
+log.set_logger("Node")
 
-from ..kernel.entity import Entity
 
-from ..components.light_source import LightSource, SPDCSource2
 from ..components.detector import QSDetectorPolarization, QSDetectorTimeBin
-from ..resource_management.resource_manager import ResourceManager
+from ..components.light_source import LightSource, SPDCSource2
+from ..kernel.entity import Entity
+from ..network_management.network_manager import NetworkManager
+from ..network_management.request import RRPMsgType
+from ..resource_management.resource_manager import (MsgRecieverType,
+                                                    ResourceManager,
+                                                    ResourceManagerMsgType)
+from ..resource_management.task_manager import TaskManager
 from ..transport_layer.transport_manager import TransportManager
 from ..utils.encoding import *
-from ..network_management.request import RRPMsgType
-from ..network_management.network_manager import NetworkManager
 from .message_queue_handler import MessageQueueHandler
-from ..resource_management.task_manager import TaskManager
-from ..resource_management.resource_manager import MsgRecieverType ,ResourceManagerMsgType
 
 """
 def force_import(backend):
@@ -196,9 +199,11 @@ class BSMNode(Node):
         from ..kernel.timeline import Timeline
         if Timeline.DLCZ:
             #print('DLCZ node egb')
-            from ..entanglement_management.DLCZ_generation import EntanglementGenerationB
+            from ..entanglement_management.DLCZ_generation import \
+                EntanglementGenerationB
         elif Timeline.bk:
-            from ..entanglement_management.bk_generation import EntanglementGenerationB
+            from ..entanglement_management.bk_generation import \
+                EntanglementGenerationB
         Node.__init__(self, name, timeline)
         self.bsm = SingleAtomBSM("%s_bsm" % name, timeline)
         self.eg = EntanglementGenerationB(self, "{}_eg".format(name), other_nodes)
