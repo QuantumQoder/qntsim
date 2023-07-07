@@ -29,21 +29,14 @@ def qdsp(topology:Dict, app_settings:Dict):
                       2:basis[1][0],
                       3:basis[1][1]}
     photons = [Photon(name=state, quantum_state=_quantum_state[state]) for state in initial_states]
-    # print("photons", photons)
     hwp = HalfWaveplate(name=np.pi/2, timeline=simulator)
     for photon, msg in zip(photons, messages[0]):
         print(msg)
         src_node.send_qubit(dst=dst_node.name, qubit=hwp.apply(qubit=photon) if int(msg) else photon)
-        simulator.init()
-        simulator.run()
-        photons = dst_node.qubit_buffer.get(1, [])
-        print("photons,", photons)
-    for event in simulator.events.data_list:
-        print(event.owner, event.activation, event.act_params)
-    # print(simulator.events.data_list)
-    # print(dst_node.qubit_buffer)
+    simulator.init()
+    simulator.run()
     photons = dst_node.qubit_buffer.get(1, [])
-    print("photons,", photons)
+    print("final photons,", photons)
     results = [Photon.measure(basis=basis[photon.name//2], photon=hwp.apply(qubit=photon) if int(msg) else photon) for photon, msg in zip(photons, messages[1])]
     strings = ["".join([str(result^int(char)) for result, char in zip(results, message)]) for message in messages]
     recv_msgs = to_string(strings=strings, _was_binary=_is_binary)

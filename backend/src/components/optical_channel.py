@@ -6,10 +6,9 @@ OpticalChannels must be attached to nodes on both ends.
 """
 
 import heapq as hq
-from typing import TYPE_CHECKING
-
 #from numpy import random
 from random import random
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..kernel.timeline import Timeline
@@ -17,8 +16,9 @@ if TYPE_CHECKING:
     from ..components.photon import Photon
     from ..message import Message
     from ..network_management.request import RRPMsgType
-from ..kernel.entity import Entity
+
 from ..kernel._event import Event
+from ..kernel.entity import Entity
 from ..network_management.request import RRPMsgType
 
 
@@ -137,7 +137,7 @@ class QuantumChannel(OpticalChannel):
             assert time == self.timeline.now(), "qc {} transmit method called at invalid time".format(self.name)
 
         # check if photon kept
-        if (random() > self.loss) or qubit.is_null:
+        if (random() > self.loss) or not qubit.is_null:
             # check if polarization encoding and apply necessary noise
             if (qubit.encoding_type["name"] == "polarization") and (
                     random() > self.polarization_fidelity):
