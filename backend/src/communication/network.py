@@ -731,7 +731,7 @@ class Network:
             List[Dict[int, str]]: The decoded messages for all the 'networks'
         """
         logging.info("messages")
-        return [network._decode(return_, *arg) for network, return_, arg in zip(networks, all_returns, args)]
+        return [network._decode(return_, *arg) for network, return_, arg in zip(networks, all_returns, args if args else [[None]]*len(networks))]
         # executor = ThreadPoolExecutor(max_workers=len(networks))
         # jobs = [executor.submit(network._decode, network, *args) for network in networks]
         # return [job.result() for job in  jobs]
