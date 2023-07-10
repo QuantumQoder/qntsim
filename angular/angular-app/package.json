@@ -1,12 +1,17 @@
 {
   "name": "qntsim",
   "version": "0.0.0",
+  "main": "main.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open --port 3800",
     "build": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "electron": "electron .",
+    "electron-build": "ng build --configuration=production && electron .",
+    "electron-package-win": "ng build --prod && electron-packager . --no-prune --ignore=/node_modules --ignore=/e2e --ignore=/src --overwrite",
+    "electron-package-mac": "electron-packager . --platform=darwin --no-prune --ignore=/node_modules --ignore=/e2e --ignore=/src"
   },
   "private": true,
   "dependencies": {
@@ -58,6 +63,8 @@
     "@types/jasmine": "~3.10.0",
     "@types/node": "^12.11.1",
     "@types/three": "^0.149.0",
+    "electron": "^25.2.0",
+    "electron-packager": "^17.1.1",
     "jasmine-core": "~3.10.0",
     "javascript-obfuscator": "^4.0.0",
     "karma": "~6.3.0",
