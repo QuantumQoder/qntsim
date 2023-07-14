@@ -7,16 +7,17 @@ The manager defines an API for interacting with quantum states.
 
 from abc import abstractmethod
 from copy import copy
-from typing import List, Dict, Tuple, TYPE_CHECKING
 from math import sqrt
+from typing import TYPE_CHECKING, Dict, List, Tuple
 
-from qutip.qip.circuit import QubitCircuit, Gate
 # from qutip.qip.operations import gate_qntsim_product
-from numpy import log2, array, kron, identity, zeros, arange, outer
-from numpy.random import random_sample, choice
+from numpy import arange, array, identity, kron, log2, outer, zeros
+from numpy.random import choice, random_sample
 from qiskit import *
-from .quantum_utils import *
 from qiskit import quantum_info
+from qutip.qip.circuit import Gate, QubitCircuit
+
+from .quantum_utils import *
 
 
 class QuantumManager():
@@ -41,7 +42,7 @@ class QuantumManager():
         """
         pass
 
-    def get(self, key: int) -> "State":
+    def get(self, key: int) -> "KetState":
         """Method to get quantum state stored at an index.
         Args:
             key (int): key for quantum state.
