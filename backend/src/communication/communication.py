@@ -48,7 +48,6 @@ class Communication(Timeline):
         load_topology = self.__topology.load_config_json if "nodes" in topology else self.__topology.load_config
         load_topology(config=topology)
         for _, node in self.__topology.nodes.items():
-        for _, node in self.__topology.nodes.items():
             node.keys = [info.memory.qstate_key for info in node.memory_array if type(node) in [EndNode, ServiceNode]]
         if require_entanglements:
             for nodes in self._bin_strs:
