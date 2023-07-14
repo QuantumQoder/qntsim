@@ -7,6 +7,7 @@ from numpy import mean
 
 from ..kernel._event import Event
 from ..utils import log
+from ..utils.log import logger
 from .attack import ATTACK_TYPE, Attack
 from .network import Network
 from .security_checks import insert_check_bits
@@ -227,13 +228,13 @@ class ProtocolPipeline:
         self.__kwds = kwds
         self._index = -1
 
-        # Set up logging
-        logging.basicConfig(
-            filename=self.__name + ".log",
-            filemode="w",
-            level=logging.INFO,
-            format="%(pathname)s > %(threadName)s : %(module)s . %(funcName)s %(message)s",
-        )
+        # # Set up logging
+        # logging.basicConfig(
+        #     filename=self.__name + ".log",
+        #     filemode="w",
+        #     level=logging.INFO,
+        #     format="%(pathname)s > %(threadName)s : %(module)s . %(funcName)s %(message)s",
+        # )
 
         self.messages_list = messages_list
         self.__funcs = []
@@ -325,7 +326,7 @@ class ProtocolPipeline:
         mid_time = time_ns()
 
         # Log that all networks have been generated
-        logging.info("generated all networks")
+        logger.info("generated all networks")
 
         # Execute the network flow for all networks in parallel
         returns_list = Network.execute(networks=self.networks)
@@ -338,7 +339,7 @@ class ProtocolPipeline:
             )
 
         # Log the completion time
-        logging.info(
+        logger.info(
             f"completed execution within {(time_ns()-start_time-mid_time):e} ns"
         )
 
