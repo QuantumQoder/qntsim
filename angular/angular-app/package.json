@@ -1,7 +1,7 @@
 {
   "name": "qntsim",
   "version": "0.0.0",
-  "main": "main.js",
+  
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open --port 3800",
