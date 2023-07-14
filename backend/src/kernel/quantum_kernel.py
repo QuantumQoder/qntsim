@@ -68,7 +68,7 @@ class QuantumKernel():
         """
         pass
 
-    def get(self, key: int) -> "State":
+    def get(self, key: int) -> "KetState":
         """Method to get quantum state stored at an index.
         Args:
             key (int): key for quantum state.
