@@ -1,17 +1,19 @@
 from abc import abstractmethod
 from copy import copy
-from multiprocessing import Manager
-from typing import List, Dict, Tuple, TYPE_CHECKING
 from math import sqrt
-from qutip.qip.circuit import QubitCircuit, Gate
-from qutip.qip.operations import gate_sequence_product
-from numpy import log2, array, kron, identity, zeros, arange, outer
-from numpy.random import random_sample, choice
-from qiskit import *
-from .quantum_utils import *
-from qiskit import quantum_info
+from multiprocessing import Manager
 from random import random
+from typing import TYPE_CHECKING, Dict, List, Tuple
 
+from numpy import arange, array, identity, kron, log2, outer, zeros
+from numpy.random import choice, random_sample
+from qiskit import *
+from qiskit import quantum_info
+from qutip.qip.circuit import Gate, QubitCircuit
+from qutip.qip.operations import gate_sequence_product
+
+from ..components.circuit import Circuit
+from .quantum_utils import *
 
 """
 def Factory(backend_circuit ="English"):
