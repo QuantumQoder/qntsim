@@ -7,8 +7,9 @@ from numpy.random import choice
 from qntsim.communication import Network
 from qntsim.components.circuit import QutipCircuit
 from qntsim.topology.node import EndNode
+from qntsim.utils import log
 
-logger = logging.getLogger("main.application.seminal_qsdc")
+# logger = logging.getLogger("main.application.seminal_qsdc")
 
 def seminal_qsdc(topology:Dict, app_settings:Dict):
     s = time.time()
@@ -43,18 +44,18 @@ def foo1(network:Network, _, node_name:str, err_threshold1:float=0.5):
     return measured_pairs
 
 def first_check(network:Network, measured_pairs:Dict[Tuple[int], Dict[int, int]]):
-    logger.info("First security check initiated")
+    log.logger.info("First security check initiated")
     qtc = QutipCircuit(1)
     qtc = network._add_noise(err_type="reset", qtc=qtc)
     qtc.measure(0)
     if mean(network._bell_pairs.get(keys) == (network._add_noise(err_type="readout", qtc=qtc, keys=set(keys)-set(output)).get(set(keys)-set(output)), output.get(list(output)[0])) for keys, output in measured_pairs.items())>0.75:
-        logger.error("Eavesdropper detected during first check")
+        log.logger.error("Eavesdropper detected during first check")
         return {"Err_msg":"Eavesdropper detected in first check!!"}
-    logger.info("First security check passed")
+    log.logger.info("First security check passed")
 
 def second_check(network:Network, err_msg:Dict[str], node_name:str, err_threshold2:float=0.5):
     if err_msg: return err_msg
-    logger.info("Second security check initiated")
+    log.logger.info("Second security check initiated")
     node:EndNode = network._net_topo.nodes.get(node_name)
     qtc = QutipCircuit(2)
     qtc = network._add_noise(err_type="reset", qtc=qtc)
@@ -65,9 +66,9 @@ def second_check(network:Network, err_msg:Dict[str], node_name:str, err_threshol
     # for info in node.resource_manager.memory_manager:
         # if info.state != ""
     if mean((bell_pair:=network._bell_pairs.get((keys:=network.manager.get(info.memory.qstate_key)))) == ((output:=network._add_noise(err_type="readout", qtc=qtc, keys=keys)).get(keys[0]), output.get(keys[1])) if choice([0, 1], p=[1-err_threshold2, err_threshold2]) else bell_pair for info in node.resource_manager.memory_manager if info.state=="ENTANGLED")>0.75:
-        logger.error("Eavesdropper detected during first check")
+        log.logger.error("Eavesdropper detected during first check")
         return {"Err_msg":"Eavesdropper detected in first check!!"}
-    logger.info("Second security check initiated")
+    log.logger.info("Second security check initiated")
 
 
 if __name__=="__main__":

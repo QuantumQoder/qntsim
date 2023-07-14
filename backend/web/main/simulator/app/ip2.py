@@ -14,8 +14,9 @@ from qntsim.communication import (ATTACK_TYPE, Attack, ErrorAnalyzer, Network,
 from qntsim.communication.template import Party
 from qntsim.communication.utils import pass_
 from qntsim.components.circuit import QutipCircuit
+from qntsim.utils import log
 
-logger = logging.getLogger("main_logger.application_layer." + "ip2")
+# logger = logging.getLogger("main_logger.application_layer." + "ip2")
 # from main.simulator.topology_funcs import network_graph
 
 
@@ -63,7 +64,7 @@ class Sender(Party):
         for key, mod_msg in zip(cls.input_messages, modified_message.values()):
             cls.input_messages[key] = mod_msg
         logging.info(f"in message by {cls.__name__}!")
-        logger.info("Check bits inserted by sender")
+        log.logger.info("Check bits inserted by sender")
 
     @classmethod
     def encode(cls, network: Network, returns: Any, receiver:'Receiver'):
@@ -110,8 +111,8 @@ class Sender(Party):
                 qtc.h(0)
             network.manager.run_circuit(qtc, [d])
         logging.info(f"message by {cls.__name__}")
-        logger.info(f"message by {cls.__name__}")
-        logger.info("bits encoded by sender")
+        log.logger.info(f"message by {cls.__name__}")
+        log.logger.info("bits encoded by sender")
 
         return cls.d_a
 
@@ -133,8 +134,8 @@ class Sender(Party):
         )
         cls.q_a = cls.s_a + cls.i_a + cls.d_a
         logging.info(f"in key-sequence by {cls.__name__}")
-        logger.info(f"in key-sequence by {cls.__name__}")
-        logger.info("Inserted decoy photons by sender")
+        log.logger.info(f"in key-sequence by {cls.__name__}")
+        log.logger.info("Inserted decoy photons by sender")
         return cls.d_a
 
 
@@ -177,7 +178,7 @@ class Receiver(Party):
             network=network, node_index=1, num_decoy_photons=num_decoy_photons
         )
         logging.info(f"keys for epr pairs and decoy photons by {cls.__name__}")
-        logger.info(f"keys for epr pairs and decoy photons by {cls.__name__}")
+        log.logger.info(f"keys for epr pairs and decoy photons by {cls.__name__}")
         cls.d_b = sorted(list(set(cls.d_b) - set(cls.d_a)))
 
         return seq_a, list(seq_a[-len(cls.userID) // 2 :]), cls.d_a
@@ -196,7 +197,7 @@ class Receiver(Party):
             str(output) for outputs in returns for output in outputs.values()
         )
         outputs = "".join([str(int(network.label[0])^int(o0))+str(int(network.label[1])^int(o1)) for o0, o1 in zip(outputs[::2], outputs[1::2])])
-        logger.info("message decoded by receiver")
+        log.logger.info("message decoded by receiver")
         return outputs
 
     @classmethod
@@ -225,8 +226,8 @@ class Receiver(Party):
             logging.info(f"failed, err= {1 - err_prct}")
             return
         logging.info(f"passed, messages received: {cls.received_msgs}")
-        logger.info(f"passed, messages received: {cls.received_msgs}")
-        logger.info("Integrity checked by receiver")
+        log.logger.info(f"passed, messages received: {cls.received_msgs}")
+        log.logger.info("Integrity checked by receiver")
 
 class UTP:
     @classmethod
@@ -265,8 +266,8 @@ class UTP:
             return {"-1":f'failed between {cls1.__name__} and {cls2.__name__}, err={mean(err)}'}
             # os._exit(f'Security of the channel between {cls1.__name__} and {cls2.__name__} is compromised.')
         logging.info(f"passed between {cls1.__name__} and {cls2.__name__}")
-        logger.info(f"passed between {cls1.__name__} and {cls2.__name__}")
-        logger.info("Channel security checked by UTP")
+        log.logger.info(f"passed between {cls1.__name__} and {cls2.__name__}")
+        log.logger.info("Channel security checked by UTP")
         return returns
 
     @staticmethod
@@ -325,8 +326,8 @@ class UTP:
             # os._exit(f'{cls1.__name__} is not authenticated')
         else:
             logging.info(f"{cls1.__name__}, passed!")
-            logger.info(f"{cls1.__name__}, passed!")
-            logger.info("Channle authenticated by UTP")
+            log.logger.info(f"{cls1.__name__}, passed!")
+            log.logger.info("Channle authenticated by UTP")
 
         return outputs
 
@@ -348,7 +349,7 @@ class UTP:
                 outputs.append(
                     network.manager.run_circuit(circuit=circuit, keys=state.keys)
                 )
-        logger.info("measurement performed by UTP")
+        log.logger.info("measurement performed by UTP")
         return outputs
 
 

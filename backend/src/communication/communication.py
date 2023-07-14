@@ -1,7 +1,7 @@
 import math
 from collections import deque
 from functools import reduce
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Optional, Tuple, Union
 
 import numpy as np
 
@@ -47,6 +47,7 @@ class Communication(Timeline):
         self.__topology = Topology(name=self.__name, timeline=self)
         load_topology = self.__topology.load_config_json if "nodes" in topology else self.__topology.load_config
         load_topology(config=topology)
+        for _, node in self.__topology.nodes.items():
         for _, node in self.__topology.nodes.items():
             node.keys = [info.memory.qstate_key for info in node.memory_array if type(node) in [EndNode, ServiceNode]]
         if require_entanglements:
@@ -141,24 +142,6 @@ class Communication(Timeline):
         if num_epr < demand_size:
             logger.debug(f"Demand size not met. Requesting for {demand_size-num_epr} entanglements.")
             self._request_entanglements(src_node=src_node, dst_node=dst_node, demand_size=demand_size-num_epr, start_time=self.now())
-
-    def _identify_entanglements(self, src_node:EndNode, dst_node:EndNode):
-        self.epr_pairs = {}
-        self.epr_pairs.update({(src_node, dst_node):"asd"})
-
-    def _initialize_photons(self, src_node:EndNode, dst_node:EndNode, initial_states:Optional[List[int | str]]):
-        assert initial_states == self.size, f"The length of the initial states array must be of he size {self.size}"
-        initial_states = initial_states or np.random.randint(4, size=self.size)
-        basis = getattr(encoding, self.basis).get("bases")
-        quantum_state = {0:basis[0][0],
-                         1:basis[0][1],
-                         2:basis[1][0],
-                         3:basis[1][1]}
-        self.photons = {(src_node, dst_node):[Photon(name=initial_state,
-                                                     wavelength=self.wavelength,
-                                                     location=self,
-                                                     quantum_state=quantum_state[initial_state]) for initial_state in initial_states]}
-        logger.debug(f"Initialized {self.size} photons with initial states {initial_states} at {src_node.name}")
 
     def _apply_noise(self, noise:str, qtc:QutipCircuit, keys:List[int]=None):
         model = noise_model()

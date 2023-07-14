@@ -10,17 +10,19 @@ from qiskit import *
 from qiskit.quantum_info import random_statevector
 from qntsim.components.circuit import QutipCircuit
 from qntsim.topology.topology import Topology
+from qntsim.utils import log
 from qutip.qip.operations import gate_sequence_product
 from tabulate import tabulate
 
-logger = logging.getLogger("main_logger.application_layer." + "ghz")
+# logger = logging.getLogger("main_logger.application_layer." + "ghz")
+# logger = log.logger
 
 
 class GHZ():
 
     #Requesting transport manager for entanglements
     def request_entanglements(self,endnode1,endnode2,endnode3,middlenode):
-        logger.info("Requesting three two-party entanglements")
+        log.logger.info("Requesting three two-party entanglements")
         endnode1.transport_manager.request(middlenode.owner.name, 5e12,1, 20e12, 0 , 0.5,2e12) 
         endnode2.transport_manager.request(middlenode.owner.name, 5e12,1, 20e12, 0 , 0.5,2e12) 
         endnode3.transport_manager.request(middlenode.owner.name, 5e12,1, 20e12, 0 , 0.5,2e12) 
@@ -32,7 +34,7 @@ class GHZ():
         endnode1=alice
         endnode2=bob
         endnode3=charlie
-        logger.info('endnode1 , endnode2, endnode3, middlenode are '+endnode1.owner.name+ ", "+endnode2.owner.name+ ", "+endnode3.owner.name+ ", "+middlenode.owner.name)
+        log.logger.info('endnode1 , endnode2, endnode3, middlenode are '+endnode1.owner.name+ ", "+endnode2.owner.name+ ", "+endnode3.owner.name+ ", "+middlenode.owner.name)
         
         return self.request_entanglements(endnode1,endnode2,endnode3,middlenode)
 
@@ -103,7 +105,7 @@ class GHZ():
         print("Output", output)
         ghz_state = qm_middle.get(middle_key).state
         print("\nGHZ State\n",  qm_middle.get(middle_key).state)
-        logger.info("obtained GHZ state: " + str(qm_middle.get(alice_key).state))
+        log.logger.info("obtained GHZ state: " + str(qm_middle.get(alice_key).state))
         print("\nGHZ State alice\n",  qm_middle.get(alice_key).state)
         print("\nGHZ State bob\n",  qm_middle.get(bob_key).state)
         print("\nGHZ State charlie\n",  qm_middle.get(charlie_key).state)
