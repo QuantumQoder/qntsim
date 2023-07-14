@@ -1,7 +1,6 @@
 import inspect
 import itertools
 import json
-import logging
 import os
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -15,8 +14,10 @@ from numpy.random import randint
 from pandas import DataFrame
 
 from ..components.circuit import QutipCircuit
+from ..kernel.entity import Entity
 from ..kernel.timeline import Timeline
 from ..topology.topology import Topology
+from ..utils import log
 from .circuits import bell_type_state_analyzer
 from .noise import ERROR_TYPE
 from .NoiseModel import noise_model
@@ -24,9 +25,10 @@ from .utils import to_binary, to_string
 
 Timeline.bk = True
 Timeline.DLCZ = False
+logger = log.logger
 
 
-class Network:
+class Network(Entity):
     """
     Initializes a quantum network object, which consists of nodes that can communicate with each other using qubits.
 
@@ -227,6 +229,7 @@ class Network:
     ) -> None:
         self.__name = name
         self._topology = topology
+        # self._topology = topology if isinstance(topology, Dict) else json.loads(topology) if ".json" in topology else None
         self._backend = backend
         # self._parameters = parameters
         self._stop_time = stop_time
@@ -255,7 +258,7 @@ class Network:
 
         # if caller != ProtocolPipeline.__name__:
         #     print("Configuring logger!")
-        #     logging.basicConfig(
+        #     logger.basicConfig(
         #         filename=self.__name + ".log",
         #         filemode="w",
         #         level=logging.INFO,
@@ -335,7 +338,7 @@ class Network:
 
             # Clear the output and log information
             clear_output()
-            logging.info("EPR pair generator")
+            logger.info("EPR pair generator")
 
         # Otherwise, initialize photons
         else:
@@ -499,7 +502,7 @@ class Network:
                 qtc.h(0)
             self.manager.run_circuit(qtc, [key])
         self._initials = self._initials.tolist()
-        logging.info(
+        logger.info(
             f"Initialized {self.size} photons with initial states {self._initials}"
         )
 
@@ -593,7 +596,7 @@ class Network:
             if int(bin):
                 key = info.memory.qstate_key
                 self.manager.run_circuit(qtc, [key])
-        logging.info("message bits into qubits")
+        logger.info("message bits into qubits")
 
     def superdense_code(self, _: Any, msg_index: int, node_index: int = 0):
         """Encodes 2-bit classical information through superdense coding.
@@ -616,7 +619,7 @@ class Network:
                 qtc.z(0)
             key = info.memory.qstate_key
             self.manager.run_circuit(qtc, [key])
-        logging.info("message bits into the channel")
+        logger.info("message bits into the channel")
 
     def teleport(self, _: Any, node_index: int = 0, msg_index: int = 0):
         """Encodes message bit as superposed states and then teleports the state over the entangled channel. 0's and 1's are encoded as '+' and '-' quantum states, respectively.
@@ -640,7 +643,7 @@ class Network:
                 outputs = self._add_noise(err_type="readout", qtc=bsa, keys=[new_key, key])
                 self._corrections[keys] = [outputs.get(new_key), outputs.get(key)]
                 print(key, state.keys, new_key, info.state)
-        logging.info("message states")
+        logger.info("message states")
 
     def measure(self, _: Any):
         """Measures the qubits and stores the output for decoding the message
@@ -716,7 +719,7 @@ class Network:
         print(self._strings)
         self.recv_msgs = {rec[1:]:message for rec, message in zip(list(self.messages)[::-1], to_string(strings=self._strings, _was_binary=self._is_binary))}
         for k, v in self.recv_msgs.items():
-            logging.info(f"Received message {k}: {v}")
+            logger.info(f"Received message {k}: {v}")
 
         return self.recv_msgs
 
@@ -730,7 +733,7 @@ class Network:
         Returns:
             List[Dict[int, str]]: The decoded messages for all the 'networks'
         """
-        logging.info("messages")
+        logger.info("messages")
         return [network._decode(return_, *arg) for network, return_, arg in zip(networks, all_returns, args if args else [[None]]*len(networks))]
         # executor = ThreadPoolExecutor(max_workers=len(networks))
         # jobs = [executor.submit(network._decode, network, *args) for network in networks]
@@ -745,14 +748,14 @@ class Network:
             node_name (str, optional): Index of the node to be dumped. Defaults to ''.
             info_state (str, optional): State of the memory to be dumped. Choices = ['ENTANGLED', 'OCCUPIED', 'RAW']. Defaults to '', upon which all memories are dumped.
         """
-        logging.basicConfig(
-            filename=self.__name + ".log",
-            filemode="w",
-            level=logging.INFO,
-            format="%{funcName}s %(message)s",
-        )
+        # logging.basicConfig(
+        #     filename=self.__name + ".log",
+        #     filemode="w",
+        #     level=logging.INFO,
+        #     format="%{funcName}s %(message)s",
+        # )
         for node in [self._net_topo.nodes.get(node_name)] if node_name else self.nodes:
-            logging.info(f"{node.owner.name}'s memory arrays")
+            logger.info(f"{node.owner.name}'s memory arrays")
             keys, states = [], []
             for info in node.resource_manager.memory_manager:
                 if not info_state or info.state == info_state:
@@ -761,7 +764,7 @@ class Network:
                     keys.append(state.keys)
                     states.append(state.state)
                 dataframe = DataFrame({"keys": keys, "states": states})
-        logging.info(dataframe.to_string())
+        logger.info(dataframe.to_string())
 
     def draw(self, _: Any):
         """_summary_

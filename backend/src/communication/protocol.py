@@ -1,4 +1,3 @@
-import logging
 from functools import partial
 from time import time, time_ns
 from typing import Any, Dict, List, Tuple
@@ -6,6 +5,8 @@ from typing import Any, Dict, List, Tuple
 from IPython.display import clear_output
 from numpy import mean
 
+from ..kernel._event import Event
+from ..utils import log
 from .attack import ATTACK_TYPE, Attack
 from .network import Network
 from .security_checks import insert_check_bits
