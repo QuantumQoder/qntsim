@@ -1,59 +1,110 @@
 import math
 from collections import deque
 from functools import reduce
-from typing import Any, Callable, Dict, List, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+
+import numpy as np
 
 from ..components.circuit import QutipCircuit
-from ..kernel.entity import Entity
+from ..components.photon import Photon
 from ..kernel.timeline import Timeline
 from ..topology.node import EndNode, ServiceNode
 from ..topology.topology import Topology
+from ..utils import encoding, log
 from .circuits import bell_type_state_analyzer, xor_type_state_analyzer
 from .NoiseModel import noise_model
+from .relay_manager import RelayManager
 from .utils import to_binary, to_string
 
+logger = log.logger
+RelayManager.DLCZ = False
+RelayManager.bk = True
 
-class Network(Entity):
-    _obj:'Network' = None
+
+class Communication(Timeline):
+    _obj:'Communication' = None
     _flow:List[Callable] = []
 
-    def __init__(self, name:str, topology:Dict, messages, stop_time:float, backend:str="Qutip", formalism:str="ket_vector", require_entanglements:bool=True, timeout:int=10e12, **kwargs) -> None:
+    def __init__(self,
+                 name:str,
+                 topology:Dict[str, Dict[str, Any]],
+                 messages:Dict[Tuple[str], str],
+                 stop_time:float,
+                 backend:str="Qutip",
+                 formalism:str="ket_vector",
+                 require_entanglements:bool=True,
+                 timeout:int=10e12,
+                 **kwargs) -> None:
+        self._obj = self
+        self.__name = name or __class__.__name__
         self.__timeout = timeout
         self.messages = messages
         self.__is_binary, self._bin_strs = to_binary()
         self.__dict__.update(kwargs)
         # if hasattr(self, "size"):
         #     if 
-        Entity(name=name or __class__.__name__, timeline=Timeline(stop_time=stop_time, backend=backend, formalism=formalism))
-        self.owner = self
-        self.__configuration = Topology(name=self.name, timeline=self.timeline)
-        load_topology = self.__configuration.load_config_json if "nodes" in topology else self.__configuration.load_config
+        Timeline.__init__(self=self, stop_time=stop_time, backend=backend, formalism=formalism)
+        self.__topology = Topology(name=self.__name, timeline=self)
+        load_topology = self.__topology.load_config_json if "nodes" in topology else self.__topology.load_config
         load_topology(config=topology)
-        for _, node in self.__configuration.nodes.items():
+        for _, node in self.__topology.nodes.items():
             node.keys = [info.memory.qstate_key for info in node.memory_array if type(node) in [EndNode, ServiceNode]]
-        # if require_entanglements:
-        #     self._request_entanglements()
-        #     self.__simulator.init()
-        #     self.__simulator.run()
-        #     self._identify_entanglements()
-        # else:
-        #     self._initialize_photons()
+        if require_entanglements:
+            for nodes in self._bin_strs:
+                src_node = nodes[0]
+                dst_nodes = nodes[1:]
+                for dst_node in dst_nodes:
+                    self._request_entanglements(src_node=self.__topology.nodes.get(src_node),
+                                                dst_node=self.__topology.nodes.get(dst_node),
+                                                demand_size=self.size,
+                                                start_time=self.start_time,
+                                                end_time=self.end_time,
+                                                priority=self.priority,
+                                                target_fidelity=self.target_fidelity)
+                    logger.info(f"{self.size} EPR pairs generated between {src_node} and {dst_node}")
+                    self._identify_entanglements(src_node=src_node,
+                                                 dst_node=dst_node)
+        else:
+            for nodes in self._bin_strs:
+                src_node = nodes[0]
+                dst_nodes = nodes[1:]
+                for dst_node in dst_nodes:
+                    self._initialize_photons(src_node=self.__topology.nodes.get(src_node),
+                                             dst_node=self.__topology.nodes.get(dst_node),
+                                             initial_states=self.initial_states)
+        self.is_running = True
+
+    def __getattr__(self, name):
+        if hasattr(self, name):
+            return getattr(self, name)
+        if name == "size":
+            return len(list(self._bin_strs.values())[0])
+        if name == "start_time":
+            return self.now()
+        if name == "end_time":
+            return self.now() + 10e12
+        if name == "priority":
+            return 0
+        if name == "target_fidelity":
+            return 0.99
+        if name == "initial_states":
+            return None
 
     def __iter__(self):
-        return iter(self.__configuration.get_nodes_by_type("EndNode"))
+        return iter(self.__topology.get_nodes_by_type("EndNode"))
 
     def __getitem__(self, item):
-        return self.__configuration.nodes.get(item)
+        return self.__topology.nodes.get(item)
 
     def __call__(self, id_:int=0) -> Any:
         self.id = id_
-        self.name += id_
+        self.__name += id_
         return reduce(function=lambda ret, func:func(self, ret), sequence=self._flow, initial=())
 
     def __repr__(self) -> str:
         return "\n".join(
             [
-                f"Memory keys of: {node.owner.name}\n"
+                f"Memory keys of: {node.name}\n"
                 + "\n".join(
                     [
                         f"{state.keys}\t{state.state}"
@@ -84,11 +135,30 @@ class Network(Entity):
                                   priority=priority,
                                   target_fidelity=target_fidelity,
                                   timeout=self.__timeout)
-        self.timeline.init()
-        self.timeline.run()
+        self.init()
+        self.run()
         num_epr = sum([1 for info in src_node.memory_array if info.state == "ENTANGLED"])
         if num_epr < demand_size:
-            self._request_entanglements(src_node=src_node, dst_node=dst_node, demand_size=demand_size-num_epr, start_time=self.timeline.now())
+            logger.debug(f"Demand size not met. Requesting for {demand_size-num_epr} entanglements.")
+            self._request_entanglements(src_node=src_node, dst_node=dst_node, demand_size=demand_size-num_epr, start_time=self.now())
+
+    def _identify_entanglements(self, src_node:EndNode, dst_node:EndNode):
+        self.epr_pairs = {}
+        self.epr_pairs.update({(src_node, dst_node):"asd"})
+
+    def _initialize_photons(self, src_node:EndNode, dst_node:EndNode, initial_states:Optional[List[int | str]]):
+        assert initial_states == self.size, f"The length of the initial states array must be of he size {self.size}"
+        initial_states = initial_states or np.random.randint(4, size=self.size)
+        basis = getattr(encoding, self.basis).get("bases")
+        quantum_state = {0:basis[0][0],
+                         1:basis[0][1],
+                         2:basis[1][0],
+                         3:basis[1][1]}
+        self.photons = {(src_node, dst_node):[Photon(name=initial_state,
+                                                     wavelength=self.wavelength,
+                                                     location=self,
+                                                     quantum_state=quantum_state[initial_state]) for initial_state in initial_states]}
+        logger.debug(f"Initialized {self.size} photons with initial states {initial_states} at {src_node.name}")
 
     def _apply_noise(self, noise:str, qtc:QutipCircuit, keys:List[int]=None):
         model = noise_model()
@@ -103,26 +173,19 @@ class Network(Entity):
                 try:
                     model.add_readout_error(err=self.readout)
                 finally:
-                    return model._apply_readout_error_qntsim(crc=qtc, manager=self.timeline.quantum_manager, keys=keys)
+                    return model._apply_readout_error_qntsim(crc=qtc, manager=self.quantum_manager, keys=keys)
 
     def _encode(self, src_node:EndNode, dst_node:EndNode):
+        self._initialize_photons(initial_states=self.initial_states if hasattr(self, "initial_state") else None)
+        for parties, bin_msg in self._bin_strs.items():
+            pass
         pass
 
     def _densecode(self, src_node:EndNode, dst_node:EndNode):
         pass
 
     def _teleport(self, _, /):
-        meas_results = {}
-        alpha = complex(1/math.sqrt(2))
-        bsa = bell_type_state_analyzer(2)
-        for nodes, bin_str in self._bin_strs.items():
-            src_node = nodes[0]
-            dst_nodes = nodes[1:]
-            for dst_node in dst_nodes:
-                self._request_entanglements(src_node=src_node, dst_node=dst_node, demand_size=len(bin_str))
-            if len(dst_nodes)>1:
-                self._get_state()
-        return meas_results
+        pass
 
     # def _get_state(self, state:str, nodes:List[EndNode]):
     #     topology = {node_name:node.neighbors for node_name, node in self.__configuration.nodes.items() if node.__class__ in [EndNode, ServiceNode]}
@@ -134,7 +197,7 @@ class Network(Entity):
 
     def _swap_entanglement(self, state:str, current_node:ServiceNode, neighbor_nodes:List[Union[EndNode, ServiceNode]], qtc:QutipCircuit):
         current_keys = [info.memory.qstate_key for info in current_node.memory_array if info.state=="ENTANGLED"]
-        neighbor_keys = [[self.timeline.quantum_manager.get(info.memory.qstate_key).keys for info in neighbor_node.memory_array if info.state=="ENTANGLED"] for neighbor_node in neighbor_nodes]
+        neighbor_keys = [[self.quantum_manager.get(info.memory.qstate_key).keys for info in neighbor_node.memory_array if info.state=="ENTANGLED"] for neighbor_node in neighbor_nodes]
         circuit = (
             bell_type_state_analyzer(len(neighbor_nodes)) if state == "ghz" else
             xor_type_state_analyzer(len(neighbor_nodes)) if state == "xor" else
@@ -145,7 +208,7 @@ class Network(Entity):
             for ent_keys in entangled_keys:
                 swap_keys.append(set(ent_keys) & set(current_keys))
             swap_keys.sort()
-            results = self.timeline.quantum_manager.run_circuit(circuit=circuit, keys=swap_keys)
+            results = self.quantum_manager.run_circuit(circuit=circuit, keys=swap_keys)
             for key in swap_keys:
                 pass
 
