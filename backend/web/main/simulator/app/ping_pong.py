@@ -9,8 +9,9 @@ from qntsim.communication import (Network, ProtocolPipeline,
                                   bell_type_state_analyzer, pass_, to_string)
 from qntsim.components.circuit import QutipCircuit
 from qntsim.topology.node import EndNode
+from qntsim.utils import log
 
-logger = logging.getLogger("main_logger.application_layer.ping_pong")
+# logger = logging.getLogger("main_logger.application_layer.ping_pong")
 
 def ping_pong(topology:Dict, app_settings:Dict):
     s = time.time()
@@ -62,7 +63,7 @@ def encode(network: Network, _, msg_index: int, mode_switch_prob: float):
             mode = random.choices(["service", "control"], weights=[1 - mode_switch_prob, mode_switch_prob])[0]
             key = info.memory.qstate_key
 
-            logger.info(f"mode: {mode} on key: {key}")
+            log.logger.info(f"mode: {mode} on key: {key}")
 
             if mode == "service":
                 if int(next(msg_iter, 0)):
@@ -104,7 +105,7 @@ def decode(networks:List[Network], all_returns:List[Any], err_threshold:float):
             string += "".join(str(out) for out in output)
     network._strings = [string[:len(network._bin_msgs[0])]]
     if mean(int_lst) > err_threshold:
-        logger.error("Eavesdropper detected in channel.")
+        log.logger.error("Eavesdropper detected in channel.")
         return {"Err_msg":"Eavesdropper detected in channel."}
     else:
         return to_string(strings=network._strings, _was_binary=network._is_binary)

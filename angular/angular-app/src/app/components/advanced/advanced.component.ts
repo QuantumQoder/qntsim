@@ -290,12 +290,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
     if (this.app_id == 8) {
-      if (this.appSettingsForm.get('message1')?.value.length % 2 != 0) {
+      console.log(this.appSettingsForm.get('message1')?.value)
+      if (this.nodesSelection.message1.length % 2 != 0) {
         alert("Message1 length should be even ");
         // this.spinner = false
         return
       }
-      if (this.appSettingsForm.get('message2')?.value.length % 2 != 0) {
+      if (this.nodesSelection.message2.length % 2 != 0) {
         alert("Message2 length should be even ");
         // this.spinner = false
         return
@@ -457,13 +458,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       {
         sender: {
           node: this.nodesSelection.sender,
-          message: this.nodesSelection.message
+          message: this.nodesSelection.message1
           // num_check_bits: this.nodesSelection.numCheckBits,
           // num_decoy_photons: this.nodesSelection.numDecoy
         },
         receiver: {
           node: this.nodesSelection.receiver,
-          message: this.nodesSelection.message
+          message: this.nodesSelection.message2
         },
         // sender: this.nodesSelection.sender,
         // receiver: this.nodesSelection.receiver,

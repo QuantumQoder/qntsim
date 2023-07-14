@@ -1,20 +1,23 @@
 
 from qntsim.kernel.timeline import Timeline
+
 Timeline.DLCZ=False
 Timeline.bk=True
 
-from tabulate import tabulate
-from qntsim.components.circuit import Circuit,QutipCircuit
+import logging
+import math
+
 from qiskit import *
-from qutip.qip.circuit import QubitCircuit, Gate
-from qutip.qip.operations import gate_sequence_product
 from qiskit.extensions import Initialize
 #from qiskit.ignis.verification import marginal_counts
 from qiskit.quantum_info import random_statevector
-import math
+from qntsim.components.circuit import Circuit, QutipCircuit
+from qntsim.utils import log
+from qutip.qip.circuit import Gate, QubitCircuit
+from qutip.qip.operations import gate_sequence_product
+from tabulate import tabulate
 
-import logging
-logger = logging.getLogger("main_logger.application_layer." + "teleportation")
+# logger = logging.getLogger("main_logger.application_layer." + "teleportation")
 
 
 
@@ -32,7 +35,7 @@ class Teleportation():
         sender=alice
         receiver=bob
         print('sender, receiver',sender.owner.name,receiver.owner.name)
-        logger.info('sender, receiver: '+sender.owner.name+ " " + receiver.owner.name)
+        log.logger.info('sender, receiver: '+sender.owner.name+ " " + receiver.owner.name)
         return self.request_entanglements(sender,receiver)
 
 
@@ -292,11 +295,11 @@ class Teleportation():
     def run(self,alice,bob,A_0,A_1):
         crz,crx,case, random_qubit,alice_state=self.alice_measurement(A_0,A_1,alice)
         print("Measurement result of random qubit crz",crz)
-        logger.info(alice.owner.name + " sent measurement results")
+        log.logger.info(alice.owner.name + " sent measurement results")
         #print("Measurement result of random qubit crz",crz)
         print("Measurement result of alice qubit crx",crx)
         bob_initial_state, bob_final_state,gatesl = self.bob_gates(crz,crx,case,bob)
-        logger.info(bob.owner.name + " received the final state")
+        log.logger.info(bob.owner.name + " received the final state")
         
         # initial entanglement alice_bob_entanglement: alice_bob_entangled_state
         # measurement_result_of_random_qubit near alice's end : meas_rq

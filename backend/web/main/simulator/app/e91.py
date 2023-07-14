@@ -4,7 +4,7 @@ import math
 from qntsim.kernel.quantum_kernel import KetState
 import random
 import logging
-logger = logging.getLogger("main_logger.application_layer." + "e91")
+# logger = logging.getLogger("main_logger.application_layer." + "e91")
 
 
 _psi_minus = [complex(0) , complex(math.sqrt(1 / 2)), -complex(math.sqrt(1 / 2)), complex(0)]
