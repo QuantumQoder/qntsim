@@ -1,13 +1,15 @@
-import numpy as np
-from typing import Any, Callable
-from functools import partial
 from enum import Enum
+from functools import partial
+from typing import Any, Callable
+
+import numpy as np
+from joblib import Parallel, delayed, wrap_non_picklable_objects
 from numpy import pi
 from numpy.random import randint, uniform
-from joblib import Parallel, delayed, wrap_non_picklable_objects
 
-from .network import Network
 from ..components.circuit import QutipCircuit
+from .network import Network
+
 
 class Attack:
     @staticmethod
@@ -23,7 +25,7 @@ class Attack:
             returns (Any): Returns from the previous function
         """
         node_indices = range(1, len(network.nodes)) if len(network.nodes)>1 else [0]
-        _ = [attack(i=node, network=network) for node in node_indices]
+        _ = [attack(network=network, i=node) for node in node_indices]
         # Parallel(n_jobs=-1, prefer=None)(attack(i=node, network=network, manager=network.manager) for node in node_indices)
         
         return returns
@@ -31,7 +33,7 @@ class Attack:
     @staticmethod
     # @delayed
     # @wrap_non_picklable_objects
-    def denial_of_service(i:int, network:Network):
+    def denial_of_service(network:Network, _:Any|None, i:int):
         """Denial of Service
 
         Args:
@@ -51,7 +53,7 @@ class Attack:
     @staticmethod
     # @delayed
     # @wrap_non_picklable_objects
-    def entangle_and_measure(i:int, network:Network):
+    def entangle_and_measure(network:Network, _:Any|None, i:int):
         """Entangle and Measure
 
         Args:
@@ -73,7 +75,7 @@ class Attack:
     @staticmethod
     # @delayed
     # @wrap_non_picklable_objects
-    def intercept_and_resend(i:int, network:Network):
+    def intercept_and_resend(network:Network, _:Any|None, i:int):
         """Intercept and Resend
 
         Args:
@@ -99,6 +101,6 @@ class Attack:
             # if info.index>network.size-1: break
     
 class ATTACK_TYPE(Enum):
-    DoS = partial(Attack.denial_of_service)
+    DS = partial(Attack.denial_of_service)
     EM = partial(Attack.entangle_and_measure)
     IR = partial(Attack.intercept_and_resend)
