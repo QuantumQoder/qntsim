@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HomePageComponent } from './components/home-page/home-page.component';
 import { ResultsComponent } from './components/results/results.component';
+// import { CodeEditorModule } from './components/codeeditor/modules/codeeditor.module';
+import { CodeEditorComponent } from './components/codeeditor/codeeditor.component';
 
 const routes: Routes = [
   { path: '', component: HomePageComponent, title: "QNTSIM" },
@@ -10,6 +12,7 @@ const routes: Routes = [
   { path: 'results', component: ResultsComponent, title: 'Results' },
   { path: 'intro', loadChildren: () => import('./components/intro/intro-modules/intro.module').then(m => m.IntroModule), title: "Intro" },
   { path: 'minimal', loadChildren: () => import('./components/minimal/modules/minimal.module').then(m => m.MinimalModule), title: "Minimal" },
+  { path: 'new-protocol', component: CodeEditorComponent, title: "New Protocol" },
   { path: '**', redirectTo: '' }
 ];
 

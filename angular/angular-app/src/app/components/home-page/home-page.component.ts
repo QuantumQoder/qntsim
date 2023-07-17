@@ -1,44 +1,44 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
-import * as D3 from 'd3';
-import Globe from 'globe.gl';
-import { ConditionsService } from 'src/services/conditions.service';
-import * as _ from 'underscore';
+import { AfterViewInit, Component, OnInit } from "@angular/core";
+import * as D3 from "d3";
+import Globe from "globe.gl";
+import { ConditionsService } from "src/app/services/conditions.service";
+import * as _ from "underscore";
 
 @Component({
-  selector: 'app-home-page',
-  templateUrl: './home-page.component.html',
-  styleUrls: ['./home-page.component.less']
+  selector: "app-home-page",
+  templateUrl: "./home-page.component.html",
+  styleUrls: ["./home-page.component.less"],
 })
 export class HomePageComponent implements OnInit, AfterViewInit {
-  constructor(private conService: ConditionsService) { }
+  constructor(private conService: ConditionsService) {}
   ngOnInit(): void {
-    this.conService.currentSection = 'home'
+    this.conService.currentSection = "home";
   }
   ngAfterViewInit(): void {
-    var globe = <HTMLElement>document.getElementById('globe');
-    console.log("col-5" + globe.clientHeight)
+    var globe = <HTMLElement>document.getElementById("globe");
+    console.log("col-5" + globe.clientHeight);
     const parallax = document.getElementById("parallax")!;
     // Parallax Effect for DIV 1
     window.addEventListener("scroll", function () {
       let offset = window.pageYOffset;
       parallax.style.backgroundPositionY = offset * 0.4 + "px";
       // DIV 1 background will move slower than other elements on scroll.
-    })
+    });
 
-
-    const COUNTRY = 'India';
+    const COUNTRY = "India";
     const OPACITY = 0.5;
-    const myGlobe = Globe()
-      (<HTMLElement>document.getElementById('globeViz'))
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+    const myGlobe = Globe()(<HTMLElement>document.getElementById("globeViz"))
+      .globeImageUrl(
+        "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+      )
       .pointOfView({
         lat: 28.7041,
         lng: 77.1025,
-        altitude: 2
+        altitude: 2,
       }) // aim at continental US centroid
       .height(globe.clientHeight / 1.5)
       .width(globe.clientWidth)
-      .backgroundColor('rgba(0,0,0,0)')
+      .backgroundColor("rgba(0,0,0,0)")
       // .arcLabel((d: any) => `${d.airline}: ${d.srcIata} &#8594; ${d.dstIata}`)
       .arcStartLat((d: any) => +d.srcAirport.lat)
       .arcStartLng((d: any) => +d.srcAirport.lng)
@@ -48,15 +48,18 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       .arcDashGap(1)
       .arcDashInitialGap(() => Math.random())
       .arcDashAnimateTime(4000)
-      .arcColor((d: any) => [`rgba(255, 255,255, ${OPACITY})`, `rgba(3, 207, 252, ${OPACITY})`])
+      .arcColor((d: any) => [
+        `rgba(255, 255,255, ${OPACITY})`,
+        `rgba(3, 207, 252, ${OPACITY})`,
+      ])
       .arcsTransitionDuration(0)
-      .pointColor(() => 'orange')
+      .pointColor(() => "orange")
       .pointAltitude(0)
       .pointRadius(0.2)
       .pointsMerge(true);
     // myGlobe.position.y = 1000;
     // load data
-    const airportParse = ([airportId, name, city, country, iata, icao, lat, lng, alt, timezone, dst, tz, type, source]: any) => ({
+    const airportParse = ([
       airportId,
       name,
       city,
@@ -70,9 +73,24 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       dst,
       tz,
       type,
-      source
+      source,
+    ]: any) => ({
+      airportId,
+      name,
+      city,
+      country,
+      iata,
+      icao,
+      lat,
+      lng,
+      alt,
+      timezone,
+      dst,
+      tz,
+      type,
+      source,
     });
-    const routeParse = ([airline, airlineId, srcIata, srcAirportId, dstIata, dstAirportId, codeshare, stops, equipment]: any) => ({
+    const routeParse = ([
       airline,
       airlineId,
       srcIata,
@@ -81,28 +99,53 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       dstAirportId,
       codeshare,
       stops,
-      equipment
+      equipment,
+    ]: any) => ({
+      airline,
+      airlineId,
+      srcIata,
+      srcAirportId,
+      dstIata,
+      dstAirportId,
+      codeshare,
+      stops,
+      equipment,
     });
 
-
-
     Promise.all([
-      fetch('https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat').then(res => res.text())
-        .then(d => D3.csvParseRows(d, airportParse)),
-      fetch('https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat').then(res => res.text())
-        .then(d => D3.csvParseRows(d, routeParse)),
-      fetch('https://globe.gl/example/datasets/ne_110m_admin_0_countries.geojson').then(res => res.json())
-        .then(countries => countries.features)
+      fetch(
+        "https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat"
+      )
+        .then((res) => res.text())
+        .then((d) => D3.csvParseRows(d, airportParse)),
+      fetch(
+        "https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat"
+      )
+        .then((res) => res.text())
+        .then((d) => D3.csvParseRows(d, routeParse)),
+      fetch(
+        "https://globe.gl/example/datasets/ne_110m_admin_0_countries.geojson"
+      )
+        .then((res) => res.json())
+        .then((countries) => countries.features),
     ]).then(([airports, routes, cuntData]) => {
-      const byIata = _.indexBy(airports, 'iata', false);
+      const byIata = _.indexBy(airports, "iata", false);
       const filteredRoutes = routes
-        .filter((d: any) => byIata.hasOwnProperty(d.srcIata) && byIata.hasOwnProperty(d.dstIata)) // exclude unknown airports
-        .filter((d: any) => d.stops === '0') // non-stop flights only
-        .map((d: any) => Object.assign(d, {
-          srcAirport: byIata[d.srcIata],
-          dstAirport: byIata[d.dstIata]
-        }))
-        .filter((d: any) => d.srcAirport.country === COUNTRY && d.dstAirport.country !== COUNTRY); // international routes from country
+        .filter(
+          (d: any) =>
+            byIata.hasOwnProperty(d.srcIata) && byIata.hasOwnProperty(d.dstIata)
+        ) // exclude unknown airports
+        .filter((d: any) => d.stops === "0") // non-stop flights only
+        .map((d: any) =>
+          Object.assign(d, {
+            srcAirport: byIata[d.srcIata],
+            dstAirport: byIata[d.dstIata],
+          })
+        )
+        .filter(
+          (d: any) =>
+            d.srcAirport.country === COUNTRY && d.dstAirport.country !== COUNTRY
+        ); // international routes from country
 
       // const gData = [...Array(N).keys()].map(() => ({
       //   lat: (Math.random() - 0.5) * 180,
@@ -110,18 +153,22 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       //   size: 7 + Math.random() * 30,
       //   color: ['red', 'white', 'blue', 'green'][Math.round(Math.random() * 3)]
       // }));
-      [{
-        lat: 17.385,
-        lng: 78.4867,
-      }];
+      [
+        {
+          lat: 17.385,
+          lng: 78.4867,
+        },
+      ];
 
       myGlobe.controls().autoRotate = true;
       // myGlobe.position.y = -1000
       myGlobe
         .polygonsData(cuntData)
-        .polygonCapColor((feat: any) => feat.properties.NAME == COUNTRY ? "#6B7B8C" : "#6B7B8C")
-        .polygonSideColor(() => 'rgba(0, 100, 0, 0.15)')
-        .polygonStrokeColor(() => '#55626f')
+        .polygonCapColor((feat: any) =>
+          feat.properties.NAME == COUNTRY ? "#6B7B8C" : "#6B7B8C"
+        )
+        .polygonSideColor(() => "rgba(0, 100, 0, 0.15)")
+        .polygonStrokeColor(() => "#55626f")
         // .htmlElementsData(gData)
         // .htmlElement((d: any) => {
         //   const el = document.createElement('div');

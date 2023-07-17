@@ -1,8 +1,6 @@
 import { Injectable } from "@angular/core";
-
 @Injectable({ providedIn: 'root' })
 export class DiagramBuilderService {
-
 
     addNewNode(nodetype: string, newKey: any) {
         const newNode = {
@@ -133,5 +131,5 @@ export class DiagramBuilderService {
     findNodeWithKey(key, myDiagram) {
         return myDiagram.model.nodeDataArray.find(node => node.key == key);
     }
-
+   
 }

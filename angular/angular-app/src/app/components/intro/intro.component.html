@@ -266,10 +266,23 @@
             <h1 class="display-1">PingPong QSDC</h1>
             <br>
             <div class="row">
-                <p class="col-11">A QKD scheme using EPR pairs with each EPR pair carrying two bits of key code. This
-                    protocol is the
-                    seminal work on QSDC by G.L. Long and X.S. Liu <a href=""
-                        (click)="quant_ph('https://arxiv.org/pdf/quant-ph/0012056.pdf')">https://arxiv.org/pdf/quant-ph/0012056.pdf.</a>​
+                <p class="col-11">A novel secure communication protocol is presented, based on an entangled pair of
+                    qubits and allowing asymptotically
+                    secure key distribution and Quasi secure direct communication. Since the information is transferred
+                    in a deterministic
+                    manner, no qubits must be discarded. The transmission of information is instantaneous, i.e., the
+                    information can be
+                    decoded during the transmission. Security against arbitrary eavesdropping attacks is provided. The
+                    link of the paper can
+                    be found here:
+                    <a href=""
+                        (click)="quant_ph('https://doi.org/10.1103/PhysRevLett.89.18790')">https://doi.org/10.1103/PhysRevLett.89.18790
+                        .</a>​
+                    <br>
+                    The user can control the modes of the protocol namely: Service- The probability with which user
+                    encodes the message and,
+                    Control- The probability with which they measure their qubits and compares their results for
+                    eavesdropping check.
                 </p>
                 <div class="btn-group col-12 d-flex justify-content-center gap-2">
                     <div>
@@ -542,16 +555,14 @@
             <h1 class="display-1">QSDC with Teleportation</h1>
             <br>
             <div class="row">
-                <p class="text-justify col-11">Quantum Information of an unknown quantum state of a two-level particle
-                    is communicated from Alice to Bob using
-                    pre-shared entanglements and teleportation in presence of a supervisor Charlie. Alice encodes the
-                    secret message
-                    directly on her sequence of particle states and transmits them to Bob. The protocol developed by T.
-                    Gao, F L Yan and Z X
-                    Wang has a unique feature where communication between two sides depends on the agreement of a third
-                    side.
+                <p class="text-justify col-11">A novel scheme for secure direct communication between Alice and Bob is
+                    proposed, where there is no need for
+                    establishing a shared secret key. The communication is based on Einstein-Podolsky-Rosen (EPR) pairs
+                    and teleportation
+                    between Alice and Bob. The link of the paper can be found here:
                     <a href=""
-                        (click)="quant_ph('https://iopscience.iop.org/article/10.1088/1009-1963/14/5/006/meta')">https://iopscience.iop.org/article/10.1088/1009-1963/14/5/006/meta</a>
+                        (click)="quant_ph('https://link.springer.com/article/10.1140/epjb/e2004-00296-4')">https://link.springer.com/article/10.1140/epjb/e2004-00296-4
+                        .</a>
                 </p>
 
                 <div class="btn-group col-12 d-flex justify-content-center gap-2">
@@ -567,21 +578,18 @@
             </div>
             <br>
             <div class="row">
-                <div class="col-10">
+                <div class="col-12">
                     <p-steps [model]="items" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
                 </div>
             </div>
             <br>
-            <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>PREPARING SHARED EN​TANGLEMENT​</small></h3>
+            <h3 *ngIf="activeIndex==0" class="display-4 text-center"><small>Sharing EPR pairs​</small></h3>
             <div *ngIf="activeIndex==0">
                 <img class="img1" src="assets/images/qsdctel/qtel1.svg" alt="...">
-                <p class="text-justify">The protocol requires 3 parties to come together. For instance say, Charlie
-                    share a 3-qubit
-                    entanglement with Alice, Bob and himself.​ This entanglement can also be shared by someone like
-                    David where he prepares the entanglement and shares the qubits with Alice, Bob and Charlie.</p>
+                <p class="text-justify">Alice and Bob shares EPR pairs between them.</p>
             </div>
             <br>
-            <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>ALICE ENCODES THE MESSAGE​</small></h3>
+            <h3 *ngIf="activeIndex==1" class="display-4 text-center"><small>ENCODING​</small></h3>
             <div *ngIf="activeIndex==1">
                 <img class="img1" src="assets/images/qsdctel/qtel2.svg" alt="...">
                 <br>
@@ -606,7 +614,7 @@
                 ​</p>
             <br>
         </div>
-        <div *ngIf="app=='10'" class="col-12">
+        <div *ngIf="app=='10'" class="col-12"> 
             <h1 class="display-4">MDI-QSDC with user authentication</h1>
             <div class="row">
                 <p class="text-justify col-12 mb-2">This is a new theoretical scheme for measurement device independent
