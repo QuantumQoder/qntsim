@@ -275,7 +275,7 @@ export class TopologyLoaderService {
         },
       ],
     },
-    4: {
+    3: {
       nodes: [
         {
           key: "node1",
@@ -329,7 +329,7 @@ export class TopologyLoaderService {
         },
       ],
     },
-    5: {
+    4: {
       nodes: [
         {
           key: "node1",
@@ -559,5 +559,290 @@ export class TopologyLoaderService {
   updateDiagram(data: any, topology) {
     topology.model = new go.GraphLinksModel(data.nodes, data.links);
     // console.log(this.topology.model.nodeDataArray);
+  }
+
+  getAppConfig(appSettingsForm: any) {
+    return {
+      2: {
+        sender: appSettingsForm.get("sender")?.value,
+        receiver: appSettingsForm.get("receiver")?.value,
+        startTime: 1e12,
+        size: appSettingsForm.get("size")?.value,
+        priority: 0,
+        targetFidelity: appSettingsForm.get("targetFidelity")?.value,
+        timeout: 2e12,
+      },
+      1: {
+        sender: appSettingsForm.get("sender")?.value,
+        receiver: appSettingsForm.get("receiver")?.value,
+        keyLength: String(appSettingsForm.get("keyLength")?.value),
+      },
+      3: {
+        sender: appSettingsForm.get("sender")?.value,
+        receiver: appSettingsForm.get("receiver")?.value,
+        amplitude1: "0.70710678118+0j",
+        amplitude2: "0-0.70710678118j",
+      },
+      4: {
+        endnode1: appSettingsForm.get("endnode1")?.value,
+        endnode2: appSettingsForm.get("endnode2")?.value,
+        endnode3: appSettingsForm.get("endnode3")?.value,
+        middlenode: appSettingsForm.get("middleNode")?.value,
+      },
+      5: {
+        sender: appSettingsForm.get("sender")?.value,
+        receiver: appSettingsForm.get("receiver")?.value,
+        sequenceLength: 3,
+        key: appSettingsForm.get("key")?.value,
+      },
+      6: {
+        sender: appSettingsForm.get("sender")?.value,
+        receiver: appSettingsForm.get("receiver")?.value,
+        sequenceLength: "2",
+        message: appSettingsForm.get("message")?.value,
+      },
+      7: {
+        sender: {
+          node: appSettingsForm.get("sender")?.value,
+          message: appSettingsForm.get("messageIp1")?.value,
+          userID: "1010",
+          num_check_bits: 4,
+          num_decoy_photons: 4,
+        },
+        receiver: {
+          node: appSettingsForm.get("receiver")?.value,
+          userID: "1011",
+        },
+        bell_type: "10",
+        attack: "none",
+      },
+      8: {
+        sender: appSettingsForm.get("sender")?.value,
+        receiver: appSettingsForm.get("receiver")?.value,
+        message1: appSettingsForm.get("message1")?.value,
+        message2: appSettingsForm.get("message2")?.value,
+        num_photons: 5,
+        attack: "",
+      },
+      9: {
+        sender: {
+          node: appSettingsForm.get("sender")?.value,
+          message: appSettingsForm.get("message")?.value,
+        },
+        receiver: {
+          node: appSettingsForm.get("receiver")?.value,
+        },
+        bell_type: "10",
+        attack: "none",
+      },
+      10: {
+        sender: {
+          node: appSettingsForm.get("sender")?.value,
+          message: appSettingsForm.get("inputMessage")?.value,
+          userID: "1011",
+          num_check_bits: 4,
+          num_decoy_photons: 4,
+        },
+        receiver: {
+          node: appSettingsForm.get("receiver")?.value,
+          userID: "1010",
+        },
+        bell_type: "10",
+        error_threshold: 0.5,
+        attack: "none",
+        channel: 1,
+      },
+    };
+  }
+  getTopologyRequestPayload(nodeArray, linkRequestArray, cc) {
+    return {
+      nodes: nodeArray,
+      quantum_connections: linkRequestArray,
+      classical_connections: cc,
+      detector_properties: {
+        efficiency: 1,
+        count_rate: 25e6,
+        time_resolution: 150,
+      },
+
+      light_source_properties: {
+        frequency: 2000,
+        wavelength: 1550,
+        bandwidth: 0,
+        mean_photon_num: 0.1,
+        phase_error: 0,
+      },
+    };
+  }
+  getRequestPayload(appForm: any, topology, appConfig, debug) {
+    return {
+      application: appForm.get("app")?.value,
+      topology: topology,
+      appSettings: appConfig,
+      debug: {
+        modules: debug.modules,
+        logLevel: debug.loggingLevel.value,
+      },
+    };
+  }
+  setAlert(appSettingsForm, app_id) {
+    if (app_id == 5) {
+      if (appSettingsForm.get("key")?.value.length % 2 != 0) {
+        alert("Key length should be even");
+        // this.spinner = false
+        return;
+      }
+    }
+    if (app_id == 10) {
+      if (appSettingsForm.get("inputMessage")?.value.length % 2 != 0) {
+        alert("Message length should be even ");
+        // this.spinner = false
+        return;
+      }
+    }
+    if (app_id == 6) {
+      if (appSettingsForm.get("message")?.value.length % 2 != 0) {
+        alert("Message length should be even ");
+        // this.spinner = false
+        return;
+      }
+    }
+    if (app_id == 7) {
+      if (appSettingsForm.get("messageIp1")?.value.length % 2 != 0) {
+        alert("Message length should be even ");
+        // this.spinner = false
+        return;
+      }
+    }
+
+    if (app_id == 10) {
+      if (appSettingsForm.get("inputMessage")?.value.length % 2 != 0) {
+        alert("Message length should be even");
+        return;
+      }
+    }
+
+    if (app_id == 8) {
+      if (
+        appSettingsForm.get("message1")?.value.length !=
+        appSettingsForm.get("message2")?.value.length
+      ) {
+        alert("Sender's Message and Receiver's message length should be same.");
+        return;
+      }
+    }
+    if (app_id != 4) {
+      console.log(app_id);
+      if (appSettingsForm.get("sender")?.value == "") {
+        alert("Please select a sender");
+        return;
+      } else if (appSettingsForm.get("receiver")?.value == "") {
+        alert("Please select a receiver.");
+        return;
+      }
+    }
+    if (app_id == 4) {
+      if (
+        appSettingsForm.get("endnode1")?.value == "" ||
+        appSettingsForm.get("endnode2")?.value == "" ||
+        appSettingsForm.get("endnode3")?.value == ""
+      ) {
+        alert("Please select End Nodes.");
+        return;
+      }
+    }
+  }
+  setAlertAdvanced(
+    app_id,
+    appSettingsForm,
+    nodesSelection,
+    lightSourceProps,
+    nodesData,
+    myDiagram
+  ): boolean {
+    if (app_id == 5) {
+      if (appSettingsForm.get("message")?.value.length % 2 != 0) {
+        alert("Message length should be even ");
+        // this.spinner = false
+        return false;
+      }
+    }
+
+    if (app_id == 10 || app_id == 9 || app_id == 7 || app_id == 6) {
+      if (nodesSelection.message == "") {
+        alert("Please select a message");
+        return false;
+      }
+      if (nodesSelection.message.length % 2 != 0) {
+        alert("Message length should be even ");
+        return false;
+      }
+    }
+    if (app_id == 8) {
+      if (appSettingsForm.get("message1")?.value.length % 2 != 0) {
+        alert("Message1 length should be even ");
+        // this.spinner = false
+        return false;
+      }
+      if (appSettingsForm.get("message2")?.value.length % 2 != 0) {
+        alert("Message2 length should be even ");
+        // this.spinner = false
+        return false;
+      }
+    }
+    if (app_id != 4) {
+      if (nodesSelection.sender == "") {
+        alert("Please select a sender");
+        return false;
+      } else if (nodesSelection.receiver == "") {
+        alert("Please select a receiver.");
+        return false;
+      } else if (nodesSelection.sender == nodesSelection.receiver) {
+        alert("Sender and Receiver cannot be same node");
+        return false;
+      }
+    }
+    if (app_id == 10) {
+      if (
+        lightSourceProps.meanPhotonNum >= 0 &&
+        !(lightSourceProps.meanPhotonNum <= 1)
+      ) {
+        alert("Mean Photon Number should be between 0 and 1");
+        return false;
+      }
+    }
+    if (app_id == 4) {
+      let middleNode = appSettingsForm.get("middleNode")?.value;
+      //nodesSelection.endNode1)
+      //nodesSelection.endNode2)
+      //nodesSelection.endNode3)
+      if (
+        nodesSelection.endNode1 == "" ||
+        nodesSelection.endNode2 == "" ||
+        nodesSelection.endNode3 == "" ||
+        middleNode == ""
+      ) {
+        alert("Please select End Nodes.");
+        return false;
+      }
+      if (
+        nodesSelection.endNode1 == nodesSelection.endNode2 ||
+        nodesSelection.endNode2 == nodesSelection.endNode3 ||
+        nodesSelection.endNode3 == nodesSelection.endNode1
+      ) {
+        alert("End Nodes cannot be same node");
+        return false;
+      }
+    }
+    for (let i = 0; i < myDiagram.nodeDataArray.length; i++) {
+      if (!((myDiagram.nodeDataArray[i] as any).key in nodesData)) {
+        alert(
+          "Please configure the node named:" +
+            (myDiagram.nodeDataArray[i] as any).text
+        );
+        return false;
+      }
+    }
+    return true;
   }
 }

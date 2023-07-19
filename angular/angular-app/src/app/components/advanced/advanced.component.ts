@@ -22,6 +22,7 @@ import { HoldingDataService } from "src/app/services/holding-data.service";
 
 import * as go from "gojs";
 import { DiagramBuilderService } from "src/app/services/diagram-builder.service";
+import { TopologyLoaderService } from "src/app/services/loadTopology.service";
 
 @Component({
   selector: "app-advanced",
@@ -153,7 +154,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     private holdingData: HoldingDataService,
     private _route: Router,
     private diagramStorage: DiagramStorageService,
-    private diagramBuilder: DiagramBuilderService
+    private diagramBuilder: DiagramBuilderService,
+    private topologyLoader: TopologyLoaderService
   ) {}
   ngOnDestroy(): void {
     this.diagramStorage.setAppSettingsFormDataAdvanced({
@@ -202,16 +204,16 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     this.endNodes = [];
     this.nodes = [];
     this.nodesData = {};
-    for (let i = 0; i < nodesArray.length; i++) {
+    this.nodes = nodesArray.map((node) => {
       const nodereq = {
-        Name: nodesArray[i].name,
-        Type: nodesArray[i].properties[0].propValue.toLowerCase(),
-        noOfMemory: Number(nodesArray[i].properties[1].propValue),
+        Name: node.name,
+        Type: node.properties[0].propValue.toLowerCase(),
+        noOfMemory: Number(node.properties[1].propValue),
         memory: {
-          frequency: Number(nodesArray[i].memory[0].propValue),
-          expiry: Number(nodesArray[i].memory[1].propValue),
-          efficiency: Number(nodesArray[i].memory[2].propValue),
-          fidelity: Number(nodesArray[i].memory[3].propValue),
+          frequency: Number(node.memory[0].propValue),
+          expiry: Number(node.memory[1].propValue),
+          efficiency: Number(node.memory[2].propValue),
+          fidelity: Number(node.memory[3].propValue),
         },
         swap_success_rate: 0.99,
         swap_degradation: 1,
@@ -223,15 +225,9 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
           phase_error: this.lightSourceProps.phaseError,
         },
       };
-      this.nodesData[nodesArray[i].key] = nodereq;
-      if (
-        (this.myDiagram.model.nodeDataArray[i] as any).key in this.nodesData
-      ) {
-        this.nodes.push(
-          this.nodesData[(this.myDiagram.model.nodeDataArray[i] as any).key]
-        );
-      }
-    }
+      this.nodesData[node.key] = nodereq;
+      return this.nodesData[node.key];
+    });
     for (const [key, value] of Object.entries(this.nodesData)) {
       if (value["Type"].toLowerCase() == "end") {
         this.endNodes.push(value);
@@ -354,106 +350,19 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   parameters() {
     this.app_id = localStorage.getItem("app_id");
-    if (this.app_id == 5) {
-      if (this.appSettingsForm.get("message")?.value.length % 2 != 0) {
-        alert("Message length should be even ");
-        // this.spinner = false
-        return;
-      }
+    if (
+      !this.topologyLoader.setAlertAdvanced(
+        this.app_id,
+        this.appSettingsForm,
+        this.nodesSelection,
+        this.lightSourceProps,
+        this.nodesData,
+        this.myDiagram.model
+      )
+    ) {
+      return;
     }
 
-    if (
-      this.app_id == 10 ||
-      this.app_id == 9 ||
-      this.app_id == 7 ||
-      this.app_id == 6
-    ) {
-      if (this.nodesSelection.message == "") {
-        alert("Please select a message");
-        return;
-      }
-      if (this.nodesSelection.message.length % 2 != 0) {
-        alert("Message length should be even ");
-        return;
-      }
-    }
-    if (this.app_id == 8) {
-      if (this.appSettingsForm.get("message1")?.value.length % 2 != 0) {
-        alert("Message1 length should be even ");
-        // this.spinner = false
-        return;
-      }
-      if (this.appSettingsForm.get("message2")?.value.length % 2 != 0) {
-        alert("Message2 length should be even ");
-        // this.spinner = false
-        return;
-      }
-    }
-    if (this.app_id != 4) {
-      if (this.nodesSelection.sender == "") {
-        alert("Please select a sender");
-        return;
-      } else if (this.nodesSelection.receiver == "") {
-        alert("Please select a receiver.");
-        return;
-      } else if (this.nodesSelection.sender == this.nodesSelection.receiver) {
-        alert("Sender and Receiver cannot be same node");
-        return;
-      }
-    }
-    if (this.app_id == 10) {
-      if (
-        this.lightSourceProps.meanPhotonNum >= 0 &&
-        !(this.lightSourceProps.meanPhotonNum <= 1)
-      ) {
-        alert("Mean Photon Number should be between 0 and 1");
-        return;
-      }
-    }
-    if (this.app_id == 4) {
-      let middleNode = this.appSettingsForm.get("middleNode")?.value;
-      //this.nodesSelection.endNode1)
-      //this.nodesSelection.endNode2)
-      //this.nodesSelection.endNode3)
-      if (
-        this.nodesSelection.endNode1 == "" ||
-        this.nodesSelection.endNode2 == "" ||
-        this.nodesSelection.endNode3 == "" ||
-        middleNode == ""
-      ) {
-        alert("Please select End Nodes.");
-        return;
-      }
-      if (
-        this.nodesSelection.endNode1 == this.nodesSelection.endNode2 ||
-        this.nodesSelection.endNode2 == this.nodesSelection.endNode3 ||
-        this.nodesSelection.endNode3 == this.nodesSelection.endNode1
-      ) {
-        alert("End Nodes cannot be same node");
-        return;
-      }
-    }
-    if (this.myDiagram.model.nodeDataArray.length > 2) {
-      if (
-        this.myDiagram.model.nodeDataArray.every(
-          (obj) => obj.properties[0].propValue === "End"
-        )
-      ) {
-        alert("All elements are of type End");
-        return;
-      }
-    }
-    for (let i = 0; i < this.myDiagram.model.nodeDataArray.length; i++) {
-      if (
-        !((this.myDiagram.model.nodeDataArray[i] as any).key in this.nodesData)
-      ) {
-        alert(
-          "Please configure the node named:" +
-            (this.myDiagram.model.nodeDataArray[i] as any).text
-        );
-        return;
-      }
-    }
     this.myDiagram.model.modelData["position"] = go.Point.stringify(
       this.myDiagram.position
     );
@@ -465,21 +374,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     for (const [key, value] of Object.entries(this.nodesData)) {
       this.nodes.push(value);
     }
-    // const fromNode = this.myDiagram.model.nodeDataArray.find(node => node.name == this.nodesSelection.sender);
-    // console.log(fromNode)
-    // const toNode = this.myDiagram.model.nodeDataArray.find(node => node.name == this.nodesSelection.receiver);
-    // console.log(toNode);
-    // const links = this.myDiagram.model.linkDataArray;
-    // console.log(links)
-    // const hasRoutes = links.some(link => link.from === fromNode.key && link.to === toNode.key);
-
-    // let path = this.diagramBuilder.findRouteBFS(fromNode, toNode, this.myDiagram);
-    // path = path.filter(link => link.from != null && link.to != null)
-    // console.log(path);
-    // } else {
-    //   console.log("There are no routes between the nodes");
-    // }
-
     this.spinner = true;
     this.app_id = localStorage.getItem("app_id");
     if (!this.app_id) {

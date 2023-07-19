@@ -1,4 +1,6 @@
+import { updateTopology } from "./../../store/minimal.actions";
 import { HoldingDataService } from "src/app/services/holding-data.service";
+import { CookieService } from "ngx-cookie-service";
 import { ApiServiceService } from "../../services/api-service.service";
 import {
   AfterViewInit,
@@ -13,20 +15,13 @@ import {
   FormGroup,
   Validators,
 } from "@angular/forms";
-// import * as go from "gojs";
+import * as go from "gojs";
 import { Observable, map } from "rxjs";
 import { ConditionsService } from "src/app/services/conditions.service";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { DiagramStorageService } from "src/app/services/diagram-storage.service";
 import { Store } from "@ngrx/store";
-import {
-  updateEndNodes,
-  updateServicesNodes,
-  updateTopology,
-  updateTopologyData,
-} from "src/app/store/minimal.actions";
-import { cloneDeep } from "lodash";
 import { TopologyLoaderService } from "src/app/services/loadTopology.service";
 
 @Component({
@@ -37,7 +32,7 @@ import { TopologyLoaderService } from "src/app/services/loadTopology.service";
 })
 export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
   stateStoreValue: Observable<any>;
-  type: any = "Star";
+  type = "Star";
   data: string = "|1\\rangle";
   debug = {
     loggingLevel: {
@@ -81,13 +76,13 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
   cc: any[] = [];
   appSettingsResult: any;
   appConfig: any;
-  info: any = {
+  info = {
     end: "Origin or destination nodes for user/application requests, each connected to one service node.",
     service:
       "Entanglement-swapping nodes (similar to classical routers) connect non-neighbor nodes\n but don't support request creation or application hosting.",
   };
   lastValue = {
-    type: "star",
+    type: this.type,
     level: this.level,
   };
   endNode1: any[] = ["node1"];
@@ -146,28 +141,14 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
     if (diagramData) {
       this.level = diagramData.level;
       this.type = diagramData.type;
-      // this.topologyData.nodes = diagramData.topology.nodeDataArray
-      // this.topologyData.links = diagramData.topology.linkDataArray
     }
-    const type = this.type.toLowerCase();
-    this.initDiagram(type, this.level);
-    // this.service.getJson(urlData.url, urlData.type).subscribe(
-    //   (result) => {
-    //     this.topologyData = result;
-    //     this.topologyData.nodes = this.topologyData.nodes.map((node) => ({
-    //       ...node,
-    //       description:
-    //         node.color === "orange" ? this.info.service : this.info.end,
-    //     }));
-    //     this.updateNodes();
-    //   },
-    //   (error) => {
-    //     console.log(error);
-    //   },
-    //   () => {
-    //     this.init(this.topologyData.nodes, this.topologyData.links);
-    //   }
-    // );
+
+    this.topologyData = this.topologyLoader.loadTopologyMinimal(
+      this.type.toLowerCase(),
+      this.level
+    );
+    this.init(this.topologyData.nodes, this.topologyData.links);
+    this.updateNodes();
   }
   toggle(data: any) {
     var content;
@@ -273,34 +254,36 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.getAppSettingsResults();
   }
-
+  updateDiagram(data: any) {
+    this.topology.model = new go.GraphLinksModel(data.nodes, data.links);
+    console.log(this.topology.model.nodeDataArray);
+  }
   allowBitsInput($event: any) {
     if ($event.key.match(/[0-1]*/)["0"]) {
     } else {
       $event.preventDefault();
     }
   }
-
+  updateDistance() {
+    this.distance = this.topologyForm.get("distance")?.value;
+  }
   updateNodes() {
-    this.serviceNodes = [];
-    this.endNodes = [];
-    for (let i = 0; i < this.topologyData.nodes.length; i++) {
-      if (this.topologyData.nodes[i].color == "lightblue") {
-        this.endNodes.push(this.topologyData.nodes[i]);
-        this.senderNodes = this.endNodes;
-        this.receiverNodes = this.endNodes;
-        // this.endNode1 = this.endNodes
-        this.endNode1 = this.endNodes;
-        this.endNode2 = this.endNodes;
-        this.endNode3 = this.endNodes;
-      } else if (this.topologyData.nodes[i].color == "orange") {
-        this.serviceNodes.push(this.topologyData.nodes[i]);
-      }
-      this.store.dispatch(updateTopologyData(this.topologyData));
-      this.store.dispatch(updateEndNodes(this.endNodes));
-      this.store.dispatch(updateServicesNodes(this.serviceNodes));
+    this.serviceNodes = this.topologyData.nodes.filter(
+      (node) => node.color === "orange"
+    );
+    this.endNodes = this.topologyData.nodes.filter(
+      (node) => node.color === "lightblue"
+    );
+
+    if (this.endNodes.length) {
+      this.senderNodes = this.endNodes;
+      this.receiverNodes = this.endNodes;
+      this.endNode1 = this.endNodes;
+      this.endNode2 = this.endNodes;
+      this.endNode3 = this.endNodes;
     }
   }
+
   endNode(data: any) {
     // var remainingNodes = [];
     console.log(data);
@@ -308,103 +291,179 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
     this.endNode1 = this.endNode1.filter((e) => e.key != data);
     console.log(this.endNode1);
   }
-  getType($event: any) {
-    this.updateJson();
-  }
-  levelChange() {
-    this.level = this.topologyForm.get("level")?.value;
-    this.updateJson();
-  }
 
-  e2eChange(data: string) {
-    if (data == "target") {
-      this.e2e.targetFidelity =
-        this.appSettingsForm.get("targetFidelity")?.value;
-    } else if (data == "size") {
-      this.e2e.size = this.appSettingsForm.get("size")?.value;
-    }
-  }
-  initDiagram(type, topologyLevel) {
-    this.loadTopology(type, topologyLevel);
-    this.topology = this.topologyLoader.buildMinimalTopology(
-      this.topology,
-      type,
-      topologyLevel,
-      this.showProperties
+  init(nodes: any, links: any) {
+    var $ = go.GraphObject.make; // for conciseness in defining templates
+    this.topology = $(
+      go.Diagram,
+      "topology", // create a Diagram for the DIV HTML element
+      {
+        initialContentAlignment: go.Spot.Center, // center the content
+        "undoManager.isEnabled": true, // enable undo & redo
+        "panningTool.isEnabled": false,
+        "toolManager.hoverDelay": 0,
+        // "ViewportBoundsChanged": function (e: any) {
+        //   e.diagram.toolManager.panningTool.isEnabled =
+        //     !e.diagram.viewportBounds.containsRect(e.diagram.documentBounds);
+        // },
+      }
     );
+    // define a simple Node template
+    var tooltipTemplate = $(
+      go.Adornment,
+      "Auto",
+      $(go.Shape, "RoundedRectangle", { fill: "lightyellow" }),
+      $(go.TextBlock, { margin: 4 }, new go.Binding("text", "description"))
+    );
+    this.topology.nodeTemplate = $(
+      go.Node,
+      "Auto", // the Shape will go around the TextBlockcontextMenu:
+      {
+        // Add the tooltip to the node
+        toolTip: tooltipTemplate,
+        contextMenu: $(
+          go.Adornment,
+          "Vertical", // that has one button
+          $("ContextMenuButton", $(go.TextBlock, "Set as Sender"), {
+            click: (e: go.InputEvent, obj: go.GraphObject) => {
+              this.showProperties(e, obj, "sender");
+            },
+          }),
+          $("ContextMenuButton", $(go.TextBlock, "Set as Receiver"), {
+            click: (e: go.InputEvent, obj: go.GraphObject) => {
+              this.showProperties(e, obj, "receiver");
+            },
+          })
+          // more ContextMenuButtons would go here
+        ),
+        // contextMenu: new go.Binding("contextMenu", "", this.nodeContextMenu).ofObject(),
+      },
+      $(
+        go.Shape,
+        "RoundedRectangle",
+        { strokeWidth: 0 },
+        // Shape.fill is bound to Node.data.color
+        new go.Binding("fill", "color")
+      ),
+      new go.Binding("position", "loc", go.Point.parse).makeTwoWay(
+        go.Point.stringify
+      ),
+
+      $(
+        go.TextBlock,
+        { margin: 8 }, // some room around the text
+        // TextBlock.text is bound to Node.data.key
+        new go.Binding("text", "key")
+      )
+    );
+
+    // function getAppropriateContextMenu(appId: any) {
+    //   var $ = go.GraphObject.make;
+    //   if (appId == "" || appId == undefined || appId == null) {
+    //     return "";
+    //   }
+    //   if (appId == 4) {
+    //     return $(
+    //       go.Adornment,
+    //       "Vertical",
+    //       $("ContextMenuButton", $(go.TextBlock, "Set as endnode1"), {
+    //         click: function (e: any, obj: any) {
+    //           alert("Set as endnode1");
+    //         },
+    //       }),
+    //       $("ContextMenuButton", $(go.TextBlock, "Set as endnode2"), {
+    //         click: function (e: any, obj: any) {
+    //           alert("Set as endnode2");
+    //         },
+    //       }),
+    //       $("ContextMenuButton", $(go.TextBlock, "Set as endnode3"), {
+    //         click: function (e: any, obj: any) {
+    //           alert("Set as endnode3");
+    //         },
+    //       }),
+    //       $("ContextMenuButton", $(go.TextBlock, "Set as endnode4"), {
+    //         click: function (e: any, obj: any) {
+    //           alert("Set as endnode4");
+    //         },
+    //       })
+    //     );
+    //   } else {
+    //     return $(
+    //       go.Adornment,
+    //       "Vertical",
+    //       $("ContextMenuButton", $(go.TextBlock, "Set as sender"), {
+    //         click: function (e: any, obj: any) {
+    //           alert("Set as sender");
+    //         },
+    //       }),
+    //       $("ContextMenuButton", $(go.TextBlock, "Set as receiver"), {
+    //         click: function (e: any, obj: any) {
+    //           alert("Set as receiver");
+    //         },
+    //       })
+    //     );
+    //   }
+    // }
+
+    this.topology.linkTemplate = $(go.Link, $(go.Shape));
+    this.topology.model = new go.GraphLinksModel(nodes, links);
     this.topology.addDiagramListener("Modified", () => {
-      console.log("Topology Model:", this.topology.model);
       this.diagramStorage.setMinimalValues({
         topology: this.topology.model,
         type: this.type,
         level: this.level,
       });
-      // const topologyModel = JSON.parse(JSON.stringify(this.topology.model));
-      this.store.dispatch(
-        updateTopology({
-          // topology: topologyModel,
-          topologyType: this.type,
-          level: this.level,
-        })
-      );
       // console.log(this.diagramStorage.getAdvancedDiagramModel())
     });
   }
-  loadTopology(type, topologyLevel) {
-    this.topology = this.topologyLoader.buildMinimalTopology(
-      this.topology,
-      type,
-      topologyLevel,
-      this.showProperties
-    );
+
+  getAppropriateContextMenu(appId: any) {
+    var $ = go.GraphObject.make;
+    if (appId == "" || appId == undefined || appId == null) {
+      return "";
+    }
+    if (appId == 4) {
+      return $(
+        go.Adornment,
+        "Vertical",
+        $("ContextMenuButton", $(go.TextBlock, "Set as endnode1"), {
+          click: function (e: any, obj: any) {
+            alert("Set as endnode1");
+          },
+        }),
+        $("ContextMenuButton", $(go.TextBlock, "Set as endnode2"), {
+          click: function (e: any, obj: any) {
+            alert("Set as endnode2");
+          },
+        }),
+        $("ContextMenuButton", $(go.TextBlock, "Set as endnode3"), {
+          click: function (e: any, obj: any) {
+            alert("Set as endnode3");
+          },
+        }),
+        $("ContextMenuButton", $(go.TextBlock, "Set as endnode4"), {
+          click: function (e: any, obj: any) {
+            alert("Set as endnode4");
+          },
+        })
+      );
+    } else {
+      return $(
+        go.Adornment,
+        "Vertical",
+        $("ContextMenuButton", $(go.TextBlock, "Set as sender"), {
+          click: function (e: any, obj: any) {
+            alert("Set as sender");
+          },
+        }),
+        $("ContextMenuButton", $(go.TextBlock, "Set as receiver"), {
+          click: function (e: any, obj: any) {
+            alert("Set as receiver");
+          },
+        })
+      );
+    }
   }
-  // getAppropriateContextMenu(appId: any) {
-  //   var $ = go.GraphObject.make;
-  //   if (appId == "" || appId == undefined || appId == null) {
-  //     return "";
-  //   }
-  //   if (appId == 4) {
-  //     return $(
-  //       go.Adornment,
-  //       "Vertical",
-  //       $("ContextMenuButton", $(go.TextBlock, "Set as endnode1"), {
-  //         click: function (e: any, obj: any) {
-  //           alert("Set as endnode1");
-  //         },
-  //       }),
-  //       $("ContextMenuButton", $(go.TextBlock, "Set as endnode2"), {
-  //         click: function (e: any, obj: any) {
-  //           alert("Set as endnode2");
-  //         },
-  //       }),
-  //       $("ContextMenuButton", $(go.TextBlock, "Set as endnode3"), {
-  //         click: function (e: any, obj: any) {
-  //           alert("Set as endnode3");
-  //         },
-  //       }),
-  //       $("ContextMenuButton", $(go.TextBlock, "Set as endnode4"), {
-  //         click: function (e: any, obj: any) {
-  //           alert("Set as endnode4");
-  //         },
-  //       })
-  //     );
-  //   } else {
-  //     return $(
-  //       go.Adornment,
-  //       "Vertical",
-  //       $("ContextMenuButton", $(go.TextBlock, "Set as sender"), {
-  //         click: function (e: any, obj: any) {
-  //           alert("Set as sender");
-  //         },
-  //       }),
-  //       $("ContextMenuButton", $(go.TextBlock, "Set as receiver"), {
-  //         click: function (e: any, obj: any) {
-  //           alert("Set as receiver");
-  //         },
-  //       })
-  //     );
-  //   }
-  // }
 
   showProperties(e: go.InputEvent, obj: any, data: String) {
     console.log(obj);
@@ -413,14 +472,6 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
     this.nodes = this.topologyData.nodes;
     this.appSettingsForm.get(data)?.patchValue(node);
   }
-  // updateNodeContextMenu() {
-  //   var $ = go.GraphObject.make;
-  //   var nodeTemplate = this.topology.nodeTemplate.copy();
-  //   nodeTemplate.contextMenu = new go.Binding("contextMenu", "", this.nodeContextMenu).ofObject();
-  //   this.topology.nodeTemplate = nodeTemplate;
-  //   // Force re-layout of the diagram to apply the updated template
-  //   this.topology.layoutDiagram(true);
-  // }
 
   getApp($event: any) {
     let app_id = this.appForm.get("app")?.value;
@@ -429,7 +480,8 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
     if (app_id == 4) {
       this.level = 3;
       this.topologyForm.get("level").patchValue(this.level);
-      this.levelChange();
+      // this.levelChange();
+      this.updateJson();
     }
     this.updateNodes();
     localStorage.setItem("app_id", this.appForm.get("app")?.value);
@@ -447,83 +499,20 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   runApp() {
     // this.spinner = true;
-    var linkArray = [];
+    // var linkArray = [];
     // var nodeArray = []
     var linkRequestArray = [];
     const nodeDataArray = this.topologyData.nodes;
     const linkDataArray = this.topologyData.links;
     const app_id = this.appForm.get("app")?.value;
-    if (app_id == 5) {
-      if (this.appSettingsForm.get("key")?.value.length % 2 != 0) {
-        alert("Key length should be even");
-        // this.spinner = false
-        return;
-      }
-    }
-    if (app_id == 10) {
-      if (this.appSettingsForm.get("inputMessage")?.value.length % 2 != 0) {
-        alert("Message length should be even ");
-        // this.spinner = false
-        return;
-      }
-    }
-    if (app_id == 6) {
-      if (this.appSettingsForm.get("message")?.value.length % 2 != 0) {
-        alert("Message length should be even ");
-        // this.spinner = false
-        return;
-      }
-    }
-    if (app_id == 7) {
-      if (this.appSettingsForm.get("messageIp1")?.value.length % 2 != 0) {
-        alert("Message length should be even ");
-        // this.spinner = false
-        return;
-      }
-    }
-
-    if (app_id == 10) {
-      if (this.appSettingsForm.get("inputMessage")?.value.length % 2 != 0) {
-        alert("Message length should be even");
-        return;
-      }
-    }
-
-    if (app_id == 8) {
-      if (
-        this.appSettingsForm.get("message1")?.value.length !=
-        this.appSettingsForm.get("message2")?.value.length
-      ) {
-        alert("Sender's Message and Receiver's message length should be same.");
-        return;
-      }
-    }
-    if (app_id != 4) {
-      console.log(app_id);
-      if (this.appSettingsForm.get("sender")?.value == "") {
-        alert("Please select a sender");
-        return;
-      } else if (this.appSettingsForm.get("receiver")?.value == "") {
-        alert("Please select a receiver.");
-        return;
-      }
-    }
-    if (app_id == 4) {
-      if (
-        this.appSettingsForm.get("endnode1")?.value == "" ||
-        this.appSettingsForm.get("endnode2")?.value == "" ||
-        this.appSettingsForm.get("endnode3")?.value == ""
-      ) {
-        alert("Please select End Nodes.");
-        return;
-      }
-    }
-
+    this.topologyLoader.setAlert(this.appSettingsForm, app_id);
     const nodeArray = nodeDataArray.map((node: any) => ({
       Name: node.key,
       Type: node.color === "orange" ? "service" : "end",
       noOfMemory: this.topologyForm.get("noOfMemories")?.value,
       memory: this.service.getMemory(),
+      swap_success_rate: 0.99,
+      swap_degradation: 1,
     }));
     if (app_id != 4) {
       localStorage.setItem("sender", this.appSettingsForm.get("sender")?.value);
@@ -532,7 +521,7 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
         this.appSettingsForm.get("receiver")?.value
       );
     }
-    let cc: any[] = [];
+    let cc = [];
     this.spinner = true;
     localStorage.setItem("app_id", app_id);
     console.log(nodeArray);
@@ -547,55 +536,33 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.cc = [];
-    for (var i = 0; i < nodeDataArray.length; i++) {
-      for (var j = 0; j < nodeDataArray.length; j++) {
-        cc.push([nodeDataArray[i].key, nodeDataArray[j].key]);
-      }
-    }
-    if (cc.length) {
-      for (var i = 0; i < cc.length; i++) {
-        var [node1, node2] = cc[i];
-        var [distance, delay] = node1 == node2 ? [0, 0] : [1000, 10000000000];
-        this.cc.push({
-          Nodes: [node1, node2],
-          Delay: delay,
-          Distance: distance,
-        });
-      }
-    }
+    cc = nodeDataArray.flatMap((item1, index1) =>
+      nodeDataArray.map((item2, index2) => [item1.key, item2.key])
+    );
 
-    var topology = {
-      nodes: nodeArray,
-      quantum_connections: linkRequestArray,
-      classical_connections: this.cc,
-      detector_properties: {
-        efficiency: 1,
-        count_rate: 25e6,
-        time_resolution: 150,
-      },
-      swap_success_rate: 0.99,
-      swap_degradation: 1,
-      light_source_properties: {
-        frequency: 2000,
-        wavelength: 1550,
-        bandwidth: 0,
-        mean_photon_num: 0.1,
-        phase_error: 0,
-      },
-    };
+    this.cc = nodeDataArray.flatMap((item1) =>
+      nodeDataArray.map((item2) => ({
+        Nodes: [item1.key, item2.key],
+        Delay: item1.key === item2.key ? 0 : 10000000000,
+        Distance: item1.key === item2.key ? 0 : 1000,
+      }))
+    );
+
+    var topology = this.topologyLoader.getTopologyRequestPayload(
+      nodeArray,
+      linkDataArray,
+      this.cc
+    );
     this.getAppSetting(this.appForm.get("app")?.value);
     console.log(this.appConfig);
     this.debug.modules = this.debug.modules.map((module) => module.value);
 
-    var request = {
-      application: this.appForm.get("app")?.value,
-      topology: topology,
-      appSettings: this.appConfig,
-      debug: {
-        modules: this.debug.modules,
-        logLevel: this.debug.loggingLevel.value,
-      },
-    };
+    var request = this.topologyLoader.getRequestPayload(
+      this.appForm,
+      topology,
+      this.appConfig,
+      this.debug
+    );
 
     this.api.runApplication(request, environment.apiUrl).subscribe(
       (result) => {
@@ -725,118 +692,29 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
       this.appSettingsResult = results;
     });
   }
-
   getAppSetting(app_id: any) {
-    const appConfigMap = {
-      2: {
-        sender: this.appSettingsForm.get("sender")?.value,
-        receiver: this.appSettingsForm.get("receiver")?.value,
-        startTime: 1e12,
-        size: this.appSettingsForm.get("size")?.value,
-        priority: 0,
-        targetFidelity: this.appSettingsForm.get("targetFidelity")?.value,
-        timeout: 2e12,
-      },
-      1: {
-        sender: this.appSettingsForm.get("sender")?.value,
-        receiver: this.appSettingsForm.get("receiver")?.value,
-        keyLength: String(this.appSettingsForm.get("keyLength")?.value),
-      },
-      3: {
-        sender: this.appSettingsForm.get("sender")?.value,
-        receiver: this.appSettingsForm.get("receiver")?.value,
-        amplitude1: "0.70710678118+0j",
-        amplitude2: "0-0.70710678118j",
-      },
-      4: {
-        endnode1: this.appSettingsForm.get("endnode1")?.value,
-        endnode2: this.appSettingsForm.get("endnode2")?.value,
-        endnode3: this.appSettingsForm.get("endnode3")?.value,
-        middlenode: this.appSettingsForm.get("middleNode")?.value,
-      },
-      5: {
-        sender: this.appSettingsForm.get("sender")?.value,
-        receiver: this.appSettingsForm.get("receiver")?.value,
-        sequenceLength: 3,
-        key: this.appSettingsForm.get("key")?.value,
-      },
-      6: {
-        sender: this.appSettingsForm.get("sender")?.value,
-        receiver: this.appSettingsForm.get("receiver")?.value,
-        sequenceLength: "2",
-        message: this.appSettingsForm.get("message")?.value,
-      },
-      7: {
-        sender: {
-          node: this.appSettingsForm.get("sender")?.value,
-          message: this.appSettingsForm.get("messageIp1")?.value,
-          userID: "1010",
-          num_check_bits: 4,
-          num_decoy_photons: 4,
-        },
-        receiver: {
-          node: this.appSettingsForm.get("receiver")?.value,
-          userID: "1011",
-        },
-        bell_type: "10",
-        attack: "none",
-      },
-      8: {
-        sender: this.appSettingsForm.get("sender")?.value,
-        receiver: this.appSettingsForm.get("receiver")?.value,
-        message1: this.appSettingsForm.get("message1")?.value,
-        message2: this.appSettingsForm.get("message2")?.value,
-        num_photons: 5,
-        attack: "",
-      },
-      9: {
-        sender: {
-          node: this.appSettingsForm.get("sender")?.value,
-          message: this.appSettingsForm.get("message")?.value,
-        },
-        receiver: {
-          node: this.appSettingsForm.get("receiver")?.value,
-        },
-        bell_type: "10",
-        attack: "none",
-      },
-      10: {
-        sender: {
-          node: this.appSettingsForm.get("sender")?.value,
-          message: this.appSettingsForm.get("inputMessage")?.value,
-          userID: "1011",
-          num_check_bits: 4,
-          num_decoy_photons: 4,
-        },
-        receiver: {
-          node: this.appSettingsForm.get("receiver")?.value,
-          userID: "1010",
-        },
-        bell_type: "10",
-        error_threshold: 0.5,
-        attack: "none",
-        channel: 1,
-      },
-    };
+    const appConfigMap = this.topologyLoader.getAppConfig(this.appSettingsForm);
     this.appConfig = appConfigMap[app_id];
   }
   updateJson() {
     let type = this.type.toLowerCase();
-    if (type === this.lastValue.type && this.level == this.lastValue.level) {
+    if (type == this.lastValue.type && this.level == this.lastValue.level) {
       return;
     }
-    // let urlData = this.service.jsonUrl(this.type.toLowerCase(), this.level);
     this.topologyData = this.topologyLoader.loadTopologyMinimal(
       type,
       this.level
     );
-    this.topologyData = this.topologyLoader.addDescriptionToNodes(
-      this.topologyData,
-      this.info
-    );
+    this.topologyData.nodes = this.topologyData.nodes.map((node) => {
+      return {
+        ...node,
+        description:
+          node.color === "orange" ? this.info.service : this.info.end,
+      };
+    });
     this.updateNodes();
-    this.topologyLoader.updateDiagram(this.topologyData, this.topology);
-    if (this.appForm.get("app")?.value == 4)
+    this.updateDiagram(this.topologyData);
+    if (this.appForm.get("app")?.value == 4) {
       if (this.topologyForm.get("type")?.value == "Star") {
         this.appSettingsForm.get("endnode1").patchValue("node1");
         this.appSettingsForm.get("endnode2").patchValue("node3");
@@ -846,35 +724,8 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
         this.appSettingsForm.get("endnode2").patchValue("node5");
         this.appSettingsForm.get("endnode3").patchValue("node6");
       }
-
-    // this.service.getJson(urlData.url, urlData.type).subscribe(
-    //   (result: any) => {
-    //     this.topologyData = result;
-    //     this.info = this.topologyLoader.addDescriptionToNodes(
-    //       this.topologyData,
-    //       this.info
-    //     );
-    //     console.log(this.topologyData);
-    //     this.updateNodes();
-    //   },
-    //   (error) => {
-    //     console.log(error);
-    //   },
-    //   () => {
-    //     this.updateDiagram(this.topologyData);
-    //     if (this.appForm.get("app")?.value == 4)
-    //       if (this.topologyForm.get("type")?.value == "Star") {
-    //         this.appSettingsForm.get("endnode1").patchValue("node1");
-    //         this.appSettingsForm.get("endnode2").patchValue("node3");
-    //         this.appSettingsForm.get("endnode3").patchValue("node4");
-    //       } else if (this.topologyForm.get("type")?.value == "Mesh") {
-    //         this.appSettingsForm.get("endnode1").patchValue("node1");
-    //         this.appSettingsForm.get("endnode2").patchValue("node5");
-    //         this.appSettingsForm.get("endnode3").patchValue("node6");
-    //       }
-    //   }
-    // );
-    this.lastValue.level = type;
+    }
+    this.lastValue.level = this.level;
     this.lastValue.type = this.topologyForm.get("type")?.value.toLowerCase();
   }
   get app() {
@@ -904,16 +755,16 @@ export class MinimalComponent implements OnInit, AfterViewInit, OnDestroy {
   get key() {
     return this.appSettingsForm.get("key");
   }
-  checkValidity() {
-    this.valid;
-    let app_id = this.appForm.get("app")?.value;
-    if (app_id != 4) {
-      if (this.appSettingsForm.get("sender")?.value != "") {
-        if (this.appSettingsForm.get("receiver")?.value != "") {
-        }
-      }
-    }
-  }
+  // checkValidity() {
+  //   this.valid;
+  //   let app_id = this.appForm.get("app")?.value;
+  //   if (app_id != 4) {
+  //     if (this.appSettingsForm.get("sender")?.value != "") {
+  //       if (this.appSettingsForm.get("receiver")?.value != "") {
+  //       }
+  //     }
+  //   }
+  // }
 }
 function evenLengthValidator(control: FormControl) {
   const value = control.value;
@@ -922,10 +773,10 @@ function evenLengthValidator(control: FormControl) {
   }
   return null;
 }
-function lengthValidator(control: FormControl) {
-  const value = control.value;
-  if (value.length <= 10 || value.length >= 8) {
-    return { len: true };
-  }
-  return null;
-}
+// function lengthValidator(control: FormControl) {
+//   const value = control.value;
+//   if (value.length <= 10 || value.length >= 8) {
+//     return { len: true };
+//   }
+//   return null;
+// }
