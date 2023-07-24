@@ -1,475 +1,274 @@
-import random
-
-import qntsim
-from qntsim.components.circuit import Circuit, QutipCircuit
-from qntsim.kernel.timeline import Timeline
-
-Timeline.DLCZ=False
-Timeline.bk=True
-import logging
-import string
-import sys
+import time
+from math import inf
+from statistics import mean
+from typing import Any, Callable, Dict, Sequence
 
 import numpy as np
-from qntsim.kernel.quantum_manager import QuantumManager, QuantumManagerKet
-from qntsim.protocol import Protocol
-# from qntsim.topology.node import QuantumRouter
+from pandas import DataFrame
+from qntsim.communication import (ErrorAnalyzer, Network, __insert_seq__,
+                                  __separate_seq__, insert_check_bits,
+                                  to_binary, to_string)
+from qntsim.components.photon import Photon
+from qntsim.components.waveplates import Waveplate
+from qntsim.kernel._event import Event
+from qntsim.kernel.timeline import Timeline
+from qntsim.topology.node import EndNode
 from qntsim.topology.topology import Topology
-from qntsim.utils import log
-
-# logger = logging.getLogger("main_logger.application_layer." + "ip1")
-
-
-class IP1():
-
-    def request_entanglements(self,sender,receiver,n=50):
-        log.logger.info(sender.owner.name+" requesting entanglement with "+receiver.owner.name)
-        sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.5,5e12)
-        source_node_list=[sender.name]
-        return sender,receiver,source_node_list
-
-    def roles(self,alice,bob,n):
-        sender=alice
-        receiver=bob
-        print('sender, receiver',sender.owner.name,receiver.owner.name)
-        log.logger.info('sender, receiver are '+sender.owner.name+" "+receiver.owner.name)
-        return self.request_entanglements(sender,receiver,n)
-
-    def z_measurement(self,qm, keys):
-        circ=QutipCircuit(1)       #Z Basis measurement
-        circ.measure(0)
-        output=qm.run_circuit(circ, keys)
-        return list(output.values())[0]
-
-    def print_state_vecs(self,qm, keys):
-        for key in keys:
-            state=qm.get(key)
-            print(state)
-
-    def add_bits_to_pos(self,message, pos, bits):
-        assert(len(pos) == len(bits))
-        new_message = '0'* (len(message) + len(pos))
-        temp = list(new_message)
-
-        c, d = 0, 0
-        for i in range(len(new_message)):
-            if i in pos:
-                temp[i] = str(bits[c])
-                c = c + 1
-            else : 
-                temp[i] = message[d]
-                d = d + 1
-
-        return temp
-
-    def generate_Q1A(self,message, c):
-        check_bits_pos = random.sample(range(0, len(message) + c), c)
-        check_bits_pos.sort()
-        check_bits = []
-
-        for i in check_bits_pos:
-            random_bit = str(random.randint(0, 1))
-            check_bits.append(random_bit)
-
-        new_message = self.add_bits_to_pos(message, check_bits_pos, check_bits)
-        log.logger.info("message by sender: "+ "".join(new_message))
-        return new_message, check_bits_pos, check_bits
-
-
-    def initilize_states(self,qm_alice, message):
-        keys = []
-        for i in message:
-            if i == '0':
-                keys.append(qm_alice.new([1, 0]))
-            elif i == '1' : 
-                keys.append(qm_alice.new([0, 1]))
-        return keys
-
-    def apply_theta(self,qm, keys, theta = None):
-        if theta == None : 
-            theta = random.randint(0, 8)
-        for key in keys:
-            circ = QutipCircuit(1)
-            circ.ry(0, 2*theta/360*np.pi)
-            qm.run_circuit(circ, [key])
-        return theta
-
-    def get_IDs(self):
-        sender_id = "0011"
-        receiver_id = "0110"
-        log.logger.info("sender_id: "+str( sender_id))
-        log.logger.info("receiver_id: "+str(receiver_id))
-        return sender_id, receiver_id
-        
-
-    def hadamard_transform(self,qm, keys):
-        circ = QutipCircuit(len(keys))
-        for i in range(len(keys)):
-            circ.h(i)
-        qm.run_circuit(circ, keys)
-
-    def get_IA(self,qm, IdA):
-        IA_keys = []
-        for i in range(0, len(IdA), 2):
-            keys = self.initilize_states(qm, IdA[i + 1])
-            assert(len(keys) == 1)
-            if IdA[i] == '1':
-                self.hadamard_transform(qm, keys)
-            IA_keys.append(keys[0])
-        return IA_keys
-
-    def add_random_keys(self,keys_to_add, original_keys):
-        new_list = ['0' for i in range(len(keys_to_add) + len(original_keys))]
-        random_pos = random.sample(range(0, len(new_list)), len(keys_to_add))
-        random_pos.sort()
-        c, d = 0, 0 
-        for i in range(len(new_list)):
-            if i in random_pos:
-                new_list[i] = keys_to_add[c]
-                c = c + 1
-            else : 
-                new_list[i] = original_keys[d]
-                d = d + 1
-        # loggger.info("random keys ge
-        # : " + "".join(new_list))
-        return new_list, random_pos
-
-    def generate_Q2A(self,qm, IdA, Q1A_keys):
-        IA_keys = self.get_IA(qm, IdA)
-        Q2A_keys, random_pos = self.add_random_keys(IA_keys, Q1A_keys)
-        
-        return Q2A_keys, random_pos, IA_keys
-
-    def get_IdB1(self,IdB):
-        r = ['0' for i in range(len(IdB))]
-        for i in range(len(IdB)):
-            r[i] = str(random.randint(0,1))
-
-        temp = [str(int(IdB[i])^int(r[i])) for i in range(len(r))]
-        IdB1 = ''.join(temp)
-        return IdB1, r
-
-    def get_IB(self,qm, IdB1, IdB):
-        IB_keys = []
-
-        for i in range(len(IdB1)):
-            keys = self.initilize_states(qm, IdB1[i])
-            assert len(keys) == 1
-            IB_keys.append(keys[0])
-            if (IdB[i] == '1'):
-                self.hadamard_transform(qm, keys)
-
-        return IB_keys
-
-    def generate_Q3A(self,qm, IdB, Q2A_keys):
-        IdB1, r = self.get_IdB1(IdB)
-        IB_keys = self.get_IB (qm, IdB1, IdB)
-        Q3A_keys, random_pos = self.add_random_keys(IB_keys, Q2A_keys)
-        return Q3A_keys, random_pos, IdB1, IB_keys, r
-
-    def get_theta_keys(self,qm, theta, IdB1):
-        theta_keys = []
-        binary_theta = format(theta, "b")
-        for i in range(len(binary_theta)):
-            keys = self.initilize_states(qm, binary_theta[i])
-            theta_keys.append(keys[0])
-            if (IdB1[i] == '1'):
-                self.hadamard_transform(qm, keys)
-
-        return theta_keys
-
-    def generate_Q4A(self,qm, theta, Q3A_keys, IdB1):
-        theta_keys = self.get_theta_keys(qm, theta, IdB1)
-        Q4A_keys, random_pos =self. add_random_keys(theta_keys, Q3A_keys)
-        return Q4A_keys, random_pos, theta_keys
-
-    # There's one subtelety in the way decoy qubits work
-    # I am putting them in anywhere randomly, yet their results that I save I save in an ordered fashion
-    # Thus results and positions do not have a 1-1 correspondance necessarily
-    # To change this, I make the random assignment sorted.
-    def generate_decoy_qubits(self,qm, m):
-        decoy_keys = []
-        decoy_results = []
-        for i in range(m):
-            random_bit = random.randint(0, 1)
-            keys = self.initilize_states(qm, str(random_bit))
-            decoy_results.append(str(random_bit))
-            random_bit = random.randint(0, 1)
-            if (random_bit == 1):
-                self.hadamard_transform(qm, keys)
-            decoy_keys.append(keys[0])
-            decoy_results[i] += str(random_bit)
-        log.logger.info("Decoy photons generated: "+ "".join(decoy_results))
-        return decoy_keys, decoy_results
-
-    def generate_Q5A(self,qm, Q4A_keys, m):
-        decoy_keys, decoy_results = self.generate_decoy_qubits(qm, m)
-        Q5A_keys, random_pos = self.add_random_keys(decoy_keys, Q4A_keys)
-        return Q5A_keys, random_pos, decoy_results
-
-    def run_encoding_process(self,alice,message, IdA, IdB):
-        log.logger.info("message encoded into the network :" + str(message))
-        qm_alice=alice.timeline.quantum_manager
-        Q1A, check_bits_pos, check_bits = self.generate_Q1A(message, 3)
-        Q1A_keys = self.initilize_states(qm_alice, Q1A)
-        theta = self.apply_theta(qm_alice, Q1A_keys)
-        
-        Q2A_keys, IA_pos, IA_keys = self.generate_Q2A(qm_alice, IdA, Q1A_keys)
-        Q3A_keys, IB_pos, IdB1, IB_keys, r = self.generate_Q3A(qm_alice, IdB, Q2A_keys)
-        Q4A_keys, theta_keys_pos, theta_keys = self.generate_Q4A(qm_alice, theta, Q3A_keys, IdB1)
-        Q5A_keys, decoy_pos, decoy_results =self.generate_Q5A(qm_alice, Q4A_keys, m = 3)
-        return Q5A_keys, decoy_pos, decoy_results, IA_keys, IB_keys, r, theta_keys, Q1A_keys, check_bits_pos, check_bits
-
-    def run_security_check(self,qm, Q5A_keys, decoy_pos, decoy_results):
-        to_remove = []
-        for i, pos in enumerate(decoy_pos):
-            if decoy_results[i][1] == '1':
-                self.hadamard_transform(qm, [Q5A_keys[pos]])
-            output = self.z_measurement(qm, [Q5A_keys[pos]])
-            log.logger.info("key : "+ str(Q5A_keys[pos])+ " output : "+ str(output)+ " expected output : "+ str( decoy_results[i][0]))
-            #assert(output == int(decoy_results[i][0])), "Security check did not pass!"
-            if output == int(decoy_results[i][0]):
-                self.security_msg="Security check passed"  #Security check did not pass!
-            else :
-                self.security_msg="Security check did not pass" 
-            to_remove.append(Q5A_keys[pos])
-
-        log.logger.info("Security check successful!")
-        return list(set(Q5A_keys) - set(to_remove))
-
-
-    def authenticate_IdA(self,qm, IA_keys, Q5A_keys, IdA):
-        c = 0
-        for key in Q5A_keys:
-            if key not in IA_keys:
-                continue
-
-            if IdA[c] == '1':
-                self.hadamard_transform(qm, [key])
-
-            output = self.z_measurement(qm, [key])
-            if output == int(IdA[c + 1]):
-                self.IdA_msg="IdA authenticated"
-            else:
-                
-                self.IdA_msg="IdA authentication did not pass"
-               
-
-            #assert(output == int(IdA[c + 1])), "IdA authentication did not pass!"
-            c = c + 2
-        log.logger.info("IdA authenticated!")
-
-    def Bobs_IdB1(self,qm, IB_keys, Q5A_keys, IdB):
-
-        local_IdB1 = []
-
-        assert(len(IB_keys) == len(IdB)), " Mismatch in IB_keys and IdB! "
-        for i, key in enumerate(IB_keys):
-            if IdB[i] == '1':
-                self.hadamard_transform(qm, [key])
-
-            local_IdB1.append(self.z_measurement(qm, [key]))
-
-        return local_IdB1
-
-    def check_r(self,IdB, Bobs_IdB1, r):
-        Bobs_r = [str(int(IdB[i])^int(Bobs_IdB1[i])) for i in range(len(IdB))]
-        log.logger.info("Bobs_r that he gets : "+ "".join(Bobs_r))
-        log.logger.info("Alice's encoded r : "+ str(r))
-        assert (Bobs_r == r), "Bob's r is different from Alice's r! Some error!"
-        log.logger.info("Bob's r is same as Alice's r! Authentication procedure passed")
-        ##for output
-        return Bobs_r,r
-
-    def authenticate_r(self,qm, IB_keys, Q5A_keys, IdB, r):
-        local_IdB1 = self.Bobs_IdB1(qm, IB_keys, Q5A_keys, IdB)
-        Bobs_r,r=self.check_r(IdB, local_IdB1, r)
-        return Bobs_r,r
-
-    def run_authentication_procedure(self,qm, IdA, IdB, IA_keys, IB_keys, Q5A_keys, r):
-        self.authenticate_IdA(qm, IA_keys, Q5A_keys, IdA)
-        Bobs_r,r=self.authenticate_r(qm, IB_keys, Q5A_keys, IdB, r)
-        return Bobs_r,r
-
-    def Bob_get_theta(self,qm, IdB, theta_keys):
-        bin_theta = []
-        for i, key in enumerate(theta_keys):
-            if IdB[i] == '1':
-                self.hadamard_transform(qm, [key])
-
-            bin_theta.append(str(self.z_measurement(qm, [key])))
-        str_bin_theta = str("".join(bin_theta))
-        theta = int(str_bin_theta, 2)
-        return theta
-
-    def Bob_decode_theta(self,qm, Q1A_keys, Bob_theta):
-        self.apply_theta(qm, Q1A_keys, -1*Bob_theta)
-        Bob_message = []
-        for key in Q1A_keys:
-            Bob_message.append(str(self.z_measurement(qm, [key])))
-
-        return "".join(Bob_message)
-
-    def Bob_remove_check_bits(self,message, check_bits_pos, check_bits):
-        final_message = []
-        c = 0
-        for pos in range(len(message)):
-            if pos in check_bits_pos:
-                assert(message[pos] == check_bits[c]), "Check bits not the same!"
-                c = c + 1
-                continue
-            final_message.append(message[pos])
-
-        log.logger.info("Check bits protocol passed!")
-        return final_message
-
-    def run_decoding_process(self,qm, IdB, theta_keys, Q5A_keys, Q1A_keys, check_bits_pos, check_bits):
-        Bob_theta = self.Bob_get_theta(qm, IdB, theta_keys)
-        Bob_message_with_check_bits = self.Bob_decode_theta(qm, Q1A_keys, Bob_theta)
-        Bob_final_message = self.Bob_remove_check_bits(Bob_message_with_check_bits, check_bits_pos, check_bits)
-        return "".join(Bob_final_message)
-
-
-    # TODO: qd_sp transmission
-    def copy_Q5A(self,Q5A_keys, alice, bob):
-        qm_alice = alice.timeline.quantum_manager
-        qm_bob = bob.timeline.quantum_manager
-        bob_keys = []
-        alice_to_bob_dict = {}
-
-        for alice_key in Q5A_keys:
-            state=qm_alice.get(alice_key)
-            new_key = qm_bob.new(state.state)
-            bob_keys.append(new_key)
-            alice_to_bob_dict[alice_key] = new_key
-
-        return alice_to_bob_dict
-
-
-    def update_keys(self,alice_to_bob_dict, Q5A_keys, IA_keys, IB_keys, theta_keys, Q1A_keys):
-        keys_to_update = [Q5A_keys, IA_keys, IB_keys, theta_keys, Q1A_keys]
-        new_keys = [[], [], [], [], []]
-        for i, batch in enumerate(keys_to_update):
-            for key in batch:
-                new_keys[i].append(alice_to_bob_dict[key])
-
-        return new_keys
-
-
-
-    def run(self,alice,bob,message ):
-        print("IP1")
-        qm_alice=alice.timeline.quantum_manager
-        qm_bob=bob.timeline.quantum_manager
-        IdA, IdB = self.get_IDs()
-        Q5A_keys, decoy_pos, decoy_results, IA_keys, IB_keys, r, theta_keys, Q1A_keys, check_bits_pos, check_bits =self.run_encoding_process(alice,message, IdA, IdB)
-        
-        ## Sends qubits to bobs node
-        alice_to_bob_dict = self.copy_Q5A(Q5A_keys, alice, bob)
-        Q5A_keys, IA_keys, IB_keys, theta_keys, Q1A_keys = self.update_keys(alice_to_bob_dict, Q5A_keys, IA_keys, IB_keys, theta_keys, Q1A_keys)
-        ## Maybe use identity gates. Currently simulating it by copying keys
-
-        self.run_security_check(qm_bob, Q5A_keys, decoy_pos, decoy_results)
-        Bobs_r,r=self.run_authentication_procedure(qm_bob, IdA, IdB, IA_keys, IB_keys, Q5A_keys, r)
-        
-
-        Bob_message = self.run_decoding_process(qm_bob, IdB, theta_keys, Q5A_keys, Q1A_keys, check_bits_pos, check_bits)
-        log.logger.info(f"input message : {message}")
-        log.logger.info(f"Bob_message : {Bob_message}")
-        
-        if Bobs_r == r : 
-            display_msg="Bob's r is same as Alice's r! Authentication procedure passed"
-            
-        else:
-            display_msg="Bob's r is different from Alice's r! Authentication procedure failed!"
-        log.logger.info(display_msg)
-        #Bobs_r : Bobs_r that he gets 
-        #Alice_r: Alice's encoded r
-        res ={
-            "Security_msg":self.security_msg,
-            "IdA_msg":self.IdA_msg,
-            "Bobs_r": Bobs_r,
-            "Alice_r ": r,
-            "display_msg":display_msg,
-            "input_message": message,
-            "bob_message" : Bob_message
+from qntsim.utils.encoding import polarization
+from qntsim.utils.log import logger
+from rich import print_json
+from rich_dataframe import prettify
+from rich_dataframe import print as print_rich
+
+basis = polarization.get("bases")
+
+def ip1(topology:Dict, app_settings:Dict[str, Dict[str, Any]]):
+    response = {}
+    theta = app_settings.get("theta", np.random.randint(0, 360)) # If user doesn't provide value, default it to numpy.randint
+    message = app_settings.get("sender").get("message")
+    _is_binary, messages = to_binary(messages=[message])
+
+    # #####################################################       Setting up the simulator         #################################################
+    start_time = time.time()
+    simulator = Timeline( stop_time=app_settings.get("stop_time", inf), backend=app_settings.get("backend", "Qutip"))
+    configuration = Topology(name="ip1", timeline=simulator)
+    configuration.load_config_json(config=topology)
+    logger.debug("loaded topology into the simulator")
+    src_node:EndNode = configuration.nodes.get(app_settings.get("sender").get("node"))
+    dst_node:EndNode = configuration.nodes.get(app_settings.get("receiver").get("node"))
+
+    logger.info("|------------------Simulation started------------------|")
+    mod_msg = insert_check_bits(messages=messages, num_check_bits=(num_check_bits:=app_settings.get("sender").get("num_check_bits")))
+    logger.debug(f"{num_check_bits} check bits inserted into the message")
+
+    # ############################################      Encoding user input message into photons           ########################################
+    logger.info("|---------------Encoding process started---------------|")
+    print(mod_msg)
+    photons = [Photon(name="msg"+str(char), quantum_state=basis[0][int(char)]) for _, message in mod_msg.items() for char in message]
+    logger.info("Message encoded into the photons")
+    logger.debug("Message photons generated")
+    wp = Waveplate(name=theta, timeline=simulator, angle=theta)
+    photons = [wp.apply(qubit=photon) for photon in photons]
+    logger.debug(f"Applied {theta}\degree rotation to the message photons")
+    
+    # #########################################              Encoding sender's id into photons           #################################
+    sender_id = app_settings.get("sender").get("userID")
+    ids_photons = [Photon(name="ids"+str(i0), quantum_state=basis[int(i0)][int(i1)]) for i0, i1 in zip(sender_id[::2], sender_id[1::2])]
+    logger.info(f"Sender ID {sender_id} encoded into the photons")
+
+    # ###################################                   Encoding receiver's id into photons             ################################
+    receiver_id = app_settings.get("receiver").get("userID")
+    r = np.random.randint(low=0, high=2, size=len(receiver_id))
+    idr_photons = [Photon(name="idr"+str(i0), quantum_state=basis[int(i0)][int(i0)^int(i1)]) for i0, i1 in zip(receiver_id, r)]
+    logger.info(f"Receiver ID {receiver_id} encoded into the photons")
+
+    # ########################################             Encoding rotation angle into photons           #############################
+    theta_bin = bin(theta)[2:].rjust(9, '0')
+    print("Theta", theta_bin, bin(theta))
+    theta_photons = [Photon(name="theta"+str(i0), quantum_state=basis[int(i0)][int(i1)]) for i0, i1 in zip(receiver_id, '0'*(len(receiver_id)-len(theta_bin))+theta_bin)]
+
+    # ###########################################   Generating decoy photons for security checking            ##########################
+    decoy_states = np.random.randint(4, size=app_settings.get("sender").get("num_decoy_photons"))
+    prettify(DataFrame(decoy_states), clear_console=False)
+    decoy_photons = [Photon(name="decoy"+str(state//2), quantum_state=basis[state//2][state%2]) for state in decoy_states]
+    logger.info(f"{len(decoy_states)} decoy photons generated")
+    logger.debug("Constructing photon sequence")
+    ids_locs, q2 = __insert_seq__(photons, ids_photons) # q1 + ids
+    idr_locs, q3 = __insert_seq__(q2, idr_photons) # q2 + idr
+    theta_locs, q4 = __insert_seq__(q3, theta_photons) # q3 + theta
+    decoy_locs, q5 = __insert_seq__(q4, decoy_photons) # q4 + decoy
+    for photon in q5:
+        photon.name = str(q5.index(photon))+" "+photon.name
+        simulator.events.push(event=Event(time=simulator.now()+time.time(), owner=src_node, activation_method="send_qubit", act_params=[dst_node.name, photon]))
+        logger.debug(f"Generated event for sending qubit to {dst_node.name} node")
+    simulator.init()
+    simulator.run()
+    simulator.is_running = True
+    photons_received = dst_node.qubit_buffer.get(1, []) # received photons at the receiver's node
+    rearranged_photons = rearrange_photons(photons=photons_received) # q5
+    print("photons received:")
+    prettify(DataFrame({"send photons":q5, "recieved photons":rearranged_photons}), clear_console=False, row_limit=100, col_limit=50)
+    logger.info(f"Photons received at {dst_node.name} node")
+
+    logger.info("|--------------Extraction and Decoding started------------|")
+
+    print("q4")
+    q4_received, received_decoy_meas = extract_seq(indices=decoy_locs, lst=rearranged_photons) # q5 - decoy
+    logger.info("Extracted decoy photons")
+    if mean([int(state%2)^int(recv_meas) for state, recv_meas in zip(decoy_states, received_decoy_meas)]) > app_settings.get("err_threshold", 0.25):
+        logger.info("Eavesdropper detected in channel")
+        return
+    rearranged_q4 = rearrange_photons(photons=q4_received)
+    prettify(DataFrame(rearranged_q4), clear_console=False, row_limit=100)
+    
+    print("q3")
+    q3_received, received_theta_str = extract_seq(indices=theta_locs, lst=rearranged_q4) # q4 - theta
+    rearranged_q3 = rearrange_photons(photons=q3_received)
+    prettify(DataFrame(rearranged_q3), clear_console=False, row_limit=100)
+    
+    print("q2")
+    q2_received, received_receiver_id = extract_seq(indices=idr_locs, lst=rearranged_q3) # q3 - idr
+    rearranged_q2 = rearrange_photons(photons=q2_received)
+    prettify(DataFrame(rearranged_q2), clear_console=False, row_limit=100)
+    # prettify(DataFrame([ids_locs, idr_locs, theta_locs, decoy_locs]), clear_console=False)
+    logger.info("Extracted receiver id")
+    if mean([int(r_id!=s_id)^r for r_id, s_id, r in zip(received_receiver_id, receiver_id, r)]) > 0.3:
+        print("returned")
+        logger.info("Receiver not authenticated")
+        return
+    
+    print("q1")
+    q1_received, received_sender_id = extract_seq(indices=ids_locs, lst=rearranged_q2, list_comp=lambda photons: [str(Photon.measure(basis=basis[int(photon.name[-1])], photon=photon)) for photon in photons]) # q2 - ids
+    rearranged_q1 = rearrange_photons(photons=q1_received)
+    prettify(DataFrame(rearranged_q1), clear_console=False, row_limit=100)
+    logger.info("Extracted sender id")
+    if mean([int(r_id==s_id) for r_id, s_id in zip(received_sender_id, sender_id)]) > 0.3:
+        logger.info("Sender not authenticated")
+        return
+    received_theta = int(received_theta_str, 2)
+    logger.info("recovered rotation angle from photon sequence received")
+    wp = Waveplate(name="-"+str(received_theta), timeline=simulator, angle=-received_theta)
+    # prettify(DataFrame([wp.apply(qubit=photon) for photon in rearranged_q1]), clear_console=False)
+    # prettify(DataFrame([Photon.measure(basis=basis[0], photon=wp.apply(qubit=photon)) for photon in rearranged_q1]), clear_console=False)
+    mod_q1 = "".join([str(Photon.measure(basis=basis[0], photon=wp.apply(qubit=photon))) for photon in rearranged_q1])
+    print(mod_msg)
+    print(mod_q1)
+    for positions in mod_msg:
+        recv_msg, received_check_bits = __separate_seq__(indices=positions, lst=mod_q1)
+        if (msg_integrity := mean([int(mod_q1[index]!=chk_bit) for index, chk_bit in zip(positions, received_check_bits)])) > 0.3:
+            logger.info(f"Integrity of the message is compromised: {msg_integrity}%")
+            return
+        break
+    simulator.is_running = False
+    logger.info(f"|-------------Simulation Completed!! Message has been safely transferred from {src_node.name} to {dst_node.name}----------------------|")
+
+    recv_msg = "".join(char for char in recv_msg)
+    recv_msgs = to_string(strings=[recv_msg], _was_binary=_is_binary)
+    end_time = time.time()
+    network = Network(topology=topology,
+                      messages={(app_settings.get("sender").get("node"),
+                                 app_settings.get("receiver").get("node")):app_settings.get("sender").get("message")},
+                      require_entanglement=False)
+    network._strings = [recv_msg]
+    _, _, err_prct, err_sd, info_lk, msg_fidelity = ErrorAnalyzer._analyse(network=network)
+    app_settings.update(output_msg=recv_msgs, avg_err=err_prct, std_dev=err_sd, info_leak=info_lk, msg_fidelity=msg_fidelity)
+    response["application"] = app_settings
+    print("RESPONSE")
+    print_json(data=response)
+    from main.simulator.topology_funcs import network_graph
+    response = network_graph(network_topo=configuration, source_node_list=[src_node.name], report=response)
+    response["performance"]["execution_time"] = end_time - start_time
+
+    return response
+
+def extract_seq(indices:Sequence[int], lst:Sequence[Photon], list_comp:Callable=lambda _: None):
+    q_received, photons_received = __separate_seq__(indices=indices, lst=lst)
+    print_rich(photons_received)
+    results = list_comp(photons_received) or [str(Photon.measure(basis=basis[int(photon.name[-1])], photon=photon)) for photon in photons_received]
+    received_entity = "".join(results)
+
+    return q_received, received_entity
+
+def rearrange_photons(photons:Sequence[Photon]):
+    rearranged_photons = {int(photon.name.split()[0]):photon for photon in photons}
+    rearranged_photons = [rearranged_photons[index] for index in sorted(rearranged_photons)]
+
+    return rearranged_photons
+
+if __name__=="__main__":
+    topology = {
+        'nodes': [
+            {
+                'Name': 'node1',
+                'Type': 'end',
+                'noOfMemory': 500,
+                'memory': {
+                    'frequency': 80000000,
+                    'expiry': -1,
+                    'efficiency': 1,
+                    'fidelity': 0.93
+                    },
+                'lightSource': {
+                    'frequency': 80000000,
+                    'wavelength': 1550,
+                    'bandwidth': 0,
+                    'mean_photon_num': 0.1,
+                    'phase_error': 0
+                    }
+                },
+            {
+                'Name': 'node2',
+                'Type': 'end',
+                'noOfMemory': 500,
+                'memory': {
+                    'frequency': 80000000,
+                    'expiry': -1,
+                    'efficiency': 1,
+                    'fidelity': 0.93
+                    },
+                'lightSource': {
+                    'frequency': 80000000,
+                    'wavelength': 1550,
+                    'bandwidth': 0,
+                    'mean_photon_num': 0.1,
+                    'phase_error': 0
+                    }
+                }
+            ],
+        'quantum_connections': [
+            {
+                'Nodes': ['node1', 'node2'],
+                'Attenuation': 0.1,
+                'Distance': 70
+                }
+            ],
+        'classical_connections': [
+            {
+                'Nodes': ['node1', 'node1'],
+                'Delay': 0,
+                'Distance': 0
+                },
+            {
+                'Nodes': ['node1', 'node2'],
+                'Delay': 10000000000,
+                'Distance': 1000
+                },
+            {
+                'Nodes': ['node2', 'node1'],
+                'Delay': 10000000000,
+                'Distance': 1000
+                },
+            {
+                'Nodes': ['node2', 'node2'],
+                'Delay': 0,
+                'Distance': 0
+                }
+            ],
+        'detector': {
+            'efficiency': 1,
+            'count_rate': 25000000,
+            'time_resolution': 150
+            }
         }
-        # logger.info(res)
-        return res
-    # One question - technically all of this is happening on Alice's nodes. How do 
-    # I send everything to Bob's nodes
-    # I don't know
-    #run_ip_protocol(message = "010010")
-
-#########################################################################################################################
-
-
-# sender and receiver (Type :string)-nodes in network 
-# backend (Type :string) Qutip (Since entanglements are filtered out based on EPR state)
-# message (Type: String)--a bit string
-# Todo Support on qiskit
-# no.of entanglements=50
-
-# path (Type : String) -Path to config Json file
-"""
-def ip1(path,sender,receiver,message):
-    from qntsim.kernel.timeline import Timeline 
-    Timeline.DLCZ=False
-    Timeline.bk=True
-    from qntsim.topology.topology import Topology
-    
-    tl = Timeline(20e12,"Qutip")
-    network_topo = Topology("network_topo", tl)
-    network_topo.load_config(path)
-    
-    alice=network_topo.nodes[sender]
-    bob = network_topo.nodes[receiver]
-    ip1=IP1()
-    alice,bob=ip1.roles(alice,bob,n=50)
-    tl.init()
-    tl.run()  
-    res = ip1.run(alice,bob,message)
-    print(res)
-"""
-# jsonConfig (Type : Json) -Json Configuration of network 
-"""
-def ip1(jsonConfig,sender,receiver,message):
-    from qntsim.kernel.timeline import Timeline 
-    Timeline.DLCZ=False
-    Timeline.bk=True
-    from qntsim.topology.topology import Topology
-    
-    tl = Timeline(20e12,"Qutip")
-    network_topo = Topology("network_topo", tl)
-    network_topo.load_config_json(jsonConfig)
-    
-    alice=network_topo.nodes[sender]
-    bob = network_topo.nodes[receiver]
-    ip1=IP1()
-    alice,bob,source_node_list=ip1.roles(alice,bob,n=50)
-    tl.init()
-    tl.run()  
-    ip1.run(alice,bob,message)
-conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
-memo = {"frequency": 2e3, "expiry": 0, "efficiency": 1, "fidelity": 1}
-node1 = {"Name": "N1", "Type": "end", "noOfMemory": 50, "memory":memo}
-node2 = {"Name": "N2", "Type": "end", "noOfMemory": 50, "memory":memo}
-node3 = {"Name": "N3", "Type": "service", "noOfMemory": 50, "memory":memo}
-conf["nodes"].append(node1)
-conf["nodes"].append(node2)
-conf["nodes"].append(node3)
-qc1 = {"Nodes": ["N1", "N3"], "Attenuation": 1e-5, "Distance": 70}
-qc2 = {"Nodes": ["N2", "N3"], "Attenuation": 1e-5, "Distance": 70}
-conf["quantum_connections"].append(qc1)
-conf["quantum_connections"].append(qc2)
-cc1 = {"Nodes": ["N1", "N1"], "Delay": 0, "Distance": 0}
-cc1 = {"Nodes": ["N2", "N2"], "Delay": 0, "Distance": 0}
-cc1 = {"Nodes": ["N3", "N3"], "Delay": 0, "Distance": 0}
-cc12 = {"Nodes": ["N1", "N2"], "Delay": 1e9, "Distance": 1e3}
-cc13 = {"Nodes": ["N1", "N3"], "Delay": 1e9, "Distance": 1e3}
-cc23 = {"Nodes": ["N2", "N3"], "Delay": 1e9, "Distance": 1e3}
-conf["classical_connections"].append(cc12)
-conf["classical_connections"].append(cc13)
-conf["classical_connections"].append(cc23)
-ip1( conf, "N1", "N2", "010010")
-"""
+    app_settings = \
+        {
+            "sender":
+                {
+                    "node":"node1",
+                    "message":"h",
+                    "userID":"1011110010",
+                    "num_check_bits":4,
+                    "num_decoy_photons":4
+                },
+            "receiver":
+                {
+                    "node":"node2",
+                    "userID":"110011001"
+                },
+            "backend":"Qutip",
+            "stoptime":10e12
+        }
+    ip1(topology=topology,
+        app_settings=app_settings)
+    # print_json({"response":ip1(topology=topology,
+    #                            app_settings=app_settings)})
