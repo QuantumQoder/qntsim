@@ -32,5 +32,5 @@ def to_string(strings:List[str], _was_binary:bool):
 
     return messages
 
-def pass_(_: Any, returns: Any):
-    return returns
+def pass_returns(_: Any, returns: Any, *args, **kwds):
+    return returns, args, kwds

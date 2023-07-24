@@ -12,3 +12,12 @@ backend/web/qsdc_tel.log
 backend/web/parameters.json
 backend/web/parameters.txt
 .vscode/extensions.json
+build/
+example/logger.txt
+**/__pycache/**
+*.pyc
+web/drawgraph.html
+web/topology/templates/graph.html
+drawgraph.html
+.gitignore
+logger.txt

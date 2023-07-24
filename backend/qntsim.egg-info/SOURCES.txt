@@ -16,15 +16,15 @@ src/communication/NoiseModel.py
 src/communication/__init__.py
 src/communication/attack.py
 src/communication/circuits.py
+src/communication/communication.py
 src/communication/error_analyzer.py
 src/communication/network.py
 src/communication/noise.py
 src/communication/protocol.py
 src/communication/quantum_network.py
+src/communication/relay_manager.py
 src/communication/security_checks.py
 src/communication/template.py
-src/communication/un.py
-src/communication/up.py
 src/communication/utils.py
 src/components/DLCZ_bsm.py
 src/components/DLCZ_memory.py
@@ -80,3 +80,4 @@ src/utils/__init__.py
 src/utils/encoding.py
 src/utils/log.py
 src/utils/quantum_state.py
+tests/test_topology.py

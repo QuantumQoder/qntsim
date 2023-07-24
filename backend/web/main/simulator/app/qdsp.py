@@ -1,25 +1,31 @@
 import time
-from typing import Dict
+from math import inf
+from typing import Any, Dict
 
 import numpy as np
 from qntsim.communication import ErrorAnalyzer, Network, to_binary, to_string
 from qntsim.components.photon import Photon
 from qntsim.components.waveplates import HalfWaveplate
+from qntsim.kernel._event import Event
 from qntsim.kernel.timeline import Timeline
 from qntsim.topology.node import EndNode
 from qntsim.topology.topology import Topology
 from qntsim.utils.encoding import polarization
+from qntsim.utils.log import logger
 
 
-def qdsp(topology:Dict, app_settings:Dict):
+def qdsp(topology:Dict, app_settings:Dict[str, Dict[str, Any]]):
     response = {}
     message1 = app_settings.get("sender").get("message")
     message2 = app_settings.get("receiver").get("message")
-    start_time = time.time()
     _is_binary, messages = to_binary(messages=[message1, message2])
-    simulator = Timeline(stop_time=app_settings.get("stoptime", 10e12), backend=app_settings.get("backend", "Qutip"))
+
+    
+    start_time = time.time()
+    simulator = Timeline(stop_time=app_settings.get("stoptime", inf), backend=app_settings.get("backend", "Qutip"))
     configuration = Topology(name="qdsp", timeline=simulator)
     configuration.load_config_json(config=topology)
+    logger.debug("loaded topology into the simulator")
     src_node:EndNode = configuration.nodes.get(app_settings.get("sender").get("node"))
     dst_node:EndNode = configuration.nodes.get(app_settings.get("receiver").get("node"))
     initial_states = np.random.randint(4, size=len(messages[0]))
@@ -28,23 +34,44 @@ def qdsp(topology:Dict, app_settings:Dict):
                       1:basis[0][1],
                       2:basis[1][0],
                       3:basis[1][1]}
+
+    simulator.is_running = True
+    logger.info("|------------------Simulation started------------------|")
     photons = [Photon(name=state, quantum_state=_quantum_state[state]) for state in initial_states]
+    logger.info("Photons generated for the transmission")
+    logger.info("|---------------Encoding process started---------------|")
     hwp = HalfWaveplate(name=np.pi/2, timeline=simulator)
     for photon, msg in zip(photons, messages[0]):
-        print(msg)
-        src_node.send_qubit(dst=dst_node.name, qubit=hwp.apply(qubit=photon) if int(msg) else photon)
+        simulator.events.push(event=Event(time=simulator.now()+time.time(), owner=src_node, activation_method="send_qubit", act_params=[dst_node.name, hwp.apply(qubit=photon) if int(msg) else photon]))
+        logger.debug(f"Generated event for sending qubit to {dst_node.name} node")
     simulator.init()
     simulator.run()
     photons = dst_node.qubit_buffer.get(1, [])
     print("final photons,", photons)
+    logger.info(f"Photons received at {dst_node.name} node")
+
+    logger.info("|--------------Masurement and Decoding started------------|")
     results = [Photon.measure(basis=basis[photon.name//2], photon=hwp.apply(qubit=photon) if int(msg) else photon) for photon, msg in zip(photons, messages[1])]
-    strings = ["".join([str(result^int(char)) for result, char in zip(results, message)]) for message in messages]
+    strings = ["".join([str(result^int(char)^(state%2)) for result, char, state in zip(results, message, initial_states)]) for message in messages]
+    print(initial_states)
+    print(messages)
+    print(results)
+    print(strings)
+    simulator.is_running = False
+    logger.info(f"|-------------Simulation Completed!! Message has been safely transferred from {src_node.name} to {dst_node.name}----------------------|")
+
+    
     recv_msgs = to_string(strings=strings, _was_binary=_is_binary)
-    network = Network(topology=topology, messages={(app_settings.get("sender").get("node"), app_settings.get("receiver").get("node")):messages[0], (app_settings.get("receiver").get("node"), app_settings.get("sender").get("node")):messages[1]}, require_entanglement=False)
+    end_time = time.time()
+    network = Network(topology=topology,
+                      messages={(app_settings.get("sender").get("node"),
+                                 app_settings.get("receiver").get("node")):messages[0],
+                                (app_settings.get("receiver").get("node"),
+                                 app_settings.get("sender").get("node")):messages[1]},
+                      require_entanglement=False)
     network._strings = strings
     _, _, err_prct, err_sd, info_lk, msg_fidelity = ErrorAnalyzer._analyse(network=network)
-    end_time = time.time()
-    app_settings.update(output_msg=recv_msgs[0], avg_err=err_prct, std_dev=err_sd, info_leak=info_lk, msg_fidelity=msg_fidelity)
+    app_settings.update(output_msg=recv_msgs, avg_err=err_prct, std_dev=err_sd, info_leak=info_lk, msg_fidelity=msg_fidelity)
     response["application"] = app_settings
     print("response", response)
     from main.simulator.topology_funcs import network_graph
@@ -134,12 +161,12 @@ if __name__=="__main__":
             "sender":
                 {
                     "node":"node1",
-                    "message":"1011",
+                    "message":"h",
                 },
             "receiver":
                 {
                     "node":"node2",
-                    "message":"1001",
+                    "message":"m",
                 },
             "backend":"Qutip",
             "stoptime":1e12

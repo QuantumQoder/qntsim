@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Sequence
 from random import sample
 from numpy.random import randint
 
@@ -15,6 +15,12 @@ def __insert_seq__(lst:List, seq:List):
     iter1, iter2 = iter(lst), iter(seq)
     
     return  insert_locations, [next(iter1) if i not in insert_locations else type(lst[0])(next(iter2)) if is_same_type else next(iter2) for i in range(len(lst)+len(seq))]
+
+def __separate_seq__(indices:Sequence, lst:Sequence):
+    list_items = list(filter(lambda x: x not in indices, lst))
+    seq_items = list(filter(lambda x: x in indices, lst))
+
+    return list_items, seq_items
 
 def insert_check_bits(messages:List[str], num_check_bits:int):
     """Insert check bits into a list of strings

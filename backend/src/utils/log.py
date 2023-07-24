@@ -12,7 +12,7 @@ Attributes:
 """
 
 import logging
-
+import logging.handlers
 
 # def _init_logger():
 #     lg = logging.getLogger(__name__)
@@ -59,10 +59,12 @@ def read_from_memory(logger, level="INFO"):
     log_level = logging.getLevelName(level)
     print("log_level:", log_level)
     memory_handlers = logger.handlers
+    print("memory_handlers: ", memory_handlers)
     # all_memory_logs = []
     logs =[]
     for handler in memory_handlers:
         records = handler.buffer
+        print("records: ", records)
         
         
         for record in records:

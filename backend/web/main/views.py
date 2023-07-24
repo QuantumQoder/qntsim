@@ -79,45 +79,45 @@ class RunApp(APIView):
         
         
         modules  = {'physical': ['interferometer',
-                    'spdc_lens',
-                    'beam_splitter',
-                    'DLCZ_bsm',
-                    'light_source',
-                    'circuit',
-                    'bk_memory',
-                    'polarization_measurement',
-                    'bk_bsm',
-                    'switch',
-                    'optical_channel',
-                    'waveplates',
-                    'photon',
-                    'detector',
-                    'DLCZ_memory'],
+                                 'spdc_lens',
+                                 'beam_splitter',
+                                 'DLCZ_bsm',
+                                 'light_source',
+                                 'circuit',
+                                 'bk_memory',
+                                 'polarization_measurement',
+                                 'bk_bsm',
+                                 'switch',
+                                 'optical_channel',
+                                 'waveplates',
+                                 'photon',
+                                 'detector',
+                                 'DLCZ_memory'],
                     'link': ['bk_purification',
-                    'DLCZ_generation',
-                    'DLCZ_purification',
-                    'entanglement_protocol',
-                    'bk_swapping',
-                    'DLCZ_swapping',
-                    'bk_generation'],
+                             'DLCZ_generation',
+                             'DLCZ_purification',
+                             'entanglement_protocol',
+                             'bk_swapping',
+                             'DLCZ_swapping',
+                             'bk_generation'],
                     'network': ['node'],
                     'transport': ['transport_manager'],
                     'application': ['ip1_',
-                    'pp',
-                    'ghz',
-                    'qsdc_teleportation',
-                    'mdi_qsdc',
-                    'single_photon_qd',
-                    'ping_pong',
-                    'teleportation',
-                    'e91',
-                    'utils',
-                    'e2e',
-                    'qss',
-                    'ip1',
-                    'qsdc1',
-                    'qdsp',
-                    'ip2'],
+                                    'pp',
+                                    'ghz',
+                                    'qsdc_teleportation',
+                                    'mdi_qsdc',
+                                    'single_photon_qd',
+                                    'ping_pong',
+                                    'teleportation',
+                                    'e91',
+                                    'utils',
+                                    'e2e',
+                                    'qss',
+                                    'ip1',
+                                    'qsdc1',
+                                    'qdsp',
+                                    'ip2'],
                     "eventSimulation":['timeline']}
         
         selected_modules = debug["modules"]#["transport"]
@@ -125,6 +125,7 @@ class RunApp(APIView):
         for module in selected_modules:
             for file in modules[module]:
                 log.track_module(file)
+        print("log_modules: ", log._log_modules)
         
         
         importlib.reload(qntsim)
@@ -166,8 +167,11 @@ class RunApp(APIView):
         debug_levels = {"debug": "DEBUG", "info":"INFO"}
         print(debug_levels[debug["logLevel"]])
         log_level = debug_levels[debug["logLevel"]]
+        print(log.logger, log_level)
+        print("current handlers: ", log.logger.handlers)
         logs = log.read_from_memory(log.logger, level = log_level)
         output["logs"] = logs
+        print(output)
         
         
         return JsonResponse(output, safe = False)

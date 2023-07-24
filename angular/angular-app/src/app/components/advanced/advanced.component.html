@@ -256,7 +256,7 @@
                         <p-accordion [activeIndex]="0">
 
                             <p-accordionTab header="Application Parameters"
-                                *ngIf="app_id != 10 && app_id != 9 &&  app_id != 7 && app_id != 6">
+                                *ngIf="app_id != 10 && app_id != 9 &&  app_id != 7 && app_id != 6 && app_id != 8">
                                 <form [formGroup]="appSettingsForm">
                                     <div class="mt-1 col-9 mx-auto" *ngIf="app_id != 4 && app_id !=10">
                                         <label for="type" class="form-label font-bold"
@@ -497,14 +497,14 @@
                                     </div>
                                     <div class="mt-1" *ngIf="app_id == 8">
                                         <label for="type" class="form-label font-bold"
-                                            pTooltip="The classical message of the sender (enter binary string, only even nos.)">
+                                            pTooltip="message1">
                                             Message <i class="fa-solid fa-circle-info fa-xs"
                                                 style="color: #000000;"></i>
                                         </label>
                                         <input type="text" class="form-control" (keydown)="numericOnly($event)"
                                             [(ngModel)]="nodesSelection.message1">
                                     </div>
-                                    <div class="mt-1">
+                                    <div class="mt-1" *ngIf="app_id != 8">
                                         <label for="type" class="form-label font-bold"
                                             pTooltip="The classical message of the sender (enter binary string, only even nos.)">
                                             Message <i class="fa-solid fa-circle-info fa-xs"

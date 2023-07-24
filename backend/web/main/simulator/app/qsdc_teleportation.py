@@ -1,21 +1,25 @@
-from random import choices
 import random
+from random import choices
+
 from qntsim.kernel.timeline import Timeline
+
 Timeline.DLCZ=False
 Timeline.bk=True
-from qntsim.topology.topology import Topology
-from qntsim.components.circuit import QutipCircuit
-import numpy as np
+import logging
 import math
 
-import logging
-logger = logging.getLogger("main_logger.application_layer." + "qsdc_teleportation")
+import numpy as np
+from qntsim.components.circuit import QutipCircuit
+from qntsim.topology.topology import Topology
+from qntsim.utils import log
+
+# logger = logging.getLogger("main_logger.application_layer." + "qsdc_teleportation")
 
 
 class QSDCTeleportation():
     
     def request_entanglements(self,sender,receiver,n):
-        logger.info(sender.owner.name+" requesting entanglement with "+receiver.owner.name)
+        log.logger.info(sender.owner.name+" requesting entanglement with "+receiver.owner.name)
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.5,5e12)
         source_node_list=[sender.name]
         return sender,receiver,source_node_list
@@ -24,7 +28,7 @@ class QSDCTeleportation():
         sender=alice
         receiver=bob
         print('sender, receiver',sender.owner.name,receiver.owner.name)
-        logger.info('sender, receiver are '+sender.owner.name+" "+receiver.owner.name)    
+        log.logger.info('sender, receiver are '+sender.owner.name+" "+receiver.owner.name)    
         return self.request_entanglements(sender,receiver,n)
     
     def filter_entanglements(self, nodes, correlated=False):
@@ -171,7 +175,7 @@ class QSDCTeleportation():
         indices, crx, crz = self.teleport(alice, message=message)
         print("indices",indices, crx, crz)
         decoded_msg = self.decode(bob,indices,crx,crz)
-        logger.info("message decoded")
+        log.logger.info("message decoded")
         error =0
         res = {
             "input_message":message,

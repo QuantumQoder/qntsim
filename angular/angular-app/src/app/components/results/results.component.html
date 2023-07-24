@@ -838,29 +838,54 @@
             </div>
             <br>
             <div class="lead">
-                <strong>Sender Messages</strong>
+                <strong>Send Messages</strong>
             </div>
             <br>
             <table class="table table-bordered">
                 <thead>
                     <tr class="table-primary">
                         <td class="col">
-                            Participant 1: Sent message
+                            Sender: Sent message
                         </td>
                         <td class="col">
-                            Participant 2: Sent message
+                            Receiver: Sent message
                         </td>
                     </tr>
                     <tr>
                         <td class="col">
-                            {{data.input_message1}}
+                            {{data.sender.message}}
                         </td>
                         <td class="col">
-                            {{data.input_message2}}
+                            {{data.receiver.message}}
                         </td>
                     </tr>
                 </thead>
 
+            </table>
+            <br>
+            <div class="lead">
+                <strong>Received Messages</strong>
+            </div>
+            <br>
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="table-primary">
+                        <td class="col">
+                            Sender: Received Message<i class="fa-solid fa-circle-info" style="color: #000000;"></i>
+                        </td>
+                        <td class="col">
+                            Receiver: Received Message<i class="fa-solid fa-circle-info" style="color: #000000;"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col">
+                            {{data.output_msg[0]}}
+                        </td>
+                        <td class="col">
+                            {{data.output_msg[1]}}
+                        </td>
+                    </tr>
+                </thead>
             </table>
             <br>
             <div class="lead">
@@ -876,43 +901,34 @@
                         <td class="col">
                             Error Rate (%)
                         </td>
+                        <td class="col">
+                            Standard Deviation(%)
+                        </td>
+                        <td class="col">
+                            Information Leakage(%)
+                        </td>
+                        <td class="col">
+                            Message Fidelity (%)
+                        </td>
                     </tr>
                     <tr>
                         <td class="col">
                             {{data.attack}}
                         </td>
                         <td class="col">
-                            {{data.error}}
+                            {{data.avg_err}}
+                        </td>
+                        <td class="col">
+                            {{data.std_dev}}
+                        </td>
+                        <td class="col">
+                            {{data.info_leak}}
+                        </td>
+                        <td class="col">
+                            {{data.msg_fidelity}}
                         </td>
                     </tr>
                 </tbody>
-            </table>
-            <br>
-            <div class="lead">
-                <strong>Received Messages</strong>
-            </div>
-            <br>
-            <table class="table table-bordered">
-                <thead>
-                    <tr class="table-primary">
-                        <td class="col">
-                            Participant 1: Received Message<i class="fa-solid fa-circle-info"
-                                style="color: #000000;"></i>
-                        </td>
-                        <td class="col">
-                            Participant 2: Received Message<i class="fa-solid fa-circle-info"
-                                style="color: #000000;"></i>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="col">
-                            {{data.output_message1}}
-                        </td>
-                        <td class="col">
-                            {{data.output_message2}}
-                        </td>
-                    </tr>
-                </thead>
             </table>
         </div>
         <div *ngIf="app_id==9">
