@@ -24,6 +24,7 @@ from .request import Request, ReservationProtocol, RoutingProtocol, RRPMsgType
 from .reservation import Reservation, ResourceReservationProtocol, RSVPMsgType
 from .routing import (NewRoutingProtocol, RoutingTableUpdateProtocol,
                       StaticRoutingProtocol)
+from ..utils import log
 
 # logger = logging.getLogger("main_logger." + "network_manager")
 
@@ -144,7 +145,6 @@ class NetworkManager():
         resource_reservation_protocol = ReservationProtocol(self.owner,virtual_request,routing_protocol)
 
         self.owner.reservation_manager.append(resource_reservation_protocol)
-
         resource_reservation_protocol.start()
     
     def create_request(self,initiator:str, responder: str, start_time: int, end_time: int, memory_size: int, target_fidelity: float,priority: int,tp_id: int,congestion_retransmission:int,remaining_demand_size:int):
@@ -160,6 +160,7 @@ class NetworkManager():
         resource_reservation_protocol = ReservationProtocol(self.owner,user_request,routing_protocol)
         self.owner.reservation_manager.append(resource_reservation_protocol)
         resource_reservation_protocol.start()
+        log.logger.info("network manager started resource reservation protocol on "+self.owner.name )
 
     def process_request(self ,msg: "Message"): 
         payload=msg.kwargs['request']
@@ -181,6 +182,7 @@ class NetworkManager():
    
         # ResourceReservationProtocol.Start()
         resource_reservation_protocol.start()
+        log.logger.info("network manager started resource reservation protocol on "+self.owner.name )
 
     def schedule_rtup(self):
         #print("---------------rtup--------------" , self.owner.name)

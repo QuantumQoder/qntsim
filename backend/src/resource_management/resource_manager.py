@@ -20,7 +20,7 @@ from ..message import Message
 from .rule_manager import RuleManager
 from .memory_manager import MemoryManager
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
-import logging
+from ..utils import log
 # logger = logging.getLogger("main_logger.resource_management"+"resource_manager")
 
 class ResourceManagerMsgType(Enum):
@@ -325,6 +325,7 @@ class ResourceManager():
         msg.id = 2
 
         ##print("waiting protocols and pending protocols", self.waiting_protocols,self.pending_protocols)
+        log.logger.debug('resource manager send request for protocol {} to {}'.format(protocol.name, req_dst))
         self.owner.message_handler.send_message(req_dst, msg)
 
     def received_message(self, src: str, msg: "Message") -> None:
@@ -335,6 +336,9 @@ class ResourceManager():
             msg (ResourceManagerMessage): message received.
         """
         ##print("resource manager receive method",msg.kwargs['protocol'].name,msg.msg_type ,self.owner.name)
+
+        log.logger.debug("{} receive {} message from {}".format(self.name, msg.msg_type.name, src))
+        
         if msg.msg_type is ResourceManagerMsgType.REQUEST:
             #logger.info("Resourcemanager REQUEST received by " + self.owner.name)
             req_condition_func=msg.kwargs.get('req_condition_func')
@@ -355,6 +359,9 @@ class ResourceManager():
                 ###print('#######Protocol Start method to be called##########')
                 ##print('Protocol Name: Resource manager ',ini_protocol.name,protocol.name,self.owner.name)
                 ##print("receive message queue if loop",self.owner.message_handler.manager_queue,self.owner.name )
+
+                log.logger.debug("protocol {} paired with {} on {}".format(protocol.name, ini_protocol.name, self.owner.name))
+
                 protocol.start()
                 ##print("receive message queue if loop 2",self.owner.message_handler.manager_queue,self.owner.name )
                 self.owner.message_handler.process_msg(msg.receiver_type,msg.receiver)
@@ -393,6 +400,9 @@ class ResourceManager():
                     ##print("receive message queue elif loop",self.owner.message_handler.manager_queue,self.owner.name )
                     #protocol.start()
                     ##print("receive message queue elif loop 2",self.owner.message_handler.manager_queue,self.owner.name )
+                    
+                    log.logger.debug("protocol {} paired with {} on {}".format(protocol.name, ini_protocol.name, self.owner.name))
+
                     protocol.start()
             else:
                 #print('#######Protocol Not called##########')
@@ -448,7 +458,7 @@ class ResourceManager():
         
     def memory_expire(self, memory: "Memory"):
         """Method to receive memory expiration events."""
-
+        log.logger.debug("memory expired at "+ memory.name)
         self.update(None, memory, "RAW")
 
     def release_remote_protocol(self, dst: str, protocol: "EntanglementProtocol") -> None:

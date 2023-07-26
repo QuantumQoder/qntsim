@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 from ..kernel._event import Event
 from ..kernel.entity import Entity
 from ..network_management.request import RRPMsgType
+from ..utils import log
 
 
 class OpticalChannel(Entity):
@@ -47,6 +48,7 @@ class OpticalChannel(Entity):
             polarization_fidelity (float): probability of no polarization error for a transmitted qubit.
             light_speed (float): speed of light within the fiber (in m/ps).
         """
+        log.logger.info("Create channel {}".format(name))
 
         Entity.__init__(self, name, timeline)
         self.sender = None
@@ -109,6 +111,10 @@ class QuantumChannel(OpticalChannel):
     def set_ends(self, sender: "Node", receiver: "Node") -> None:
         self.sender = sender
         self.receiver = receiver
+        log.logger.info(
+            "Set {} {} as ends of quantum channel {}".format(sender.name,
+                                                             receiver,
+                                                             self.name))
         sender.assign_qchannel(self, receiver.name)
 
     def transmit(self, _from:str, qubit: "Photon", dst:str, app:str, source: "Node") -> None:
@@ -121,6 +127,10 @@ class QuantumChannel(OpticalChannel):
         Side Effects:
             Receiver node may receive the qubit (via the `receive_qubit` method).
         """
+        log.logger.info(
+            "{} send qubit with state {} to {} by Channel {}".format(
+                self.sender.name, qubit.quantum_state, self.receiver,
+                self.name))
 
         assert self.delay != 0 and self.loss != 1, "QuantumChannel init() function has not been run for {}".format(self.name)
         assert source == self.sender
@@ -220,6 +230,10 @@ class ClassicalChannel(OpticalChannel):
     def set_ends(self, sender: "Node", receiver: "Node") -> None:
         self.sender = sender
         self.receiver = receiver
+        log.logger.info(
+            "Set {} {} as ends of classical channel {}".format(sender.name,
+                                                               receiver,
+                                                               self.name))
         sender.assign_cchannel(self, receiver.name)
 
     def transmit(self, message: "Message", source: "Node", priority: int) -> None:
@@ -236,6 +250,13 @@ class ClassicalChannel(OpticalChannel):
         # if message.msg_type== RRPMsgType.RESERVE:
 
             # #print("message type",message.msg_type ,source,self.sender)
+
+        log.logger.info(
+            "{} send message {} to {} by Channel {}".format(self.sender.name,
+                                                            message,
+                                                            self.receiver,
+                                                            self.name))
+        
         assert source == self.sender
         # if message.msg_type== RRPMsgType.RESERVE:
 

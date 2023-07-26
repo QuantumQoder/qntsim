@@ -21,6 +21,9 @@ if TYPE_CHECKING:
     from ..topology.node import QuantumRouter
     from .memory_manager import MemoryInfo, MemoryManager
     from .resource_manager import ResourceManager
+    
+from ..utils import log
+
 
 class Task:
 	id_counter = itertools.count()
@@ -155,10 +158,14 @@ class SubTask:
 		Child subtask runs the protocol encapsulated within it on the memory passed as argument to it
 	"""
 	def run(self):
+
+		log.logger.info('Running subtask:	' + str(self.name))
 		
 		protocol, req_dsts, req_condition_funcs = self.action(self.memories_info)
 		if protocol == True:
 			#print('Purification not needed')
+			log.logger.debug('subtask generates protocol {}'.format(protocol.name))
+
 			self.on_complete(2)
 			return
 		
@@ -176,7 +183,6 @@ class SubTask:
 			info.memory.detach(info.memory.memory_array)
 			info.memory.attach(protocol[0])
 		
-		logging.debug('Running subtask:	' + str(self.name))
 		# print('Running subtask:	' + str(self.name))
 		for dst, req_func in zip(req_dsts, req_condition_funcs):
 			self.task.task_manager.send_request(protocol[0], dst, req_func)
@@ -304,7 +310,7 @@ class TaskManager:
 
 		task.wakeup(self.owner.timeline.now())
 		subtasks = task.action(task.memories_info, dependency_subtasks=dependency_subtasks)
-		logging.debug('Running task:	' + str (task.name))
+		log.logger.debug('Running task:	' + str (task.name))
 		
 		for subtask in subtasks:
 			subtask.task = task
@@ -341,7 +347,7 @@ class TaskManager:
 		#Get the parent task from this subtask and obtain its dependents
 		dependent_tasks = self.task_map[subtask.task]['is_dependecy_of']
 		#print('dependent_tasks for this: ', len(dependent_tasks))
-		logging.debug('subtask success:	' + str(subtask.name))
+		log.logger.debug('subtask success:	' + str(subtask.name))
 		#Call the dependent task's dependency_subtask_map and append to it
 		for dependent_task in dependent_tasks:
 			dependent_task.set_dependency_to_subtask(subtask)
@@ -360,8 +366,8 @@ class TaskManager:
 
 	def subtask_failure(self, subtask):
 		#Since subtask has failed we check if it was dependent on any other subtask and we keep on doing this till we reach the first subtask in the chain
-		logging.debug('subtask failed:	' + str(subtask.name))
-		logging.debug('initial dependencies for this subtask:	'+ str( [i.name for i in subtask.initial_dependency_subtasks]))
+		log.logger.debug('subtask failed:	' + str(subtask.name))
+		log.logger.debug('initial dependencies for this subtask:	'+ str( [i.name for i in subtask.initial_dependency_subtasks]))
 		for init_dep_subtask in subtask.initial_dependency_subtasks:
 			# print(f'running init_dep_subtask: {init_dep_subtask.name}')
 			init_dep_subtask.run()

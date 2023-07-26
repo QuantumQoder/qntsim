@@ -22,6 +22,7 @@ from .photon import Photon
 from .circuit import BaseCircuit
 from ..kernel.entity import Entity
 from ..kernel._event import Event
+from ..utils import log
 from ..utils.encoding import single_atom
 from ..utils.quantum_state import QuantumState
 
@@ -178,6 +179,8 @@ class Memory(Entity):
         # if can't excite yet, do nothing
         if self.timeline.now() < self.next_excite_time:
             return
+        
+        log.logger.debug("memory {} excited and released photon".format(self.name))
 
         # measure quantum state
         res = self.timeline.quantum_manager.run_circuit(self._meas_circuit, [self.qstate_key])
