@@ -16,6 +16,7 @@ from ..kernel.entity import Entity
 from ..kernel._event import Event
 from ..kernel.quantum_manager import QuantumManagerKet, QuantumManagerDensity
 from ..utils.encoding import *
+from ..utils import log
 from ..utils.quantum_state import QuantumState
 
 
@@ -190,6 +191,7 @@ class PolarizationBSM(BSM):
         """
         ###print('PolarizationBSM')
         super().get(photon)
+        log.logger.debug(self.name + " received photon")
 
         if len(self.photons) != 2:
             return
@@ -281,6 +283,7 @@ class TimeBinBSM(BSM):
         """
         ###print('TimeBinBSM')
         super().get(photon)
+        log.logger.debug(self.name + " received photon")
 
         if len(self.photons) != 2:
             return
@@ -406,6 +409,7 @@ class SingleAtomBSM(BSM):
         """
         ###print('SingleAtomBSM')
         super().get(photon)
+        log.logger.debug(self.name + " received photon")
 
         memory = photon.memory
 
@@ -428,8 +432,10 @@ class SingleAtomBSM(BSM):
                 # if we're in stage 1: null photon will need bsm assigned
                 if null_0 and memory_0.previous_bsm == -1:
                     memory_0.previous_bsm = memory_1.previous_bsm
+                    log.logger.info(self.name + " passed stage 1")
                 elif null_1 and memory_1.previous_bsm == -1:
                     memory_1.previous_bsm = memory_0.previous_bsm
+                    log.logger.info(self.name + " passed stage 1")
                 
                 # if we're in stage 2: check if psi+ or psi-, then assign new state
                 else:
@@ -437,7 +443,7 @@ class SingleAtomBSM(BSM):
                         desired_state = BSM._psi_minus
                     else:
                         desired_state = BSM._psi_plus
-
+                    log.logger.info(self.name + " passed stage 2")
                     _set_memory_with_fidelity([memory_0, memory_1], desired_state)
 
     def trigger(self, detector: Detector, info: Dict[str, Any]):

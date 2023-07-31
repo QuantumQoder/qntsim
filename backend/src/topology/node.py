@@ -84,7 +84,7 @@ class Node(Entity):
         self.qubit_buffer = {1: []}
         self.all_pair_shortest_dist = None
         self.neighbors = None
-        log.logger.debug("Node")
+        log.logger.debug("Node {} created".format(self.name))
 
     def init(self) -> None:
         pass

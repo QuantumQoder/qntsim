@@ -14,6 +14,7 @@ from .photon import Photon
 from ..kernel.entity import Entity
 from ..kernel._event import Event
 from ..utils.encoding import polarization, single_atom
+from ..utils import log
 
 
 class LightSource(Entity):
@@ -80,6 +81,7 @@ class LightSource(Entity):
             state_list (List[List[complex]]): list of complex coefficient arrays to send as photon-encoded qubits.
             dst (str): name of destination node to receive photons.
         """
+        log.logger.info("{} emitting {} photons".format(self.name, len(state_list)))
 
         time = self.timeline.now()
         period = int(round(1e12 / self.frequency))
@@ -145,6 +147,7 @@ class SPDCSource(LightSource):
         Arguments:
             state_list (List[List[complex]]): list of complex coefficient arrays to send as photon-encoded qubits.
         """
+        log.logger.info("SPDC sourcee {} emitting {} photons".format(self.name, len(state_list)))
 
         time = self.timeline.now()
 
@@ -234,6 +237,9 @@ class SPDCSource2(LightSource):
         #     return False
 
         # Create entangled photons
+
+        log.logger.info("SPDC sourcee {} emitting photons".format(self.name))
+
         photon0 = Photon("", wavelength=self.wavelength, location=self,
                         encoding_type=single_atom)
 

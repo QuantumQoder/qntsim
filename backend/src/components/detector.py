@@ -22,6 +22,7 @@ from ..components.interferometer import Interferometer
 from ..components.switch import Switch
 from ..kernel._event import Event
 from ..kernel.entity import Entity
+from ..utils import log
 from ..utils.encoding import time_bin
 
 
@@ -112,6 +113,7 @@ class Detector(Entity):
 
     def notify(self, info: Dict[str, Any]):
         """Custom notify function (calls `trigger` method)."""
+        log.logger.info("{} detected photon".format(self.name))
         for observer in self._observers:
             observer.trigger(self, info)
 

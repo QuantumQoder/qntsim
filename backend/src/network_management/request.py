@@ -441,6 +441,8 @@ class ReservationProtocol():     #(Protocol):
                 #print("msg.msg_typed",msg.msg_type,msg)
                 self.request.path.append(self.node)
                 self.request.pathnames.append(self.node.name)
+
+                log.logger.debug("message type {} sent from {} to {}".format(msg.msg_type,self.node.name,next_node.name))
                 self.node.message_handler.send_message(next_node,msg)
                 #send_message(self, dst: str, msg: "Message", priority=inf)
                 #self.node.messagehandler.send_message(receiver_node,request , msg_type)####send message to next hop node's network manager (send message function?network manager or protocol)
@@ -454,7 +456,7 @@ class ReservationProtocol():     #(Protocol):
                 self.request.pathnames.append(self.node.name)
                 # logger.info("Resources reserved")
                 #print("Request ID:", self.requst.id)
-                log.logger.info("Finalized path"+str(self.request.pathnames))
+                log.logger.info("reservation "+str(self.request.id)+ " successfull. Finalized path "+str(self.request.pathnames))
                 index=self.request.path.index(self.node)
                 prev_node=self.request.path[index-1]
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.CREATE_TASKS,request=self.request)
@@ -471,6 +473,7 @@ class ReservationProtocol():     #(Protocol):
                 #self.load_rules(rules,self.request)
                 #print("tasks created at" ,self.node.name )
                 #call task and dependency creation method
+                log.logger.debug("message type {} sent from {} to {}".format(msg.msg_type,self.node.name,prev_node.name))
                 self.node.message_handler.send_message(prev_node.name,msg)
                 #send classical message to previous node path[index-1]'s Reservation protocol to createtasks 
                 #in receive msg check this condn
@@ -489,7 +492,7 @@ class ReservationProtocol():     #(Protocol):
             self.request.status='REJECT'
             #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
             msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.FAIL,request=self.request)
-            
+            log.logger.debug("Memories not available for "+ self.name)
             #(RESORCES NOT AVAILABLE)
             #msg_type="FAIL"
             #self.request.status='REJECT'
@@ -512,7 +515,10 @@ class ReservationProtocol():     #(Protocol):
                 index=len(self.request.path)-1
                 #prev_node=self.request.path[index-1]
                 prev_node=self.request.path[index]
+
+                #log.logger.debug("message type {} sent from {} to {}".format(msg.msg_type,self.node.name,prev_node.name))
                 self.node.message_handler.send_message(prev_node.name,msg)
+
                 """if self.request.congestion_retransmission==1:
                     msg1=Message(MsgRecieverType.MANAGER, ManagerType.TransportManager,CongestionMsgType.FAIL,request=self.request)
                     self.node.message_handler.send_message(src.name,msg1)"""
@@ -523,6 +529,8 @@ class ReservationProtocol():     #(Protocol):
     def receive_message(self ,msg :"RRPMsgType"):
 
         if msg.msg_type==RRPMsgType.CREATE_TASKS :
+            log.logger.debug("message type {} recieved by {}".format(msg.msg_type,self.node.name))
+
             payload=msg.kwargs['request']
             self.request=payload
             #print("request src , resp , curr node", self.request.initiator,self.request.responder,self.node.name ,self.request.status)
@@ -552,6 +560,7 @@ class ReservationProtocol():     #(Protocol):
                 #call tasks and dependency
                 #print("tasks created at ",self.node.name)
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.CREATE_TASKS,request=self.request)
+                log.logger.debug("message type {} sent from {} to {}".format(msg.msg_type,self.node.name,prev_node.name))
                 self.node.message_handler.send_message(prev_node.name,msg)
                 
             
@@ -566,6 +575,7 @@ class ReservationProtocol():     #(Protocol):
             #back track path and release resources"""
 
         elif msg.msg_type==RRPMsgType.FAIL :
+            log.logger.debug("message type {} recieved by {}".format(msg.msg_type,self.node.name))
             
             #self.request=msg.payload
             self.request=msg.kwargs['request']
@@ -599,6 +609,8 @@ class ReservationProtocol():     #(Protocol):
                 prev_node=self.request.path[index-1]
                 #print("removed resources at ",self.node.name)
                 msg=Message(MsgRecieverType.MANAGER, ManagerType.ReservationManager,RRPMsgType.FAIL,request=self.request)
+                
+                #log.logger.debug("message type {} sent from {} to {}".format(msg.msg_type,self.node.name,prev_node.name))
                 self.node.message_handler.send_message(prev_node.name,msg)
 
         self.node.message_handler.process_msg(msg.receiver_type,msg.receiver)
@@ -782,7 +794,9 @@ class ReservationProtocol():     #(Protocol):
                 
                 task_EG_left.set_action(ent_gen_action)
                 last_left_task = task_EG_left
-                
+
+        #log.logger.debug("generation tasks created on "+self.node.name)
+
         #Task for purification creation
         if index > 0:
             #To accept virtual links, we skip the purification step when a non physical neighbor is found
@@ -920,7 +934,8 @@ class ReservationProtocol():     #(Protocol):
                 self.node.task_manager.add_task(task_Purify_left, [task_EG_left])
                 task_Purify_left.set_reservation(reservation)
                 last_left_task = task_Purify_left
-    
+
+        #log.logger.debug("purification tasks created on "+self.node.name)
         
         """
             Entanglement swapping tasks
@@ -1370,6 +1385,8 @@ class ReservationProtocol():     #(Protocol):
                     task_swap_middle.can_run_on_init = True
                 
             #task_list.append(curr_task)
+        #log.logger.debug("swapping tasks created on "+self.node.name)
+        log.logger.info("Tasks created on "+self.node.name)
     
     def set_swapping_success_rate(self, prob: float) -> None:
         assert 0 <= prob <= 1
