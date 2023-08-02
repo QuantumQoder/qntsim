@@ -4,7 +4,7 @@ This module introduces the QuantumCircuit class. The qutip library is used to ca
 
 from abc import abstractmethod
 from math import e, pi
-from typing import TYPE_CHECKING, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from qiskit import QuantumCircuit
@@ -154,15 +154,16 @@ class BaseCircuit():
 
     def get_counts(self, quantum_manager:Union[QuantumKernel, QuantumManager], nodes:Union[Node, List[Node]], node_map:Dict[str, Union[int, List[int]]], shots:int=1024) -> Tuple[Dict[int, Dict[int, int]], Dict[str, int]]:
         """
-        {500:{0:0.5, 1:0.5}, 1000:{0:0.5, 1:0.5}, ...}
+        outputs = {500:{0:0.5, 1:0.5}, 1000:{0:0.5, 1:0.5}, ...}
+        counts = {"00":145, "01":346, ...}
         """
         if isinstance(nodes, int): nodes = [nodes]
         node_map = {key:([val] if isinstance(val, int) else val) for key, val in node_map.items()}
         assert len(nodes) <= self.num_qubits, "Number of nudes should be less than number of qubits."
         memory_managers = [([node for node in nodes if node.name==node_name][0]).resource_manager.memory_manager[i:i+1] for node_name, qubits in node_map.items() for i in range(len(qubits))]
         keys = [info.memory.qstate_key for infos in zip(*memory_managers) for info in infos]
-        counts = {key:{0:0, 1:0} for key in keys}
-        results = {}
+        outputs = {key:{0:0, 1:0} for key in keys}
+        counts = {}
         for _ in range(shots):
             for infos in zip(*memory_managers):
                 for info in infos:
@@ -171,14 +172,14 @@ class BaseCircuit():
             base = ""
             for key, val in result.items():
                 base += str(val)
-                counts[key][val] += 1
-            if base in results: results[base] += 1
-            else: results[base] = 1
-        for key, res in counts.items():
+                outputs[key][val] += 1
+            if base in counts: counts[base] += 1
+            else: counts[base] = 1
+        for key, res in outputs.items():
             for bit, count in res.items():
                 if count == 0: res.pop(bit)
-            if not res: counts.pop(key)
-        return counts, results
+            if not res: outputs.pop(key)
+        return outputs, counts
 
 class Circuit(BaseCircuit):
     """Class for a quantum circuit.
