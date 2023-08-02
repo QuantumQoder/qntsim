@@ -1,4 +1,4 @@
-# Folder Structure
+# Directory Tree
 
 ```bash
 src
