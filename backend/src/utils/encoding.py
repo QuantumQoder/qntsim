@@ -11,7 +11,6 @@ Attributes:
 
 from math import sqrt
 
-
 polarization =\
     {"name": "polarization",
      "bases": [((complex(1), complex(0)), (complex(0), complex(1))),
