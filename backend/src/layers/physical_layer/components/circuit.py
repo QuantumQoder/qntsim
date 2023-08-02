@@ -125,12 +125,12 @@ class BaseCircuit():
         return len(self.measured_qubits)
 
     @property
-    def depth(self):
+    def depth(self) -> int:
         indices = [index for gate in self.gates for index in gate[1] if isinstance(index, int)]
         return max(set(indices), key=indices.count)
 
-    def append_gates(self, gates:List[str, List[int]]) -> None:
-        assert self.num_qubits >= max(gate[-1] for gate in gates), f"Maximum numbers of qubits should be less than or equal to {self.num_qubits} qubits of the current circuit"
+    def append_gates(self, gates:List[str, List[int, float]]) -> None:
+        assert self.num_qubits >= max(gate[1] for gate in gates), f"Maximum numbers of qubits should be less than or equal to {self.num_qubits} qubits of the current circuit"
         self.gates += gates
 
     def combine_circuit(self, circuit:"BaseCircuit", qubit_map:Optional[Dict[int, int]]) -> None:
@@ -152,25 +152,33 @@ class BaseCircuit():
     def duplicate(self) -> "BaseCircuit":
         return self.__copy__()
 
-    def get_counts(self, quantum_manager:Union[QuantumKernel, QuantumManager], nodes:Union[Node, List[Node]], node_map:Dict[str, Union[int, List[int]]], shots:int=1024):
+    def get_counts(self, quantum_manager:Union[QuantumKernel, QuantumManager], nodes:Union[Node, List[Node]], node_map:Dict[str, Union[int, List[int]]], shots:int=1024) -> Tuple[Dict[int, Dict[int, int]], Dict[str, int]]:
+        """
+        {500:{0:0.5, 1:0.5}, 1000:{0:0.5, 1:0.5}, ...}
+        """
         if isinstance(nodes, int): nodes = [nodes]
         node_map = {key:([val] if isinstance(val, int) else val) for key, val in node_map.items()}
         assert len(nodes) <= self.num_qubits, "Number of nudes should be less than number of qubits."
         memory_managers = [([node for node in nodes if node.name==node_name][0]).resource_manager.memory_manager[i:i+1] for node_name, qubits in node_map.items() for i in range(len(qubits))]
         keys = [info.memory.qstate_key for infos in zip(*memory_managers) for info in infos]
         counts = {key:{0:0, 1:0} for key in keys}
+        results = {}
         for _ in range(shots):
             for infos in zip(*memory_managers):
                 for info in infos:
                     info.to_raw()
             result = quantum_manager.run_circuit(circuit=self, keys=keys)
+            base = ""
             for key, val in result.items():
+                base += str(val)
                 counts[key][val] += 1
+            if base in results: results[base] += 1
+            else: results[base] = 1
         for key, res in counts.items():
             for bit, count in res.items():
                 if count == 0: res.pop(bit)
             if not res: counts.pop(key)
-        return counts
+        return counts, results
 
 class Circuit(BaseCircuit):
     """Class for a quantum circuit.
