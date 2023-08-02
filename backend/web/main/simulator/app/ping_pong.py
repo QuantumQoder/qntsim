@@ -6,7 +6,8 @@ from statistics import mean
 from typing import Any, Dict, List
 
 from qntsim.communication import (Network, ProtocolPipeline,
-                                  bell_type_state_analyzer, pass_, to_string)
+                                  bell_type_state_analyzer, pass_returns,
+                                  to_string)
 from qntsim.components.circuit import QutipCircuit
 from qntsim.topology.node import EndNode
 from qntsim.utils import log
@@ -27,7 +28,7 @@ def ping_pong(topology:Dict, app_settings:Dict):
                     ):app_settings.get("sender").get("message")
                 }],
             encode=partial(encode, mode_switch_prob=app_settings.get("sender").get("switchProb", 0.25)),
-            measure=partial(pass_), attack=app_settings.get("attack"))
+            measure=partial(pass_returns), attack=app_settings.get("attack"))
         received_msgs, avg_err, std_dev, info_leak, msg_fidelity = protocol(topology=topology, size=lambda x:int(x*5*app_settings.get("sender").get("switchProb", 0.25)), require_entanglement=True, decode=partial(decode, err_threshold=app_settings.get("error_threshold", 0.54)))
         end_time = time.time()
         if "Err_msg" in received_msgs[0]:
@@ -48,7 +49,7 @@ def ping_pong(topology:Dict, app_settings:Dict):
     return response
 
 def encode(network: Network, _, msg_index: int, mode_switch_prob: float):
-    logging.info("Encoding message into the entangled pairs.")
+    log.logger.info("Encoding message into the entangled pairs.")
     src_node: EndNode = network.nodes[msg_index]
     message = network._bin_msgs[msg_index]
     msg_iter = iter(message)

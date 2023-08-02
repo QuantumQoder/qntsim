@@ -24,6 +24,7 @@ from django.views.decorators.http import condition
 from main.models import Applications, Results
 from main.serializers import ApplicationSerializer
 from main.simulator import topology_funcs
+from main.simulator.app.ip1 import ip1
 from main.simulator.app.ip2 import ip2_run
 from main.simulator.app.qdsp import qdsp
 from main.simulator.topology_funcs import *
@@ -145,7 +146,7 @@ class RunApp(APIView):
         elif application == "ghz":
             results = ghz(topology, appSettings["endnode1"], appSettings["endnode2"], appSettings["endnode3"], appSettings["middlenode"] )
         elif application == "ip1":
-            results = ip1(topology, appSettings["sender"]["node"], appSettings["receiver"]["node"], appSettings["sender"]["message"] )
+            results = ip1(topology, appSettings)
         elif application == "ping_pong":
             results = ping_pong(topology=topology, app_settings=appSettings)
         elif application == "qsdc1":
