@@ -303,6 +303,9 @@ class Network(Entity):
         setting parameters, and identifying end nodes. If there are multiple end nodes,
         it requests entanglements, identifies states, rectifies entanglements,
         and logs information. Otherwise, it initializes photons.
+
+        Args:
+          require_entanglement(bool) : For the protocols for which entnaglement is required the paramaters is set to be True.
         """
         # Create a timeline and topology for the quantum network
         self._timeline = Timeline(stop_time=self._stop_time, backend=self._backend)
@@ -326,17 +329,18 @@ class Network(Entity):
         # Set initial values for Bell pairs and state identification
         self._bell_pairs = {}
 
-        # If there are multiple end nodes, request entanglements and rectify entanglements
+        # If entnaglement is required then request entanglements. Identify the entanglement state and rectify the identified state to the required state out of the four bell states.
+
         if require_entanglement:
             self._request_entanglements()
             # print(__name__, "Entities", self._timeline.entities)
             # print(__name__, "Events", self._timeline.events)
             self._timeline.init()
             self._timeline.run()
-            self._identify_quantum_states()
+            self._identify_quantum_states() #Identify which state has been produced out of four bell state.
             self._rectify_entanglements(
                 label=self.label if hasattr(self, "label") else "00"
-            )
+            )# Modify the identified state to desired state out of the four bell states.
 
             # Clear the output and log information
             clear_output()
@@ -344,7 +348,7 @@ class Network(Entity):
 
         # Otherwise, initialize photons
         else:
-            self._initialize_photons()
+            self._initialize_photons() #When protocols require direct transmission instead of entanglement
 
     # def _set_parameters(self):
     #     nodes = self._net_topo.nodes
@@ -420,7 +424,7 @@ class Network(Entity):
 
     def _identify_quantum_states(self):
         """
-        Identifies the quantum states of a circuit.
+        Identifies the quantum states of a circuit based on the statevector of the state. Information of entangled states for every node is obtained from memory manager of the node.
         """
         for node in self[:-1]:  # iterate over all nodes except the last node
             for info in node.resource_manager.memory_manager:
@@ -447,6 +451,7 @@ class Network(Entity):
             bell_pair_index_j,
         ) in self._bell_pairs.items():
             qtc = QutipCircuit(1)
+            #Applying operartions to modify the state.
             if bell_pair_index_j ^ int(label[1]):
                 qtc.x(0)
             if bell_pair_index_i ^ int(label[0]):
@@ -579,7 +584,7 @@ class Network(Entity):
                     self.manager.run_circuit(qtc, [key])
 
     def encode(self, _: Any, msg_index: int, node_index: int = 0):
-        """Encodes the classical bits as unitary gates on single photons. 0 & 1 are mapped to I and iY gates, respectively.
+        """Encodes the classical bits as unitary gates on single photons. 0 & 1 are mapped to I and iY gates, respectively. Used for direct transmission.
 
         Args:
             returns (Any): Returns from previous function.
@@ -601,7 +606,7 @@ class Network(Entity):
         logger.info("message bits into qubits")
 
     def superdense_code(self, _: Any, msg_index: int, node_index: int = 0):
-        """Encodes 2-bit classical information through superdense coding.
+        """Encodes 2-bit classical information through superdense coding. Used for direct transmission.
 
         Args:
             returns (Any): Returns from previous function.
@@ -636,14 +641,14 @@ class Network(Entity):
         self._corrections = {}
         msg = iter(self._bin_msgs[msg_index])
         for info in self[node_index].resource_manager.memory_manager:
-            if info.state == "ENTANGLED":
+            if info.state == "ENTANGLED": 
                 bin = next(msg)
                 key = info.memory.qstate_key
-                new_key = self.manager.new([alpha, ((-1) ** int(bin)) * alpha])
+                new_key = self.manager.new([alpha, ((-1) ** int(bin)) * alpha]) #memory address of the data to be transported. 
                 state = self.manager.get(key)
                 keys = tuple(set(state.keys) - set([key]))
                 outputs = self._add_noise(err_type="readout", qtc=bsa, keys=[new_key, key])
-                self._corrections[keys] = [outputs.get(new_key), outputs.get(key)]
+                self._corrections[keys] = [outputs.get(new_key), outputs.get(key)] #Corrections at the receiver.
                 print(key, state.keys, new_key, info.state)
         logger.info("message states")
 
@@ -654,7 +659,7 @@ class Network(Entity):
             returns (Any): Returns from the previous function call.
         """
         self._outputs = []
-        if hasattr(self, "_initials"):
+        if hasattr(self, "_initials"): #When direct tranmission is used
             node = self[0]
             for info, initial in zip(
                 node.resource_manager.memory_manager, self._initials
@@ -668,7 +673,7 @@ class Network(Entity):
                 self._outputs.append(
                     self._add_noise(err_type="readout", qtc=qtc, keys=[key])
                 )
-        elif hasattr(self, "_corrections"):
+        elif hasattr(self, "_corrections"): #When teleportation is used
             output = 0
             print(self._corrections)
             for keys, value in self._corrections.items():
@@ -704,8 +709,12 @@ class Network(Entity):
     # @delayed
     # @wrap_non_picklable_objects
     def _decode(self, *_):
+        """
+        Decode binary measurement output according to the encoding used.
+        """
+        
         self._strings = []
-        if hasattr(self, "_initials"):
+        if hasattr(self, "_initials"): #When direct transmission is used
             node = self.nodes[0]
             for bin_msg in self._bin_msgs:
                 string = ""
@@ -714,7 +723,7 @@ class Network(Entity):
                 ):
                     bin = bin_msg[info.index] if len(self._bin_msgs) > 1 else "0"
                     key = info.memory.qstate_key
-                    string += str(initial % 2 ^ output.get(key) ^ int(bin))
+                    string += str(initial % 2 ^ output.get(key) ^ int(bin)) #Binary to integer conversion
                 self._strings.append(string)
         else:
             self._strings = ["".join(str(*output.values()) for output in self._outputs)]
@@ -787,7 +796,7 @@ class Network(Entity):
             networks (List[Network]): List of <network> objects
 
         Returns:
-            List[Any]: The executed result of each network
+            List[Any]: The executed result of each network (result of the last function in the flow)
         """
         return [network._execute(i) for i, network in enumerate(networks, 1)]
         # executor = ThreadPoolExecutor(max_workers=len(networks))

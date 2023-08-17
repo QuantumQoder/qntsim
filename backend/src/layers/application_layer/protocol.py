@@ -21,7 +21,7 @@ class ProtocolPipeline:
             name (str, optional): A unique name to the protocol. Defaults to 'protocol'.
 
         (Optional) Kwds:
-            state (int):
+            state (int): State for entanglement distribution. “state” =0 corresponds to GHZ state and “state” = 1 corresponds to XOR state
             label (str): Initial states of qubits for entanglement in the computational basis. Does not work with superposition states.
             encode (partial): User-defined encode function for the encoding scheme of a specific protocol.
             attack (str): Acronym of the attack to be implemented.
@@ -40,9 +40,9 @@ class ProtocolPipeline:
     Attributes:
         Protocol.__Protocol_name:
         Protocol.__Protocol_funcs:
-        Protocol.messages_list:
-        Protocol.networks:
-        Protocol.recv_msgs_list:
+        Protocol.messages_list:List of dictionary of messages for each <Network> the class would generate. Basically, the class would create a <Network> object for each message dictionary provied in the list.
+        Protocol.networks: List of networks. Each network is dedicated to one element of the messages_list.
+        Protocol.recv_msgs_list: List of decoded responses after network execution.
         Protocol.full_err_list:
         Protocol.mean_list:
         Protocol.sd_list:
@@ -53,8 +53,13 @@ class ProtocolPipeline:
         Protocol.__repr__(): Returns a string representation of the protocol.
 
     Further Info:
-        The class creates the flow of execution for protocols, containing no authentication, or no security checks using random bits, or anything of that sort. In other words, the class generates the flow for unauthenticated/insecure protocols based on the parameters provided during the instantiation, or function call, or both. In other words, the parameters provided to the class are mapped to specfic function calls, which then implements the specific protocol in the specific sequential flow. These parameters to the instantiation, or to the function calls need to be provided with specific keywords, so that the map can be created to the function calls, as these parameters serve as the arguments to the function calls.
-        User-defined functions can also be provided as keyword arguments during constructor/function call, though with the condition that the functions need to defined in the following fashion:-
+        The class creates the flow of execution for protocols, containing no authentication, or no security checks using random bits, or anything of that sort. 
+        In other words, the class generates the flow for unauthenticated/insecure protocols based on the parameters provided during the instantiation, or function call, or both. 
+        In other words, the parameters provided to the class are mapped to specfic function calls, which then implements the specific protocol in the specific sequential flow. 
+        These parameters to the instantiation, or to the function calls need to be provided with specific keywords, so that the map can be created to the function calls, 
+        as these parameters serve as the arguments to the function calls.
+        User-defined functions can also be provided as keyword arguments during constructor/function call, though with the condition that the functions need to defined in the 
+        following fashion:-
 
             def <function_name>(arg1:'Network', arg2:Any, ...):
                 .
@@ -215,8 +220,12 @@ class ProtocolPipeline:
         self, messages_list: List[Dict[Tuple, str]], name: str = "protocol", **kwds
     ) -> None:
         """
-        Initializes the Protocol class.
-
+        Initializes the Protocol class. Creates a list of functions which contains functions for generating entangled state, encoding function, attack implementation and 
+        measurement functions.If user does not choose to encode the message teleportation is used instead of encoding function. If user chooses to encode but does not provide 
+        and encoding function then uses default encoding function of the <Network> class. The measurement function is being added similarly. Attack function is implemented 
+        according to attack type mentioned by ther user. This function list is provided stored in a variable of the <Networ> class and is used in every object of the class. After 
+        creating the list of functions to be executed a list of <Networks> class object is created where each network is dedicated to an element of the messages_list. Each of these
+        networks is executed parallely. The results contain measurement outpputs which are then decoded. 
         Args:
             messages_list (List[Dict[Tuple, str]]): A list of dictionaries where each dictionary contains the messages to be
                                                     transmitted over a network.
@@ -333,10 +342,9 @@ class ProtocolPipeline:
 
         # If the network flow was not provided as an argument, use the default flow and attempt to decode received messages
         if Network._flow == self.__funcs:
-            self.recv_msgs_list = kwds.get("decode", Network.decode)(
-                networks=self.networks,
-                all_returns=returns_list
-            )
+            self.recv_msgs_list = kwds.get("decode", Network.decode)(networks=self.networks,
+                                                                        all_returns=returns_list
+                                                                    )
 
         # Log the completion time
         logger.info(

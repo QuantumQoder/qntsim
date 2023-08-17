@@ -20,14 +20,14 @@ class ErrorAnalyzer:
         lk_list = np.zeros(len(network._bin_msgs[0]))
         print(network._bin_msgs, network._strings)
         for bin_msg, string in zip(network._bin_msgs, network._strings[::-1]):
-            err_list += np.array([int(m) ^ int(s) for m, s in zip(bin_msg, string)])
+            err_list += np.array([int(m) ^ int(s) for m, s in zip(bin_msg, string)]) #bit flips
             lk_list += np.array(
                 [
                     int(m) ^ int(lk)
                     for m, lk in zip(
                         bin_msg,
                         network._lk_msg if hasattr(network, "_lk_msgs") else bin_msg,
-                    )
+                    ) #leaked bits
                 ]
             )
         err_list /= len(network._bin_msgs)
