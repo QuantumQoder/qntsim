@@ -43,14 +43,14 @@ class Attacker(ServiceNode, QuantumChannel):
         encoder = getattr(encoding, qubit.encoding_type)
         bases = encoder.get("bases")
         match self.__attack:
-            case "DS":
+            case "DS": #Denial of service
                 qubit.random_noise()
-            case "EM":
+            case "EM": #Entangle and measure
                 photon = deepcopy(qubit)
                 photon.set_state(state=bases[0][0])
                 qubit.entangle(photon=photon)
                 Photon.measure(basis=bases[0], photon=photon)
-            case "IR":
+            case "IR": #Intercept and Response
                 photon = deepcopy(qubit)
                 photon.set_state(state=(basis := bases[np.random.randint(2)])[Photon.measure(basis=basis, photon=qubit)])
                 return photon
