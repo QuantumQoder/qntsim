@@ -69,7 +69,7 @@ class Attack:
         network._lk_msg = []
         for info in node.resource_manager.memory_manager:
             key = info.memory.qstate_key
-            new_key = network.manager.new([1, 0])
+            new_key = network.manager.new([1, 0]) #attacker's photon
             network._lk_msg.append(network.manager.run_circuit(qtc, [key, new_key]))
             # if info.index>network.size-1: break
     
