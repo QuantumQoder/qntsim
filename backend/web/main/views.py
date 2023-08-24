@@ -21,17 +21,17 @@ from django.shortcuts import render
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import condition
-from main.models import Applications, Results
+from main.models import Applications, Results, Gates
 from main.serializers import ApplicationSerializer
 from main.simulator import topology_funcs
 from main.simulator.app.ip2 import ip2_run
 from main.simulator.app.qdsp import qdsp
 from main.simulator.topology_funcs import *
 from qntsim.utils import log
-from rest_framework import generics, mixins
+from rest_framework import generics, mixins, permissions
 from rest_framework.views import APIView
-
-
+# from models import 
+# from .services.quantumcircuit_service import getCircuits, quantum_circuit_service, add_gate_service
 def home(request):
     context = {
         "title": "QNT Simulator"
@@ -65,7 +65,8 @@ def fetchAppOptions(request):
 
 
 class RunApp(APIView):
-
+    authentication_classes = ()
+    permission_classes = (permissions.AllowAny,)  # Allow any user to access
 
     def post(self,request):
         ############### configuring logger ###############
@@ -232,6 +233,79 @@ class ApplicationResult(generics.GenericAPIView):
         result = Results.objects.filter(id = result_id).values().first()
         print('result', result)
         return JsonResponse(result)
+
+# class QuantumCircuitExecuter(generics.GenericAPIView):
+
+#     def post(self, request):
+#         status = quantum_circuit_service(self,request)
+#         return JsonResponse(status)
+    
+
+class AddGate(generics.GenericAPIView):
+    authentication_classes = ()
+    permission_classes = (permissions.AllowAny,)  # Allow any user to access
+
+    def get(self,request):
+        try:
+            gates = Gates.objects.all()
+            print(gates)
+            gate_list=[]
+            for gate in gates:
+                list ={ }
+                list["id"] = gate.gate_id
+                # list["gt_id"] = gate.gt_id.gt_id
+                # list["gt_name"] = gate.gt_id.gt_name
+                # list["single_multiple"] = gate.gt_id.single_multiple
+                # list["gt_description"] = gate.gt_id.gt_description
+                list["gate_name"] = gate.gate_name
+                list["gate_description"] = gate.gate_description
+                gate_list.append(list)
+            return JsonResponse(gate_list, safe =False)
+        except Exception as e:
+            return JsonResponse({"status":"failed","error":str(e)},status = 500)
+
+    def post(self, request):
+        try:
+                request_data = request.data
+
+                for gate in request_data:
+                    # print(gate)
+                    gate = Gates(
+                        gate_name=gate.get("gate_name"),
+                        gate_description=gate.get("gate_description")
+                    )
+                    gate.save()
+                return JsonResponse({"status":"success"})
+        except Exception as e:
+                return JsonResponse({"status":"failed","error":str(e)},status = 500) 
+        
+    def put(self,request):
+        try:
+            gate = Gates.objects.get(gate_id=request.data.get("gate_id"))
+            gate.gate_name = request.data.get("gate_name")
+            gate.gate_description = request.data.get("gate_description")
+            gate.save()
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"status":"failed","error":str(e)},status = 500)
+        
+    def delete(self,request):
+        try:
+            gate = Gates.objects.all()
+            gate.delete()
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"status":"failed","error":str(e)},status = 500)    
+        
+class Circuit(generics.GenericAPIView):
+
+    def post(self, request):
+        try:
+            print(request.data)
+
+            return JsonResponse({"status":"success"})
+        except Exception as e:
+            return JsonResponse({"status":"failed","error":str(e)})   
 
 @csrf_exempt
 def testrun(request):

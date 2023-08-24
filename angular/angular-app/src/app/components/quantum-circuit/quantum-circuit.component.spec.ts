@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CodeeditorComponent } from './codeeditor.component';
+import { QuantumCircuitComponent } from './quantum-circuit.component';
 
-describe('CodeeditorComponent', () => {
-  let component: CodeeditorComponent;
-  let fixture: ComponentFixture<CodeeditorComponent>;
+describe('QuantumCircuitComponent', () => {
+  let component: QuantumCircuitComponent;
+  let fixture: ComponentFixture<QuantumCircuitComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CodeeditorComponent ]
+      declarations: [ QuantumCircuitComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CodeeditorComponent);
+    fixture = TestBed.createComponent(QuantumCircuitComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

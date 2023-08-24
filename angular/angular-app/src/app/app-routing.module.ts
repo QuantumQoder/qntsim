@@ -1,23 +1,55 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { HomePageComponent } from './components/home-page/home-page.component';
-import { ResultsComponent } from './components/results/results.component';
-// import { CodeEditorModule } from './components/codeeditor/modules/codeeditor.module';
-import { CodeEditorComponent } from './components/codeeditor/codeeditor.component';
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
+import { HomePageComponent } from "./components/home-page/home-page.component";
+import { ResultsComponent } from "./components/results/results.component";
+
+import { QuantumCircuitComponent } from "./components/quantum-circuit/quantum-circuit.component";
 
 const routes: Routes = [
-  { path: '', component: HomePageComponent, title: "QNTSIM" },
-  { path: 'applications', loadChildren: () => import('./components/applications/application-modules/application.module').then(m => m.ApplicationModule), title: 'Applications' },
-  { path: 'advanced', loadChildren: () => import('./components/advanced/modules/advanced.module').then(m => m.AdvancedModule), title: 'Advanced' },
-  { path: 'results', component: ResultsComponent, title: 'Results' },
-  { path: 'intro', loadChildren: () => import('./components/intro/intro-modules/intro.module').then(m => m.IntroModule), title: "Intro" },
-  { path: 'minimal', loadChildren: () => import('./components/minimal/modules/minimal.module').then(m => m.MinimalModule), title: "Minimal" },
-  { path: 'new-protocol', component: CodeEditorComponent, title: "New Protocol" },
-  { path: '**', redirectTo: '' }
+  { path: "", component: HomePageComponent, title: "QNTSIM" },
+  {
+    path: "applications",
+    loadChildren: () =>
+      import(
+        "./components/applications/application-modules/application.module"
+      ).then((m) => m.ApplicationModule),
+    title: "Applications",
+  },
+  {
+    path: "advanced",
+    loadChildren: () =>
+      import("./components/advanced/modules/advanced.module").then(
+        (m) => m.AdvancedModule
+      ),
+    title: "Advanced",
+  },
+  { path: "results", component: ResultsComponent, title: "Results" },
+  {
+    path: "intro",
+    loadChildren: () =>
+      import("./components/intro/intro-modules/intro.module").then(
+        (m) => m.IntroModule
+      ),
+    title: "Intro",
+  },
+  {
+    path: "minimal",
+    loadChildren: () =>
+      import("./components/minimal/modules/minimal.module").then(
+        (m) => m.MinimalModule
+      ),
+    title: "Minimal",
+  },
+  {
+    path: "circuit",
+    component: QuantumCircuitComponent,
+    title: "Quantum Circuit",
+  },
+  { path: "**", redirectTo: "" },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

@@ -16,14 +16,14 @@ export class HomePageComponent implements OnInit, AfterViewInit {
   }
   ngAfterViewInit(): void {
     var globe = <HTMLElement>document.getElementById("globe");
-    console.log("col-5" + globe.clientHeight);
-    const parallax = document.getElementById("parallax")!;
+    // console.log("col-5" + globe.clientHeight);
+    // const parallax = document.getElementById("parallax")!;
     // Parallax Effect for DIV 1
-    window.addEventListener("scroll", function () {
-      let offset = window.pageYOffset;
-      parallax.style.backgroundPositionY = offset * 0.4 + "px";
-      // DIV 1 background will move slower than other elements on scroll.
-    });
+    // window.addEventListener("scroll", function () {
+    //   let offset = window.pageYOffset;
+    //   parallax.style.backgroundPositionY = offset * 0.4 + "px";
+    //   // DIV 1 background will move slower than other elements on scroll.
+    // });
 
     const COUNTRY = "India";
     const OPACITY = 0.5;
@@ -165,9 +165,9 @@ export class HomePageComponent implements OnInit, AfterViewInit {
       myGlobe
         .polygonsData(cuntData)
         .polygonCapColor((feat: any) =>
-          feat.properties.NAME == COUNTRY ? "#6B7B8C" : "#6B7B8C"
+          feat.properties.NAME == COUNTRY ? "transparent" : "transparent"
         )
-        .polygonSideColor(() => "rgba(0, 100, 0, 0.15)")
+        // .polygonSideColor(() => "rgba(0, 100, 0, 0.15)")
         .polygonStrokeColor(() => "#55626f")
         // .htmlElementsData(gData)
         // .htmlElement((d: any) => {

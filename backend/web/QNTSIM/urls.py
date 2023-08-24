@@ -16,9 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from main.views import (ApplicationList, ApplicationResult,  # ,log_view
-                        PastResultsList, RunApp, stream_logs)
+                        PastResultsList, RunApp, stream_logs,AddGate,Circuit)
 from rest_framework_simplejwt import views as jwt_views
 from users.views import UserSignup
+from django.views.decorators.csrf import csrf_exempt
+
 
 urlpatterns = [
     path('api/token/',jwt_views.TokenObtainPairView.as_view(),name ='token_obtain_pair'),
@@ -32,4 +34,9 @@ urlpatterns = [
     path('result_list/', PastResultsList.as_view()),
     path('result/',ApplicationResult.as_view()),
     # path('logs/', log_view, name='logs')
+    # path('quantum_circuit/',QuantumCircuitExecuter.as_view()),
+    path('quantum_gates/',csrf_exempt(AddGate.as_view())),
+    path("circuit",Circuit.as_view())
+    # path('circuits/',AddCircuit.as_view()),
+    # path('',)
 ]

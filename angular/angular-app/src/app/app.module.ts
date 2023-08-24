@@ -1,3 +1,4 @@
+import { QuantumcircuitService } from "./components/quantum-circuit/quantumcircuit.service";
 import { CommonModule } from "@angular/common";
 import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
 import {
@@ -34,14 +35,23 @@ import { NavbarComponent } from "./utilities/navbar/navbar.component";
 import { ConditionsService } from "src/app/services/conditions.service";
 import { HoldingDataService } from "src/app/services/holding-data.service";
 import { ApiServiceService } from "src/app/services/api-service.service";
-import { CodeEditorComponent } from "./components/codeeditor/codeeditor.component";
+
 // import { MonacoEditorModule } from 'ngx-monaco-editor';
 import { MonacoEditorModule, MONACO_PATH } from "@materia-ui/ngx-monaco-editor";
 import { StoreModule } from "@ngrx/store";
 import { minimalReducer } from "./store/minimal.reducer";
-import { StoreDevtoolsModule } from "@ngrx/store-devtools";
+// import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { TopologyLoaderService } from "./services/loadTopology.service";
 
+import { InputTextModule } from "primeng/inputtext";
+import { DialogModule } from "primeng/dialog";
+import { MultiSelectModule } from "primeng/multiselect";
+import { DropdownModule } from "primeng/dropdown";
+import { QuantumCircuitComponent } from "./components/quantum-circuit/quantum-circuit.component";
+import { TableModule } from "primeng/table";
+import { StepsModule } from "primeng/steps";
+import { TabMenuModule } from "primeng/tabmenu";
+// import { AccordionModule } from "primeng/accordion";
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
   declarations: [
@@ -51,9 +61,17 @@ import { TopologyLoaderService } from "./services/loadTopology.service";
     NavbarComponent,
     FooterComponent,
     CtrlClickDirective,
-    CodeEditorComponent,
+    QuantumCircuitComponent,
   ],
   imports: [
+    TabMenuModule,
+    StepsModule,
+    TableModule,
+    DialogModule,
+    DropdownModule,
+    InputTextModule,
+    MultiSelectModule,
+    // QuantumGatesModule,
     SplitButtonModule,
     RouterModule,
     ProgressSpinnerModule,
@@ -92,6 +110,7 @@ import { TopologyLoaderService } from "./services/loadTopology.service";
     HoldingDataService,
     ApiServiceService,
     TopologyLoaderService,
+    QuantumcircuitService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     {
       provide: MONACO_PATH,

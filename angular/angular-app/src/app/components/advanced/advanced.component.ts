@@ -23,6 +23,7 @@ import { HoldingDataService } from "src/app/services/holding-data.service";
 import * as go from "gojs";
 import { DiagramBuilderService } from "src/app/services/diagram-builder.service";
 import { TopologyLoaderService } from "src/app/services/loadTopology.service";
+// import { DialogService } from "primeng/dynamicdialog";
 
 @Component({
   selector: "app-advanced",
@@ -32,6 +33,7 @@ import { TopologyLoaderService } from "src/app/services/loadTopology.service";
   encapsulation: ViewEncapsulation.Emulated,
 })
 export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
+  circuit: boolean = false;
   app: any;
   adornedpart: any;
   routeFrom: string;
@@ -46,6 +48,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   private addButtonAdornment: go.Adornment;
   nodeTypeSelect: boolean = false;
   private subscription: Subscription;
+
   nodesSelection = {
     sender: "",
     receiver: "",
@@ -135,18 +138,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   application: any;
   activeIndex: number = 0;
   appSettingsForm;
-  app_data: {
-    1: string;
-    2: string;
-    3: string;
-    4: string;
-    5: string;
-    6: string;
-    7: string;
-    8: string;
-    9: string;
-    10: string;
-  };
+  app_data: any = [];
   constructor(
     private fb: FormBuilder,
     private con: ConditionsService,
@@ -262,10 +254,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         this.serviceNodes.length > 0 ? this.serviceNodes[0].Name : "";
   }
   ngOnInit(): void {
-    this.con
-      .getAppList()
-      .pipe(map((d: any) => d.appList))
-      .subscribe((result: any) => (this.app_data = result));
+    this.app_data = this.con.getAdvancedAppList();
+    // .subscribe((result: any) => (this.app_data = result));
     this.app_id = localStorage.getItem("app_id");
     this.application = localStorage.getItem("app");
     this.routeFrom = this.holdingData.getRoute();
@@ -512,19 +502,23 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         logLevel: this.debug.loggingLevel.value,
       },
     };
+
     let url =
       this.app_id != 2
         ? environment.apiUrl
         : this.simulator.value == "version1"
         ? environment.apiUrl
         : environment.apiUrlNew;
-    // let url = environment.apiUrlNew;
-    // this.apiService.getStream().subscribe(data => { this.logs = data; });
-    // whatever your request data is
-    // The API service is used to send the request to the backend
+    if (this.app_id == 11) {
+      this.apiService.setRequest({ url, req });
+      this._route.navigate(["/circuit"]);
+      return;
+    }
+
     this.apiService.advancedRunApplication(req, url).subscribe({
       next: (response) => {
         this.con.setResult(response);
+
         if (response.application.Err_msg) {
           alert(`Error has occurred!! ${response.application.Err_msg}`);
         }
@@ -538,10 +532,14 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       complete: () => {
         this.spinner = false;
-        sessionStorage.setItem("saved_model", this.myDiagram.model);
+        // sessionStorage.setItem("saved_model", this.myDiagram.model);
         this._route.navigate(["/results"]);
       },
     });
+    // let url = environment.apiUrlNew;
+    // this.apiService.getStream().subscribe(data => { this.logs = data; });
+    // whatever your request data is
+    // The API service is used to send the request to the backend
   }
   linkClicked(link: any) {
     if (!link || !link.data || !link.data.key) {

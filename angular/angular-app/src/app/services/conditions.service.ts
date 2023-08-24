@@ -1,163 +1,124 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { map, Subject } from 'rxjs';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { map, Subject } from "rxjs";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class ConditionsService {
-  public app_id: number = 2
-  public app: string
+  public app_id: number = 2;
+  public app: string;
   currentSection: any;
   public selectedAppResult = new Subject();
   public _result = this.selectedAppResult.asObservable();
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
   updateNode(value: any) {
-    this.selectedAppResult.next(value)
+    this.selectedAppResult.next(value);
   }
-  public result: any
+  public result: any;
 
+  getAdvancedAppList() {
+    return [
+      {
+        appName: "End to end Bell Pairs",
+        appId: 2,
+      },
+      {
+        appName: "End to end GHZ",
+        appId: 4,
+      },
+      {
+        appName: "Quantum Teleportation",
+        appId: 3,
+      },
+      {
+        appName: "Ekert 91 QKD",
+        appId: 1,
+      },
+      {
+        appName: "Seminal QSDC",
+        appId: 5,
+      },
+      {
+        appName: "PingPong QSDC",
+        appId: 6,
+      },
+      {
+        appName: "Arbitrary Basis QSDC with user authentication",
+        appId: 7,
+      },
+      {
+        appName: "Single Photon QD",
+        appId: 8,
+      },
+      {
+        appName: "QSDC with Teleportation",
+        appId: 9,
+      },
+      {
+        appName: "MDI-QSDC with user authentication",
+        appId: 10,
+      },
+      {
+        appName: "Create a new application",
+        appId: 11,
+      },
+    ];
+  }
   getResult() {
     return this.result;
     // return this.dummytext
   }
   setResult(value: any) {
-    this.result = value
+    this.result = value;
   }
   getapp_id() {
-    return this.app_id
+    return this.app_id;
   }
   setapp_id(app_id: number) {
-    this.app_id = app_id
+    this.app_id = app_id;
   }
   getApp() {
-    return this.app
+    return this.app;
   }
   setApp(app: string) {
-    this.app = app
+    this.app = app;
   }
   jsonUrl(type: any, level: any) {
     return {
-      url: type.toLowerCase() + '_' + level + '.json',
-      type: type.toLowerCase()
-    }
+      url: type.toLowerCase() + "_" + level + ".json",
+      type: type.toLowerCase(),
+    };
   }
   getJson(url: string, type: any) {
-    return this.http.get('../assets/preload-topologies/' + type + '/' + url)
+    return this.http.get("../assets/preload-topologies/" + type + "/" + url);
   }
   getAppList() {
-    return this.http.get('../assets/app-infos/appList.json')
+    return this.http.get("../assets/app-infos/appList.json");
   }
   getAppSetting() {
-    return this.http.get('../assets/app-infos/appSettings.json')
+    return this.http.get("../assets/app-infos/appSettings.json");
   }
   getMemory() {
-    return { "frequency": 2000, "expiry": -1, "efficiency": 1, "fidelity": 0.93 }
+    return { frequency: 2000, expiry: -1, efficiency: 1, fidelity: 0.93 };
   }
 
-
   dummytext = {
+    application: {
+      sender: [
+        [0, "n1", "n3", 0.6332, 1.038, 2000, "ENTANGLED"],
 
-    "application": {
+        [1, "n1", "n3", 0.6332, 1.118, 2000, "ENTANGLED"],
 
-      "sender": [
+        [2, "n1", "n3", 0.6332, 1.134, 2000, "ENTANGLED"],
 
-        [
+        [3, "n1", "n3", 0.6332, 1.15, 2000, "ENTANGLED"],
 
-          0,
-
-          "n1",
-
-          "n3",
-
-          0.6332,
-
-          1.038,
-
-          2000,
-
-          "ENTANGLED"
-
-        ],
-
-        [
-
-          1,
-
-          "n1",
-
-          "n3",
-
-          0.6332,
-
-          1.118,
-
-          2000,
-
-          "ENTANGLED"
-
-        ],
-
-        [
-
-          2,
-
-          "n1",
-
-          "n3",
-
-          0.6332,
-
-          1.134,
-
-          2000,
-
-          "ENTANGLED"
-
-        ],
-
-        [
-
-          3,
-
-          "n1",
-
-          "n3",
-
-          0.6332,
-
-          1.15,
-
-          2000,
-
-          "ENTANGLED"
-
-        ],
-
-        [
-
-          4,
-
-          "n1",
-
-          "n3",
-
-          0.6332,
-
-          1.102,
-
-          2000,
-
-          "ENTANGLED"
-
-        ]
-
+        [4, "n1", "n3", 0.6332, 1.102, 2000, "ENTANGLED"],
       ],
 
-      "receiver": [
-
+      receiver: [
         [
-
           0,
 
           "n3",
@@ -170,12 +131,10 @@ export class ConditionsService {
 
           2001.03800017501,
 
-          "ENTANGLED"
-
+          "ENTANGLED",
         ],
 
         [
-
           1,
 
           "n3",
@@ -188,12 +147,10 @@ export class ConditionsService {
 
           2001.11800017501,
 
-          "ENTANGLED"
-
+          "ENTANGLED",
         ],
 
         [
-
           2,
 
           "n3",
@@ -206,12 +163,10 @@ export class ConditionsService {
 
           2001.13400017501,
 
-          "ENTANGLED"
-
+          "ENTANGLED",
         ],
 
         [
-
           3,
 
           "n3",
@@ -224,12 +179,10 @@ export class ConditionsService {
 
           2001.10200017501,
 
-          "ENTANGLED"
-
+          "ENTANGLED",
         ],
 
         [
-
           4,
 
           "n3",
@@ -242,28 +195,22 @@ export class ConditionsService {
 
           2001.15000017501,
 
-          "ENTANGLED"
-
-        ]
-
-      ]
-
+          "ENTANGLED",
+        ],
+      ],
     },
 
-    "performance": {
+    performance: {
+      latency: 0.10200017500999992,
 
-      "latency": 0.10200017500999992,
+      fidelity: 0.6331666666666667,
 
-      "fidelity": 0.6331666666666667,
+      throughput: 100.0,
 
-      "throughput": 100.0,
-
-      "execution_time": 5.79
-
+      execution_time: 5.79,
     },
 
-    "logs": [
-
+    logs: [
       "INFO: Logging Begins...",
 
       "INFO: In e2e",
@@ -316,10 +263,7 @@ export class ConditionsService {
 
       "INFO: Swapping sucessful between ('n1', 'n3')",
 
-      "INFO: Swapping sucessful between ('n1', 'n3')"
-
-    ]
-
-  }
-
+      "INFO: Swapping sucessful between ('n1', 'n3')",
+    ],
+  };
 }
