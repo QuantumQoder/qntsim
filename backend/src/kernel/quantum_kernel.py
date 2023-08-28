@@ -3,7 +3,8 @@ from copy import copy
 from math import sqrt
 from multiprocessing import Manager
 from random import random
-from typing import TYPE_CHECKING, Dict, List, Tuple
+from typing import (TYPE_CHECKING, Dict, List, Literal, Optional, Self, Tuple,
+                    overload)
 
 from numpy import arange, array, identity, kron, log2, outer, zeros
 from numpy.random import choice, random_sample
@@ -12,7 +13,7 @@ from qiskit import quantum_info
 from qutip.qip.circuit import Gate, QubitCircuit
 from qutip.qip.operations import gate_sequence_product
 
-from ..components.circuit import Circuit
+from ..components.circuit import QiskitCircuit
 from .quantum_utils import *
 
 """
@@ -40,19 +41,15 @@ class QuantumKernel():
     Attributes:
         states (Dict[int, KetState]): mapping of state keys to quantum state objects.
     """
+    @staticmethod
+    def create(_type:Literal["Qiskit", "Qutip"]) -> "QuantumKernel":
+        match _type:
+            case "Qiskit":
+                return QuantumManagerKetQiskit
+            case "Qutip":
+                return QuantumManagerKetQutip
 
-    @classmethod
-    def create(cls,type):
-
-        QuantumManagerKet_class=None
-        if type=='Qiskit':
-            QuantumManagerKet_class=QuantumManagerKetQiskit
-        elif type=='Qutip':
-            QuantumManagerKet_class=QuantumManagerKetQutip
-
-        return QuantumManagerKet_class
-
-    def __init__(self, formalism ):
+    def __init__(self, formalism):
         self.states = {}
         self._least_available = 0
         self.formalism = formalism
@@ -78,7 +75,7 @@ class QuantumKernel():
         return self.states[key]
 
     @abstractmethod
-    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:
+    def run_circuit(self, circuit: "QiskitCircuit", keys: List[int]) -> int:
         """Method to run a circuit on a given set of quantum states.
         Args:
             circuit (Circuit): quantum circuit to apply.
@@ -91,7 +88,7 @@ class QuantumKernel():
 
 
     @abstractmethod
-    def _prepare_circuit(self, circuit: "Circuit", keys: List[int]):
+    def _prepare_circuit(self, circuit: "QiskitCircuit", keys: List[int]):
         
        pass
 
@@ -124,7 +121,7 @@ class QuantumManagerKetQiskit(QuantumKernel):
         key = self._least_available
         self._least_available += 1
         self.states[key] = QuantumCircuit(QuantumRegister(1, f"k_{key}"))
-        #print('self states', self.states[key])
+        ## print('self states', self.states[key])
         return key
     def new2(self):
         key = self._least_available
@@ -133,10 +130,10 @@ class QuantumManagerKetQiskit(QuantumKernel):
         circ = QuantumCircuit(QuantumRegister(1, f"k_{key}"))
         circ.initialize(initial_state, 0)
         self.states[key] = circ
-        #print('new2 circ', circ,self.states[key])
+        ## print('new2 circ', circ,self.states[key])
         return key
 
-    def _prepare_circuit(self, circuit: "Circuit", keys: List[int]):
+    def _prepare_circuit(self, circuit: "QiskitCircuit", keys: List[int]):
         
         # Create a quantum circuit with or without classical measurement registers based on number of measured qubits
         if len(circuit.measured_qubits)>0:
@@ -150,7 +147,7 @@ class QuantumManagerKetQiskit(QuantumKernel):
 
         # go through keys and get all unique qstate objects from the required keys
         for key in keys:
-            #print('key in keys', key)
+            ## print('key in keys', key)
             qstate = self.states[key]
 
             # Check if you have added the state corresponding to the key in the circuit
@@ -181,12 +178,12 @@ class QuantumManagerKetQiskit(QuantumKernel):
 
         return all_keys, circ
 
-    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:    
+    def run_circuit(self, circuit: "QiskitCircuit", keys: List[int]) -> int:    
         super().run_circuit(circuit, keys)
 
         # Compile the circuit into Qiskit quanutm circuit
         all_keys, circ = self._prepare_circuit(circuit, keys)
-        #print("new circuit", all_keys, circ)
+        ## print("new circuit", all_keys, circ)
 
         # If none of the qubits are measured
         if len(circuit.measured_qubits) == 0:
@@ -199,7 +196,7 @@ class QuantumManagerKetQiskit(QuantumKernel):
 
             # measure state (state reassignment done in _measure method)
             keys = [all_keys[i] for i in circuit.measured_qubits]
-            #print('before measure', keys, all_keys,circ )
+            ## print('before measure', keys, all_keys,circ )
             return self._measure(circ, keys, all_keys)
 
     def set(self, keys: List[int], amplitudes: List[complex]) -> None:
@@ -247,7 +244,7 @@ class QuantumManagerKetQiskit(QuantumKernel):
             # Partially trace out measured qubits. This works because the statevector produced in previous step 
             # already considers the wave function (and ultimately entanglement) collapse due to measurements 
             new_state = quantum_info.partial_trace(statevector, measured_indices).to_statevector().data
-            #print('new state', new_state)
+            ## print('new state', new_state)
             for key in keys:
                 all_keys.remove(key)
 
@@ -257,11 +254,11 @@ class QuantumManagerKetQiskit(QuantumKernel):
             # Initialize the qubits with their respective state vectors
             qc.initialize(new_state, list(range(len(all_keys))))
             # qc.save_statevector()
-            # print('State vector', qc.get_statevector())
+            # # print('State vector', qc.get_statevector())
             # Assign quantum circuits to keys.
             for key in all_keys:
                 self.states[key] = qc
-                #print('self states', qc)
+                ## print('self states', qc)
 
         return dict(zip(keys, result_digits))
 
@@ -280,12 +277,12 @@ class QuantumManagerKetQutip(QuantumKernel):
         self.states[key] = KetState(amplitudes, [key])
         return key
     
-    def _prepare_circuit(self, circuit: "Circuit", keys: List[int]):
+    def _prepare_circuit(self, circuit: "QiskitCircuit", keys: List[int]):
         old_states = []
         all_keys = []
 
         # go through keys and get all unique qstate objects
-        #print('prepare circuit qutip')
+        ## print('prepare circuit qutip')
         for key in keys:
             qstate = self.states[key]
             if qstate.keys[0] not in all_keys:
@@ -322,9 +319,9 @@ class QuantumManagerKetQutip(QuantumKernel):
         swap_mat = gate_sequence_product(swap_circuit.propagators()).full()
         return all_keys, swap_mat
 
-    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:
+    def run_circuit(self, circuit: "QiskitCircuit", keys: List[int]) -> int:
         super().run_circuit(circuit, keys)
-        #print('run circuit')
+        ## print('run circuit')
         new_state, all_keys, circ_mat = self._prepare_circuit(circuit, keys)
 
         new_state = circ_mat @ new_state
