@@ -562,8 +562,8 @@ class QutipCircuit(BaseCircuit):
     @staticmethod
     def __rzz(phi:float) -> Qobj:
         import cmath
-        return Qobj([[cmath.exp(-1j*phi/2),                   0,                       0,                0],
-                     [                   0, cmath.exp(1j*phi/2),                       0,                0],
+        return Qobj([[cmath.exp(-1j*phi/2),                   0,                   0,                    0],
+                     [                   0, cmath.exp(1j*phi/2),                   0,                    0],
                      [                   0,                   0, cmath.exp(1j*phi/2),                    0],
                      [                   0,                   0,                   0, cmath.exp(-1j*phi/2)]])
 
