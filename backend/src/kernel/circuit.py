@@ -48,7 +48,6 @@ class BaseCircuit():
         Returns:
             BaseCircuit: The appropriate child class corresponding to type
         """
-        cls.__type = _type
         match _type:
             case "Qiskit":
                 child_cls = QiskitCircuit
@@ -56,6 +55,7 @@ class BaseCircuit():
                 child_cls = QutipCircuit
         if size:
             self = object.__new__(child_cls)
+            self.__type = _type
             self.size = size
             self.gates = []
             self.measured_qubits = []
@@ -70,7 +70,7 @@ class BaseCircuit():
         Returns:
             Self: The duplicated object
         """
-        circuit = __class__(__class__.__type, self.size)
+        circuit = __class__(self.__type, self.size)
         circuit.gates = [[gate, [arg for arg in args]] for gate, args in self.gates]
         circuit.measured_qubits = [qubit for qubit in self.measured_qubits]
         circuit._cache = deepcopy(self._cache)
@@ -486,7 +486,7 @@ class _Circuit(BaseCircuit):
         self._cache = None
         return self
 
-class QiskitCircuit(_Circuit):
+class QiskitCircuit(BaseCircuit):
     """Class for a quantum circuit.
     Attributes:
         size (int): the number of qubits in the circuit.
@@ -560,7 +560,7 @@ class QiskitCircuit(_Circuit):
             qc.measure(key_index, i)
         return qc
 
-class QutipCircuit(_Circuit):
+class QutipCircuit(BaseCircuit):
     """Class for a quantum circuit.
     Attributes:
         size (int): the number of qubits in the circuit.
