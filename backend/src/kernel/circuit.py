@@ -1,12 +1,16 @@
 """Models for simulation of quantum circuit.
-This module introduces the QuantumCircuit class. The qutip library is used to calculate the unitary matrix of a circuit.
+This module introduces the BaseCircuit class and it's platform-specific child classes.
+The child classes in the module cannot be instantiated separately. They must be instantiated
+through the BaseCircuit.__new__ dunder.
+The qutip library is used to calculate the unitary matrix of a circuit.
 """
 
 import math
 from copy import deepcopy
 from numbers import Number
 from types import NoneType
-from typing import Callable, Dict, List, Literal, Optional, Self, Union
+from typing import (Callable, Dict, List, Literal, Optional, Self, TypeAlias,
+                    Union, overload)
 
 import numpy as np
 from qiskit import QuantumCircuit
@@ -19,42 +23,45 @@ from qutip.qip.operations import (controlled_gate, gate_sequence_product,
 def validator(func:Callable[["BaseCircuit", [...]], NoneType]) -> Callable:
     def wrapper(self:"BaseCircuit", *args, **kwargs) -> NoneType:
         assert all(q < self.size for q in args if isinstance(q, int)), "Qubit index out of bounds"
-        return func(*args, **kwargs)
+        return func(self, *args, **kwargs)
     return wrapper
 
 class BaseCircuit():
-    @staticmethod
-    def create(_type:Literal["Qiskit", "Qutip"]) -> "BaseCircuit":
-        """Returns the appropriate class corresponding to type
+    __circuit_class: TypeAlias = Union["QiskitCircuit", "QutipCircuit"]
+    
+    @overload
+    def __new__(cls, _type:Literal["Qiskit", "Qutip"]) -> __circuit_class: ...
+    
+    @overload
+    def __new__(cls, _type:Literal["Qiskit", "Qutip"], size:int) -> Self: ...
+    
+    def __new__(cls, _type:Literal["Qiskit", "Qutip"], size:Optional[int] = None) -> Union[Self, __circuit_class]:
+        """The __new__ of the 'BaseCircuit' class works as an object factory method,
+        as well as, a class factory method. Refer to the overloaded type hints.
 
         Args:
-            type (Literal[&quot;Qiskit&quot;, &quot;Qutip&quot;]): The backend type
-            TODO: Keep on adding a str name for increasing dependency and add a match case
+            _type (Literal[&quot;Qiskit&quot;, &quot;Qutip&quot;]): The backend type
+            TODO: Keep on adding a str name for increasing dependency on other platforms and add a match case
             corresponding to that
+            size (int): the number of qubits used in circuit.
 
         Returns:
             BaseCircuit: The appropriate child class corresponding to type
         """
+        cls.__type = _type
         match _type:
             case "Qiskit":
-                return QiskitCircuit
+                child_cls = QiskitCircuit
             case "Qutip":
-                return QutipCircuit
-
-    def __init__(self, size: int) -> None:
-        """Constructor for quantum circuit.
-        .. warning::
-            The object is unable to perform inplace measurement and/or apply classically controlled gates
-        TODO: Resolve the precaution.
-        
-        Args:
-            size (int): the number of qubits used in circuit.
-        """
-        
-        self.size = size
-        self.gates = []
-        self.measured_qubits = []
-        self._cache = None
+                child_cls = QutipCircuit
+        if size:
+            self = object.__new__(child_cls)
+            self.size = size
+            self.gates = []
+            self.measured_qubits = []
+            self._cache = None
+            return self
+        return child_cls
 
     def __copy__(self) -> Self:
         """Creates a new object with the same parameter. This is equivalent to deepcopy.
@@ -63,7 +70,7 @@ class BaseCircuit():
         Returns:
             Self: The duplicated object
         """
-        circuit = __class__(self.size)
+        circuit = __class__(__class__.__type, self.size)
         circuit.gates = [[gate, [arg for arg in args]] for gate, args in self.gates]
         circuit.measured_qubits = [qubit for qubit in self.measured_qubits]
         circuit._cache = deepcopy(self._cache)
@@ -240,11 +247,19 @@ class BaseCircuit():
         Args:
             circuit (Self): the incoming circuit needed to attach
         """
-        self.combine_circuit(circuit=circuit, qubit_map={i:i for i in range(self.num_qubits)}.update({circuit.num_qubits+i:circuit.num_qubits+i for i in range(circuit.num_qubits)}))
+        qubit_map = {i:i for i in range(self.num_qubits)}
+        qubit_map.update({circuit.num_qubits+i:circuit.num_qubits+i for i in range(circuit.num_qubits)})
+        self.combine_circuit(circuit=circuit, qubit_map=qubit_map)
 
     def parse_circuit(self, circuit:Optional[Union[QuantumCircuit, QubitCircuit]] = None) -> Union[QuantumCircuit, QubitCircuit]:
         if circuit:
-            assert self.num_qubits < circuit.num_qubits, f"The number of qubits in {circuit} should be less than {self.num_qubits}."
+            num_qubits = getattr(circuit, ("num_qubit" if isinstance(circuit, QuantumCircuit) else
+                                           "N"))
+            assert self.num_qubits == num_qubits, f"The number of qubits in circuit must be equal to {self.num_qubits}."
+            num_clbits = getattr(circuit, ("num_clbits" if isinstance(circuit, QuantumCircuit) else
+                                           "num_cbits"))
+            assert num_clbits, "The circuit object must have classical registers."
+            assert self.num_measured_qubits == num_clbits, f"The number of classical bits in circuit must be equal to {self.num_measured_qubits}."
 
     @validator
     def i(self, qubit:int) -> None:
@@ -453,7 +468,25 @@ class BaseCircuit():
         """
         self.measured_qubits.append(qubit)
 
-class QiskitCircuit(BaseCircuit):
+class _Circuit(BaseCircuit):
+    """This class is not supposed to be used outside the current module.
+    The class is defined to override the BaseCircuit.__new__ so that the
+    child classes can be instantiated separately, while inheriting the
+    attributes from the base class <BaseCircuit>.
+
+    Base Class:
+        BaseCircuit (_type_): The base class for the platform-dependent
+                              child classes.
+    """
+    def __new__(cls, size: int) -> Self:
+        self = object.__new__(cls)
+        self.size = size
+        self.gates = []
+        self.measured_qubits = []
+        self._cache = None
+        return self
+
+class QiskitCircuit(_Circuit):
     """Class for a quantum circuit.
     Attributes:
         size (int): the number of qubits in the circuit.
@@ -461,8 +494,8 @@ class QiskitCircuit(BaseCircuit):
         measured_qubits (List[int]): a list of indices of measured qubits.
     """
 
-    def __init__(self, size: int):
-        super().__init__(size)
+    def __new__(cls, size:int) -> Self:
+        return BaseCircuit.__new__(cls, "Qiskit", size)
 
     def parse_circuit(self, circuit:Optional[QuantumCircuit] = None) -> QuantumCircuit:
         BaseCircuit.parse_circuit(self, circuit)
@@ -471,8 +504,8 @@ class QiskitCircuit(BaseCircuit):
             qubits = [arg for arg in args if isinstance(arg, int)]
             angles = list(set(args) - set(qubits))
             if hasattr(circuit, gate):
-                g = getattr(circuit, gate)
-                g(*angles, *qubits)
+                _gate = getattr(circuit, gate)
+                _gate(*angles, *qubits)
             else:
                 match gate:
                     case "ry":
@@ -484,7 +517,8 @@ class QiskitCircuit(BaseCircuit):
                                                     [0, -1j*math.sin(angles[0]/2),     math.cos(angles[0]/2), 0],
                                                     [1,                         0,                         0, 1]]),
                                        *qubits)
-            circuit.measure(self.measured_qubits, range(self.num_measured_qubits))
+        circuit.measure(self.measured_qubits, circuit.cregs)
+        return circuit
 
     def compile_circuit(self, qc:QuantumCircuit) -> QuantumCircuit:
         """Method to get unitary matrix of circuit without measurement.
@@ -526,7 +560,7 @@ class QiskitCircuit(BaseCircuit):
             qc.measure(key_index, i)
         return qc
 
-class QutipCircuit(BaseCircuit):
+class QutipCircuit(_Circuit):
     """Class for a quantum circuit.
     Attributes:
         size (int): the number of qubits in the circuit.
@@ -579,9 +613,6 @@ class QutipCircuit(BaseCircuit):
     def __sdg() -> Qobj:
         return rz(-math.pi/2)
     
-    def __init__(self, size: int):
-        super().__init__(size)
-    
     __gate_map = {"x":"X",
                   "y":"Y",
                   "z":"Z",
@@ -616,6 +647,9 @@ class QutipCircuit(BaseCircuit):
                   "iswap":"iSWAP",
                   "cswap":"FREDKIN"}
 
+    def __new__(cls, size:int) -> Self:
+        return BaseCircuit.__new__(cls, "Qutip", size)
+
     def parse_circuit(self, circuit:Optional[QubitCircuit] = None) -> QubitCircuit:
         BaseCircuit.parse_circuit(self, circuit)
         circuit = circuit or QubitCircuit(self.num_qubits, num_cbits=self.num_measured_qubits,
@@ -633,6 +667,7 @@ class QutipCircuit(BaseCircuit):
             circuit.add_gate(self.__gate_map.get(gate), targets=qubits[-1], controls=qubits[:-1], arg_value=angles)
         for i, measured_qubit in enumerate(self.measured_qubits):
             circuit.add_measurement(f"M{i}", targets=measured_qubit, classical_store=i)
+        return circuit
 
     def get_unitary_matrix(self) -> "np.ndarray":
         """Method to get unitary matrix of circuit without measurement.
