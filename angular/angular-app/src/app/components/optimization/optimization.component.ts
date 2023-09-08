@@ -1,14 +1,13 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from "@angular/core";
+import { AfterViewInit, Component, OnInit } from "@angular/core";
 import { ApiServiceService } from "src/app/services/api-service.service";
-import { QuantumcircuitService } from "./quantumcircuit.service";
+import { QuantumcircuitService } from "../quantum-circuit/quantumcircuit.service";
+
 @Component({
-  selector: "app-quantum-circuit",
-  templateUrl: "./quantum-circuit.component.html",
-  styleUrls: ["./quantum-circuit.component.less"],
+  selector: "app-optimization",
+  templateUrl: "./optimization.component.html",
+  styleUrls: ["./optimization.component.less"],
 })
-export class QuantumCircuitComponent
-  implements OnInit, OnDestroy, AfterViewInit
-{
+export class OptimizationComponent implements OnInit, AfterViewInit {
   gatesParams = false;
   generatedImage = {
     presence: false,
@@ -23,6 +22,10 @@ export class QuantumCircuitComponent
       lambda: { value: 0, variable: false },
       // variable: false,
     },
+  };
+  optimizationAlgos = {
+    value: "",
+    options: [],
   };
   selectedCell = {
     nodeName: "",
@@ -56,8 +59,13 @@ export class QuantumCircuitComponent
     console.log(this.options);
     this.app_id = localStorage.getItem("app_id");
     this.requestData = this.apiService.getRequest();
-    for (let node of this.requestData.req.topology.nodes) {
-      this.tableData[node.Name] = {
+    this.optimizationAlgos.value = this.service.getOptimizationAlogorithm();
+    this.optimizationAlgos.options = this.service.getCircuitsForOptimization(
+      this.service.getOptimizationAlogorithm()
+    );
+    console.log(this.optimizationAlgos);
+    for (let node of this.optimizationAlgos.options) {
+      this.tableData[node] = {
         data: Array.from({ length: this.rows.length }, () =>
           Array(this.cols.length).fill({
             value: "I",
@@ -71,9 +79,7 @@ export class QuantumCircuitComponent
         rows: [...this.rows],
         cols: [...this.cols],
       };
-      this.tableData[node.Name] = JSON.parse(
-        JSON.stringify(this.tableData[node.Name])
-      );
+      this.tableData[node] = JSON.parse(JSON.stringify(this.tableData[node]));
     }
     console.log(this.tableData);
   }
@@ -193,13 +199,17 @@ export class QuantumCircuitComponent
 
     this.generatedImage.presence = true;
 
+    setTimeout(() => {
+      this.spinner = false;
+    }, 3000);
+
     // this.apiService
     //   .advancedRunApplication(this.requestData.req, this.requestData.url)
     //   .subscribe({
     //     next: (response) => {
     //       this.con.setResult(response);
 
-    //       if (response.application.Err_msg) {
+    //       if (response.application.Err_msg) { 
     //         alert(`Error has occurred!! ${response.application.Err_msg}`);
     //       }
     //     },

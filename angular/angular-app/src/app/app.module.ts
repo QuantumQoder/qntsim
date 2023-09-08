@@ -4,7 +4,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
 import {
   CUSTOM_ELEMENTS_SCHEMA,
   NO_ERRORS_SCHEMA,
-  NgModule,
+  NgModule, isDevMode,
 } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
@@ -42,7 +42,7 @@ import { StoreModule } from "@ngrx/store";
 import { minimalReducer } from "./store/minimal.reducer";
 // import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { TopologyLoaderService } from "./services/loadTopology.service";
-
+import { CheckboxModule } from "primeng/checkbox";
 import { InputTextModule } from "primeng/inputtext";
 import { DialogModule } from "primeng/dialog";
 import { MultiSelectModule } from "primeng/multiselect";
@@ -51,6 +51,8 @@ import { QuantumCircuitComponent } from "./components/quantum-circuit/quantum-ci
 import { TableModule } from "primeng/table";
 import { StepsModule } from "primeng/steps";
 import { TabMenuModule } from "primeng/tabmenu";
+import { OptimizationComponent } from './components/optimization/optimization.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
 // import { AccordionModule } from "primeng/accordion";
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
@@ -62,8 +64,10 @@ import { TabMenuModule } from "primeng/tabmenu";
     FooterComponent,
     CtrlClickDirective,
     QuantumCircuitComponent,
+    OptimizationComponent,
   ],
   imports: [
+    CheckboxModule,
     TabMenuModule,
     StepsModule,
     TableModule,
@@ -97,6 +101,12 @@ import { TabMenuModule } from "primeng/tabmenu";
     TooltipModule,
     MonacoEditorModule,
     StoreModule.forRoot({ minimal: minimalReducer }),
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
     // StoreDevtoolsModule.instrument({
     //   maxAge: 25,
     // }),

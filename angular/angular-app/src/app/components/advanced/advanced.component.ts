@@ -23,6 +23,7 @@ import { HoldingDataService } from "src/app/services/holding-data.service";
 import * as go from "gojs";
 import { DiagramBuilderService } from "src/app/services/diagram-builder.service";
 import { TopologyLoaderService } from "src/app/services/loadTopology.service";
+import { QuantumcircuitService } from "../quantum-circuit/quantumcircuit.service";
 // import { DialogService } from "primeng/dynamicdialog";
 
 @Component({
@@ -96,6 +97,15 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       },
     ],
   };
+  newApplication = {
+    value: "Optimization",
+    options: ["Optimization", "Network"],
+  };
+  optimizationAlgo = {
+    value: "QAOA",
+    options: ["QAOA", "VQE", "VQC"],
+    visible: false,
+  };
   isLinkParameters: boolean = false;
   linksProps = {
     distance: 70,
@@ -147,7 +157,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     private _route: Router,
     private diagramStorage: DiagramStorageService,
     private diagramBuilder: DiagramBuilderService,
-    private topologyLoader: TopologyLoaderService
+    private topologyLoader: TopologyLoaderService,
+    private circuitService: QuantumcircuitService
   ) {}
   ngOnDestroy(): void {
     this.diagramStorage.setAppSettingsFormDataAdvanced({
@@ -185,6 +196,12 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       $event.preventDefault();
     }
+  }
+  optimize() {
+    console.log("Optimization ALgo Value", this.optimizationAlgo.value);
+    this.circuitService.setOptimizationAlgorithm(this.optimizationAlgo.value);
+    this.optimizationAlgo.visible = false;
+    this._route.navigate(["optimization"]);
   }
   selectNodeType(adornedpart: any) {
     this.nodeTypeSelect = true;
@@ -511,7 +528,18 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         : environment.apiUrlNew;
     if (this.app_id == 11) {
       this.apiService.setRequest({ url, req });
-      this._route.navigate(["/circuit"]);
+      // const routePage =
+      //   this.newApplication.value == "Optimization"
+      //     ? "optimization"
+      //     : this.newApplication.value == "Network"
+      //     ? "circuit"
+      //     : null;
+      if (this.newApplication.value == "Optimization") {
+        this.optimizationAlgo.visible = true;
+      } else if (this.newApplication.value == "Network") {
+        this._route.navigate(["network"]);
+      }
+      // console.log("Route:", routePage);
       return;
     }
 

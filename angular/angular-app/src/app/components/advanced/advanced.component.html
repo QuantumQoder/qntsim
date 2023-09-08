@@ -14,6 +14,32 @@
       <button class="btn btn-primary m-2" (click)="addNode('End')">End</button>
     </div>
   </p-dialog>
+  <p-dialog
+    header="Please select the optimization alogorithms"
+    [(visible)]="optimizationAlgo.visible"
+    [modal]="true"
+  >
+    <div class="d-flex flex-column gap-3 justify-content-center">
+      <!-- <button class="btn btn-primary m-2" (click)="addNode('Service')">
+        Service
+      </button>
+      <button class="btn btn-primary m-2" (click)="addNode('End')">End</button> -->
+      <div class="form-group col-8 mx-auto">
+        <label for="attenuation" class="form-label mx-auto"
+          >Optimization Algorithm
+        </label>
+        <select class="form-control" [(ngModel)]="optimizationAlgo.value">
+          <option
+            *ngFor="let data of optimizationAlgo.options"
+            [ngValue]="data"
+          >
+            {{ data }}
+          </option>
+        </select>
+      </div>
+      <button class="btn btn-primary" (click)="optimize()">Save</button>
+    </div>
+  </p-dialog>
   <!-- <p-dialog header="Please configure the cirucit" [(visible)]="circuit">
         <app-quantum-circuit></app-quantum-circuit>
     </p-dialog> -->
@@ -421,9 +447,35 @@
                 "
               >
                 <form [formGroup]="appSettingsForm">
+                  <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 11">
+                    <label
+                      for="type"
+                      class="form-label font-bold"
+                      pTooltip="The sender node of the quantum message or key."
+                    >
+                      Application Type
+                      <i
+                        class="fa-solid fa-circle-info fa-xs"
+                        style="color: #000000"
+                      ></i>
+                    </label>
+                    <select
+                      class="form-control"
+                      formControlName="sender"
+                      [(ngModel)]="newApplication.value"
+                    >
+                      <option
+                        *ngFor="let data of newApplication.options"
+                        [ngValue]="data"
+                      >
+                        {{ data }}
+                      </option>
+                    </select>
+                  </div>
+
                   <div
                     class="mt-1 col-9 mx-auto"
-                    *ngIf="app_id != 4 && app_id != 10"
+                    *ngIf="app_id != 4 && app_id != 10 && app_id != 11"
                   >
                     <label
                       for="type"
@@ -449,9 +501,10 @@
                       </option>
                     </select>
                   </div>
+
                   <div
                     class="mt-1 col-9 mx-auto"
-                    *ngIf="app_id != 4 && app_id != 10"
+                    *ngIf="app_id != 4 && app_id != 10 && app_id != 11"
                   >
                     <label
                       for="type"
