@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { ApiServiceService } from "src/app/services/api-service.service";
 import { QuantumcircuitService } from "../quantum-circuit/quantumcircuit.service";
 
@@ -7,7 +7,7 @@ import { QuantumcircuitService } from "../quantum-circuit/quantumcircuit.service
   templateUrl: "./optimization.component.html",
   styleUrls: ["./optimization.component.less"],
 })
-export class OptimizationComponent implements OnInit, AfterViewInit {
+export class OptimizationComponent implements OnInit {
   gatesParams = false;
   generatedImage = {
     presence: false,
@@ -48,11 +48,9 @@ export class OptimizationComponent implements OnInit, AfterViewInit {
 
   constructor(
     private service: QuantumcircuitService,
-    private apiService: ApiServiceService // private con: ConditionsService, // private _route: Router // private fb: FormBuilder
-  ) {}
-  ngAfterViewInit(): void {
-    // this.params.visible = true;
-  }
+    private apiService: ApiServiceService
+  ) { }
+
 
   ngOnInit(): void {
     this.options = this.service.getGatesLocal();
@@ -90,28 +88,9 @@ export class OptimizationComponent implements OnInit, AfterViewInit {
       // this.tabOptions[this.tabActiveIndex].label,
       JSON.stringify(this.tableData)
     );
-    // this.service.updateTableData(this.tabOptions[this.tabActiveIndex].label, {
-    //   data: this.tableData,
-    //   rows: this.rows,
-    //   cols: this.cols,
-    // });
+
   }
 
-  // addRow(data) {
-  //   this.rows.push(this.rows.length);
-  //   console.log("addRow", this.tableData);
-  //   this.tableData[data].push(new Array(this.cols.length).fill("I"));
-  //   console.log("addRow", this.tableData);
-  //   this.saveTableData();
-  // }
-
-  // addColumn(data) {
-  //   this.cols.push(this.cols.length);
-  //   console.log("addColumn", this.tableData);
-  //   this.tableData[data].forEach((row) => row.push("I"));
-  //   console.log("addColumn", this.tableData);
-  //   this.saveTableData();
-  // }
   optionChanged(nodeName, rowIndex, colIndex) {
     if (
       this.tableData[nodeName].data[rowIndex][colIndex].value == "RX" ||
@@ -125,12 +104,7 @@ export class OptimizationComponent implements OnInit, AfterViewInit {
         this.tableData[nodeName].data[rowIndex][colIndex].params.phi;
       this.params.value.theta =
         this.tableData[nodeName].data[rowIndex][colIndex].params.theta;
-      // this.params.value.variable.value =
-      // this.tableData[nodeName].data[rowIndex][colIndex].params.variable;
       this.params.visible = true;
-      // this.selectedCell.nodeName = nodeName;
-      // this.selectedCell.rowIndex = rowIndex;
-      // this.selectedCell.colIndex = colIndex;
       this.selectedCell = { nodeName, rowIndex, colIndex };
     }
     this.gatesParams =
@@ -192,55 +166,23 @@ export class OptimizationComponent implements OnInit, AfterViewInit {
   }
   sendRequest() {
     const generatedCircuitData = this.generateRequestForCircuit(this.tableData);
-
+    this.apiService.optimization(this.optimizationAlgos.value, generatedCircuitData).subscribe({
+      next: (res) => {
+        console.log(res)
+      }, error: (error) => {
+        console.error(error)
+      }, complete: () => {
+        console.log("Completed!!")
+      }
+    })
     this.spinner = true;
-
     this.requestData.req["circuit"] = generatedCircuitData;
-
     this.generatedImage.presence = true;
-
     setTimeout(() => {
       this.spinner = false;
     }, 3000);
 
-    // this.apiService
-    //   .advancedRunApplication(this.requestData.req, this.requestData.url)
-    //   .subscribe({
-    //     next: (response) => {
-    //       this.con.setResult(response);
 
-    //       if (response.application.Err_msg) { 
-    //         alert(`Error has occurred!! ${response.application.Err_msg}`);
-    //       }
-    //     },
-    //     error: (error) => {
-    //       console.error(`Error: ${error}`);
-    //       // this.spinner = false;
-    //       alert(
-    //         `Error has occurred! Status Code:${error.status} Status Text:${error.statusText}`
-    //       );
-    //     },
-    //     complete: () => {
-    //       // this.spinner = false;
-    //       // sessionStorage.setItem("saved_model", this.myDiagram.model);
-    //       // this._route.navigate(["/results"]);
-    //     },
-    //   });
-  }
-
-  // updateActive(event) {
-  //   // console.log(event);
-  //   this.tabActiveIndex = event.index;
-
-  //   // this.saveTableData();
-  //   console.log();
-  //   this.tableData = this.currentValue[this.tabOptions[event.index].label];
-  //   console.log(this.options, this.currentValue, this.rows, this.cols);
-  //   // this.tableData = this.service.tableDataSubject.getValue()[this.tabOptions[event.index]];
-  // }
-
-  ngOnDestroy(): void {
-    // this.subscription.unsubscribe();
   }
 
   generateRequestForCircuit(inputData) {
