@@ -53,6 +53,10 @@ import { StepsModule } from "primeng/steps";
 import { TabMenuModule } from "primeng/tabmenu";
 import { OptimizationComponent } from './components/optimization/optimization.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { OptimizationResultsComponent } from './components/optimization-results/optimization-results.component';
+import { OptimizationService } from "./services/optimization.service";
+import { NgApexchartsModule } from 'ng-apexcharts'
+// import { OptimizationResultsComponent } from './optimization-results/optimization-results.component';
 // import { AccordionModule } from "primeng/accordion";
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
@@ -65,8 +69,11 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     CtrlClickDirective,
     QuantumCircuitComponent,
     OptimizationComponent,
+    OptimizationResultsComponent,
+
   ],
   imports: [
+    NgApexchartsModule,
     CheckboxModule,
     TabMenuModule,
     StepsModule,
@@ -121,6 +128,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     ApiServiceService,
     TopologyLoaderService,
     QuantumcircuitService,
+    OptimizationService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     {
       provide: MONACO_PATH,
@@ -129,4 +137,4 @@ import { ServiceWorkerModule } from '@angular/service-worker';
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

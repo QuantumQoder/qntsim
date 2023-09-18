@@ -1,21 +1,30 @@
 <div class="container container-xl bg-white p-5">
-  <p-dialog
-    header="Add Parameters"
-    [(visible)]="params.visible"
-    [modal]="true"
-    (onHide)="saveParams()"
-  >
+  <p-dialog header="Optimizable Circuits" [modal]="true" [(visible)]="optimizationParams.visible"
+    (onHide)="optimizationParams.visible = false" [style]="{ width: '30vw' }">
+    <div class=" d-flex flex-column mx-auto gap-3 my-2" *ngIf="optimizationAlgos.value === 'QAOA'">
+      <label for="numOfLayers" class="form-label">Number of Repetitions
+        <!-- {{optimizationParams.params.numOfLayers}} -->
+      </label>
+      <input type="number" class="form-control" [(ngModel)]="optimizationParams.params.numOfLayers"
+        oninput="this.value = Math.abs(this.value)" />
+    </div>
+    <div class=" d-flex flex-column mx-auto gap-3 my-2">
+      <label for="numOfLayers" class="form-label">Select Optimizer</label>
+      <select class="form-select" [(ngModel)]="optimizer.value">
+        <option *ngFor="let data of optimizer.options" [value]="data.header">{{data.header}}</option>
+      </select>
+
+    </div>
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-primary" (click)="sendRequest()">Save</button>
+    </div>
+  </p-dialog>
+  <p-dialog header="Add Parameters" [(visible)]="params.visible" [modal]="true" (onHide)="saveParams()">
     <div class="container">
       <div class="d-flex flex-column gap-3 col-8 mx-auto">
         <div class="d-flex flex-column gap-3">
-          <label class="form-label"
-            >&Theta;({{ params.value.theta.value }}degrees)</label
-          >
-          <p-slider
-            [(ngModel)]="params.value.theta.value"
-            [min]="0"
-            [max]="360"
-          ></p-slider>
+          <label class="form-label">&Theta;({{ params.value.theta.value }}degrees)</label>
+          <p-slider [(ngModel)]="params.value.theta.value" [min]="0" [max]="360"></p-slider>
 
           <div>
             <div class="d-flex align-items-end">
@@ -24,26 +33,15 @@
             [binary]="true"
             inputId="binary"
           ></p-checkbox> -->
-              <input
-                class="form-check-input"
-                [(ngModel)]="params.value.theta.variable"
-                type="checkbox"
-                value=""
-                id="binary"
-              />
+              <input class="form-check-input" [(ngModel)]="params.value.theta.variable" type="checkbox" value=""
+                id="binary" />
               <label for="binary" class="mx-2">Variable Optimization</label>
             </div>
           </div>
         </div>
         <div class="d-flex flex-column gap-3" *ngIf="gatesParams">
-          <label class="form-label"
-            >&Phi;({{ params.value.phi.value }}degrees)</label
-          >
-          <p-slider
-            [(ngModel)]="params.value.phi.value"
-            [min]="0"
-            [max]="360"
-          ></p-slider>
+          <label class="form-label">&Phi;({{ params.value.phi.value }}degrees)</label>
+          <p-slider [(ngModel)]="params.value.phi.value" [min]="0" [max]="360"></p-slider>
           <div>
             <div class="d-flex align-items-end">
               <!-- <p-checkbox
@@ -51,26 +49,15 @@
             [binary]="true"
             inputId="binary"
           ></p-checkbox> -->
-              <input
-                class="form-check-input"
-                [(ngModel)]="params.value.phi.variable"
-                type="checkbox"
-                value=""
-                id="binary"
-              />
+              <input class="form-check-input" [(ngModel)]="params.value.phi.variable" type="checkbox" value=""
+                id="binary" />
               <label for="binary" class="mx-2">Variable Optimization</label>
             </div>
           </div>
         </div>
         <div class="d-flex flex-column gap-3" *ngIf="gatesParams">
-          <label class="form-label"
-            >&Lambda;({{ params.value.lambda.value }}degrees)</label
-          >
-          <p-slider
-            [(ngModel)]="params.value.lambda.value"
-            [min]="0"
-            [max]="360"
-          ></p-slider>
+          <label class="form-label">&Lambda;({{ params.value.lambda.value }}degrees)</label>
+          <p-slider [(ngModel)]="params.value.lambda.value" [min]="0" [max]="360"></p-slider>
           <div>
             <div class="d-flex align-items-end">
               <!-- <p-checkbox
@@ -78,13 +65,8 @@
             [binary]="true"
             inputId="binary"
           ></p-checkbox> -->
-              <input
-                class="form-check-input"
-                [(ngModel)]="params.value.lambda.variable"
-                type="checkbox"
-                value=""
-                id="binary"
-              />
+              <input class="form-check-input" [(ngModel)]="params.value.lambda.variable" type="checkbox" value=""
+                id="binary" />
               <label for="binary" class="mx-2">Variable Optimization</label>
             </div>
           </div>
@@ -119,29 +101,18 @@
   ></p-tabMenu> -->
 
   <p-accordion [activeIndex]="0">
-    <p-accordionTab
-      *ngFor="let data of optimizationAlgos.options"
-      [header]="data"
-    >
-      <div
-        class="col-10 mx-auto d-flex justify-content-center m-4 overflow-auto"
-      >
+    <p-accordionTab *ngFor="let data of optimizationAlgos.options" [header]="data.header">
+      <div class="col-10 mx-auto d-flex justify-content-center m-4 overflow-auto">
         <table class="table table-bordered bg-white rounded">
           <tbody>
-            <tr *ngFor="let i of tableData[data].rows; let rowIndex = index">
+            <tr *ngFor="let i of tableData[data.value].rows; let rowIndex = index">
               <td class="d-flex justify-content-center align-items-center">
                 q[{{ rowIndex }}]
               </td>
-              <td *ngFor="let j of tableData[data].cols; let colIndex = index">
-                <select
-                  class="form-select"
-                  [(ngModel)]="tableData[data].data[rowIndex][colIndex].value"
-                  (change)="optionChanged(data, rowIndex, colIndex)"
-                >
-                  <option
-                    *ngFor="let option of options"
-                    [value]="option.gate_name"
-                  >
+              <td *ngFor="let j of tableData[data.value].cols; let colIndex = index">
+                <select class="form-select" [(ngModel)]="tableData[data.value].data[rowIndex][colIndex].value"
+                  (change)="optionChanged(data.value, rowIndex, colIndex)">
+                  <option *ngFor="let option of options" [value]="option.gate_name">
                     {{ option.gate_name }}
                   </option>
                 </select>
@@ -151,10 +122,10 @@
         </table>
       </div>
       <div class="d-flex justify-content-center">
-        <button class="btn btn-primary mx-2" (click)="addColumn(data)">
+        <button class="btn btn-primary mx-2" (click)="addColumn(data.value)">
           Add Layer
         </button>
-        <button class="btn btn-primary mx-2" (click)="addRow(data)">
+        <button class="btn btn-primary mx-2" (click)="addRow(data.value)">
           Add Qubit
         </button>
         <!-- <button class="btn btn-primary mx-2" (click)="saveTableData()">
@@ -164,11 +135,11 @@
     </p-accordionTab>
   </p-accordion>
   <div class="d-flex justify-content-center">
-    <button class="btn btn-primary" (click)="sendRequest()">
+    <button class="btn btn-primary" (click)="optimizationParams.visible = true">
       <div *ngIf="spinner" class="spinner-border text-light" role="status">
         <span class="sr-only">Loading...</span>
       </div>
-      <span *ngIf="!spinner"> Generate Circuit </span>
+      <span *ngIf="!spinner"> Optimize </span>
     </button>
   </div>
 </div>

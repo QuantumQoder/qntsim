@@ -6,6 +6,7 @@ import { BehaviorSubject } from "rxjs/internal/BehaviorSubject";
     providedIn: 'root'
 })
 export class DiagramStorageService {
+
     private minimalformData = new BehaviorSubject<any>(null);
     currentMinimalFormData = this.minimalformData.asObservable();
 

@@ -5,6 +5,7 @@ import { ResultsComponent } from "./components/results/results.component";
 
 import { QuantumCircuitComponent } from "./components/quantum-circuit/quantum-circuit.component";
 import { OptimizationComponent } from "./components/optimization/optimization.component";
+import { OptimizationResultsComponent } from "./components/optimization-results/optimization-results.component";
 
 const routes: Routes = [
   { path: "", component: HomePageComponent, title: "QNTSIM" },
@@ -45,10 +46,15 @@ const routes: Routes = [
     path: "circuit",
     component: QuantumCircuitComponent,
     title: "Quantum Circuit",
-  },{
+  }, {
     path: "optimization",
     component: OptimizationComponent,
     title: "Optimization"
+  },
+  {
+    path: 'optimization-results',
+    component: OptimizationResultsComponent,
+    title: "Optimization Results",
   },
   { path: "**", redirectTo: "" },
 ];
@@ -57,4 +63,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

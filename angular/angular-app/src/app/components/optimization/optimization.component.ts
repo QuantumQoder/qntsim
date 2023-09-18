@@ -1,6 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { ApiServiceService } from "src/app/services/api-service.service";
 import { QuantumcircuitService } from "../quantum-circuit/quantumcircuit.service";
+import { Router } from "@angular/router";
+import { OptimizationService } from "src/app/services/optimization.service";
 
 @Component({
   selector: "app-optimization",
@@ -23,10 +25,33 @@ export class OptimizationComponent implements OnInit {
       // variable: false,
     },
   };
+  optimizationParams = {
+    visible: false,
+    params: {
+      numOfLayers: 2
+    }
+  }
   optimizationAlgos = {
     value: "",
     options: [],
   };
+  optimizer = {
+    value: "COBYLA",
+    options: [{
+      header: "Nelder-Mead", description: ""
+    }, {
+      header: "Powell", description: ""
+    }, {
+      header: "CG", description: ""
+    }, {
+      header: "BFGS", description: ""
+    }, {
+      header: "L-BFGS-B", description: ""
+    }, {
+      header: "COBYLA", description: ""
+    },
+    { header: "SLSQP", description: "" }]
+  }
   selectedCell = {
     nodeName: "",
     rowIndex: "",
@@ -48,7 +73,9 @@ export class OptimizationComponent implements OnInit {
 
   constructor(
     private service: QuantumcircuitService,
-    private apiService: ApiServiceService
+    private apiService: ApiServiceService,
+    private router: Router,
+    private optimizerService: OptimizationService
   ) { }
 
 
@@ -63,7 +90,7 @@ export class OptimizationComponent implements OnInit {
     );
     console.log(this.optimizationAlgos);
     for (let node of this.optimizationAlgos.options) {
-      this.tableData[node] = {
+      this.tableData[node.value] = {
         data: Array.from({ length: this.rows.length }, () =>
           Array(this.cols.length).fill({
             value: "I",
@@ -77,7 +104,7 @@ export class OptimizationComponent implements OnInit {
         rows: [...this.rows],
         cols: [...this.cols],
       };
-      this.tableData[node] = JSON.parse(JSON.stringify(this.tableData[node]));
+      this.tableData[node.value] = JSON.parse(JSON.stringify(this.tableData[node.value]));
     }
     console.log(this.tableData);
   }
@@ -88,7 +115,6 @@ export class OptimizationComponent implements OnInit {
       // this.tabOptions[this.tabActiveIndex].label,
       JSON.stringify(this.tableData)
     );
-
   }
 
   optionChanged(nodeName, rowIndex, colIndex) {
@@ -164,15 +190,25 @@ export class OptimizationComponent implements OnInit {
     this.gatesParams = false;
     console.log(JSON.stringify(this.tableData));
   }
+
+  addParams() {
+    this.optimizationParams.visible = true;
+
+  }
   sendRequest() {
     const generatedCircuitData = this.generateRequestForCircuit(this.tableData);
-    this.apiService.optimization(this.optimizationAlgos.value, generatedCircuitData).subscribe({
+    const requestPayload = { ...generatedCircuitData }
+    requestPayload["optimizer_details"] = { optimizer: this.optimizer.value }
+    requestPayload["num_layers"] = this.optimizationParams.params.numOfLayers
+    this.apiService.optimization(this.optimizationAlgos.value, requestPayload).subscribe({
       next: (res) => {
         console.log(res)
+        this.optimizerService.setResults(res)
       }, error: (error) => {
         console.error(error)
       }, complete: () => {
-        console.log("Completed!!")
+        console.log("Completed!!");
+        this.router.navigate(['optimization-results'])
       }
     })
     this.spinner = true;
@@ -181,8 +217,7 @@ export class OptimizationComponent implements OnInit {
     setTimeout(() => {
       this.spinner = false;
     }, 3000);
-
-
+    this.optimizationParams.visible = false
   }
 
   generateRequestForCircuit(inputData) {

@@ -48,6 +48,7 @@
     "material-icons": "^1.12.0",
     "monaco-editor": "^0.39.0",
     "monaco-editor-loader": "^0.0.1-security",
+    "ng-apexcharts": "^1.8.0",
     "ng-katex": "^2.0.3",
     "ngx-ace-editor-wrapper": "^9.1.12",
     "ngx-cookie-service": "^15.0.0",

@@ -10,7 +10,7 @@ import {
 } from "@angular/core";
 import { FormBuilder, FormControl, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
-import { Subscription, map } from "rxjs";
+import { Subscription } from "rxjs";
 import { environment } from "src/environments/environment";
 
 import { ConfirmationService, MessageService } from "primeng/api";
@@ -159,7 +159,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     private diagramBuilder: DiagramBuilderService,
     private topologyLoader: TopologyLoaderService,
     private circuitService: QuantumcircuitService
-  ) {}
+  ) { }
   ngOnDestroy(): void {
     this.diagramStorage.setAppSettingsFormDataAdvanced({
       app_id: this.app_id,
@@ -263,8 +263,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         this.endNodes.length > 2
           ? this.endNodes[2].Name
           : this.endNodes.length == 2
-          ? this.endNodes[1].Name
-          : this.endNodes[0].Name;
+            ? this.endNodes[1].Name
+            : this.endNodes[0].Name;
     }
     if (this.serviceNodes.length != 0)
       this.nodesSelection.middleNode =
@@ -280,15 +280,15 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     this.simulator.options =
       this.app == 2
         ? [
-            { header: "Version 1", value: "version1" },
-            { header: "Version 2", value: "version2" },
-          ]
+          { header: "Version 1", value: "version1" },
+          { header: "Version 2", value: "version2" },
+        ]
         : [
-            {
-              header: "Version 1",
-              value: "version1",
-            },
-          ];
+          {
+            header: "Version 1",
+            value: "version1",
+          },
+        ];
     this.debugOptions.moduleOptions = [
       {
         name: "NETWORK",
@@ -335,6 +335,11 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     );
+    this.apiService.accessToken({ username: "admin", password: "qwerty" }).subscribe(
+      (res: any) => {
+        localStorage.setItem("access", res.access);
+      }
+    )
   }
   changeApp() {
     localStorage.setItem("app_id", this.app);
@@ -342,15 +347,15 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     this.simulator.options =
       this.app == 2
         ? [
-            { header: "Version 1", value: "version1" },
-            { header: "Version 2", value: "version2" },
-          ]
+          { header: "Version 1", value: "version1" },
+          { header: "Version 2", value: "version2" },
+        ]
         : [
-            {
-              header: "Version 1",
-              value: "version1",
-            },
-          ];
+          {
+            header: "Version 1",
+            value: "version1",
+          },
+        ];
   }
   routeTo() {
     this._route.navigate(["/minimal"]);
@@ -524,8 +529,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       this.app_id != 2
         ? environment.apiUrl
         : this.simulator.value == "version1"
-        ? environment.apiUrl
-        : environment.apiUrlNew;
+          ? environment.apiUrl
+          : environment.apiUrlNew;
     if (this.app_id == 11) {
       this.apiService.setRequest({ url, req });
       // const routePage =
@@ -600,8 +605,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     const linkKey =
       this.myDiagram.model.linkDataArray.length > 0
         ? this.myDiagram.model.linkDataArray[
-            this.myDiagram.model.linkDataArray.length - 1
-          ].key
+          this.myDiagram.model.linkDataArray.length - 1
+        ].key
         : 0;
     const newNode = this.diagramBuilder.addNewNode(nodetype, newKey);
     const newLink = this.diagramBuilder.addNewLink(
@@ -1154,8 +1159,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
               tb.text.toLowerCase() == "service"
                 ? "lightsalmon"
                 : tb.text.toLowerCase() === "end"
-                ? "lightblue"
-                : "";
+                  ? "lightblue"
+                  : "";
 
             this.myDiagram.model.setDataProperty(nodeData, "color", color);
             // this.myDiagram.model.setDataProperty(nodeData, "color", color);

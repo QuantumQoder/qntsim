@@ -5,7 +5,7 @@ import { Observable, Subject } from "rxjs";
 
 @Injectable({ providedIn: "root" })
 export class TopologyLoaderService {
-  constructor() {}
+  constructor() { }
   topology: Subject<any> = new Subject<any>();
   updateTopology(data: any) {
     this.topology.next(data);
@@ -797,7 +797,7 @@ export class TopologyLoaderService {
       } else if (nodesSelection.receiver == "") {
         alert("Please select a receiver.");
         return false;
-      } else if (nodesSelection.sender == nodesSelection.receiver) {
+      } else if (nodesSelection.sender == nodesSelection.receiver && app_id != 11) {
         alert("Sender and Receiver cannot be same node");
         return false;
       }
@@ -838,7 +838,7 @@ export class TopologyLoaderService {
       if (!((myDiagram.nodeDataArray[i] as any).key in nodesData)) {
         alert(
           "Please configure the node named:" +
-            (myDiagram.nodeDataArray[i] as any).text
+          (myDiagram.nodeDataArray[i] as any).text
         );
         return false;
       }

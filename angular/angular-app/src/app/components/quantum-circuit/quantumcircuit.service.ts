@@ -6,7 +6,7 @@ import { environment } from "src/environments/environment";
   providedIn: "root",
 })
 export class QuantumcircuitService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getGates() {
     return this.http.get(environment.apiUrl + "/quantum_gates");
@@ -97,13 +97,48 @@ export class QuantumcircuitService {
   }
 
   circuitsForOptimization = {
-    QAOA: [
-      "Initialization Circuit",
-      "Cost Circuit",
-      "Mixer Circuit",
-      "Expectation Circuit",
+    "QAOA": [
+      {
+        "header": "Initialization Circuit",
+        "value": "initialization"
+      },
+      {
+        "header": "Cost Circuit",
+        "value": "cost"
+      },
+      {
+        "header": "Mixer Circuit",
+        "value": "mixer"
+      },
+      {
+        "header": "Expectation Circuit",
+        "value": "expectation"
+      }
     ],
-    VQE: ["Initialization Circuit", "Ansatz Circuit", "Expectation Circuit"],
-    VQC: ["Feature Map Circuit", "Ansatz Circuit"],
-  };
+    "VQE": [
+      // {
+      //   "header": "Initialization Circuit",
+      //   "value": "initialization"
+      // },
+      {
+        "header": "Ansatz Circuit",
+        "value": "ansatz"
+      },
+      {
+        "header": "Expectation Circuit",
+        "value": "expectation"
+      }
+    ],
+    "VQC": [
+      {
+        "header": "Feature Map Circuit",
+        "value": "feature_map"
+      },
+      {
+        "header": "Ansatz Circuit",
+        "value": "ansatz"
+      }
+    ]
+  }
+
 }
