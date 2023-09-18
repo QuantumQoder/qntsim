@@ -55,7 +55,8 @@ import { OptimizationComponent } from './components/optimization/optimization.co
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { OptimizationResultsComponent } from './components/optimization-results/optimization-results.component';
 import { OptimizationService } from "./services/optimization.service";
-import { NgApexchartsModule } from 'ng-apexcharts'
+import { NgApexchartsModule } from 'ng-apexcharts';
+import { NetworkComponent } from './components/network/network.component'
 // import { OptimizationResultsComponent } from './optimization-results/optimization-results.component';
 // import { AccordionModule } from "primeng/accordion";
 @NgModule({
@@ -70,6 +71,7 @@ import { NgApexchartsModule } from 'ng-apexcharts'
     QuantumCircuitComponent,
     OptimizationComponent,
     OptimizationResultsComponent,
+    NetworkComponent,
 
   ],
   imports: [
