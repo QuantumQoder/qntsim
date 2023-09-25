@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from ..components.photon import Photon
     from ..message import Message
 
-from ..kernel._event import Event
+from ..kernel.event import Event
 from ..kernel.entity import Entity
 
 

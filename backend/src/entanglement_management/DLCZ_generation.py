@@ -17,8 +17,8 @@ if TYPE_CHECKING:
 
 from .entanglement_protocol import EntanglementProtocol
 from ..message import Message
-from ..kernel._event import Event
-from ..components.circuit import BaseCircuit
+from ..kernel.event import Event
+from ..kernel.circuit import BaseCircuit
 from ..utils import log
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 

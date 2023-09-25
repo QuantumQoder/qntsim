@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 from ..message import Message
 from .entanglement_protocol import EntanglementProtocol
 from ..utils import log
-from ..components.circuit import BaseCircuit
+from ..kernel.circuit import BaseCircuit
 from ..topology.message_queue_handler import ManagerType, ProtocolType, MsgRecieverType
 
 class SwappingMsgType(Enum):

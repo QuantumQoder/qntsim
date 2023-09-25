@@ -4,23 +4,23 @@ This module defines the Timeline class, which provides an interface for the simu
 All entities are required to have an attached timeline for simulation.
 """
 
+import logging
 from _thread import start_new_thread
 from math import inf
 from sys import stdout
-from time import time_ns, sleep
+from time import sleep, time_ns
 from typing import TYPE_CHECKING
 
 from numpy import random
 from sympy import false
 
-if TYPE_CHECKING:
-    from ._event import Event
-
-from .kernel_utils import EventList
 from ..utils import log
+from .kernel_utils import EventList
 from .quantum_kernel import QuantumKernel
 from .quantum_manager import QuantumManagerDensity
-import logging
+
+if TYPE_CHECKING:
+    from .event import Event
 # logger = logging.getLogger("main_logger." + "timeline")
 
 """

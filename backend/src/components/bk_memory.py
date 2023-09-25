@@ -19,9 +19,9 @@ if TYPE_CHECKING:
     from ..topology.node import QuantumRouter
 
 from .photon import Photon
-from .circuit import BaseCircuit
+from ..kernel.circuit import BaseCircuit
 from ..kernel.entity import Entity
-from ..kernel._event import Event
+from ..kernel.event import Event
 from ..utils.encoding import single_atom
 from ..utils.quantum_state import QuantumState
 

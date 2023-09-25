@@ -1,19 +1,21 @@
+import itertools
+import json
+import logging
+import math
+from enum import Enum, auto
 from typing import TYPE_CHECKING, List
 
+import networkx as nx
 from pyparsing import Path
 
-if TYPE_CHECKING:
-    from ..topology.node import QuantumRouter,Node
-
-from enum import Enum, auto
-
 #from ..network_management.network_manager import NetworkManagerMessage
-import networkx as nx
-
-from ..kernel._event import Event
+from ..kernel.event import Event
 from ..kernel.timeline import Timeline
 from ..message import Message
 from ..resource_management.rule_manager import Rule
+
+if TYPE_CHECKING:
+    from ..topology.node import Node, QuantumRouter
 
 if Timeline.DLCZ:
     from ..entanglement_management.DLCZ_generation import \
@@ -25,11 +27,6 @@ elif Timeline.bk:
     from ..entanglement_management.bk_generation import EntanglementGenerationA
     from ..entanglement_management.bk_purification import BBPSSW
     from ..entanglement_management.bk_swapping import EntanglementSwappingA, EntanglementSwappingB
-
-import itertools
-import json
-import logging
-import math
 
 from ..resource_management.memory_manager import MemoryInfo, MemoryManager
 from ..resource_management.task_manager import SubTask, Task, TaskManager

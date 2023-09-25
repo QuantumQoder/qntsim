@@ -6,7 +6,7 @@ EventList is implemented as a min heap ordered by simulation time.
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ._event import Event
+    from .event import Event
 
 from fibheap import *
 

@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 from ..components.beam_splitter import BeamSplitter
 from ..components.interferometer import Interferometer
 from ..components.switch import Switch
-from ..kernel._event import Event
+from ..kernel.event import Event
 from ..kernel.entity import Entity
 from ..utils.encoding import time_bin
 
