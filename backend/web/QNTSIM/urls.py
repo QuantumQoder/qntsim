@@ -36,7 +36,7 @@ urlpatterns = [
     # path('logs/', log_view, name='logs')
     # path('quantum_circuit/',QuantumCircuitExecuter.as_view()),
     path('quantum_gates/',csrf_exempt(AddGate.as_view())),
-    path("circuit",Circuit.as_view())
+    path('circuit/', Circuit.as_view())
     # path('circuits/',AddCircuit.as_view()),
     # path('',)
 ]
