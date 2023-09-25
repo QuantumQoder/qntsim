@@ -7,7 +7,7 @@ _1qubit_gates = ['id', 'x', 'h', 'y', 'z', 's', 't', 'tdg', 'ry', 'rx', 'rz']
 _2qubit_gates = ['cx', 'swap']
 _3qubit_gates = ['ccx']
 
-class noise_model:
+class NoiseModel:
 
     def __init__(self) -> None:
         
