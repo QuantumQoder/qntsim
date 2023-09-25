@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
-import { ApiServiceService } from "src/app/services/api-service.service";
-import { QuantumcircuitService } from "../quantum-circuit/quantumcircuit.service";
 import { Router } from "@angular/router";
+import { ApiServiceService } from "src/app/services/api-service.service";
 import { OptimizationService } from "src/app/services/optimization.service";
+import { QuantumcircuitService } from "src/app/services/quantumcircuit.service";
 
 @Component({
   selector: "app-optimization",
