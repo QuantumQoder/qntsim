@@ -38,7 +38,7 @@ export class ApiServiceService {
     return this._http.post(apiUrl + "run/", data);
   }
   optimization(algorithm, data) {
-    return this._http.post(`http://192.168.0.52:8000/optimization/${algorithm.toLowerCase()}/`, data)
+    return this._http.post(`http://192.168.0.52:8001/optimization/${algorithm.toLowerCase()}/`, data)
   }
   advancedRunApplication(data: any, apiUrl: string): Observable<any> {
     const token = localStorage.getItem("access");
