@@ -4,7 +4,7 @@ Topology instances automatically perform many useful network functions.
 """
 
 from itertools import combinations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, Union
 
 import json5
 
@@ -47,7 +47,7 @@ class Topology():
 
         self.name = name
         self.timeline = timeline
-        self.nodes = {}           # internal node dictionary {node_name : node}
+        self.nodes: Dict[str, Union["EndNode", "ServiceNode"]] = {}           # internal node dictionary {node_name : node}
         self.qchannels = []       # list of quantum channels
         self.cchannels = []       # list of classical channels
         
