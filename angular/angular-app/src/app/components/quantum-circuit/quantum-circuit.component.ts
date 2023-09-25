@@ -1,14 +1,15 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
 import { ApiServiceService } from "src/app/services/api-service.service";
-import { QuantumcircuitService } from "./quantumcircuit.service";
+import { CircuitResultsService } from "src/app/services/circuitresults.service";
+import { QuantumcircuitService } from "src/app/services/quantumcircuit.service";
 @Component({
   selector: "app-quantum-circuit",
   templateUrl: "./quantum-circuit.component.html",
   styleUrls: ["./quantum-circuit.component.less"],
 })
 export class QuantumCircuitComponent
-  implements OnInit, OnDestroy, AfterViewInit
-{
+  implements OnInit, OnDestroy, AfterViewInit {
   gatesParams = false;
   generatedImage = {
     presence: false,
@@ -24,6 +25,12 @@ export class QuantumCircuitComponent
       // variable: false,
     },
   };
+  circuitLayers = {
+    visible: false,
+    params: {
+      numOfLayers: 2
+    }
+  }
   selectedCell = {
     nodeName: "",
     rowIndex: "",
@@ -42,11 +49,15 @@ export class QuantumCircuitComponent
   app_id: string;
   tabActiveLabel;
   spinner: boolean;
-
+  encodingOptions = [{ header: "State Encoding", value: 'state' }, { header: "Gate encoding", value: "gate" }]
+  appParams: any = {}
   constructor(
     private service: QuantumcircuitService,
-    private apiService: ApiServiceService // private con: ConditionsService, // private _route: Router // private fb: FormBuilder
-  ) {}
+    private resultService: CircuitResultsService,
+    private apiService: ApiServiceService, // private con: ConditionsService,
+    private _route: Router
+    // private fb: FormBuilder
+  ) { }
   ngAfterViewInit(): void {
     // this.params.visible = true;
   }
@@ -71,11 +82,13 @@ export class QuantumCircuitComponent
         rows: [...this.rows],
         cols: [...this.cols],
       };
+      this.appParams[node.Name] = JSON.parse(JSON.stringify({ message: "", encoding: "" }))
       this.tableData[node.Name] = JSON.parse(
         JSON.stringify(this.tableData[node.Name])
       );
     }
     console.log(this.tableData);
+    console.log(this.appParams)
   }
 
   saveTableData() {
@@ -186,7 +199,35 @@ export class QuantumCircuitComponent
   }
   sendRequest() {
     const generatedCircuitData = this.generateRequestForCircuit(this.tableData);
-
+    const topology = this.apiService.getRequest().req.topology
+    const appParams = this.appParams
+    // console.log(this.appParams)
+    const requestPayload: any = { circuit: { ...generatedCircuitData }, topology, appParams }
+    console.log("requestPayload from quantum-circuit", requestPayload)
+    this.resultService.execute(requestPayload).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.resultService.setResults(res)
+      },
+      error: function (err) {
+        console.error(err)
+      },
+      complete: () => {
+        this._route.navigate(["circuit-results"])
+      },
+    })
+    // this.apiService.execute(requestPayload).subscribe({
+    //   next: (res) => {
+    //     console.log(res)
+    //     this.resultService.setResults(res);
+    //   },
+    //   error: function (err) {
+    //     console.error(err)
+    //   },
+    //   complete: () => {
+    //     this._route.navigate(["circuit-results"])
+    //   }
+    // })
     this.spinner = true;
 
     this.requestData.req["circuit"] = generatedCircuitData;
