@@ -1,4 +1,3 @@
-import { QuantumcircuitService } from "./components/quantum-circuit/quantumcircuit.service";
 import { CommonModule } from "@angular/common";
 import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
 import {
@@ -23,40 +22,41 @@ import { SplitButtonModule } from "primeng/splitbutton";
 import { StyleClassModule } from "primeng/styleclass";
 import { TooltipModule } from "primeng/tooltip";
 import { HomePageComponent } from "src/app/components/home-page/home-page.component";
+import { ApiServiceService } from "src/app/services/api-service.service";
+import { ConditionsService } from "src/app/services/conditions.service";
 import { DiagramBuilderService } from "src/app/services/diagram-builder.service";
 import { DiagramStorageService } from "src/app/services/diagram-storage.service";
+import { HoldingDataService } from "src/app/services/holding-data.service";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { JwtInterceptor } from "./auth/jwt.interceptor";
+import { QuantumcircuitService } from "src/app/services/quantumcircuit.service";
 import { ResultsComponent } from "./components/results/results.component";
 import { CtrlClickDirective } from "./directives/ctrl-click";
 import { FooterComponent } from "./utilities/footer/footer.component";
 import { NavbarComponent } from "./utilities/navbar/navbar.component";
-import { ConditionsService } from "src/app/services/conditions.service";
-import { HoldingDataService } from "src/app/services/holding-data.service";
-import { ApiServiceService } from "src/app/services/api-service.service";
 
 // import { MonacoEditorModule } from 'ngx-monaco-editor';
-import { MonacoEditorModule, MONACO_PATH } from "@materia-ui/ngx-monaco-editor";
+import { MONACO_PATH, MonacoEditorModule } from "@materia-ui/ngx-monaco-editor";
 import { StoreModule } from "@ngrx/store";
 import { minimalReducer } from "./store/minimal.reducer";
 // import { StoreDevtoolsModule } from "@ngrx/store-devtools";
-import { TopologyLoaderService } from "./services/loadTopology.service";
-import { CheckboxModule } from "primeng/checkbox";
-import { InputTextModule } from "primeng/inputtext";
-import { DialogModule } from "primeng/dialog";
-import { MultiSelectModule } from "primeng/multiselect";
-import { DropdownModule } from "primeng/dropdown";
-import { QuantumCircuitComponent } from "./components/quantum-circuit/quantum-circuit.component";
-import { TableModule } from "primeng/table";
-import { StepsModule } from "primeng/steps";
-import { TabMenuModule } from "primeng/tabmenu";
-import { OptimizationComponent } from './components/optimization/optimization.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
-import { OptimizationResultsComponent } from './components/optimization-results/optimization-results.component';
-import { OptimizationService } from "./services/optimization.service";
 import { NgApexchartsModule } from 'ng-apexcharts';
-import { NetworkComponent } from './components/network/network.component'
+import { CheckboxModule } from "primeng/checkbox";
+import { DialogModule } from "primeng/dialog";
+import { DropdownModule } from "primeng/dropdown";
+import { InputTextModule } from "primeng/inputtext";
+import { MultiSelectModule } from "primeng/multiselect";
+import { StepsModule } from "primeng/steps";
+import { TableModule } from "primeng/table";
+import { TabMenuModule } from "primeng/tabmenu";
+import { CircuitResultsComponent } from './components/circuit-results/circuit-results.component';
+import { OptimizationResultsComponent } from './components/optimization-results/optimization-results.component';
+import { OptimizationComponent } from './components/optimization/optimization.component';
+import { QuantumCircuitComponent } from "./components/quantum-circuit/quantum-circuit.component";
+import { TopologyLoaderService } from "./services/loadTopology.service";
+import { OptimizationService } from "./services/optimization.service";
 // import { OptimizationResultsComponent } from './optimization-results/optimization-results.component';
 // import { AccordionModule } from "primeng/accordion";
 @NgModule({
@@ -71,7 +71,7 @@ import { NetworkComponent } from './components/network/network.component'
     QuantumCircuitComponent,
     OptimizationComponent,
     OptimizationResultsComponent,
-    NetworkComponent,
+    CircuitResultsComponent,
 
   ],
   imports: [
