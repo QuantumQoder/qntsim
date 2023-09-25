@@ -23,7 +23,7 @@ import { HoldingDataService } from "src/app/services/holding-data.service";
 import * as go from "gojs";
 import { DiagramBuilderService } from "src/app/services/diagram-builder.service";
 import { TopologyLoaderService } from "src/app/services/loadTopology.service";
-import { QuantumcircuitService } from "../quantum-circuit/quantumcircuit.service";
+import { QuantumcircuitService } from "src/app/services/quantumcircuit.service";
 // import { DialogService } from "primeng/dynamicdialog";
 
 @Component({
@@ -525,13 +525,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       },
     };
 
-    let url =
-      this.app_id != 2
-        ? environment.apiUrl
-        : this.simulator.value == "version1"
-          ? environment.apiUrl
-          : environment.apiUrlNew;
+    let url = this.app_id != 2 ?
+      environment.apiUrl :
+      this.simulator.value == "version1" ?
+        environment.apiUrl :
+        environment.apiUrlNew;
     if (this.app_id == 11) {
+      console.log({ url, req })
       this.apiService.setRequest({ url, req });
       // const routePage =
       //   this.newApplication.value == "Optimization"
@@ -542,19 +542,19 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.newApplication.value == "Optimization") {
         this.optimizationAlgo.visible = true;
       } else if (this.newApplication.value == "Network") {
-        this._route.navigate(["network"]);
+        this._route.navigate(["circuit"]);
       }
       // console.log("Route:", routePage);
       return;
     }
-
+    console.log("beofre api req:", { url, req })
     this.apiService.advancedRunApplication(req, url).subscribe({
       next: (response) => {
         this.con.setResult(response);
 
-        if (response.application.Err_msg) {
-          alert(`Error has occurred!! ${response.application.Err_msg}`);
-        }
+        // if (response.application.Err_msg) {
+        //   alert(`Error has occurred!! ${response.application.Err_msg}`);
+        // }
       },
       error: (error) => {
         console.error(`Error: ${error}`);
