@@ -66,12 +66,12 @@ class QuantumKernel():
         """
         pass
 
-    def get(self, key: int) -> "State":
+    def get(self, key: int) -> "KetState":
         """Method to get quantum state stored at an index.
         Args:
             key (int): key for quantum state.
         Returns:
-            State: quantum state at supplied key.
+            KetState: quantum state at supplied key.
         """
         return self.states[key]
 
@@ -255,7 +255,7 @@ class QuantumManagerKetQiskit(QuantumKernel):
             # Initialize the qubits with their respective state vectors
             qc.initialize(new_state, list(range(len(all_keys))))
             # qc.save_statevector()
-            # print('State vector', qc.get_statevector())
+            # print('KetState vector', qc.get_statevector())
             # Assign quantum circuits to keys.
             for key in all_keys:
                 self.states[key] = qc
@@ -413,7 +413,7 @@ class QuantumManagerKetQutip(QuantumKernel):
         
         return dict(zip(keys, result_digits))
 
-class KetState():
+class KetState:
     """Class to represent an individual quantum state as a ket vector.
     Attributes:
         state (np.array): state vector. Should be of length 2 ** len(keys).
