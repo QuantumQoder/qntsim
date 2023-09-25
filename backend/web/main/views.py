@@ -23,7 +23,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import condition
 from main.models import Applications, Results, Gates
 from main.serializers import ApplicationSerializer
-from main.simulator import topology_funcs
 from main.simulator.app.ip2 import ip2_run
 from main.simulator.app.qdsp import qdsp
 from main.simulator.topology_funcs import *
@@ -301,7 +300,9 @@ class Circuit(generics.GenericAPIView):
 
     def post(self, request):
         try:
+            print(request)
             print(request.data)
+            # custom_executor(**request.data)
 
             return JsonResponse({"status":"success"})
         except Exception as e:
