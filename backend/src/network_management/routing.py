@@ -5,26 +5,25 @@ Routing tables may be created manually, or generated and installed automatically
 Also included is the message type used by the routing protocol.
 """
 
-from enum import Enum,auto
+import json
+import math
+from enum import Enum, auto
 from platform import node
-from typing import Dict, TYPE_CHECKING
-if TYPE_CHECKING:
-    from ..topology.node import Node 
-    from ..topology.topology import Topology
-    from ..kernel._event import Event
-    
-
+from typing import TYPE_CHECKING, Dict
 
 import matplotlib.pyplot as plt
 import networkx as nx
+
 from ..message import Message
 from ..protocol import StackProtocol
-from .reservation import RSVPMsgType,ResourceReservationMessage
-import json
-import math
-from ..kernel._event import Event
+from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
+                                              ProtocolType)
+from .reservation import ResourceReservationMessage, RSVPMsgType
 
-from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
+if TYPE_CHECKING:
+    from ..kernel.event import Event
+    from ..topology.node import Node
+    from ..topology.topology import Topology
 
 class UpdateRoutingMessageType(Enum):
     UPDATE_ROUTING_TABLE=auto()
