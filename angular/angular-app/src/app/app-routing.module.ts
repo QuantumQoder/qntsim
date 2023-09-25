@@ -6,6 +6,7 @@ import { ResultsComponent } from "./components/results/results.component";
 import { QuantumCircuitComponent } from "./components/quantum-circuit/quantum-circuit.component";
 import { OptimizationComponent } from "./components/optimization/optimization.component";
 import { OptimizationResultsComponent } from "./components/optimization-results/optimization-results.component";
+import { CircuitResultsComponent } from "./components/circuit-results/circuit-results.component";
 
 const routes: Routes = [
   { path: "", component: HomePageComponent, title: "QNTSIM" },
@@ -55,6 +56,11 @@ const routes: Routes = [
     path: 'optimization-results',
     component: OptimizationResultsComponent,
     title: "Optimization Results",
+  },
+  {
+    path: "circuit-results",
+    component: CircuitResultsComponent,
+    title: "Circuit Results"
   },
   { path: "**", redirectTo: "" },
 ];
