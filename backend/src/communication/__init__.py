@@ -1,9 +1,9 @@
 from .attack import ATTACK_TYPE, Attack
-from .circuits import bell_type_state_analyzer
+from .analyzer_circuits import bell_type_state_analyzer
 from .error_analyzer import ErrorAnalyzer
 from .network import Network
 from .noise import ERROR_TYPE
-from .NoiseModel import noise_model
+from .noise_model import NoiseModel
 from .protocol import ProtocolPipeline
 from .security_checks import insert_check_bits, insert_decoy_photons
 from .utils import pass_, to_binary, to_string
@@ -20,6 +20,6 @@ __all__ = [
     "ERROR_TYPE",
     "ErrorAnalyzer",
     "Network",
-    "noise_model",
+    "NoiseModel",
     "ProtocolPipeline"
 ]
