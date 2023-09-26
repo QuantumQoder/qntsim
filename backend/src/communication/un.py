@@ -3,13 +3,13 @@ from collections import deque
 from functools import reduce
 from typing import Any, Callable, Dict, List, Tuple, Union
 
-from ..components.circuit import QutipCircuit
+from ..kernel.circuit import QutipCircuit
 from ..kernel.entity import Entity
 from ..kernel.timeline import Timeline
 from ..topology.node import EndNode, ServiceNode
 from ..topology.topology import Topology
-from .circuits import bell_type_state_analyzer, xor_type_state_analyzer
-from .NoiseModel import noise_model
+from .analyzer_circuits import bell_type_state_analyzer, xor_type_state_analyzer
+from .noise_model import NoiseModel
 from .utils import to_binary, to_string
 
 
@@ -91,7 +91,7 @@ class Network(Entity):
             self._request_entanglements(src_node=src_node, dst_node=dst_node, demand_size=demand_size-num_epr, start_time=self.timeline.now())
 
     def _apply_noise(self, noise:str, qtc:QutipCircuit, keys:List[int]=None):
-        model = noise_model()
+        model = NoiseModel()
         match noise:
             case "reset":
                 try:
