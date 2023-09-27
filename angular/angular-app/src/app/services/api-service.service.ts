@@ -1,9 +1,8 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { environment } from "src/environments/environment";
 import { CookieService } from "ngx-cookie-service";
-import { tap } from "rxjs";
 import { Observable, Subject } from "rxjs";
+import { environment } from "src/environments/environment";
 
 @Injectable({
   providedIn: "root",
@@ -41,12 +40,12 @@ export class ApiServiceService {
     return this._http.post(`http://192.168.0.52:8001/optimization/${algorithm.toLowerCase()}/`, data)
   }
   advancedRunApplication(data: any, apiUrl: string): Observable<any> {
-    const token = localStorage.getItem("access");
-    const headers = new HttpHeaders().set("Authorization", `Bearer ${token}`);
-    const observable = this._http.post(apiUrl + "run/", data, { headers });
+    // const token = localStorage.getItem("access");
+    // const headers = new HttpHeaders().set("Authorization", `Bearer ${token}`);
+
 
     // observable.subscribe(() => this.startStream(apiUrl));
-    return observable;
+    return this._http.post(apiUrl + "run/", data);
   }
 
   async startStream(url: string) {
@@ -101,5 +100,10 @@ export class ApiServiceService {
   }
   setRequest(data) {
     this.request = data;
+  }
+
+  execute(data) {
+    console.log(environment.apiUrl + "circuit/", data)
+    return this._http.post(environment.apiUrl + "circuit/", data)
   }
 }

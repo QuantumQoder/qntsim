@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from ..kernel._event import Event
+from ..kernel.event import Event
 
 
 class CONetR:
