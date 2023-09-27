@@ -1,5 +1,5 @@
 import numpy as np
-from qntsim.components.circuit import BaseCircuit
+from qntsim.kernel.circuit import BaseCircuit
 import math
 from qntsim.kernel.quantum_kernel import KetState
 import random
@@ -29,16 +29,15 @@ class E91():
 
     # circuit measurements
     def measurement(self,qm,choice, key):
+        BaseCircuit = BaseCircuit("Qutip")
         if choice == 1: 
-            Circuit=BaseCircuit.create("Qutip")      #X observable
-            circ=Circuit(1)
+            circ=BaseCircuit(1)
             circ.h(0)
             circ.measure(0)
             output=qm.run_circuit(circ,[key])
 
         if choice == 2:  
-            Circuit=BaseCircuit.create("Qutip")       #W observable
-            circ=Circuit(1)
+            circ=BaseCircuit(1)
             circ.s(0)
             # circ.
             circ.h(0)
@@ -48,14 +47,12 @@ class E91():
             output=qm.run_circuit(circ,[key])
 
         if choice == 3:  
-            Circuit=BaseCircuit.create("Qutip")       #Z observable
-            circ=Circuit(1)
+            circ=BaseCircuit(1)
             circ.measure(0)
             output=qm.run_circuit(circ,[key])
 
         if choice == 4: 
-            Circuit=BaseCircuit.create("Qutip")        #V observable
-            circ=Circuit(1)
+            circ=BaseCircuit(1)
             circ.s(0)
             circ.h(0)
             print(circ)

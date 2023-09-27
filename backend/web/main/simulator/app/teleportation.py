@@ -4,7 +4,7 @@ Timeline.DLCZ=False
 Timeline.bk=True
 
 from tabulate import tabulate
-from qntsim.components.circuit import Circuit,QutipCircuit
+from qntsim.kernel.circuit import BaseCircuit,QutipCircuit
 from qiskit import *
 from qutip.qip.circuit import QubitCircuit, Gate
 from qutip.qip.operations import gate_sequence_product

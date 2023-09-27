@@ -8,7 +8,7 @@ import logging
 from qiskit import *
 #from qiskit.ignis.verification import marginal_counts
 from qiskit.quantum_info import random_statevector
-from qntsim.components.circuit import QutipCircuit
+from qntsim.kernel.circuit import QutipCircuit
 from qntsim.topology.topology import Topology
 from qutip.qip.operations import gate_sequence_product
 from tabulate import tabulate

@@ -1,7 +1,7 @@
 import random
 
 import qntsim
-from qntsim.components.circuit import Circuit, QutipCircuit
+from qntsim.kernel.circuit import BaseCircuit, QutipCircuit
 from qntsim.kernel.timeline import Timeline
 
 Timeline.DLCZ=False

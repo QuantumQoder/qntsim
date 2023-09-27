@@ -9,7 +9,7 @@ from typing import Any, Dict, List
 
 from numpy import add, outer, random, zeros
 
-from ..kernel.circuit import Circuit
+from ..kernel.circuit import BaseCircuit
 from ..kernel.entity import Entity
 from ..kernel.event import Event
 from ..kernel.quantum_manager import QuantumManagerDensity, QuantumManagerKet

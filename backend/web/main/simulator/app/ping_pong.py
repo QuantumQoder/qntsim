@@ -5,9 +5,11 @@ from functools import partial
 from statistics import mean
 from typing import Any, Dict, List
 
-from qntsim.communication import (Network, ProtocolPipeline,
-                                  bell_type_state_analyzer, pass_, to_string)
-from qntsim.components.circuit import QutipCircuit
+from qntsim.communication.network import Network
+from qntsim.communication.protocol import ProtocolPipeline
+from qntsim.communication.analyzer_circuits import bell_type_state_analyzer
+from qntsim.communication.utils import pass_values, to_characters
+from qntsim.kernel.circuit import QutipCircuit
 from qntsim.topology.node import EndNode
 
 logger = logging.getLogger("main_logger.application_layer.ping_pong")

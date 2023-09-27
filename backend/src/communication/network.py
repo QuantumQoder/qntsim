@@ -14,13 +14,13 @@ from joblib import Parallel, delayed, wrap_non_picklable_objects
 from numpy.random import randint
 from pandas import DataFrame
 
-from ..components.circuit import QutipCircuit
+from ..kernel.circuit import QutipCircuit
 from ..kernel.timeline import Timeline
 from ..topology.topology import Topology
-from .circuits import bell_type_state_analyzer
+from .analyzer_circuits import bell_type_state_analyzer
 from .noise import ERROR_TYPE
-from .NoiseModel import noise_model
-from .utils import to_binary, to_string
+from .noise_model import NoiseModel
+from .utils import to_binary, to_characters
 
 Timeline.bk = True
 Timeline.DLCZ = False
@@ -461,7 +461,7 @@ class Network:
         Returns:
         - QutipCircuit: The QutipCircuit object with the specified error applied.
         """
-        model = noise_model()  # Create a new noise model
+        model = NoiseModel()  # Create a new noise model
 
         # Apply the specified error to the noise model
         match err_type:
@@ -714,7 +714,7 @@ class Network:
         else:
             self._strings = ["".join(str(*output.values()) for output in self._outputs)]
         print(self._strings)
-        self.recv_msgs = {rec[1:]:message for rec, message in zip(list(self.messages)[::-1], to_string(strings=self._strings, _was_binary=self._is_binary))}
+        self.recv_msgs = {rec[1:]:message for rec, message in zip(list(self.messages)[::-1], to_characters(strings=self._strings, _was_binary=self._is_binary))}
         for k, v in self.recv_msgs.items():
             logging.info(f"Received message {k}: {v}")
 

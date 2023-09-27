@@ -18,7 +18,7 @@ def Factory(backend_circuit ="English"):
  
     #Factory Method
     circuits = {
-        "QuTip": Circuit,
+        "QuTip": BaseCircuit,
         "Qiskit": QiskitCircuit
         #"Spanish": SpanishLocalizer,
     }
@@ -76,10 +76,10 @@ class QuantumKernel():
         return self.states[key]
 
     @abstractmethod
-    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:
+    def run_circuit(self, circuit: "BaseCircuit", keys: List[int]) -> int:
         """Method to run a circuit on a given set of quantum states.
         Args:
-            circuit (Circuit): quantum circuit to apply.
+            circuit (BaseCircuit): quantum circuit to apply.
             keys (List[int]): list of keys for quantum states to apply circuit to.
         Returns:
             Dict[int, int]: dictionary mapping qstate keys to measurement results.
@@ -89,7 +89,7 @@ class QuantumKernel():
 
 
     @abstractmethod
-    def _prepare_circuit(self, circuit: "Circuit", keys: List[int]):
+    def _prepare_circuit(self, circuit: "BaseCircuit", keys: List[int]):
         
        pass
 
@@ -134,7 +134,7 @@ class QuantumManagerKetQiskit(QuantumKernel):
         #print('new2 circ', circ,self.states[key])
         return key
 
-    def _prepare_circuit(self, circuit: "Circuit", keys: List[int]):
+    def _prepare_circuit(self, circuit: "BaseCircuit", keys: List[int]):
         
         # Create a quantum circuit with or without classical measurement registers based on number of measured qubits
         if len(circuit.measured_qubits)>0:
@@ -179,7 +179,7 @@ class QuantumManagerKetQiskit(QuantumKernel):
 
         return all_keys, circ
 
-    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:    
+    def run_circuit(self, circuit: "BaseCircuit", keys: List[int]) -> int:    
         super().run_circuit(circuit, keys)
 
         # Compile the circuit into Qiskit quanutm circuit
@@ -211,7 +211,7 @@ class QuantumManagerKetQiskit(QuantumKernel):
         SHOULD NOT be called individually; only from circuit method (unless for unit testing purposes).
         Modifies quantum state of all qubits given by all_keys.
         Args:
-            circ (QuantumCircuit): Quantum Circuit to measure.
+            circ (QuantumCircuit): Quantum BaseCircuit to measure.
             keys (List[int]): list of keys to measure.
             all_keys (List[int]): list of all keys corresponding to circ.
         Returns:
@@ -278,7 +278,7 @@ class QuantumManagerKetQutip(QuantumKernel):
         self.states[key] = KetState(amplitudes, [key])
         return key
     
-    def _prepare_circuit(self, circuit: "Circuit", keys: List[int]):
+    def _prepare_circuit(self, circuit: "BaseCircuit", keys: List[int]):
         old_states = []
         all_keys = []
 
@@ -320,7 +320,7 @@ class QuantumManagerKetQutip(QuantumKernel):
         swap_mat = gate_sequence_product(swap_circuit.propagators()).full()
         return all_keys, swap_mat
 
-    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:
+    def run_circuit(self, circuit: "BaseCircuit", keys: List[int]) -> int:
         super().run_circuit(circuit, keys)
         #print('run circuit')
         new_state, all_keys, circ_mat = self._prepare_circuit(circuit, keys)

@@ -20,7 +20,8 @@ services:
     ports:
       - '5432'
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - ${PWD}/db-data:/var/lib/postgresql/data
+      # - ./data/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -35,9 +36,10 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
     ports:
       - "5050:80"
-  # ng:
-  #   container_name: ng1
-  #   build: angular
-  #   ports:
-  #     - "80:80"
-  #   tty: true
+      
+  ng:
+    container_name: ng1
+    build: angular
+    ports:
+      - "80:80"
+    tty: true

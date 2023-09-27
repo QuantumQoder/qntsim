@@ -8,12 +8,18 @@ from typing import Any, Dict, List, Tuple
 
 from numpy import mean
 from numpy.random import randint
-from qntsim.communication import (ATTACK_TYPE, Attack, ErrorAnalyzer, Network,
-                                  bell_type_state_analyzer, insert_check_bits,
-                                  insert_decoy_photons, to_binary, to_string)
+from qntsim.communication.attack import ATTACK_TYPE, Attack
+from qntsim.communication.error_analyzer import ErrorAnalyzer
+from qntsim.communication.network import Network
+from qntsim.communication.analyzer_circuits import bell_type_state_analyzer
+from qntsim.communication.security_checks import insert_check_bits, insert_decoy_photons
+from qntsim.communication.utils import to_binary, to_characters
+
+
+
 from qntsim.communication.template import Party
-from qntsim.communication.utils import pass_
-from qntsim.components.circuit import QutipCircuit
+from qntsim.communication.utils import pass_values
+from qntsim.kernel.circuit import QutipCircuit
 
 logger = logging.getLogger("main_logger.application_layer." + "ip2")
 # from main.simulator.topology_funcs import network_graph

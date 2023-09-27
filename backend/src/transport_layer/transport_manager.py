@@ -1,19 +1,18 @@
-import qntsim
-from qntsim.kernel.timeline import Timeline
-from qntsim.kernel._event import Event
+from ..kernel.event import Event
 from enum import Enum, auto
 from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from ..topology.node import QuantumRouter,Node
 from ..kernel.timeline import Timeline
-if Timeline.DLCZ:
-    from ..components.DLCZ_memory import Memory
-elif Timeline.bk:
-    from ..components.bk_memory import Memory
 from ..message import Message
 import itertools
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 from ..network_management.request import Request 
+
+if TYPE_CHECKING:
+    from ..topology.node import QuantumRouter,Node
+if Timeline.DLCZ:
+    from ..components.DLCZ_memory import Memory
+elif Timeline.bk:
+    from ..components.bk_memory import Memory
 
  
 

@@ -623,8 +623,8 @@ class QNtSim(Timeline, Topology):
             all_results: List[Dict[int, int]] = {}
             for other_circuit in list(circuits.values())[1:]:
                 circuit = other_circuit.duplicate()
-                for sender_circuit in sender_circuits:
-                    if sender_circuit.num
+                # for sender_circuit in sender_circuits:
+                #     if sender_circuit.num
             for sender_circuit in sender_circuits:
                 if sender_circuit.num_qubits > receiver_circuit.num_qubits:
                     new_keys = [self.quantum_manager.new() for _ in range()]

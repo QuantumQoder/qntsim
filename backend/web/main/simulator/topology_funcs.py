@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Literal, Tuple, TypeAlias, Union
 
 import numpy as np
 import pandas as pd
-from qntsim.communication.interface import Interface
+# from qntsim.communication.interface import Interface
 from qntsim.communication.network import Network
 from qntsim.communication.protocol import ProtocolPipeline
 from qntsim.components.photon import Photon
@@ -56,88 +56,88 @@ print(logger.handlers)
 __local_circuit_json_type: TypeAlias = Dict[str, List[Dict[str, Union[str, Dict[str, Dict[str, Any]]]]]]
 __global_circuit_json_type: TypeAlias = Dict[str, __local_circuit_json_type]
 
-def custom_executor(appParams: Dict[str, Dict[str, str]],
-                    circuit: __global_circuit_json_type,
-                    topology: Dict[str, Union[List[Dict[str, Any]], Dict[str, Any]]]):
-    senders = [node for node, msgParams in appParams.items() if msgParams.get("message") != ""]
-    messages = {(sender, *[node for node in appParams if node != sender]): appParams.get(sender).get("message") for sender in senders}
-    interface = Interface(topology=topology, messages=messages, require_entanglement=not should_transmit(circuit))
-    quantum_circuits = {node_name: create_circuit_object(circuit=circuit) for node_name, circuit in circuit.items()}
-    node_map = {}
-    qubit_num = -1
-    for node_name, cirq in circuit.items():
-        qubits = []
-        for _ in cirq:
-            qubit_num += 1
-            qubits.append(qubit_num)
-        node_map.update({node_name: qubits})
+# def custom_executor(appParams: Dict[str, Dict[str, str]],
+#                     circuit: __global_circuit_json_type,
+#                     topology: Dict[str, Union[List[Dict[str, Any]], Dict[str, Any]]]):
+#     senders = [node for node, msgParams in appParams.items() if msgParams.get("message") != ""]
+#     messages = {(sender, *[node for node in appParams if node != sender]): appParams.get(sender).get("message") for sender in senders}
+#     interface = Interface(topology=topology, messages=messages, require_entanglement=not should_transmit(circuit))
+#     quantum_circuits = {node_name: create_circuit_object(circuit=circuit) for node_name, circuit in circuit.items()}
+#     node_map = {}
+#     qubit_num = -1
+#     for node_name, cirq in circuit.items():
+#         qubits = []
+#         for _ in cirq:
+#             qubit_num += 1
+#             qubits.append(qubit_num)
+#         node_map.update({node_name: qubits})
 
-def should_transmit(circuit_json: __global_circuit_json_type) -> bool:
-    for local_circuit in circuit_json.values():
-        for gates in local_circuit.values():
-            for gate in gates:
-                if gate.get("value") == "transmit": return True
-    return False
+# def should_transmit(circuit_json: __global_circuit_json_type) -> bool:
+#     for local_circuit in circuit_json.values():
+#         for gates in local_circuit.values():
+#             for gate in gates:
+#                 if gate.get("value") == "transmit": return True
+#     return False
 
-def generate_full_circuit(circuit_json: __global_circuit_json_type,
-                          circuit_obj_type: Literal["qiskit", "qutip"] = "qiskit") -> BaseCircuit:
-    circuit: BaseCircuit = BaseCircuit(circuit_obj_type, sum(len(cirq) for cirq in circuit_json.values()))
-    qubit_pos = -1
-    for cirq in circuit_json.values():
-        local_circuit: BaseCircuit = create_circuit_object(cirq, circuit_obj_type)
-        qubit_map: Dict[int, int] = {}
-        for i in range(local_circuit.num_qubits):
-            qubit_pos += 1
-            qubit_map.update({i: qubit_pos})
-        circuit.combine_circuit(local_circuit, qubit_map)
-    return circuit
+# def generate_full_circuit(circuit_json: __global_circuit_json_type,
+#                           circuit_obj_type: Literal["qiskit", "qutip"] = "qiskit") -> BaseCircuit:
+#     circuit: BaseCircuit = BaseCircuit(circuit_obj_type, sum(len(cirq) for cirq in circuit_json.values()))
+#     qubit_pos = -1
+#     for cirq in circuit_json.values():
+#         local_circuit: BaseCircuit = create_circuit_object(cirq, circuit_obj_type)
+#         qubit_map: Dict[int, int] = {}
+#         for i in range(local_circuit.num_qubits):
+#             qubit_pos += 1
+#             qubit_map.update({i: qubit_pos})
+#         circuit.combine_circuit(local_circuit, qubit_map)
+#     return circuit
 
-def create_circuit_object(circuit: __local_circuit_json_type,
-                          circuit_obj_type: Literal["qiskit", "qutip"] = "qiskit") -> BaseCircuit:
-    circuit: BaseCircuit = BaseCircuit(circuit_obj_type, len(circuit))
-    qubit_num = -1
-    for gates in circuit.values():
-        qubit_num += 1
-        qubits = [qubit_num]
-        for gate_index, gate in enumerate(gates):
-            angles = []
-            match gate.get("value"):
-                case "i": continue
-                case "control": gate, qubits = get_controlled_gate(circuit, gate_index)
-                case "swap": gate, qubits = get_swap_partner(circuit, qubit_num, gate_index)
-                case str() if "params" in gate: angles = [float(angle.get("value", 0)) for angle in gate.get("params", {}).values()]
-            gate = gate.get("value")
-            circuit.apply_gate(gate, qubits, angles)
-    return circuit
+# def create_circuit_object(circuit: __local_circuit_json_type,
+#                           circuit_obj_type: Literal["qiskit", "qutip"] = "qiskit") -> BaseCircuit:
+#     circuit: BaseCircuit = BaseCircuit(circuit_obj_type, len(circuit))
+#     qubit_num = -1
+#     for gates in circuit.values():
+#         qubit_num += 1
+#         qubits = [qubit_num]
+#         for gate_index, gate in enumerate(gates):
+#             angles = []
+#             match gate.get("value"):
+#                 case "i": continue
+#                 case "control": gate, qubits = get_controlled_gate(circuit, gate_index)
+#                 case "swap": gate, qubits = get_swap_partner(circuit, qubit_num, gate_index)
+#                 case str() if "params" in gate: angles = [float(angle.get("value", 0)) for angle in gate.get("params", {}).values()]
+#             gate = gate.get("value")
+#             circuit.apply_gate(gate, qubits, angles)
+#     return circuit
 
-def get_controlled_gate(circuit_json: Union[__global_circuit_json_type, __local_circuit_json_type],
-                        layer_index: int) -> Tuple[Dict[str, str], List[int]]:
-    gate_name = ""
-    qubit_pos = -1
-    qubits = []
-    for cirq in circuit_json.values():
-        for gates in cirq.values():
-            qubit_pos += 1
-            gate = gates[layer_index].get("value")
-            if gate != "i":
-                gate_name += gate[0]
-                qubits.append(qubit_pos)
-                gates[layer_index]["value"] = "i"
-    return {"value": gate_name}, qubits
+# def get_controlled_gate(circuit_json: Union[__global_circuit_json_type, __local_circuit_json_type],
+#                         layer_index: int) -> Tuple[Dict[str, str], List[int]]:
+#     gate_name = ""
+#     qubit_pos = -1
+#     qubits = []
+#     for cirq in circuit_json.values():
+#         for gates in cirq.values():
+#             qubit_pos += 1
+#             gate = gates[layer_index].get("value")
+#             if gate != "i":
+#                 gate_name += gate[0]
+#                 qubits.append(qubit_pos)
+#                 gates[layer_index]["value"] = "i"
+#     return {"value": gate_name}, qubits
 
-def get_swap_partner(circuit_json: Union[__global_circuit_json_type, __local_circuit_json_type],
-                     qubit_index: int, layer_index: int) -> Tuple[Dict[str, str], List[int]]:
-    qubit_pos = -1
-    qubits = [qubit_index]
-    for cirq in circuit_json.values():
-        for gates in cirq.values():
-            qubit_pos += 1
-            gate = gates[layer_index].get("value")
-            if gate == "swap":
-                gates[layer_index]["value"] = "i"
-                if qubit_pos not in qubits:
-                    qubits.append(qubit_pos)
-                    return {"value": "swap"}, qubits
+# def get_swap_partner(circuit_json: Union[__global_circuit_json_type, __local_circuit_json_type],
+#                      qubit_index: int, layer_index: int) -> Tuple[Dict[str, str], List[int]]:
+#     qubit_pos = -1
+#     qubits = [qubit_index]
+#     for cirq in circuit_json.values():
+#         for gates in cirq.values():
+#             qubit_pos += 1
+#             gate = gates[layer_index].get("value")
+#             if gate == "swap":
+#                 gates[layer_index]["value"] = "i"
+#                 if qubit_pos not in qubits:
+#                     qubits.append(qubit_pos)
+#                     return {"value": "swap"}, qubits
 
 def display_quantum_state(state_vector):
     """

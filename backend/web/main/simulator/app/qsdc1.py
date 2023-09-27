@@ -4,7 +4,7 @@ from qntsim.kernel.timeline import Timeline
 Timeline.DLCZ=False
 Timeline.bk=True
 from qntsim.topology.topology import Topology
-from qntsim.components.circuit import QutipCircuit
+from qntsim.kernel.circuit import QutipCircuit
 import numpy as np
 import logging
 logger = logging.getLogger("main_logger.application_layer." + "qsdc1")

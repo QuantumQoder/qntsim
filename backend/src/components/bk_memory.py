@@ -110,7 +110,7 @@ class Memory(Entity):
         entangled_memory (Dict[str, Any]): tracks entanglement state of memory.
     """
 
-    #_meas_circuit = Circuit(1)
+    #_meas_circuit = BaseCircuit(1)
     #_meas_circuit.measure(0)
 
     def __init__(self, name: str, timeline: "Timeline", fidelity: float, frequency: float,
@@ -153,9 +153,9 @@ class Memory(Entity):
         self.excited_photon = None
         self.result={}
         self.next_excite_time = 0
-        Circuit =BaseCircuit.create(self.timeline.type)
+        BaseCircuit =BaseCircuit.create(self.timeline.type)
         # #print("memory circuit",BaseCircuit.create(self.timeline.type))
-        self._meas_circuit = Circuit(1)
+        self._meas_circuit = BaseCircuit(1)
         self._meas_circuit.measure(0)
 
 

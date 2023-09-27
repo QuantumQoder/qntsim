@@ -2,7 +2,10 @@ import time
 from typing import Dict
 
 import numpy as np
-from qntsim.communication import ErrorAnalyzer, Network, to_binary, to_string
+
+from qntsim.communication.error_analyzer import ErrorAnalyzer
+from qntsim.communication.network import Network
+from qntsim.communication.utils import to_binary, to_characters
 from qntsim.components.photon import Photon
 from qntsim.components.waveplates import HalfWaveplate
 from qntsim.kernel.timeline import Timeline

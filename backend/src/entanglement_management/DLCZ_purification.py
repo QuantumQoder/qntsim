@@ -48,7 +48,7 @@ class BBPSSW(EntanglementProtocol):
     This class provides an implementation of the BBPSSW purification protocol.
     It should be instantiated on a quantum router node.
     Variables:
-        BBPSSW.circuit (Circuit): circuit that purifies entangled memories.
+        BBPSSW.circuit (BaseCircuit): circuit that purifies entangled memories.
     Attributes:
         own (QuantumRouter): node that protocol instance is attached to.
         name (str): label for protocol instance.
@@ -58,7 +58,7 @@ class BBPSSW(EntanglementProtocol):
         meas_res (int): measurement result from circuit.
     """
 
-    #circuit = Circuit(2)
+    #circuit = BaseCircuit(2)
     #circuit.cx(0, 1)
     #circuit.measure(1)
 
@@ -80,9 +80,9 @@ class BBPSSW(EntanglementProtocol):
         self.F = None
         # if self.meas_memo is None:
         #     self.memories.pop()
-        Circuit =BaseCircuit.create(self.own.timeline.type)
+        BaseCircuit =BaseCircuit.create(self.own.timeline.type)
         #print("pur circuit",BaseCircuit.create(self.own.timeline.type))
-        self.circuit = Circuit(2)
+        self.circuit = BaseCircuit(2)
         self.circuit.cx(0, 1)
         self.circuit.measure(1)
 

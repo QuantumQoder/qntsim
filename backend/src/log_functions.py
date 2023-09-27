@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from .message import Message
 
 log.set_logger_level("debug")
-log.set_logger("out", None, "out.log")
+log.set_logger("out", "out.log")
 
 def log_debug(debug_msg: str):
     log.logger.debug(debug_msg)

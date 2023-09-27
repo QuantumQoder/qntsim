@@ -38,11 +38,11 @@ class Results(models.Model):
 #     single_multiple = models.CharField(max_length=10)
 #     gt_description = models.CharField(max_length=1000)
 
-class Gates(models.Model):
-    gate_id = models.AutoField(primary_key=True)
+# class Gates(models.Model):
+#     gate_id = models.AutoField(primary_key=True)
     
-    gate_name = models.CharField(max_length=200)
-    gate_description = models.CharField(max_length=1000)
+#     gate_name = models.CharField(max_length=200)
+#     gate_description = models.CharField(max_length=1000)
 
 # class LayerGates(models.Model):
 #     layer_gate_id = models.AutoField(primary_key=True)

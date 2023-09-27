@@ -10,7 +10,7 @@ from typing import Any, Dict, List
 from numpy import random, outer, add, zeros
 import random as rnd
 
-from ..kernel.circuit import Circuit
+from ..kernel.circuit import BaseCircuit
 from .detector import Detector
 from .photon import Photon
 from ..kernel.entity import Entity

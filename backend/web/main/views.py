@@ -21,7 +21,8 @@ from django.shortcuts import render
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import condition
-from main.models import Applications, Results, Gates
+# from main.models import Applications, Results, Gates
+from main.models import Applications, Results
 from main.serializers import ApplicationSerializer
 from main.simulator.app.ip2 import ip2_run
 from main.simulator.app.qdsp import qdsp
@@ -296,7 +297,7 @@ class AddGate(generics.GenericAPIView):
         except Exception as e:
             return JsonResponse({"status":"failed","error":str(e)},status = 500)    
         
-class Circuit(generics.GenericAPIView):
+class BaseCircuit(generics.GenericAPIView):
 
     def post(self, request):
         try:

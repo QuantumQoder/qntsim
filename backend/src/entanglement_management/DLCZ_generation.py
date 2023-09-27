@@ -102,9 +102,9 @@ class EntanglementGenerationA(EntanglementProtocol):
     # TODO: use a function to update resource manager
 
     #_plus_state = [sqrt(1/2), sqrt(1/2)]
-    #_flip_circuit = Circuit(1)
+    #_flip_circuit = BaseCircuit(1)
     #_flip_circuit.x(0)
-    #_z_circuit = Circuit(1)
+    #_z_circuit = BaseCircuit(1)
     #_z_circuit.z(0)
 
 
@@ -144,12 +144,12 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.isSuccess = False
 
         self.state = 0
-        Circuit =BaseCircuit.create(self.memory.timeline.type)
+        BaseCircuit =BaseCircuit.create(self.memory.timeline.type)
         # #print("gen circuit",BaseCircuit.create(self.memory.timeline.type))
         self._plus_state = [sqrt(1/2), sqrt(1/2)]
-        self._flip_circuit = Circuit(1)
+        self._flip_circuit = BaseCircuit(1)
         self._flip_circuit.x(0)
-        self._z_circuit = Circuit(1)
+        self._z_circuit = BaseCircuit(1)
         self._z_circuit.z(0)
 
     def received_message(self):

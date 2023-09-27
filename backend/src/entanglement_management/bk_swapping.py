@@ -98,7 +98,7 @@ class EntanglementSwappingA(EntanglementProtocol):
     EntanglementSwappingA should be instantiated on the middle node, where it measures a memory from each pair to be swapped.
     Results of measurement and swapping are sent to the end routers.
     Variables:
-        EntanglementSwappingA.circuit (Circuit): circuit that does swapping operations.
+        EntanglementSwappingA.circuit (BaseCircuit): circuit that does swapping operations.
     Attributes:
         own (QuantumRouter): node that protocol instance is attached to.
         name (str): label for protocol instance.
@@ -108,7 +108,7 @@ class EntanglementSwappingA(EntanglementProtocol):
         degradation (float): degradation factor of memory fidelity after the swapping operation.
     """
 
-    #circuit = Circuit(2)
+    #circuit = BaseCircuit(2)
     #circuit.cx(0, 1)
     #circuit.h(0)
     #circuit.measure(0)
@@ -147,10 +147,10 @@ class EntanglementSwappingA(EntanglementProtocol):
         self.is_success = False
         self.left_protocol = None
         self.right_protocol = None
-        Circuit =BaseCircuit.create(self.left_memo.timeline.type)
+        BaseCircuit =BaseCircuit.create(self.left_memo.timeline.type)
         # #print("swap circuit",BaseCircuit.create(self.left_memo.timeline.type))
 
-        self.circuit = Circuit(2)
+        self.circuit = BaseCircuit(2)
         self.circuit.cx(0, 1)
         self.circuit.h(0)
         self.circuit.measure(0)
@@ -300,22 +300,22 @@ class EntanglementSwappingB(EntanglementProtocol):
     The entanglement swapping protocol is an asymmetric protocol.
     EntanglementSwappingB should be instantiated on the end nodes, where it waits for swapping results from the middle node.
     Variables:
-            EntanglementSwappingB.x_cir (Circuit): circuit that corrects state with an x gate.
-            EntanglementSwappingB.z_cir (Circuit): circuit that corrects state with z gate.
-            EntanglementSwappingB.x_z_cir (Circuit): circuit that corrects state with an x and z gate.
+            EntanglementSwappingB.x_cir (BaseCircuit): circuit that corrects state with an x gate.
+            EntanglementSwappingB.z_cir (BaseCircuit): circuit that corrects state with z gate.
+            EntanglementSwappingB.x_z_cir (BaseCircuit): circuit that corrects state with an x and z gate.
     Attributes:
         own (QuantumRouter): node that protocol instance is attached to.
         name (str): label for protocol instance.
         hold_memory (Memory): quantum memory to be swapped.
     """
 
-    #x_cir = Circuit(1)
+    #x_cir = BaseCircuit(1)
     #x_cir.x(0)
 
-    #z_cir = Circuit(1)
+    #z_cir = BaseCircuit(1)
     #z_cir.z(0)
 
-    #x_z_cir = Circuit(1)
+    #x_z_cir = BaseCircuit(1)
     #x_z_cir.x(0)
     #x_z_cir.z(0)
 
@@ -332,15 +332,15 @@ class EntanglementSwappingB(EntanglementProtocol):
         self.memories = [hold_memo]
         self.memory = hold_memo
         self.another = None
-        Circuit =BaseCircuit.create(self.memory.timeline.type)
+        BaseCircuit =BaseCircuit.create(self.memory.timeline.type)
         # #print("swap circuit",BaseCircuit.create(self.memory.timeline.type))
-        self.x_cir = Circuit(1)
+        self.x_cir = BaseCircuit(1)
         self.x_cir.x(0)
 
-        self.z_cir = Circuit(1)
+        self.z_cir = BaseCircuit(1)
         self.z_cir.z(0)
 
-        self.x_z_cir = Circuit(1)
+        self.x_z_cir = BaseCircuit(1)
         self.x_z_cir.x(0)
         self.x_z_cir.z(0)
 

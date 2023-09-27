@@ -5,7 +5,7 @@ from qiskit.opflow.state_fns import CircuitStateFn
 from qiskit.opflow.primitive_ops import CircuitOp
 from scipy.optimize import minimize
 from qiskit.algorithms import optimizers
-from qiskit_machine_learning.algorithms import VQC
+# from qiskit_machine_learning.algorithms import VQC
 from qiskit.utils.quantum_instance import QuantumInstance
 
 
