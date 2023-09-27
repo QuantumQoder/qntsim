@@ -25,6 +25,8 @@ elif Timeline.bk:
     from ..components.bk_memory import Memory, MemoryArray
     from ..components.bk_bsm import SingleAtomBSM
     print("bk node")
+from ..utils import log
+
 
 from ..kernel.entity import Entity
 
@@ -76,6 +78,11 @@ class Node(Entity):
         self.protocols = []
         self.virtual_links = {} # node: [subtask] for more than one virtual links between a pair of nodes
         self.snapshots = []##TODO:Enhance way to store snapshots
+        self.qubit_buffer = {1: []}
+        self.all_pair_shortest_dist = None
+        self.neighbors = None
+        log.logger.debug("Node")
+
     def init(self) -> None:
         pass
 
@@ -128,17 +135,45 @@ class Node(Entity):
 
         return self.qchannels[dst].schedule_transmit(min_time)
 
-    def send_qubit(self, dst: str, qubit) -> None:
+    def send_qubit(self, dst: str, qubit, app = 1) -> None:
         """Interface for quantum channel `transmit` method."""
         ##print(f'sent qubit from node: {self.name} to node: {dst}')
         # #print((dst), type(qubit))
         # #print("qchannels", self.qchannels)
-        self.qchannels[dst].transmit(qubit, self)
+        #Find the next hop using the cached flloyd-warshall output
+        next_hop, min_dist = None, inf
+        
+        #If dst is the BSM node, it will be present in channels map but not in neigbors map
+        if dst in self.qchannels.keys() and dst not in self.neighbors:
+            #For Entanglement
+            next_hop = dst
+        else:
+            #For Direct Transmission
+            for neighbor in self.neighbors:
+                print(f'Looping over neighbors: {neighbor}')
+                if  self.all_pair_shortest_dist[neighbor][dst]< min_dist:
+                    next_hop = neighbor
+                    min_dist = self.all_pair_shortest_dist[neighbor][dst]
+        
+        if next_hop != None:
+            self.qchannels[next_hop].init()
+            self.qchannels[next_hop].transmit(self.name, qubit, dst, app, self)
+        else:
+            print('Error: Next Hop not Found')
 
-    def receive_qubit(self, src: str, qubit) -> None:
+    def receive_qubit(self, _from:str, dst:str, app:str, qubit) -> None:
         """Method to receive qubits from quantum channel (does nothing for this class)."""
 
-        pass
+        """
+            If this node is the dst:
+                pass this qubit to the application
+            else:
+                find the next hop using the djiksta algo and push this along the path
+        """
+        if dst == self.name:
+            self.qubit_buffer[app].append(qubit)
+        else:
+            self.send_qubit(dst, qubit)
 
 
 class BSMNode(Node):
@@ -185,7 +220,7 @@ class BSMNode(Node):
     
         self.message_handler.push_message(src,msg)
 
-    def receive_qubit(self, src: str, qubit):
+    def receive_qubit(self, _from:str, dst:str, app:str, qubit):
         """Method to receive qubit from quantum channel.
         Invokes get method of internal bsm with `qubit` as argument.
         Args:
@@ -247,9 +282,9 @@ class EndNode(Node):
         self.service_node = None
         self.app = None
         self.nx_graph = None
-        self.all_pair_shortest_dist = None
+        # self.all_pair_shortest_dist = None
         self.all_neighbor={}
-        self.neighbors = None
+        # self.neighbors = None
         self.random_seed = None
         self.virtualneighbors=[]
         self.delay_graph=None
@@ -326,11 +361,10 @@ class ServiceNode(Node):
         self.app = None
         self.end_node = None
         self.is_endnode = False
-        self.neighbors = None
+        # self.neighbors = None
         self.nx_graph = None
-        self.all_pair_shortest_dist = None
+        # self.all_pair_shortest_dist = None
         self.all_neighbor={}
-        self.neighbors = None
         self.random_seed = None
         self.virtualneighbors=[]
         self.delay_graph=None

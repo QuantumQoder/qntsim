@@ -256,7 +256,7 @@ class ProtocolPipeline:
         )
 
         # Add an attack to the flow if one was specified
-        if attack := self.__kwds.get("attack", ""):
+        if (attack := self.__kwds.get("attack", "")) in ATTACK_TYPE.__members__:
             self.__funcs.append(
                 partial(Attack.implement, attack=ATTACK_TYPE[attack].value)
             )
@@ -327,12 +327,14 @@ class ProtocolPipeline:
         logging.info("generated all networks")
 
         # Execute the network flow for all networks in parallel
-        _ = Network.execute(networks=self.networks)
+        returns_list = Network.execute(networks=self.networks)
 
         # If the network flow was not provided as an argument, use the default flow and attempt to decode received messages
+        print(Network._flow, self.__funcs)
         if Network._flow == self.__funcs:
             self.recv_msgs_list = kwds.get("decode", Network.decode)(
-                networks=self.networks
+                networks=self.networks,
+                all_returns=returns_list
             )
 
         # Log the completion time
@@ -391,5 +393,7 @@ class ProtocolPipeline:
         return string
 
     @staticmethod
-    def execute():
-        pass
+    def execute(topology:Dict, app_settings:Dict):
+        response = {}
+        
+        protocol = ProtocolPipeline()

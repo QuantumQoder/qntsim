@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from ..components.detector import Detector
 
 from ..kernel.entity import Entity
-from ..kernel._event import Event
+from ..kernel.event import Event
 
 
 class Interferometer(Entity):

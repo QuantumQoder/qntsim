@@ -4,12 +4,9 @@
 
 export const environment = {
   production: false,
-  // apiUrl: 'http://184.72.30.192:8000/'
-  // apiUrl: 'http://54.177.146.24:8000/'
-  apiUrl: 'http://65.1.13.72:8000/',
-  apiUrlNew: 'http://65.1.13.72:8000/'
-  // apiUrl: 'http://0.0.0.0:8000/',
-  // apiUrlNew: 'http://0.0.0.0:8000/'
+  // apiUrl: "http://13.233.122.108:8000/",
+  apiUrl: 'http://localhost:8000/',
+  apiUrlNew: "http://localhost:8000/",
 };
 
 /*

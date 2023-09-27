@@ -51,10 +51,10 @@ class QuantumManager():
         return self.states[key]
 
     @abstractmethod
-    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:
+    def run_circuit(self, circuit: "BaseCircuit", keys: List[int]) -> int:
         """Method to run a circuit on a given set of quantum states.
         Args:
-            circuit (Circuit): quantum circuit to apply.
+            circuit (BaseCircuit): quantum circuit to apply.
             keys (List[int]): list of keys for quantum states to apply circuit to.
         Returns:
             Dict[int, int]: dictionary mapping qstate keys to measurement results.
@@ -64,7 +64,7 @@ class QuantumManager():
 
 
     
-    def _prepare_circuit(self, circuit: "Circuit", keys: List[int]):
+    def _prepare_circuit(self, circuit: "BaseCircuit", keys: List[int]):
         
         # Create a quantum circuit with or without classical measurement registers based on number of measured qubits
         if len(circuit.measured_qubits)>0:
@@ -139,7 +139,7 @@ class QuantumManagerKet(QuantumManager):
         self.states[key] = QuantumCircuit(QuantumRegister(1, f"k_{key}"))
         return key
 
-    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:    
+    def run_circuit(self, circuit: "BaseCircuit", keys: List[int]) -> int:    
         super().run_circuit(circuit, keys)
 
         # Compile the circuit into Qiskit quanutm circuit
@@ -169,7 +169,7 @@ class QuantumManagerKet(QuantumManager):
         SHOULD NOT be called individually; only from circuit method (unless for unit testing purposes).
         Modifies quantum state of all qubits given by all_keys.
         Args:
-            circ (QuantumCircuit): Quantum Circuit to measure.
+            circ (QuantumCircuit): Quantum BaseCircuit to measure.
             keys (List[int]): list of keys to measure.
             all_keys (List[int]): list of all keys corresponding to circ.
         Returns:
@@ -234,7 +234,7 @@ class QuantumManagerDensity(QuantumManager):
         self.states[key] = DensityState(state, [key])
         return key
 
-    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:
+    def run_circuit(self, circuit: "BaseCircuit", keys: List[int]) -> int:
         super().run_circuit(circuit, keys)
         new_state, all_keys, circ_mat = super()._prepare_circuit(circuit, keys)
 

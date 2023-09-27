@@ -11,6 +11,23 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitAny": false,
     "noImplicitReturns": true,
+    "paths": {
+      "ngx-qiskit": [
+        "dist/ngx-qiskit"
+      ],
+      "ngx-qiskit-ui": [
+        "dist/ngx-qiskit-ui"
+      ],
+      "ngx-qiskit-ui-lib": [
+        "dist/ngx-qiskit-ui-lib"
+      ],
+      "qiskit-ui-lib": [
+        "dist/qiskit-ui-lib"
+      ],
+      "quantum-ui-visualizer": [
+        "dist/quantum-ui-visualizer"
+      ]
+    },
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,

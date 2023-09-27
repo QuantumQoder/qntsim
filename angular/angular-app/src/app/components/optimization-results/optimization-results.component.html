@@ -1,0 +1,49 @@
+<div class="container card">
+    <p class="display-3 text-center mt-3">
+        Optimization Results
+    </p>
+
+    <section class="d-flex justify-content-center col-10 mx-auto my-3">
+        <table class="col-10 table table-bordered table-secondary">
+            <thead>
+                <tr>
+                    <th class="col-6  text-center">
+                        Optimized Function Value
+                    </th>
+                    <th class="col-6 text-center">
+                        {{results.fun}}
+                    </th>
+                </tr>
+            </thead>
+
+        </table>
+    </section>
+    <section class="d-flex justify-content-center">
+        <div id="chart" class="col-10">
+            <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
+                [dataLabels]="chartOptions.dataLabels" [grid]="chartOptions.grid" [stroke]="chartOptions.stroke"
+                [yaxis]="chartOptions.yaxis" [title]="chartOptions.title"></apx-chart>
+        </div>
+    </section>
+
+    <section class="d-flex justify-content-center col-10 mx-auto my-3" *ngIf="values.length !== 0">
+        <table class="col-10 table table-bordered">
+            <thead class="table-secondary">
+                <tr>
+                    <td class="col-6  text-center">
+                        Initial Values
+                    </td>
+                    <td class="col-6  text-center">
+                        Optimized Values
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let data of values">
+                    <td class="col-6  text-center">{{data.initial}}</td>
+                    <td class="col-6  text-center">{{data.final}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</div>

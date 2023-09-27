@@ -15,24 +15,23 @@ import time
 
 import matplotlib.pyplot as plt
 import qntsim
+import websocket
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.shortcuts import render
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import condition
+# from main.models import Applications, Results, Gates
 from main.models import Applications, Results
 from main.serializers import ApplicationSerializer
-from main.simulator import topology_funcs
 from main.simulator.app.ip2 import ip2_run
+from main.simulator.app.qdsp import qdsp
 from main.simulator.topology_funcs import *
-from rest_framework import generics, mixins
+from qntsim.utils import log
+from rest_framework import generics, mixins, permissions
 from rest_framework.views import APIView
-import websocket
-
-
-
-
-
+# from models import 
+# from .services.quantumcircuit_service import getCircuits, quantum_circuit_service, add_gate_service
 def home(request):
     context = {
         "title": "QNT Simulator"
@@ -66,33 +65,79 @@ def fetchAppOptions(request):
 
 
 class RunApp(APIView):
-
+    authentication_classes = ()
+    permission_classes = (permissions.AllowAny,)  # Allow any user to access
 
     def post(self,request):
-        logger = logging.getLogger("main_logger")
-        logger.setLevel(logging.DEBUG)
-        memory_handler = logging.handlers.MemoryHandler(capacity=1000,flushLevel=logging.INFO)
-        logger.addHandler(memory_handler)
-
-        # websocket_handler = logging.handlers.WebSocketHandler(capacity=1, target=memory_handler)
-        # websocket_handler.setLevel(logging.DEBUG)
-        # logger.addHandler(memory_handler)
-        #logger.info('Logging Begins...')
-        memory_handler.flush()
-        importlib.reload(qntsim)
-        print('request', request.data.get('topology'))
+        ############### configuring logger ###############
+        log.set_logger("m")
+        log.set_logger_level('DEBUG')
+        print("handlers:", log.logger.handlers)
         topology = request.data.get('topology')
         application_id = request.data.get('application')
         appSettings = request.data.get('appSettings')
-        # Add check for getting application id and extracting name.
-        print('application id', application_id)
+        debug = request.data.get('debug')
+        
+        
+        modules  = {'physical': ['interferometer',
+                    'spdc_lens',
+                    'beam_splitter',
+                    'DLCZ_bsm',
+                    'light_source',
+                    'circuit',
+                    'bk_memory',
+                    'polarization_measurement',
+                    'bk_bsm',
+                    'switch',
+                    'optical_channel',
+                    'waveplates',
+                    'photon',
+                    'detector',
+                    'DLCZ_memory'],
+                    'link': ['bk_purification',
+                    'DLCZ_generation',
+                    'DLCZ_purification',
+                    'entanglement_protocol',
+                    'bk_swapping',
+                    'DLCZ_swapping',
+                    'bk_generation'],
+                    'network': ['node'],
+                    'transport': ['transport_manager'],
+                    'application': ['ip1_',
+                    'pp',
+                    'ghz',
+                    'qsdc_teleportation',
+                    'mdi_qsdc',
+                    'single_photon_qd',
+                    'ping_pong',
+                    'teleportation',
+                    'e91',
+                    'utils',
+                    'e2e',
+                    'qss',
+                    'ip1',
+                    'qsdc1',
+                    'qdsp',
+                    'ip2'],
+                    "eventSimulation":['timeline']}
+        
+        selected_modules = debug["modules"]#["transport"]
+        print("selected_modules:", selected_modules)
+        for module in selected_modules:
+            for file in modules[module]:
+                log.track_module(file)
+        
+        
+        importlib.reload(qntsim)
+        topology = request.data.get('topology')
+        application_id = request.data.get('application')
+        appSettings = request.data.get('appSettings')
         application = Applications.objects.filter(id = application_id).values("name").first().get('name')
-        print(f"Running applications: {application}", appSettings)
-        print('request user', request.user.username, request.user.id)
+        debug = request.data.get('debug')
         results = {}
 
         if application == "e91":
-            print("e91 views")
+            #print("e91 views")
             results = e91(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["keyLength"]))
         elif application == "e2e":
             print('e2e',appSettings["sender"], appSettings["receiver"], appSettings["startTime"], appSettings["size"], appSettings["priority"], appSettings["targetFidelity"], appSettings["timeout"])
@@ -100,63 +145,32 @@ class RunApp(APIView):
         elif application == "ghz":
             results = ghz(topology, appSettings["endnode1"], appSettings["endnode2"], appSettings["endnode3"], appSettings["middlenode"] )
         elif application == "ip1":
-            results = ip1(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"] )
+            results = ip1(topology, appSettings["sender"]["node"], appSettings["receiver"]["node"], appSettings["sender"]["message"] )
         elif application == "ping_pong":
-            results = ping_pong(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["sequenceLength"]), appSettings["message"] )
+            results = ping_pong(topology=topology, app_settings=appSettings)
         elif application == "qsdc1":
             results = qsdc1(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["sequenceLength"]), appSettings["key"] )
         elif application == "teleportation":
             results = teleportation(topology, appSettings["sender"], appSettings["receiver"], complex(appSettings["amplitude1"]), complex(appSettings["amplitude2"]) )
         elif application == "qsdc_teleportation":
-            results = qsdc_teleportation(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"], appSettings["attack"])
+            results = qsdc_teleportation(topology, appSettings["sender"]["node"], appSettings["receiver"]["node"], appSettings["sender"]["message"], appSettings["attack"])
         elif application == "single_photon_qd":
-            
-            results = single_photon_qd(topology, appSettings["sender"], appSettings["receiver"], appSettings["message1"],appSettings["message2"], appSettings["attack"])
+            results = qdsp(topology=topology, app_settings=appSettings)
+            # results = single_photon_qd(topology, appSettings["sender"], appSettings["receiver"], appSettings["message1"],appSettings["message2"], appSettings["attack"])
         elif application == "mdi_qsdc":
             results = mdi_qsdc(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"], appSettings["attack"])
         elif application == "ip2":
-            # input_messages = {int(k):str(v) for k,v in appSettings["input_messages"].items()}
-            # ids = {int(k):str(v) for k,v in appSettings["ids"].items()}
             results = ip2_run(topology,appSettings)
-        # Add code for results here
-        # print('results', results)
-        # graphs = results.get('graph')
-        # output = results.get('results')
+            
         output = results
+        print(debug["logLevel"])
+        debug_levels = {"debug": "DEBUG", "info":"INFO"}
+        print(debug_levels[debug["logLevel"]])
+        log_level = debug_levels[debug["logLevel"]]
+        logs = log.read_from_memory(log.logger, level = log_level)
+        output["logs"] = logs
         
-        records = memory_handler.buffer
-        #print(len(records))
-        logs =[]
-        layer_wise_records = {"link_layer" : [], "network_layer": [], "resource_management":[], "application_layer":[]}
         
-        for record in records:
-            # format the log record as a string
-            if record.levelname == "INFO":
-                log_message = f"{record.levelname}: {record.getMessage()}"
-                #memory_handler.buffer.remove(record)
-                name = record.name.split(".")
-                
-                layer = name[-2]
-                if layer in layer_wise_records:
-                    layer_wise_records[layer].append(log_message)
-                logs.append(log_message)
-                # else:
-                #     print("Nothing")
-        print("layer_wise_records:", layer_wise_records)
-        output["logs"] = logs#, layer_wise_records]
-        #output["layer_wise_records"] = layer_wise_records
-        
-        memory_handler.flush()
-        #print(memory_handler.buffer)
-        for handler in logger.handlers:
-            logger.removeHandler(handler)
-       
-        # print('graphs', graphs)
-        # print('output', output)
-        # print('request user', request.user)
-        # res = Results.objects.create(user = request.user, topology = topology, app_name = application, input =appSettings, output = output,graphs = graphs)
-        # res.save()
-
         return JsonResponse(output, safe = False)
 
 
@@ -219,6 +233,81 @@ class ApplicationResult(generics.GenericAPIView):
         result = Results.objects.filter(id = result_id).values().first()
         print('result', result)
         return JsonResponse(result)
+
+# class QuantumCircuitExecuter(generics.GenericAPIView):
+
+#     def post(self, request):
+#         status = quantum_circuit_service(self,request)
+#         return JsonResponse(status)
+    
+
+class AddGate(generics.GenericAPIView):
+    authentication_classes = ()
+    permission_classes = (permissions.AllowAny,)  # Allow any user to access
+
+    def get(self,request):
+        try:
+            gates = Gates.objects.all()
+            print(gates)
+            gate_list=[]
+            for gate in gates:
+                list ={ }
+                list["id"] = gate.gate_id
+                # list["gt_id"] = gate.gt_id.gt_id
+                # list["gt_name"] = gate.gt_id.gt_name
+                # list["single_multiple"] = gate.gt_id.single_multiple
+                # list["gt_description"] = gate.gt_id.gt_description
+                list["gate_name"] = gate.gate_name
+                list["gate_description"] = gate.gate_description
+                gate_list.append(list)
+            return JsonResponse(gate_list, safe =False)
+        except Exception as e:
+            return JsonResponse({"status":"failed","error":str(e)},status = 500)
+
+    def post(self, request):
+        try:
+                request_data = request.data
+
+                for gate in request_data:
+                    # print(gate)
+                    gate = Gates(
+                        gate_name=gate.get("gate_name"),
+                        gate_description=gate.get("gate_description")
+                    )
+                    gate.save()
+                return JsonResponse({"status":"success"})
+        except Exception as e:
+                return JsonResponse({"status":"failed","error":str(e)},status = 500) 
+        
+    def put(self,request):
+        try:
+            gate = Gates.objects.get(gate_id=request.data.get("gate_id"))
+            gate.gate_name = request.data.get("gate_name")
+            gate.gate_description = request.data.get("gate_description")
+            gate.save()
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"status":"failed","error":str(e)},status = 500)
+        
+    def delete(self,request):
+        try:
+            gate = Gates.objects.all()
+            gate.delete()
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"status":"failed","error":str(e)},status = 500)    
+        
+class BaseCircuit(generics.GenericAPIView):
+
+    def post(self, request):
+        try:
+            print(request)
+            print(request.data)
+            # custom_executor(**request.data)
+
+            return JsonResponse({"status":"success"})
+        except Exception as e:
+            return JsonResponse({"status":"failed","error":str(e)})   
 
 @csrf_exempt
 def testrun(request):
@@ -330,26 +419,26 @@ def stream_logs(request):
 #     print("Logs ended..")
 #     #return StreamingHttpResponse(stream_logs(), content_type='text/plain')
 
-@csrf_exempt
-def log_view(request):
-    def stream_logs():
-        # retrieve log records from the MemoryHandler buffer
-        records = memory_handler.buffer
-        for record in records:
-            # format the log record as a string
-            if record.levelname == "INFO":
-                log_message = f"{record.levelname}: {record.getMessage()}\n"
-                # yield the log message to the response stream
-                yield log_message.encode('utf-8')
+# @csrf_exempt
+# def log_view(request):
+#     def stream_logs():
+#         # retrieve log records from the MemoryHandler buffer
+#         records = memory_handler.buffer
+#         for record in records:
+#             # format the log record as a string
+#             if record.levelname == "INFO":
+#                 log_message = f"{record.levelname}: {record.getMessage()}\n"
+#                 # yield the log message to the response stream
+#                 yield log_message.encode('utf-8')
     
-    # create a StreamingHttpResponse that streams the log messages
-    response = StreamingHttpResponse(stream_logs(), content_type='text/plain')
-    # set the response status code to 200 OK
-    response.status_code = 200
-    # # set the Content-Disposition header to force download of the log file
-    # response['Content-Disposition'] = 'attachment; filename="my_log_file.txt"'
-    # for handler in logger.handlers:
-    #     logger.removeHandler(handler)
-    # for handler in logger.handlers:
-    #     logger.removeHandler(handler)
-    return response
+#     # create a StreamingHttpResponse that streams the log messages
+#     response = StreamingHttpResponse(stream_logs(), content_type='text/plain')
+#     # set the response status code to 200 OK
+#     response.status_code = 200
+#     # # set the Content-Disposition header to force download of the log file
+#     # response['Content-Disposition'] = 'attachment; filename="my_log_file.txt"'
+#     # for handler in logger.handlers:
+#     #     logger.removeHandler(handler)
+#     # for handler in logger.handlers:
+#     #     logger.removeHandler(handler)
+#     return response

@@ -1,17 +1,21 @@
 import random
+
 import qntsim
-from qntsim.components.circuit import Circuit, QutipCircuit
+from qntsim.kernel.circuit import BaseCircuit, QutipCircuit
 from qntsim.kernel.timeline import Timeline
+
 Timeline.DLCZ=False
 Timeline.bk=True
+import logging
+import string
+import sys
+
+import numpy as np
 from qntsim.kernel.quantum_manager import QuantumManager, QuantumManagerKet
 from qntsim.protocol import Protocol
 # from qntsim.topology.node import QuantumRouter
 from qntsim.topology.topology import Topology
-import string
-import sys
-import numpy as np
-import logging
+
 logger = logging.getLogger("main_logger.application_layer." + "ip1")
 
 
@@ -67,6 +71,7 @@ class IP1():
             check_bits.append(random_bit)
 
         new_message = self.add_bits_to_pos(message, check_bits_pos, check_bits)
+        logger.info("message by sender: "+ "".join(new_message))
         return new_message, check_bits_pos, check_bits
 
 
@@ -89,7 +94,12 @@ class IP1():
         return theta
 
     def get_IDs(self):
-        return '0011', '0110'
+        sender_id = "0011"
+        receiver_id = "0110"
+        logger.info("sender_id: "+str( sender_id))
+        logger.info("receiver_id: "+str(receiver_id))
+        return sender_id, receiver_id
+        
 
     def hadamard_transform(self,qm, keys):
         circ = QutipCircuit(len(keys))
@@ -119,11 +129,14 @@ class IP1():
             else : 
                 new_list[i] = original_keys[d]
                 d = d + 1
+        # loggger.info("random keys ge
+        # : " + "".join(new_list))
         return new_list, random_pos
 
     def generate_Q2A(self,qm, IdA, Q1A_keys):
         IA_keys = self.get_IA(qm, IdA)
         Q2A_keys, random_pos = self.add_random_keys(IA_keys, Q1A_keys)
+        
         return Q2A_keys, random_pos, IA_keys
 
     def get_IdB1(self,IdB):
@@ -185,7 +198,7 @@ class IP1():
                 self.hadamard_transform(qm, keys)
             decoy_keys.append(keys[0])
             decoy_results[i] += str(random_bit)
-
+        logger.info("Decoy photons generated: "+ "".join(decoy_results))
         return decoy_keys, decoy_results
 
     def generate_Q5A(self,qm, Q4A_keys, m):
@@ -194,6 +207,7 @@ class IP1():
         return Q5A_keys, random_pos, decoy_results
 
     def run_encoding_process(self,alice,message, IdA, IdB):
+        logger.info("message encoded into the network :" + str(message))
         qm_alice=alice.timeline.quantum_manager
         Q1A, check_bits_pos, check_bits = self.generate_Q1A(message, 3)
         Q1A_keys = self.initilize_states(qm_alice, Q1A)
@@ -211,7 +225,7 @@ class IP1():
             if decoy_results[i][1] == '1':
                 self.hadamard_transform(qm, [Q5A_keys[pos]])
             output = self.z_measurement(qm, [Q5A_keys[pos]])
-            print("key : ", Q5A_keys[pos], " output : ", output, " expected output : ", decoy_results[i][0])
+            logger.info("key : "+ str(Q5A_keys[pos])+ " output : "+ str(output)+ " expected output : "+ str( decoy_results[i][0]))
             #assert(output == int(decoy_results[i][0])), "Security check did not pass!"
             if output == int(decoy_results[i][0]):
                 self.security_msg="Security check passed"  #Security check did not pass!
@@ -219,7 +233,7 @@ class IP1():
                 self.security_msg="Security check did not pass" 
             to_remove.append(Q5A_keys[pos])
 
-        print("Security check successful!")
+        logger.info("Security check successful!")
         return list(set(Q5A_keys) - set(to_remove))
 
 
@@ -236,12 +250,13 @@ class IP1():
             if output == int(IdA[c + 1]):
                 self.IdA_msg="IdA authenticated"
             else:
+                
                 self.IdA_msg="IdA authentication did not pass"
                
 
             #assert(output == int(IdA[c + 1])), "IdA authentication did not pass!"
             c = c + 2
-        print("IdA authenticated!")
+        logger.info("IdA authenticated!")
 
     def Bobs_IdB1(self,qm, IB_keys, Q5A_keys, IdB):
 
@@ -258,10 +273,10 @@ class IP1():
 
     def check_r(self,IdB, Bobs_IdB1, r):
         Bobs_r = [str(int(IdB[i])^int(Bobs_IdB1[i])) for i in range(len(IdB))]
-        print("Bobs_r that he gets : ", Bobs_r)
-        print("Alice's encoded r : ", r)
+        logger.info("Bobs_r that he gets : "+ "".join(Bobs_r))
+        logger.info("Alice's encoded r : "+ str(r))
         assert (Bobs_r == r), "Bob's r is different from Alice's r! Some error!"
-        print("Bob's r is same as Alice's r! Authentication procedure passed")
+        logger.info("Bob's r is same as Alice's r! Authentication procedure passed")
         ##for output
         return Bobs_r,r
 
@@ -304,7 +319,7 @@ class IP1():
                 continue
             final_message.append(message[pos])
 
-        print("Check bits protocol passed!")
+        logger.info("Check bits protocol passed!")
         return final_message
 
     def run_decoding_process(self,qm, IdB, theta_keys, Q5A_keys, Q1A_keys, check_bits_pos, check_bits):
@@ -314,6 +329,7 @@ class IP1():
         return "".join(Bob_final_message)
 
 
+    # TODO: qd_sp transmission
     def copy_Q5A(self,Q5A_keys, alice, bob):
         qm_alice = alice.timeline.quantum_manager
         qm_bob = bob.timeline.quantum_manager
@@ -341,6 +357,7 @@ class IP1():
 
 
     def run(self,alice,bob,message ):
+        print("IP1")
         qm_alice=alice.timeline.quantum_manager
         qm_bob=bob.timeline.quantum_manager
         IdA, IdB = self.get_IDs()
@@ -356,8 +373,8 @@ class IP1():
         
 
         Bob_message = self.run_decoding_process(qm_bob, IdB, theta_keys, Q5A_keys, Q1A_keys, check_bits_pos, check_bits)
-        print(f"input message : {message}")
-        print(f"Bob_message : {Bob_message}")
+        logger.info(f"input message : {message}")
+        logger.info(f"Bob_message : {Bob_message}")
         
         if Bobs_r == r : 
             display_msg="Bob's r is same as Alice's r! Authentication procedure passed"
@@ -376,7 +393,7 @@ class IP1():
             "input_message": message,
             "bob_message" : Bob_message
         }
-        print(res)
+        # logger.info(res)
         return res
     # One question - technically all of this is happening on Alice's nodes. How do 
     # I send everything to Bob's nodes

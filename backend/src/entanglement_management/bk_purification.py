@@ -17,11 +17,11 @@ if TYPE_CHECKING:
 from ..message import Message
 from .entanglement_protocol import EntanglementProtocol
 from ..utils import log
-from ..components.circuit import BaseCircuit
+from ..kernel.circuit import BaseCircuit
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
 import logging
-logger = logging.getLogger("main_logger.link_layer."+ "bk_swapping")
+# logger = logging.getLogger("main_logger.link_layer."+ "bk_swapping")
 class BBPSSWMsgType(Enum):
     """Defines possible message types for entanglement purification"""
 
@@ -62,7 +62,7 @@ class BBPSSW(EntanglementProtocol):
     This class provides an implementation of the BBPSSW purification protocol.
     It should be instantiated on a quantum router node.
     Variables:
-        BBPSSW.circuit (Circuit): circuit that purifies entangled memories.
+        BBPSSW.circuit (BaseCircuit): circuit that purifies entangled memories.
     Attributes:
         own (QuantumRouter): node that protocol instance is attached to.
         name (str): label for protocol instance.
@@ -72,7 +72,7 @@ class BBPSSW(EntanglementProtocol):
         meas_res (int): measurement result from circuit.
     """
 
-    #circuit = Circuit(2)
+    #circuit = BaseCircuit(2)
     #circuit.cx(0, 1)
     #circuit.measure(1)
 
@@ -94,12 +94,11 @@ class BBPSSW(EntanglementProtocol):
         self.meas_res = None
         if self.meas_memo is None:
             self.memories.pop()
-        Circuit =BaseCircuit.create(self.kept_memo.timeline.type)
+        BaseCircuit =BaseCircuit.create(self.kept_memo.timeline.type)
         #print("pur circuit",BaseCircuit.create(self.kept_memo.timeline.type))
-        self.circuit = Circuit(2)
+        self.circuit = BaseCircuit(2)
         self.circuit.cx(0, 1)
         self.circuit.measure(1)
-        print("PURR")
 
     def is_ready(self) -> bool:
         return self.another is not None
@@ -143,6 +142,7 @@ class BBPSSW(EntanglementProtocol):
         kept_memo_ent = self.kept_memo.entangled_memory["node_id"]
         meas_memo_ent = self.meas_memo.entangled_memory["node_id"]
         assert kept_memo_ent == meas_memo_ent, "mismatch of entangled memories {}, {} on node {}".format(kept_memo_ent, meas_memo_ent, self.own.name)
+        # print(f'fidelity of -> self.kept_memo.fidelity: {self.kept_memo.fidelity} and self.meas_memo.fidelity: {self.meas_memo.fidelity}')
         assert self.kept_memo.fidelity == self.meas_memo.fidelity > 0.5
 
         self.meas_res = self.own.timeline.quantum_manager.run_circuit(self.circuit, [self.kept_memo.qstate_key,
@@ -154,7 +154,6 @@ class BBPSSW(EntanglementProtocol):
         self.own.message_handler.send_message(dst, message)
 
     def received_message(self, src: str, msg: Message) -> None:
-        print("Purificationnnnnnn")
         """Method to receive messages.
         Args:
             src (str): name of node that sent the message.
@@ -163,20 +162,29 @@ class BBPSSW(EntanglementProtocol):
             Will call `update_resource_manager` method.
         """
 
-        #log.logger.info(self.own.name + " received result message, succeeded: {}".format(self.meas_res == msg.meas_res))
+        log.logger.info(self.own.name + " received result message, succeeded: {}".format(self.meas_res == msg.meas_res))
         assert src == self.another.own.name
         self.update_resource_manager(self.meas_memo, "RAW")
+        rerun_memo = [self.meas_memo]
+        status = 0
         if self.meas_res == msg.kwargs["meas_res"]:
             # #print('receive pur if')
             self.kept_memo.fidelity = self.improved_fidelity(self.kept_memo.fidelity)
             self.update_resource_manager(self.kept_memo, state="ENTANGLED")
-            logger.info("Purification successful between " + self.own.name + " " + self.another.own.name)
+            # logger.info("Purification successful between " + self.own.name + " " + self.another.own.name)
+            log.logger.debug("Purification successful between " + self.own.name + " " + self.another.own.name + "at timestep" + str(self.kept_memo.timeline.time))
+            # self.subtask.on_complete(1)
+            status = 1
         else:
             # #print('receive pur else')
             self.update_resource_manager(self.kept_memo, state="RAW")
-            logger.info("Purification failed between " + self.own.name + " " + self.another.own.name)
+            # logger.info("Purification failed between " + self.own.name + " " + self.another.own.name)
+            log.logger.debug("Purification failed between " + self.own.name + " " + self.another.own.name + "at timestep" + str(self.kept_memo.timeline.time))
+            # self.subtask.on_complete(-1)
+            status = -1
             
         self.own.message_handler.process_msg(msg.receiver_type,msg.receiver)
+        self.subtask.on_complete(status, params = rerun_memo)
         
 
     def memory_expire(self, memory: "Memory") -> None:

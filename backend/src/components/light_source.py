@@ -7,10 +7,12 @@ These classes should be connected to one or two entities, respectively, that are
 from numpy import random, multiply
 import random as rnd
 
+import numpy as np
+
 
 from .photon import Photon
 from ..kernel.entity import Entity
-from ..kernel._event import Event
+from ..kernel.event import Event
 from ..utils.encoding import polarization, single_atom
 
 
@@ -89,9 +91,13 @@ class LightSource(Entity):
                 state = multiply([1, -1], state)
 
             for _ in range(num_photons):
-                wavelength = self.linewidth * random.randn() + self.wavelength
+                #wavelength = self.linewidth * random.randn() + self.wavelength
+
+                sigma = self.linewidth/3.255
+                wavelength_ = np.random.normal(self.wavelength,sigma)
+
                 new_photon = Photon(str(i),
-                                    wavelength=wavelength,
+                                    wavelength=wavelength_,
                                     location=self.owner,
                                     encoding_type=self.encoding_type,
                                     quantum_state=state)

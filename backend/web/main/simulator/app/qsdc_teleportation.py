@@ -4,7 +4,7 @@ from qntsim.kernel.timeline import Timeline
 Timeline.DLCZ=False
 Timeline.bk=True
 from qntsim.topology.topology import Topology
-from qntsim.components.circuit import QutipCircuit
+from qntsim.kernel.circuit import QutipCircuit
 import numpy as np
 import math
 
@@ -83,7 +83,7 @@ class QSDCTeleportation():
     
         a_qm = a.timeline.quantum_manager # quantum manager of the node 'a'
         indices, crz, crx = [], [], []
-        # Qutip Circuit for performing Bell measurement
+        # Qutip BaseCircuit for performing Bell measurement
         qtc = QutipCircuit(2)
         qtc.cx(0, 1)
         qtc.h(0)

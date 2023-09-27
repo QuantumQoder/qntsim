@@ -1,11 +1,19 @@
-import { AfterViewChecked, AfterViewInit, Component, HostListener } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, HostListener, OnInit } from '@angular/core';
+import { ApiServiceService } from './services/api-service.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.less']
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent implements AfterViewInit, OnInit {
+
+  constructor(private service: ApiServiceService) {
+
+  }
+  ngOnInit(): void {
+
+  }
   navBarList: any[] = [{
     header: 'Home',
     link: '/'

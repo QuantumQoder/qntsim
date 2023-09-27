@@ -6,21 +6,20 @@ import os
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial, reduce
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 from IPython.display import clear_output
-from joblib import Parallel, delayed, wrap_non_picklable_objects
 from numpy.random import randint
 from pandas import DataFrame
 
-from ..components.circuit import QutipCircuit
+from ..kernel.circuit import QutipCircuit
 from ..kernel.timeline import Timeline
 from ..topology.topology import Topology
-from .circuits import bell_type_state_analyzer
+from .analyzer_circuits import bell_type_state_analyzer
 from .noise import ERROR_TYPE
-from .NoiseModel import noise_model
-from .utils import string_to_binary
+from .noise_model import NoiseModel
+from .utils import to_binary, to_characters
 
 Timeline.bk = True
 Timeline.DLCZ = False
@@ -222,6 +221,7 @@ class Network:
         priority: int = 0,
         target_fidelity: float = 0.5,
         timeout: int = 10e12,
+        require_entanglement:bool = True,
         **kwds,
     ) -> None:
         self.__name = name
@@ -235,11 +235,7 @@ class Network:
         self._target_fidelity = target_fidelity
         self._timeout = timeout
         self.messages = messages
-        self._bin_msgs = (
-            list(messages.values())
-            if all(char in "01" for message in messages.values() for char in message)
-            else string_to_binary(messages=messages)
-        )
+        self._is_binary, self._bin_msgs = to_binary(messages=list(messages.values()))
         self.__dict__.update(**kwds)
         if not hasattr(self, "size"):
             self.size = len(self._bin_msgs[0])
@@ -252,20 +248,21 @@ class Network:
                     for noise, probs in self.noise.items()
                 }
             )
-        stack = inspect.stack()
-        caller = stack[1][0].f_locals.get("self").__class__.__name__
-        from .protocol import ProtocolPipeline
+        # stack = inspect.stack()
+        # caller = stack[1][0].f_locals.get("self").__class__.__name__
+        # from .protocol import ProtocolPipeline
 
-        if caller != ProtocolPipeline.__name__:
-            print("Configuring logger!")
-            logging.basicConfig(
-                filename=self.__name + ".log",
-                filemode="w",
-                level=logging.INFO,
-                format="%(pathname)s %(threadName)s %(module)s %(funcName)s %(message)s",
-            )
-        self._initiate()
+        # if caller != ProtocolPipeline.__name__:
+        #     print("Configuring logger!")
+        #     logging.basicConfig(
+        #         filename=self.__name + ".log",
+        #         filemode="w",
+        #         level=logging.INFO,
+        #         format="%(pathname)s %(threadName)s %(module)s %(funcName)s %(message)s",
+        #     )
+        self._initiate(require_entanglement=require_entanglement)
         self.get_keys(
+            _=None,
             node_index=self.keys_of if hasattr(self, "keys_of") else 0,
             info_state="ENTANGLED",
         )
@@ -294,7 +291,7 @@ class Network:
         """
         return self.nodes[item]
 
-    def _initiate(self):
+    def _initiate(self, require_entanglement:bool=True):
         """
         Initializes the quantum network by creating a timeline and topology,
         setting parameters, and identifying end nodes. If there are multiple end nodes,
@@ -308,13 +305,9 @@ class Network:
         # Load the configuration for the network topology
         load_topo = self._net_topo.load_config_json if "nodes" in self._topology else self._net_topo.load_config
         load_topo(self._topology)
-        # if isinstance(self._topology, (Dict, dict)):
-        #     self._net_topo.load_config_json(config=self._topology)
-        # else:
-        #     self._net_topo.load_config(self._topology)
 
         # Set parameters for the quantum network
-        self._set_parameters()
+        # self._set_parameters()
 
         # Identify the end nodes in the network
         self.nodes = self._net_topo.get_nodes_by_type("EndNode")
@@ -328,8 +321,10 @@ class Network:
         self._bell_pairs = {}
 
         # If there are multiple end nodes, request entanglements and rectify entanglements
-        if len(self.nodes) > 1:
+        if require_entanglement:
             self._request_entanglements()
+            # print(__name__, "Entities", self._timeline.entities)
+            # print(__name__, "Events", self._timeline.events)
             self._timeline.init()
             self._timeline.run()
             self._identify_quantum_states()
@@ -345,20 +340,19 @@ class Network:
         else:
             self._initialize_photons()
 
-    def _set_parameters(self):
-        nodes = self._net_topo.nodes
-        print('node', nodes,self._topology)
-        for node in self._topology.get("nodes", []):
-            
-            node_obj = nodes.get(node.get("Name"))
-            if node.get("Type") in ["service", "end"]:
-                for arg, val in node.get("memory", {}).items():
-                    node_obj.memory_array.update_memory_params(arg, val)
-                for arg, val in node.get("lightSource", {}).items():
-                    setattr(node_obj.lightsource, arg, val)
-            elif node.get("Type")=="bsm":
-                for arg, val in node.get("detector", {}).items():
-                    setattr(node_obj.bsm, arg, val)
+    # def _set_parameters(self):
+    #     nodes = self._net_topo.nodes
+    #     print('node', nodes,self._topology)
+    #     for node in self._topology.get("nodes", []):
+    #         node_obj = nodes.get(node.get("Name"))
+    #         if node.get("Type") in ["service", "end"]:
+    #             for arg, val in node.get("memory", {}).items():
+    #                 node_obj.memory_array.update_memory_params(arg, val)
+    #             for arg, val in node.get("lightSource", {}).items():
+    #                 setattr(node_obj.lightsource, arg, val)
+    #         elif node.get("Type")=="bsm":
+    #             for arg, val in node.get("detector", {}).items():
+    #                 setattr(node_obj.bsm, arg, val)
         # # Read the parameter data from the file
         # with open(self._parameters, "r") as file:
         #     data = json.load(file)
@@ -398,17 +392,18 @@ class Network:
 
     def _request_entanglements(self):
         # Loop through each sequence of keys in messages
-        for key_sequence in self.messages:
+        for node_sequence in self.messages:
             # Loop through each consecutive pair of keys in the sequence
-            for source_key, dest_key in itertools.pairwise(key_sequence):
+            for source_name, dest_name in itertools.pairwise(node_sequence):
                 # Get the source and destination nodes for the entanglement request
-                source_node = self._net_topo.nodes[source_key]
-                dest_node = self._net_topo.nodes[dest_key]
+                source_node = self._net_topo.nodes[source_name]
+                # dest_node = self._net_topo.nodes[dest_name]
+                print(f"Requesting {self.size} entanglements between {source_name} and {dest_name}")
 
                 # Get the transport manager for the source node and send the entanglement request
                 transport_manager = source_node.transport_manager
                 transport_manager.request(
-                    dest_node.owner.name,
+                    dest_name,
                     size=self.size,
                     start_time=self._start_time,
                     end_time=self._end_time,
@@ -465,7 +460,7 @@ class Network:
         Returns:
         - QutipCircuit: The QutipCircuit object with the specified error applied.
         """
-        model = noise_model()  # Create a new noise model
+        model = NoiseModel()  # Create a new noise model
 
         # Apply the specified error to the noise model
         match err_type:
@@ -507,7 +502,7 @@ class Network:
             f"Initialized {self.size} photons with initial states {self._initials}"
         )
 
-    def get_keys(self, node_index: int, info_state: str = "ENTANGLED"):
+    def get_keys(self, _:Optional[None], node_index: int, info_state: str = "ENTANGLED"):
         """Retrives the keys of a node, of a specific state. Updates the 'keys' attribute with the required keys.
 
         Args:
@@ -577,7 +572,7 @@ class Network:
                         _ = qtc.x(0) if i else qtc.z(0)
                     self.manager.run_circuit(qtc, [key])
 
-    def encode(self, returns: Any, msg_index: int, node_index: int = 0):
+    def encode(self, _: Any, msg_index: int, node_index: int = 0):
         """Encodes the classical bits as unitary gates on single photons. 0 & 1 are mapped to I and iY gates, respectively.
 
         Args:
@@ -599,7 +594,7 @@ class Network:
                 self.manager.run_circuit(qtc, [key])
         logging.info("message bits into qubits")
 
-    def superdense_code(self, returns: Any, msg_index: int, node_index: int = 0):
+    def superdense_code(self, _: Any, msg_index: int, node_index: int = 0):
         """Encodes 2-bit classical information through superdense coding.
 
         Args:
@@ -622,7 +617,7 @@ class Network:
             self.manager.run_circuit(qtc, [key])
         logging.info("message bits into the channel")
 
-    def teleport(self, returns: Any, node_index: int = 0, msg_index: int = 0):
+    def teleport(self, _: Any, node_index: int = 0, msg_index: int = 0):
         """Encodes message bit as superposed states and then teleports the state over the entangled channel. 0's and 1's are encoded as '+' and '-' quantum states, respectively.
 
         Args:
@@ -633,19 +628,20 @@ class Network:
         alpha = complex(1 / np.sqrt(2))
         bsa = bell_type_state_analyzer(2)
         self._corrections = {}
-        for bin, info in zip(
-            self._bin_msgs[msg_index], self[node_index].resource_manager.memory_manager
-        ):
-            key = info.memory.qstate_key
-            self.manager.new()
-            new_key = self.manager.new([alpha, ((-1) ** int(bin)) * alpha])
-            state = self.manager.get(key)
-            keys = tuple(set(state.keys) - set([key]))
-            outputs = self._add_noise(err_type="readout", qtc=bsa, keys=[new_key, key])
-            self._corrections[keys] = [outputs.get(new_key), outputs.get(key)]
+        msg = iter(self._bin_msgs[msg_index])
+        for info in self[node_index].resource_manager.memory_manager:
+            if info.state == "ENTANGLED":
+                bin = next(msg)
+                key = info.memory.qstate_key
+                new_key = self.manager.new([alpha, ((-1) ** int(bin)) * alpha])
+                state = self.manager.get(key)
+                keys = tuple(set(state.keys) - set([key]))
+                outputs = self._add_noise(err_type="readout", qtc=bsa, keys=[new_key, key])
+                self._corrections[keys] = [outputs.get(new_key), outputs.get(key)]
+                print(key, state.keys, new_key, info.state)
         logging.info("message states")
 
-    def measure(self, returns: Any):
+    def measure(self, _: Any):
         """Measures the qubits and stores the output for decoding the message
 
         Args:
@@ -668,7 +664,9 @@ class Network:
                 )
         elif hasattr(self, "_corrections"):
             output = 0
+            print(self._corrections)
             for keys, value in self._corrections.items():
+                print(keys)
                 if len(keys) > 1:
                     key = max(keys)
                     qtc = QutipCircuit(1)
@@ -699,7 +697,7 @@ class Network:
 
     # @delayed
     # @wrap_non_picklable_objects
-    def _decode(self, *args):
+    def _decode(self, *_):
         self._strings = []
         if hasattr(self, "_initials"):
             node = self.nodes[0]
@@ -714,19 +712,15 @@ class Network:
                 self._strings.append(string)
         else:
             self._strings = ["".join(str(*output.values()) for output in self._outputs)]
-        self.recv_msgs = {
-            rec[1:]: "".join(
-                chr(int(string[j * 8 : -~j * 8], 2)) for j in range(len(string) // 8)
-            )
-            for rec, string in zip(list(self.messages)[::-1], self._strings)
-        }
+        print(self._strings)
+        self.recv_msgs = {rec[1:]:message for rec, message in zip(list(self.messages)[::-1], to_characters(strings=self._strings, _was_binary=self._is_binary))}
         for k, v in self.recv_msgs.items():
             logging.info(f"Received message {k}: {v}")
 
         return self.recv_msgs
 
     @staticmethod
-    def decode(networks: List["Network"], *args):
+    def decode(networks: List["Network"], all_returns:Any, *args):
         """Decodes the received message from the meaured outputs
 
         Args:
@@ -736,13 +730,13 @@ class Network:
             List[Dict[int, str]]: The decoded messages for all the 'networks'
         """
         logging.info("messages")
-        return [network._decode(*args) for network in networks]
+        return [network._decode(return_, *arg) for network, return_, arg in zip(networks, all_returns, args)]
         # executor = ThreadPoolExecutor(max_workers=len(networks))
         # jobs = [executor.submit(network._decode, network, *args) for network in networks]
         # return [job.result() for job in  jobs]
         # return Parallel(n_jobs=-1, prefer='threads')(network._decode(network=network, *args) for network in networks)
 
-    def dump(self, returns: Any, node_name: str = "", info_state: str = ""):
+    def dump(self, _: Any, node_name: str = "", info_state: str = ""):
         """Logs the current memory state of the nodes in the network
 
         Args:
@@ -768,7 +762,7 @@ class Network:
                 dataframe = DataFrame({"keys": keys, "states": states})
         logging.info(dataframe.to_string())
 
-    def draw(self, returns: Any):
+    def draw(self, _: Any):
         """_summary_
 
         Args:

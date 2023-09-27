@@ -1,12 +1,12 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { MenuItem } from 'primeng/api';
-import { Router } from '@angular/router';
-import { HoldingDataService } from 'src/services/holding-data.service';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from "@angular/core";
+import { MenuItem } from "primeng/api";
+import { Router } from "@angular/router";
+import { HoldingDataService } from "src/app/services/holding-data.service";
 
 @Component({
-  selector: 'app-intro',
-  templateUrl: './intro.component.html',
-  styleUrls: ['./intro.component.less'],
+  selector: "app-intro",
+  templateUrl: "./intro.component.html",
+  styleUrls: ["./intro.component.less"],
   encapsulation: ViewEncapsulation.None,
 })
 export class IntroComponent implements OnInit, OnDestroy {
@@ -17,29 +17,28 @@ export class IntroComponent implements OnInit, OnDestroy {
   tel = new Teleportation();
   e2e = new E2E();
   routeFrom: string;
-  constructor(private router: Router, private holding: HoldingDataService) { }
+  constructor(private router: Router, private holding: HoldingDataService) {}
   ngOnDestroy(): void {
-    this.holding.setRoute('')
+    this.holding.setRoute("");
   }
-
   ngOnInit(): void {
     this.routeFrom = this.holding.getRoute();
-    console.log(this.routeFrom)
-    this.app = localStorage.getItem('app_id');
+    console.log(this.routeFrom);
+    this.app = localStorage.getItem("app_id");
     this.initItems();
   }
   route() {
-    this.router.navigate(['/minimal'])
+    this.router.navigate(["/minimal"]);
   }
   initItems() {
     const baseItems = [
-      { label: 'Sharing Bell States', index: 1 },
-      { label: 'Measurement', index: 2 },
-      { label: 'Revealing the bases', index: 3 },
+      { label: "Sharing Bell States", index: 1 },
+      { label: "Measurement", index: 2 },
+      { label: "Revealing the bases", index: 3 },
       // Add more labels as needed
     ];
 
-    this.items = baseItems.map(item => ({
+    this.items = baseItems.map((item) => ({
       label: item.label,
       command: () => console.log(item.index),
     }));
@@ -48,22 +47,32 @@ export class IntroComponent implements OnInit, OnDestroy {
   updateIndex(val: number) {
     this.activeIndex += val;
     this.step = val > 0 ? 1 : 2;
-    window.scroll({ top: 0, behavior: 'smooth' });
+    window.scroll({ top: 0, behavior: "smooth" });
   }
 
-  previous() { this.updateIndex(-1); }
-  next() { this.updateIndex(1); }
+  previous() {
+    this.updateIndex(-1);
+  }
+  next() {
+    this.updateIndex(1);
+  }
 
   changeStep(val: number) {
     this.step += val;
-    window.scroll({ top: 0, behavior: 'smooth' });
+    window.scroll({ top: 0, behavior: "smooth" });
   }
   goto() {
-    this.router.navigate(['/advanced'])
+    this.router.navigate(["/advanced"]);
   }
-  previousStep() { this.changeStep(-1); }
-  nextStep() { this.changeStep(1); }
-  quant_ph(url: string) { window.open(url, "_blank"); }
+  previousStep() {
+    this.changeStep(-1);
+  }
+  nextStep() {
+    this.changeStep(1);
+  }
+  quant_ph(url: string) {
+    window.open(url, "_blank");
+  }
 }
 
 export class Teleportation {

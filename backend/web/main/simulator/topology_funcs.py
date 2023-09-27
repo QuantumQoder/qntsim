@@ -1,17 +1,20 @@
+from copy import deepcopy
 import importlib
 import logging
+import os
 import time
-from contextlib import nullcontext
-from pprint import pprint
-from random import shuffle
+from random import randint, shuffle
 from statistics import mean
 from tokenize import String
+from typing import Any, Dict, List, Literal, Tuple, TypeAlias, Union
 
 import numpy as np
 import pandas as pd
-from pyvis.network import Network
-# from qntsim.library.protocol_handler.protocol_handler import Protocol
+# from qntsim.communication.interface import Interface
+from qntsim.communication.network import Network
 from qntsim.communication.protocol import ProtocolPipeline
+from qntsim.components.photon import Photon
+from qntsim.kernel.circuit import BaseCircuit
 from qntsim.topology.topology import Topology
 from tabulate import tabulate
 
@@ -19,24 +22,122 @@ from .app.e2e import *
 from .app.e91 import *
 from .app.ghz import *
 from .app.ip1 import *
-from .app.mdi_qsdc import *
-from .app.ping_pong import *
+from .app.ping_pong import ping_pong
 from .app.qsdc1 import *
 from .app.qsdc_teleportation import *
-from .app.single_photon_qd import *
 from .app.teleportation import *
 from .app.utils import *
 from .helpers import *
-from pyvis.network import Network
+
+# from contextlib import nullcontext
+# from pprint import pprint
+
+# Do Not Remove the following commented imports - this is for local testing purpose
+# from app.e2e import *
+# from app.e91 import *
+# from app.ghz import *
+# from app.ip1 import *
+# from app.mdi_qsdc import *
+# from app.ping_pong import *
+# from app.qsdc1 import *
+# from app.qsdc_teleportation import *
+# from app.single_photon_qd import *
+# from app.teleportation import *
+# from app.utils import *
+# from helpers import *
+# from pyvis.network import Network
 # from qntsim.library.protocol_handler.protocol_handler import Protocol
-from qntsim.communication.protocol import ProtocolPipeline
-from qntsim.topology.topology import Topology
-from tabulate import tabulate
-import logging
+# from qntsim.library.protocol_handler.protocol_handler import Protocol
+
 logger = logging.getLogger("main_logger." + "topology_funs")
 print("TOPP")
 print(logger.handlers)
 
+__local_circuit_json_type: TypeAlias = Dict[str, List[Dict[str, Union[str, Dict[str, Dict[str, Any]]]]]]
+__global_circuit_json_type: TypeAlias = Dict[str, __local_circuit_json_type]
+
+# def custom_executor(appParams: Dict[str, Dict[str, str]],
+#                     circuit: __global_circuit_json_type,
+#                     topology: Dict[str, Union[List[Dict[str, Any]], Dict[str, Any]]]):
+#     senders = [node for node, msgParams in appParams.items() if msgParams.get("message") != ""]
+#     messages = {(sender, *[node for node in appParams if node != sender]): appParams.get(sender).get("message") for sender in senders}
+#     interface = Interface(topology=topology, messages=messages, require_entanglement=not should_transmit(circuit))
+#     quantum_circuits = {node_name: create_circuit_object(circuit=circuit) for node_name, circuit in circuit.items()}
+#     node_map = {}
+#     qubit_num = -1
+#     for node_name, cirq in circuit.items():
+#         qubits = []
+#         for _ in cirq:
+#             qubit_num += 1
+#             qubits.append(qubit_num)
+#         node_map.update({node_name: qubits})
+
+# def should_transmit(circuit_json: __global_circuit_json_type) -> bool:
+#     for local_circuit in circuit_json.values():
+#         for gates in local_circuit.values():
+#             for gate in gates:
+#                 if gate.get("value") == "transmit": return True
+#     return False
+
+# def generate_full_circuit(circuit_json: __global_circuit_json_type,
+#                           circuit_obj_type: Literal["qiskit", "qutip"] = "qiskit") -> BaseCircuit:
+#     circuit: BaseCircuit = BaseCircuit(circuit_obj_type, sum(len(cirq) for cirq in circuit_json.values()))
+#     qubit_pos = -1
+#     for cirq in circuit_json.values():
+#         local_circuit: BaseCircuit = create_circuit_object(cirq, circuit_obj_type)
+#         qubit_map: Dict[int, int] = {}
+#         for i in range(local_circuit.num_qubits):
+#             qubit_pos += 1
+#             qubit_map.update({i: qubit_pos})
+#         circuit.combine_circuit(local_circuit, qubit_map)
+#     return circuit
+
+# def create_circuit_object(circuit: __local_circuit_json_type,
+#                           circuit_obj_type: Literal["qiskit", "qutip"] = "qiskit") -> BaseCircuit:
+#     circuit: BaseCircuit = BaseCircuit(circuit_obj_type, len(circuit))
+#     qubit_num = -1
+#     for gates in circuit.values():
+#         qubit_num += 1
+#         qubits = [qubit_num]
+#         for gate_index, gate in enumerate(gates):
+#             angles = []
+#             match gate.get("value"):
+#                 case "i": continue
+#                 case "control": gate, qubits = get_controlled_gate(circuit, gate_index)
+#                 case "swap": gate, qubits = get_swap_partner(circuit, qubit_num, gate_index)
+#                 case str() if "params" in gate: angles = [float(angle.get("value", 0)) for angle in gate.get("params", {}).values()]
+#             gate = gate.get("value")
+#             circuit.apply_gate(gate, qubits, angles)
+#     return circuit
+
+# def get_controlled_gate(circuit_json: Union[__global_circuit_json_type, __local_circuit_json_type],
+#                         layer_index: int) -> Tuple[Dict[str, str], List[int]]:
+#     gate_name = ""
+#     qubit_pos = -1
+#     qubits = []
+#     for cirq in circuit_json.values():
+#         for gates in cirq.values():
+#             qubit_pos += 1
+#             gate = gates[layer_index].get("value")
+#             if gate != "i":
+#                 gate_name += gate[0]
+#                 qubits.append(qubit_pos)
+#                 gates[layer_index]["value"] = "i"
+#     return {"value": gate_name}, qubits
+
+# def get_swap_partner(circuit_json: Union[__global_circuit_json_type, __local_circuit_json_type],
+#                      qubit_index: int, layer_index: int) -> Tuple[Dict[str, str], List[int]]:
+#     qubit_pos = -1
+#     qubits = [qubit_index]
+#     for cirq in circuit_json.values():
+#         for gates in cirq.values():
+#             qubit_pos += 1
+#             gate = gates[layer_index].get("value")
+#             if gate == "swap":
+#                 gates[layer_index]["value"] = "i"
+#                 if qubit_pos not in qubits:
+#                     qubits.append(qubit_pos)
+#                     return {"value": "swap"}, qubits
 
 def display_quantum_state(state_vector):
     """
@@ -194,6 +295,22 @@ def e91(network_config, sender, receiver, keyLength):
 
     return {"Error_Msg": "Couldn't generate required length.Retry Again"}
 
+def test_e91():
+    # network_config = {"nodes":[{"Name":"n1","Type":"service","noOfMemory":500,"memory":{"frequency":2000,"expiry":2000,"efficiency":1,"fidelity":0.93}},{"Name":"n2","Type":"end","noOfMemory":500,"memory":{"frequency":2000,"expiry":2000,"efficiency":1,"fidelity":0.93}}],"quantum_connections":[{"Nodes":["n1","n2"],"Attenuation":0.00001,"Distance":70}],"classical_connections":[{"Nodes":["n1","n1"],"Delay":0,"Distance":1000},{"Nodes":["n1","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n2"],"Delay":0,"Distance":1000}]}
+    # network_config = {"nodes":[{"Name":"n1","Type":"end","noOfMemory":500,"memory":{"frequency":80e6,"expiry":-1,"efficiency":1,"fidelity":0.93}},{"Name":"n2","Type":"service","noOfMemory":500,"memory":{"frequency":80e6,"expiry":-1,"efficiency":1,"fidelity":0.93}},{"Name":"n3","Type":"service","noOfMemory":500,"memory":{"frequency":80e6,"expiry":-1,"efficiency":1,"fidelity":0.93}},{"Name":"n4","Type":"end","noOfMemory":500,"memory":{"frequency":80e6,"expiry":-1,"efficiency":1,"fidelity":0.93}}],"quantum_connections":[{"Nodes":["n1","n2"],"Attenuation":0.0001,"Distance":70},{"Nodes":["n2","n3"],"Attenuation":0.0001,"Distance":70},{"Nodes":["n3","n4"],"Attenuation":0.0001,"Distance":70}],"classical_connections":[{"Nodes":["n1","n1"],"Delay":0,"Distance":0},{"Nodes":["n1","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n1","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n1","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n2"],"Delay":0,"Distance":0},{"Nodes":["n2","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n3"],"Delay":0,"Distance":0},{"Nodes":["n3","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n4"],"Delay":0,"Distance":0}]}
+    network_config = {"nodes":[{"Name":"n1","Type":"end","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99},{"Name":"n2","Type":"service","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99},{"Name":"n3","Type":"service","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99},{"Name":"n4","Type":"end","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99}],"quantum_connections":[{"Nodes":["n1","n2"],"Attenuation":0.0001,"Distance":70},{"Nodes":["n2","n3"],"Attenuation":0.0001,"Distance":70},{"Nodes":["n3","n4"],"Attenuation":0.0001,"Distance":70}],"classical_connections":[{"Nodes":["n1","n1"],"Delay":0,"Distance":0},{"Nodes":["n1","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n1","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n1","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n2"],"Delay":0,"Distance":0},{"Nodes":["n2","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n3"],"Delay":0,"Distance":0},{"Nodes":["n3","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n4"],"Delay":0,"Distance":0}]}
+    sender = "n1"
+    receiver = "n4"
+    startTime = 1e12
+    size = 6
+    priority = 0
+    targetFidelity = 0.95
+    timeout = 1.2e12
+    key_length = 2
+    report = e91(network_config, sender, receiver, key_length)
+    print(report)
+
+# test_e91()
 
 def e2e(network_config, sender, receiver, startTime, size, priority, targetFidelity, timeout):
     logger.info("End-to-End Bell Pair Distribution")
@@ -237,6 +354,45 @@ def e2e(network_config, sender, receiver, startTime, size, priority, targetFidel
     }"""
     return results
 
+def test_e2e():
+    # network_config = {"nodes":[{"Name":"n1","Type":"service","noOfMemory":500,"memory":{"frequency":2000,"expiry":2000,"efficiency":1,"fidelity":0.93}},{"Name":"n2","Type":"end","noOfMemory":500,"memory":{"frequency":2000,"expiry":2000,"efficiency":1,"fidelity":0.93}}],"quantum_connections":[{"Nodes":["n1","n2"],"Attenuation":0.00001,"Distance":70}],"classical_connections":[{"Nodes":["n1","n1"],"Delay":0,"Distance":1000},{"Nodes":["n1","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n2"],"Delay":0,"Distance":1000}]}
+    # network_config = {"nodes":[{"Name":"n1","Type":"end","noOfMemory":500,"memory":{"frequency":80e6,"expiry":-1,"efficiency":1,"fidelity":0.93}},{"Name":"n2","Type":"service","noOfMemory":500,"memory":{"frequency":80e6,"expiry":-1,"efficiency":1,"fidelity":0.93}},{"Name":"n3","Type":"service","noOfMemory":500,"memory":{"frequency":80e6,"expiry":-1,"efficiency":1,"fidelity":0.93}},{"Name":"n4","Type":"end","noOfMemory":500,"memory":{"frequency":80e6,"expiry":-1,"efficiency":1,"fidelity":0.93}}],"quantum_connections":[{"Nodes":["n1","n2"],"Attenuation":0.0001,"Distance":70},{"Nodes":["n2","n3"],"Attenuation":0.0001,"Distance":70},{"Nodes":["n3","n4"],"Attenuation":0.0001,"Distance":70}],"classical_connections":[{"Nodes":["n1","n1"],"Delay":0,"Distance":0},{"Nodes":["n1","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n1","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n1","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n2"],"Delay":0,"Distance":0},{"Nodes":["n2","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n3"],"Delay":0,"Distance":0},{"Nodes":["n3","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n4"],"Delay":0,"Distance":0}]}
+    network_config = {"nodes":[{"Name":"n1","Type":"end","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99},{"Name":"n2","Type":"service","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99},{"Name":"n3","Type":"service","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99},{"Name":"n4","Type":"end","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99}],"quantum_connections":[{"Nodes":["n1","n2"],"Attenuation":0.0001,"Distance":70},{"Nodes":["n2","n3"],"Attenuation":0.0001,"Distance":70},{"Nodes":["n3","n4"],"Attenuation":0.0001,"Distance":70}],"classical_connections":[{"Nodes":["n1","n1"],"Delay":0,"Distance":0},{"Nodes":["n1","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n1","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n1","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n2"],"Delay":0,"Distance":0},{"Nodes":["n2","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n3"],"Delay":0,"Distance":0},{"Nodes":["n3","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n4"],"Delay":0,"Distance":0}]}
+    sender = "n1"
+    receiver = "n2"
+    startTime = 1e12
+    size = 5
+    priority = 0
+    targetFidelity = 0.97
+    timeout = 5e12
+    report = e2e(network_config, sender, receiver, startTime, size, priority, targetFidelity, timeout)
+    print(report)
+
+# test_e2e()
+
+def test_direct_transmission():
+    network_config = {"nodes":[{"Name":"n1","Type":"end","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99},{"Name":"n2","Type":"service","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99},{"Name":"n3","Type":"service","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99},{"Name":"n4","Type":"end","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99}],"quantum_connections":[{"Nodes":["n1","n2"],"Attenuation":0.0001,"Distance":70},{"Nodes":["n2","n3"],"Attenuation":0.0001,"Distance":70},{"Nodes":["n3","n4"],"Attenuation":0.0001,"Distance":70}],"classical_connections":[{"Nodes":["n1","n1"],"Delay":0,"Distance":0},{"Nodes":["n1","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n1","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n1","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n2"],"Delay":0,"Distance":0},{"Nodes":["n2","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n3"],"Delay":0,"Distance":0},{"Nodes":["n3","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n4"],"Delay":0,"Distance":0}]}
+    src = "n1"
+    dst = "n4"
+
+    start_time = time.time()
+    print('network config', network_config)
+    network_config_json, tl, network_topo = load_topology(
+        network_config, "Qiskit")
+    node_s = network_topo.nodes[src]
+    node_d = network_topo.nodes[dst]
+    logger.info('Sending qubit...')
+    # tl.stop_time=30e12
+    node_s.send_qubit(dst, Photon('dummy_photon'))
+    tl.init()
+    tl.run()
+    print(f'Buffer at destination node: {node_d.name}:{node_d.qubit_buffer}')
+    print(f'Buffer at n1:{network_topo.nodes["n1"].qubit_buffer}')
+    print(f'Buffer at n2:{network_topo.nodes["n2"].qubit_buffer}')
+    print(f'Buffer at n3:{network_topo.nodes["n3"].qubit_buffer}')
+    print(f'Buffer at n4:{network_topo.nodes["n4"].qubit_buffer}')
+
+# test_direct_transmission()
 
 def ghz(network_config, endnode1, endnode2, endnode3, middlenode):
     logger.info("End-to-End GHZ Generation")
@@ -286,32 +442,32 @@ def ip1(network_config, sender, receiver, message):
     return report
 
 
-def ping_pong(network_config, sender, receiver, sequenceLength, message):
-    logger.info("PingPong QSDC")
-    start_time = time.time()
-    network_config_json, tl, network_topo = load_topology(
-        network_config, "Qutip")
-    if len(message) <= 9:
-        n = int(sequenceLength*len(message))
-        alice = network_topo.nodes[sender]
-        bob = network_topo.nodes[receiver]
-        pp = PingPong()
-        alice, bob, source_node_list = pp.roles(alice, bob, n)
-        tl.init()
-        tl.run()
-        pp.create_key_lists(alice, bob)
-        results = pp.run(sequenceLength, message)
-        report = {}
-        report["application"] = results
-        end_time = time.time()
-        execution_time = end_time-start_time
-        report = network_graph(network_topo, source_node_list, report)
-        report["performance"]["execution_time"] = execution_time
-        print(report)
-        return report
-    else:
-        print("message should be less than or equal to 9")
-        return None
+# def ping_pong(network_config, sender, receiver, sequenceLength, message):
+#     logger.info("PingPong QSDC")
+#     start_time = time.time()
+#     network_config_json, tl, network_topo = load_topology(
+#         network_config, "Qutip")
+#     if len(message) <= 9:
+#         n = int(sequenceLength*len(message))
+#         alice = network_topo.nodes[sender]
+#         bob = network_topo.nodes[receiver]
+#         pp = PingPong()
+#         alice, bob, source_node_list = pp.roles(alice, bob, n)
+#         tl.init()
+#         tl.run()
+#         pp.create_key_lists(alice, bob)
+#         results = pp.run(sequenceLength, message)
+#         report = {}
+#         report["application"] = results
+#         end_time = time.time()
+#         execution_time = end_time-start_time
+#         report = network_graph(network_topo, source_node_list, report)
+#         report["performance"]["execution_time"] = execution_time
+#         print(report)
+#         return report
+#     else:
+#         print("message should be less than or equal to 9")
+#         return None
 
 
 def qsdc1(network_config, sender, receiver, sequenceLength, key):
@@ -393,6 +549,7 @@ def qsdc_teleportation(network_config, sender, receiver, message, attack):
     print('network config json', network_topo)
     with open("topology.json", "w") as outfile:
         json.dump(topo_json, outfile)
+    print("messages ", sender, receiver, message)
     messages = {(sender, receiver): message}
     # attack=None
     topology = '/code/web/topology.json'

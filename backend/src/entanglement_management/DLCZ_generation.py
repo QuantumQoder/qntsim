@@ -17,8 +17,8 @@ if TYPE_CHECKING:
 
 from .entanglement_protocol import EntanglementProtocol
 from ..message import Message
-from ..kernel._event import Event
-from ..components.circuit import BaseCircuit
+from ..kernel.event import Event
+from ..kernel.circuit import BaseCircuit
 from ..utils import log
 from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
@@ -102,9 +102,9 @@ class EntanglementGenerationA(EntanglementProtocol):
     # TODO: use a function to update resource manager
 
     #_plus_state = [sqrt(1/2), sqrt(1/2)]
-    #_flip_circuit = Circuit(1)
+    #_flip_circuit = BaseCircuit(1)
     #_flip_circuit.x(0)
-    #_z_circuit = Circuit(1)
+    #_z_circuit = BaseCircuit(1)
     #_z_circuit.z(0)
 
 
@@ -144,12 +144,12 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.isSuccess = False
 
         self.state = 0
-        Circuit =BaseCircuit.create(self.memory.timeline.type)
+        BaseCircuit =BaseCircuit.create(self.memory.timeline.type)
         # #print("gen circuit",BaseCircuit.create(self.memory.timeline.type))
         self._plus_state = [sqrt(1/2), sqrt(1/2)]
-        self._flip_circuit = Circuit(1)
+        self._flip_circuit = BaseCircuit(1)
         self._flip_circuit.x(0)
-        self._z_circuit = Circuit(1)
+        self._z_circuit = BaseCircuit(1)
         self._z_circuit.z(0)
 
     def received_message(self):
@@ -465,7 +465,7 @@ class EntanglementGenerationA(EntanglementProtocol):
         dst=self.subtask.task.get_reservation().responder
         src=self.subtask.task.get_reservation().initiator
         if (self.own.name==src and self.other==dst) or (self.own.name==dst and self.other==src) :
-            print(f'Entanglement sucessful between {src,dst}')
+            print(f'Entanglement successful between {src,dst}')
 
 
     def _entanglement_fail(self):

@@ -8,21 +8,29 @@ from typing import Any, Dict, List, Tuple
 
 from numpy import mean
 from numpy.random import randint
-from qntsim.communication import (ATTACK_TYPE, Attack, ErrorAnalyzer, Network,
-                                  bell_type_state_analyzer, insert_check_bits,
-                                  insert_decoy_photons, string_to_binary)
-from qntsim.components.circuit import QutipCircuit
-import logging
+from qntsim.communication.attack import ATTACK_TYPE, Attack
+from qntsim.communication.error_analyzer import ErrorAnalyzer
+from qntsim.communication.network import Network
+from qntsim.communication.analyzer_circuits import bell_type_state_analyzer
+from qntsim.communication.security_checks import insert_check_bits, insert_decoy_photons
+from qntsim.communication.utils import to_binary, to_characters
+
+
+
+from qntsim.communication.template import Party
+from qntsim.communication.utils import pass_values
+from qntsim.kernel.circuit import QutipCircuit
+
 logger = logging.getLogger("main_logger.application_layer." + "ip2")
 # from main.simulator.topology_funcs import network_graph
 
 
-logging.basicConfig(
-    filename="ip2.log",
-    filemode="w",
-    level=logging.INFO,
-    format="%(pathname)s %(threadName)s %(module)s %(funcName)s %(message)s",
-)
+# logging.basicConfig(
+#     filename="ip2.log",
+#     filemode="w",
+#     level=logging.INFO,
+#     format="%(pathname)s %(threadName)s %(module)s %(funcName)s %(message)s",
+# )
 
 
 class Party:
@@ -43,20 +51,25 @@ class Sender(Party):
     num_check_bits: int = None
 
     @classmethod
-    def input_check_bits(cls, network: Network, returns: Any):
+    def input_check_bits(cls, network: Network, returns: Any, receiver:'Receiver'):
         """Alice inserts random check bits into her message for estimating the integrity of the received message
         Args:
             network (Network): The <Network> instance which executes the sequence of functions
             returns (Any): Returns from the previous function in the sequence
         """
+        cls._isit, messages = to_binary(cls.input_messages.get((cls.node, receiver.node)))
+        cls.input_messages[(cls.node, receiver.node)] = messages
+        print(cls.input_messages)
         modified_message = insert_check_bits(
             messages=list(cls.input_messages.values()),
             num_check_bits=cls.num_check_bits,
         )
         cls.chk_bts_insrt_lctns = list(modified_message)[0]
+        print(modified_message)
         for key, mod_msg in zip(cls.input_messages, modified_message.values()):
             cls.input_messages[key] = mod_msg
         logging.info(f"in message by {cls.__name__}!")
+        logger.info("Check bits inserted by sender")
 
     @classmethod
     def encode(cls, network: Network, returns: Any, receiver:'Receiver'):
@@ -68,6 +81,7 @@ class Sender(Party):
         Returns:
             cls.d_a: List of memory keys of decoy photons
         """
+        print(cls.input_messages)
         cls.i_a, cls.d_a = returns[1], returns[2]
         cls.s_a = [ele for ele in returns[0] if ele not in cls.i_a]
         cls.m_a = sample(cls.s_a, k=len(cls.s_a) - len(cls.userID) // 2)
@@ -103,6 +117,7 @@ class Sender(Party):
             network.manager.run_circuit(qtc, [d])
         logging.info(f"message by {cls.__name__}")
         logger.info(f"message by {cls.__name__}")
+        logger.info("bits encoded by sender")
 
         return cls.d_a
 
@@ -118,14 +133,14 @@ class Sender(Party):
         Returns:
             cls.d_a: List of memory keys of decoy photons
         """
-        if -1 in returns: return returns
+        if "-1" in returns: return returns
         cls.d_a, cls.photons_a = insert_decoy_photons(
             network=network, node_index=0, num_decoy_photons=num_decoy_photons
         )
         cls.q_a = cls.s_a + cls.i_a + cls.d_a
         logging.info(f"in key-sequence by {cls.__name__}")
         logger.info(f"in key-sequence by {cls.__name__}")
-
+        logger.info("Inserted decoy photons by sender")
         return cls.d_a
 
 
@@ -182,11 +197,12 @@ class Receiver(Party):
         Returns:
             _type_: _description_
         """
-        if -1 in returns: return returns
+        if "-1" in returns: return returns
         outputs = "".join(
             str(output) for outputs in returns for output in outputs.values()
         )
-
+        outputs = "".join([str(int(network.label[0])^int(o0))+str(int(network.label[1])^int(o1)) for o0, o1 in zip(outputs[::2], outputs[1::2])])
+        logger.info("message decoded by receiver")
         return outputs
 
     @classmethod
@@ -198,22 +214,25 @@ class Receiver(Party):
             cls1 (_type_): _description_
             threshold (float): _description_
         """
-        if -1 in returns: return returns
-        if -1 in returns: return returns
+        if "-1" in returns: return returns
+        print(returns)
         cls.received_msgs = "".join(
             char for i, char in enumerate(returns) if i not in cls1.chk_bts_insrt_lctns
         )
-        network._strings = cls.received_msgs
+        network._strings = [cls.received_msgs]
+        print(cls1._isit, cls.received_msgs, network._strings)
+        cls.received_msgs = to_string(strings=[cls.received_msgs], _was_binary=cls1._isit)[0]
+        print(cls1._isit, cls.received_msgs, network._strings)
         err = [
             int(returns[pos]) ^ int(cls1.input_messages.get((cls1.node, cls.node))[pos])
             for pos in cls1.chk_bts_insrt_lctns
         ]
         if (err_prct := sum(err) / len(err)) > threshold:
-            logging.info("failed, err=", 1 - err_prct)
+            logging.info(f"failed, err= {1 - err_prct}")
             return
         logging.info(f"passed, messages received: {cls.received_msgs}")
         logger.info(f"passed, messages received: {cls.received_msgs}")
-
+        logger.info("Integrity checked by receiver")
 
 class UTP:
     @classmethod
@@ -228,7 +247,7 @@ class UTP:
             cls2 (_type_): _description_
             threshold (float): _description_
         """
-        if -1 in returns: return returns
+        if "-1" in returns: return returns
         print(f"channel_security between {cls1.__name__} and {cls2.__name__}")
         keys = returns if cls1 == Sender or cls2 == Sender else cls2.d_b
         basis = cls2.photons_a if cls1 != cls or cls2 == Sender else cls2.photons_b
@@ -249,11 +268,11 @@ class UTP:
                 f"failed between {cls1.__name__} and {cls2.__name__}, err={mean_}"
             )
             # sys.exit(f"failed between {cls1.__name__} and {cls2.__name__}, err={mean_}")
-            return {-1:f'failed between {cls1.__name__} and {cls2.__name__}, err={mean(err)}'}
+            return {"-1":f'failed between {cls1.__name__} and {cls2.__name__}, err={mean(err)}'}
             # os._exit(f'Security of the channel between {cls1.__name__} and {cls2.__name__} is compromised.')
         logging.info(f"passed between {cls1.__name__} and {cls2.__name__}")
         logger.info(f"passed between {cls1.__name__} and {cls2.__name__}")
-
+        logger.info("Channel security checked by UTP")
         return returns
 
     @staticmethod
@@ -268,6 +287,7 @@ class UTP:
         Returns:
             _type_: _description_
         """
+        if "-1" in returns: return returns
         outputs = []
         for ia, ib in zip(cls1.i_a, cls2.i_b):
             state = network.manager.get(ia)
@@ -282,10 +302,12 @@ class UTP:
             str(output) if i % 2 else str(output ^ cls1.basis[i // 2])
             for i, output in enumerate(outputs)
         )
+        # outputs = "".join([str(int(o)^int(b)) for o, b in zip(outputs, network.label+network.label)])
+        outputs = "".join([str(int(network.label[0])^int(o0))+str(int(network.label[1])^int(o1)) for o0, o1 in zip(outputs[::2], outputs[1::2])])
         print("1", outputs)
         if outputs != cls2.userID:
             # sys.exit(f"{cls2.__name__} is not authenticated")
-            return {-1:f'{cls2.__name__} is not authenticated'}
+            return {"-1":f'{cls2.__name__} is not authenticated'}
             # os._exit(f'{cls2.__name__} is not authenticated')
         else:
             logging.info(f"{cls2.__name__}, passed!")
@@ -300,14 +322,17 @@ class UTP:
                     ).values()
                 )
             )
-        outputs = "".join(str(o) for o in outputs)
+        # outputs = "".join([str(int(o)^int(b)) for o, b in zip(outputs, network.label+network.label)])
+        outputs = "".join([str(int(network.label[0])^int(o0))+str(int(network.label[1])^int(o1)) for o0, o1 in zip(outputs[::2], outputs[1::2])])
         print("2", outputs)
         if outputs != cls1.userID:
-            sys.exit(f"{cls1.__name__} is not authenticated")
+            return {"-1":f'{cls1.__name__} is not authenticated'}
+            # sys.exit(f"{cls1.__name__} is not authenticated")
             # os._exit(f'{cls1.__name__} is not authenticated')
         else:
             logging.info(f"{cls1.__name__}, passed!")
             logger.info(f"{cls1.__name__}, passed!")
+            logger.info("Channle authenticated by UTP")
 
         return outputs
 
@@ -321,7 +346,7 @@ class UTP:
         Returns:
             _type_: _description_
         """
-        if -1 in returns: return returns
+        if "-1" in returns: return returns
         outputs = []
         for m in cls.s_a:
             if m in cls.m_a:
@@ -329,7 +354,7 @@ class UTP:
                 outputs.append(
                     network.manager.run_circuit(circuit=circuit, keys=state.keys)
                 )
-
+        logger.info("measurement performed by UTP")
         return outputs
 
 
@@ -388,19 +413,6 @@ def pass_(network: Network, returns: Any):
 
 def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
     message = app_settings.get("sender").get("message")
-    is_binary = all(char in '01' for char in message)
-    message = (
-        message
-        if is_binary
-        else string_to_binary(
-            {
-                (
-                    app_settings.get("sender").get("node"),
-                    app_settings.get("receiver").get("node"),
-                ): message
-            }
-        )[0]
-    )
     app_settings.get("sender").update(
         {
             "input_messages": {
@@ -414,18 +426,19 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
     Sender.update_params(**(app_settings.get("sender")))
     Receiver.update_params(**(app_settings.get("receiver")))
     label = app_settings.get("bell_type", "00")
-    error_threshold = app_settings.get("error_threshold")
+    error_threshold = app_settings.get("error_threshold", 0.5)
     attack = app_settings.get("attack")
     channel = app_settings.get("channel")
-    channel = [1 if i == channel else 0 for i in range(3)]
+    channel = [1 if i+1 == channel else 0 for i in range(3)]
+    print(attack, channel)
     Network._flow = [
-        partial(Network.draw),
-        partial(Network.dump),
-        partial(Sender.input_check_bits),
+        # partial(Network.draw),
+        # partial(Network.dump),
+        partial(Sender.input_check_bits, receiver=Receiver),
         partial(Receiver.setup, num_decoy_photons=Sender.num_decoy_photons),
         partial(Sender.encode, receiver=Receiver),
         partial(Attack.implement, attack=ATTACK_TYPE[attack].value)
-        if attack and channel[0]
+        if attack in ATTACK_TYPE.__members__ and channel[0]
         else partial(pass_),
         partial(
             UTP.check_channel_security,
@@ -441,7 +454,7 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
             UTP.check_channel_security, cls1=UTP, cls2=Sender, threshold=error_threshold
         ),
         partial(Attack.implement, attack=ATTACK_TYPE[attack].value)
-        if attack and channel[2]
+        if attack in ATTACK_TYPE.__members__ and channel[2]
         else partial(pass_),
         partial(
             UTP.check_channel_security, cls1=UTP, cls2=Receiver, threshold=error_threshold
@@ -469,6 +482,7 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
     start_time = time.time()
     err_msg = network()
     end_time = time.time()
+    # print(network._bin_msgs, network._strings)
     if not err_msg:
         err_tuple = ErrorAnalyzer._analyse(network=network)
         print(f"Average error in network:{err_tuple[2]}")
@@ -485,17 +499,20 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
             info_leak=err_tuple[4],
             msg_fidelity=err_tuple[5],
         )
-    else: app_settings.update({"Err_msg":err_msg.get(-1, "Unidentified error.")})
-    app_settings.pop("inpit_messages")
+    else: app_settings.update({"Err_msg":err_msg.get("-1", "Unidentified error.")})
+    app_settings.get("sender").pop("input_messages")
+    # app_settings.get("sender")["userID"] = to_string(strings=[app_settings.get("sender").get("userID")], _was_binary=_is_sender)[0]
+    # app_settings.get("receiver")["userID"] = to_string(strings=[app_settings.get("receiver").get("userID")], _was_binary=_is_receiver)[0]
     response = {}
     response["application"] = app_settings
+    print(response)
     from main.simulator.topology_funcs import network_graph
 
     # from ..topology_funcs import network_graph
     response = network_graph(
         network_topo=network._net_topo, source_node_list=[Sender.node], report=response
     )
-    response["performance"]["execution_time"] = start_time - end_time
+    response["performance"]["execution_time"] = end_time - start_time
 
     # return network, Receiver.received_msgs, err_tuple[2:]
     return response
@@ -503,87 +520,289 @@ def ip2_run(topology: Dict[str, Any], app_settings: Dict[str, Any]):
 
 if __name__ == "__main__":
     topology = {
-        "nodes": [
+        'nodes': [
             {
-                "Name": "n1",
-                "Type": "end",
-                "noOfMemory": 500,
-                "memory": {
-                    "frequency": 2000,
-                    "expiry": 2000,
-                    "efficiency": 0,
-                    "fidelity": 0.93,
+                'Name': 'node1',
+                'Type': 'end',
+                'noOfMemory': 500,
+                'memory': {
+                    'frequency': 80000000,
+                    'expiry': -1,
+                    'efficiency': 1,
+                    'fidelity': 0.93
+                    },
+                'lightSource': {
+                    'frequency': 80000000,
+                    'wavelength': 1550,
+                    'bandwidth': 0,
+                    'mean_photon_num': 0.1,
+                    'phase_error': 0
+                    }
                 },
-            },
             {
-                "Name": "n2",
-                "Type": "end",
-                "noOfMemory": 500,
-                "memory": {
-                    "frequency": 2000,
-                    "expiry": 2000,
-                    "efficiency": 0,
-                    "fidelity": 0.93,
-                },
-            },
+                'Name': 'node2',
+                'Type': 'end',
+                'noOfMemory': 500,
+                'memory': {
+                    'frequency': 80000000,
+                    'expiry': -1,
+                    'efficiency': 1,
+                    'fidelity': 0.93
+                    },
+                'lightSource': {
+                    'frequency': 80000000,
+                    'wavelength': 1550,
+                    'bandwidth': 0,
+                    'mean_photon_num': 0.1,
+                    'phase_error': 0
+                    }
+                }
+            ],
+        'quantum_connections': [
             {
-                "Name": "n3",
-                "Type": "end",
-                "noOfMemory": 500,
-                "memory": {
-                    "frequency": 2000,
-                    "expiry": 2000,
-                    "efficiency": 0,
-                    "fidelity": 0.93,
-                },
-            },
+                'Nodes': ['node1', 'node2'],
+                'Attenuation': 0.1,
+                'Distance': 70
+                }
+            ],
+        'classical_connections': [
             {
-                "Name": "n4",
-                "Type": "service",
-                "noOfMemory": 500,
-                "memory": {
-                    "frequency": 2000,
-                    "expiry": 2000,
-                    "efficiency": 0,
-                    "fidelity": 0.93,
+                'Nodes': ['node1', 'node1'],
+                'Delay': 0,
+                'Distance': 0
                 },
-            },
-        ],
-        "quantum_connections": [
-            {"Nodes": ["n1", "n4"], "Attenuation": 0.00001, "Distance": 70},
-            {"Nodes": ["n2", "n4"], "Attenuation": 0.00001, "Distance": 70},
-            {"Nodes": ["n3", "n4"], "Attenuation": 0.00001, "Distance": 70},
-        ],
-        "classical_connections": [
-            {"Nodes": ["n1", "n1"], "Delay": 0, "Distance": 1000},
-            {"Nodes": ["n1", "n2"], "Delay": 1000000000, "Distance": 1000},
-            {"Nodes": ["n1", "n3"], "Delay": 1000000000, "Distance": 1000},
-            {"Nodes": ["n1", "n4"], "Delay": 1000000000, "Distance": 1000},
-            {"Nodes": ["n2", "n1"], "Delay": 1000000000, "Distance": 1000},
-            {"Nodes": ["n2", "n2"], "Delay": 0, "Distance": 1000},
-            {"Nodes": ["n2", "n3"], "Delay": 1000000000, "Distance": 1000},
-            {"Nodes": ["n2", "n4"], "Delay": 1000000000, "Distance": 1000},
-            {"Nodes": ["n3", "n1"], "Delay": 1000000000, "Distance": 1000},
-            {"Nodes": ["n3", "n2"], "Delay": 1000000000, "Distance": 1000},
-            {"Nodes": ["n3", "n3"], "Delay": 0, "Distance": 1000},
-            {"Nodes": ["n3", "n4"], "Delay": 1000000000, "Distance": 1000},
-            {"Nodes": ["n4", "n1"], "Delay": 1000000000, "Distance": 1000},
-            {"Nodes": ["n4", "n2"], "Delay": 1000000000, "Distance": 1000},
-            {"Nodes": ["n4", "n3"], "Delay": 1000000000, "Distance": 1000},
-            {"Nodes": ["n4", "n4"], "Delay": 0, "Distance": 1000},
-        ],
-    }
+            {
+                'Nodes': ['node1', 'node2'],
+                'Delay': 10000000000,
+                'Distance': 1000
+                },
+            {
+                'Nodes': ['node2', 'node1'],
+                'Delay': 10000000000,
+                'Distance': 1000
+                },
+            {
+                'Nodes': ['node2', 'node2'],
+                'Delay': 0,
+                'Distance': 0
+                }
+            ],
+        'detector': {
+            'efficiency': 1,
+            'count_rate': 25000000,
+            'time_resolution': 150
+            }
+        }
+        # "nodes":[
+        #     {
+        #         "Name":"node1",
+        #         "Type":"end",
+        #         "noOfMemory":500,
+        #         "memory": {
+        #             "frequency": 8000000,
+        #             "expiry": -1,
+        #             "efficiency": 1,
+        #             "fidelity": 0.93}
+        #         },
+        #     {
+        #         "Name":"node2",
+        #         "Type":"service",
+        #         "noOfMemory":500,
+        #         "memory": {
+        #             "frequency": 8000000,
+        #             "expiry": -1,
+        #             "efficiency": 1,
+        #             "fidelity": 0.93}
+        #         },
+        #     {
+        #         "Name":"node3",
+        #         "Type":"end",
+        #         "noOfMemory":500,
+        #         "memory": {
+        #             "frequency": 8000000,
+        #             "expiry": -1,
+        #             "efficiency": 1,
+        #             "fidelity": 0.93}},
+        #     {
+        #         "Name":"node4",
+        #         "Type":"end",
+        #         "noOfMemory":500,
+        #         "memory": {
+        #             "frequency": 8000000,
+        #             "expiry": -1,
+        #             "efficiency": 1,
+        #             "fidelity": 0.93}}],
+        # "quantum_connections":[
+        #     {
+        #         "Nodes":["node1", "node2"],
+        #         "Attenuation":1e-5,
+        #         "Distance":70
+        #         },
+        #     {
+        #         "Nodes":["node2", "node3"],
+        #         "Attenuation":1e-5,
+        #         "Distance":70
+        #         },
+        #     {
+        #         "Nodes":["node3", "node4"],
+        #         "Attenuation":1e-5,
+        #         "Distance":70
+        #         }
+        #     ],
+        # "classical_connections":[
+        #     {
+        #         "Nodes":["node1", "node1"],
+        #         "Delay":0,
+        #         "Distance":0},
+        #     {
+        #         "Nodes":["node1", "node2"],
+        #         "Delay":1e9,
+        #         "Distance":1000},
+        #     {
+        #         "Nodes":["node1", "node3"],
+        #         "Delay":1e9,
+        #         "Distance":1000},
+        #     {
+        #         "Nodes":["node1", "node4"],
+        #         "Delay":1e9,
+        #         "Distance":1000},
+        #     {
+        #         "Nodes":["node2", "node1"],
+        #         "Delay":1e9,
+        #         "Distance":1000},
+        #     {
+        #         "Nodes":["node2", "node2"],
+        #         "Delay":0,
+        #         "Distance":0},
+        #     {
+        #         "Nodes":["node2", "node3"],
+        #         "Delay":1e9,
+        #         "Distance":1000},
+        #     {
+        #         "Nodes":["node2", "node4"],
+        #         "Delay":1e9,
+        #         "Distance":1000},
+        #     {
+        #         "Nodes":["node3", "node1"],
+        #         "Delay":1e9,
+        #         "Distance":1000},
+        #     {
+        #         "Nodes":["node3", "node2"],
+        #         "Delay":1e9,
+        #         "Distance":1000},
+        #     {
+        #         "Nodes":["node3", "node3"],
+        #         "Delay":0,
+        #         "Distance":0
+        #         },
+        #     {
+        #         "Nodes":["node3", "node4"],
+        #         "Delay":1e9,
+        #         "Distance":1000
+        #         },
+        #     {
+        #         "Nodes":["node4", "node1"],
+        #         "Delay":1e9,
+        #         "Distance":1000},
+        #     {
+        #         "Nodes":["node4", "node2"],
+        #         "Delay":1e9,
+        #         "Distance":1000},
+        #     {
+        #         "Nodes":["node4", "node3"],
+        #         "Delay":1e9,
+        #         "Distance":1000
+        #         },
+        #     {
+        #         "Nodes":["node4", "node4"],
+        #         "Delay":0,
+        #         "Distance":0
+        #         },
+        #     ]
+        # }
+    #     "nodes": [
+    #         {
+    #             "Name": "n1",
+    #             "Type": "end",
+    #             "noOfMemory": 500,
+    #             "memory": {
+    #                 "frequency": 2000,
+    #                 "expiry": 2000,
+    #                 "efficiency": 0,
+    #                 "fidelity": 0.93,
+    #             },
+    #         },
+    #         {
+    #             "Name": "n2",
+    #             "Type": "end",
+    #             "noOfMemory": 500,
+    #             "memory": {
+    #                 "frequency": 2000,
+    #                 "expiry": 2000,
+    #                 "efficiency": 0,
+    #                 "fidelity": 0.93,
+    #             },
+    #         },
+    #         {
+    #             "Name": "n3",
+    #             "Type": "end",
+    #             "noOfMemory": 500,
+    #             "memory": {
+    #                 "frequency": 2000,
+    #                 "expiry": 2000,
+    #                 "efficiency": 0,
+    #                 "fidelity": 0.93,
+    #             },
+    #         },
+    #         {
+    #             "Name": "n4",
+    #             "Type": "service",
+    #             "noOfMemory": 500,
+    #             "memory": {
+    #                 "frequency": 2000,
+    #                 "expiry": 2000,
+    #                 "efficiency": 0,
+    #                 "fidelity": 0.93,
+    #             },
+    #         },
+    #     ],
+    #     "quantum_connections": [
+    #         {"Nodes": ["n1", "n4"], "Attenuation": 0.00001, "Distance": 70},
+    #         {"Nodes": ["n2", "n4"], "Attenuation": 0.00001, "Distance": 70},
+    #         {"Nodes": ["n3", "n4"], "Attenuation": 0.00001, "Distance": 70},
+    #     ],
+    #     "classical_connections": [
+    #         {"Nodes": ["n1", "n1"], "Delay": 0, "Distance": 1000},
+    #         {"Nodes": ["n1", "n2"], "Delay": 1000000000, "Distance": 1000},
+    #         {"Nodes": ["n1", "n3"], "Delay": 1000000000, "Distance": 1000},
+    #         {"Nodes": ["n1", "n4"], "Delay": 1000000000, "Distance": 1000},
+    #         {"Nodes": ["n2", "n1"], "Delay": 1000000000, "Distance": 1000},
+    #         {"Nodes": ["n2", "n2"], "Delay": 0, "Distance": 1000},
+    #         {"Nodes": ["n2", "n3"], "Delay": 1000000000, "Distance": 1000},
+    #         {"Nodes": ["n2", "n4"], "Delay": 1000000000, "Distance": 1000},
+    #         {"Nodes": ["n3", "n1"], "Delay": 1000000000, "Distance": 1000},
+    #         {"Nodes": ["n3", "n2"], "Delay": 1000000000, "Distance": 1000},
+    #         {"Nodes": ["n3", "n3"], "Delay": 0, "Distance": 1000},
+    #         {"Nodes": ["n3", "n4"], "Delay": 1000000000, "Distance": 1000},
+    #         {"Nodes": ["n4", "n1"], "Delay": 1000000000, "Distance": 1000},
+    #         {"Nodes": ["n4", "n2"], "Delay": 1000000000, "Distance": 1000},
+    #         {"Nodes": ["n4", "n3"], "Delay": 1000000000, "Distance": 1000},
+    #         {"Nodes": ["n4", "n4"], "Delay": 0, "Distance": 1000},
+    #     ],
+    # }
     app_settings = {
         "sender": {
-            "message": "011010",
-            "node": "n1",
-            "userID": "0111",
+            "message": "011011",
+            "node": "node1",
+            "userID": "1001",
             "num_check_bits": 4,
             "num_decoy_photons": 4,
         },
-        "receiver": {"node": "n2", "userID": "0110"},
+        "receiver": {"node": "node2", "userID": "0110"},
+        "attack":"none",
+        "channel":1,
         "error_threshold": 0.4,
-        "bell_type": "00",
+        "bell_type": "01",
     }
     response = ip2_run(topology=topology, app_settings=app_settings)
 

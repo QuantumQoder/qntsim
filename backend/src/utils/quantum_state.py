@@ -3,13 +3,13 @@
 This module defines the QuantumState class, used by photons and memories to track internal quantum states.
 The class provides interfaces for measurement and entanglement.
 """
+import random as rnd
 from functools import lru_cache
 from math import sqrt
 from typing import Tuple
 
-from numpy import pi, cos, sin, array, outer, kron, identity, arange
-from numpy.random import random, random_sample, choice
-import random as rnd
+from numpy import arange, array, cos, identity, kron, outer, pi, sin
+from numpy.random import choice, random, random_sample
 
 
 def swap_bits(num, pos1, pos2):
@@ -132,7 +132,7 @@ class QuantumState():
 
         # handle unentangled case
         else:
-            prob = _measure_state_with_cache(self.state, basis)
+            prob = _measure_state_with_cache(tuple(self.state), tuple(basis))
             if rnd.random() < prob:
                 new_state = basis[0]
                 result = 0

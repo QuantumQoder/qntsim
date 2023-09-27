@@ -20,9 +20,18 @@ setup(
     package_data={"qntsim":["logging.ini"]},
     install_requires=[
         'numpy',
-	'matplotlib',
+        'matplotlib',
         'json5',
         'pandas',
-        'qutip'
+        'qutip',
+        'qiskit[all]',
+        'fibheap',
+        'networkx',
+        'aenum',
+        'typing-extensions',
+        'rich',
+        'pyvis',
+        'tabulate',
+        'django'
     ],
 )

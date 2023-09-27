@@ -1,0 +1,87 @@
+{
+	"id": 0,
+	"name": "qntsim",
+	"variant": "project",
+	"kind": 1,
+	"flags": {},
+	"packageName": "qntsim",
+	"readme": [
+		{
+			"kind": "text",
+			"text": "# QNTSim\r\n\r\nThis project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.0.2.\r\n\r\n## Development server\r\n\r\nRun "
+		},
+		{
+			"kind": "code",
+			"text": "`ng serve`"
+		},
+		{
+			"kind": "text",
+			"text": " for a dev server. Navigate to "
+		},
+		{
+			"kind": "code",
+			"text": "`http://localhost:4200/`"
+		},
+		{
+			"kind": "text",
+			"text": ". The app will automatically reload if you change any of the source files.\r\n\r\n## Code scaffolding\r\n\r\nRun "
+		},
+		{
+			"kind": "code",
+			"text": "`ng generate component component-name`"
+		},
+		{
+			"kind": "text",
+			"text": " to generate a new component. You can also use "
+		},
+		{
+			"kind": "code",
+			"text": "`ng generate directive|pipe|service|class|guard|interface|enum|module`"
+		},
+		{
+			"kind": "text",
+			"text": ".\r\n\r\n## Build\r\n\r\nRun "
+		},
+		{
+			"kind": "code",
+			"text": "`ng build`"
+		},
+		{
+			"kind": "text",
+			"text": " to build the project. The build artifacts will be stored in the "
+		},
+		{
+			"kind": "code",
+			"text": "`dist/`"
+		},
+		{
+			"kind": "text",
+			"text": " directory.\r\n\r\n## Running unit tests\r\n\r\nRun "
+		},
+		{
+			"kind": "code",
+			"text": "`ng test`"
+		},
+		{
+			"kind": "text",
+			"text": " to execute the unit tests via [Karma](https://karma-runner.github.io).\r\n\r\n## Running end-to-end tests\r\n\r\nRun "
+		},
+		{
+			"kind": "code",
+			"text": "`ng e2e`"
+		},
+		{
+			"kind": "text",
+			"text": " to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.\r\n\r\n## Further help\r\n\r\nTo get more help on the Angular CLI use "
+		},
+		{
+			"kind": "code",
+			"text": "`ng help`"
+		},
+		{
+			"kind": "text",
+			"text": " or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page."
+		}
+	],
+	"symbolIdMap": {}
+}

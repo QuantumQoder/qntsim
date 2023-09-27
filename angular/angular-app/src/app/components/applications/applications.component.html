@@ -22,7 +22,6 @@
     <div id="apps" class="col-12 md:col-4">
         <p-carousel [value]="data" [numVisible]="4" [numScroll]="1" [circular]="true" contentClass="carousal"
             [autoplayInterval]="5000" [responsiveOptions]="responsiveOptions">
-
             <ng-template let-data pTemplate="item">
                 <div class="card" (click)="app(data.appId,data.appName)">
                     <div class="face face1">

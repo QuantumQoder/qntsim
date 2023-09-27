@@ -1,5 +1,14 @@
-json5
-matplotlib
 numpy
+matplotlib
+json5
 pandas
 qutip
+qiskit[all]
+fibheap
+networkx
+aenum
+typing-extensions
+rich
+pyvis
+tabulate
+django

@@ -11,7 +11,7 @@ from time import time_ns, sleep
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ._event import Event
+    from .event import Event
 
 from .eventlist import EventList
 from ..utils import log

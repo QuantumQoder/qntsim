@@ -6,10 +6,11 @@ QSDetector is defined as an abstract template and as implementaions for polariza
 """
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Dict
-
 #from numpy import random
 from random import random
+from typing import TYPE_CHECKING, Any, Dict
+
+import numpy as np
 
 if TYPE_CHECKING:
     from ..kernel.timeline import Timeline
@@ -17,10 +18,10 @@ if TYPE_CHECKING:
     from typing import List
 
 from ..components.beam_splitter import BeamSplitter
-from ..components.switch import Switch
 from ..components.interferometer import Interferometer
+from ..components.switch import Switch
+from ..kernel.event import Event
 from ..kernel.entity import Entity
-from ..kernel._event import Event
 from ..utils.encoding import time_bin
 
 
@@ -38,10 +39,11 @@ class Detector(Entity):
         count_rate (float): maximum detection rate; defines detector cooldown time.
         time_resolution (int): minimum resolving power of photon arrival time (in ps).
         photon_counter (int): counts number of detection events.
+        r_jitter (float): timing jitter rate
     """
 
     def __init__(self, name: str, timeline: "Timeline", efficiency=0.99, dark_count=0, count_rate=int(25e6),
-                 time_resolution=150):
+                 time_resolution=150, r_jitter = 0):
         Entity.__init__(self, name, timeline)  # Detector is part of the QSDetector, and does not have its own name
         self.efficiency = efficiency
         self.dark_count = dark_count  # measured in 1/s
@@ -49,6 +51,7 @@ class Detector(Entity):
         self.time_resolution = time_resolution  # measured in ps
         self.next_detection_time = -1
         self.photon_counter = 0
+        self.r_jitter = r_jitter
 
     def init(self):
         """Implementation of Entity interface (see base class)."""
@@ -67,7 +70,12 @@ class Detector(Entity):
         ##print('Detector')
         self.photon_counter += 1
         now = self.timeline.now()
-        time = round(now / self.time_resolution) * self.time_resolution
+
+        #timing jitter
+        time_jitter = now + np.random.normal(0,self.r_jitter)
+
+        #time resolution
+        time = round(time_jitter / self.time_resolution) * self.time_resolution
 
         if (random() < self.efficiency or dark_get) and now > self.next_detection_time:
             ##print(f'Detector : {self.name} and time :{time}')

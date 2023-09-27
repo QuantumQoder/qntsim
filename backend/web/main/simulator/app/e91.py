@@ -1,5 +1,5 @@
 import numpy as np
-from qntsim.components.circuit import BaseCircuit
+from qntsim.kernel.circuit import BaseCircuit
 import math
 from qntsim.kernel.quantum_kernel import KetState
 import random
@@ -29,16 +29,15 @@ class E91():
 
     # circuit measurements
     def measurement(self,qm,choice, key):
+        BaseCircuit = BaseCircuit("Qutip")
         if choice == 1: 
-            Circuit=BaseCircuit.create("Qutip")      #X observable
-            circ=Circuit(1)
+            circ=BaseCircuit(1)
             circ.h(0)
             circ.measure(0)
             output=qm.run_circuit(circ,[key])
 
         if choice == 2:  
-            Circuit=BaseCircuit.create("Qutip")       #W observable
-            circ=Circuit(1)
+            circ=BaseCircuit(1)
             circ.s(0)
             # circ.
             circ.h(0)
@@ -48,14 +47,12 @@ class E91():
             output=qm.run_circuit(circ,[key])
 
         if choice == 3:  
-            Circuit=BaseCircuit.create("Qutip")       #Z observable
-            circ=Circuit(1)
+            circ=BaseCircuit(1)
             circ.measure(0)
             output=qm.run_circuit(circ,[key])
 
         if choice == 4: 
-            Circuit=BaseCircuit.create("Qutip")        #V observable
-            circ=Circuit(1)
+            circ=BaseCircuit(1)
             circ.s(0)
             circ.h(0)
             print(circ)
@@ -822,3 +819,22 @@ e91("Qiskit", conf, "N1", "N2", 8)
                 bob_choice_list[key]=bob_choice
         return bob_choice_list,meas_results_bob
     """
+
+
+
+def test_e91():
+    # network_config = {"nodes":[{"Name":"n1","Type":"service","noOfMemory":500,"memory":{"frequency":2000,"expiry":2000,"efficiency":1,"fidelity":0.93}},{"Name":"n2","Type":"end","noOfMemory":500,"memory":{"frequency":2000,"expiry":2000,"efficiency":1,"fidelity":0.93}}],"quantum_connections":[{"Nodes":["n1","n2"],"Attenuation":0.00001,"Distance":70}],"classical_connections":[{"Nodes":["n1","n1"],"Delay":0,"Distance":1000},{"Nodes":["n1","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n2"],"Delay":0,"Distance":1000}]}
+    # network_config = {"nodes":[{"Name":"n1","Type":"end","noOfMemory":500,"memory":{"frequency":80e6,"expiry":-1,"efficiency":1,"fidelity":0.93}},{"Name":"n2","Type":"service","noOfMemory":500,"memory":{"frequency":80e6,"expiry":-1,"efficiency":1,"fidelity":0.93}},{"Name":"n3","Type":"service","noOfMemory":500,"memory":{"frequency":80e6,"expiry":-1,"efficiency":1,"fidelity":0.93}},{"Name":"n4","Type":"end","noOfMemory":500,"memory":{"frequency":80e6,"expiry":-1,"efficiency":1,"fidelity":0.93}}],"quantum_connections":[{"Nodes":["n1","n2"],"Attenuation":0.0001,"Distance":70},{"Nodes":["n2","n3"],"Attenuation":0.0001,"Distance":70},{"Nodes":["n3","n4"],"Attenuation":0.0001,"Distance":70}],"classical_connections":[{"Nodes":["n1","n1"],"Delay":0,"Distance":0},{"Nodes":["n1","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n1","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n1","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n2"],"Delay":0,"Distance":0},{"Nodes":["n2","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n3"],"Delay":0,"Distance":0},{"Nodes":["n3","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n4"],"Delay":0,"Distance":0}]}
+    network_config = {"nodes":[{"Name":"n1","Type":"end","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99},{"Name":"n2","Type":"service","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99},{"Name":"n3","Type":"service","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99},{"Name":"n4","Type":"end","noOfMemory":500,"memory":{"frequency":80000000,"expiry":-1,"efficiency":1,"fidelity":0.93},"swap_success_rate":1,"swap_degradation":0.99}],"quantum_connections":[{"Nodes":["n1","n2"],"Attenuation":0.0001,"Distance":70},{"Nodes":["n2","n3"],"Attenuation":0.0001,"Distance":70},{"Nodes":["n3","n4"],"Attenuation":0.0001,"Distance":70}],"classical_connections":[{"Nodes":["n1","n1"],"Delay":0,"Distance":0},{"Nodes":["n1","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n1","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n1","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n2"],"Delay":0,"Distance":0},{"Nodes":["n2","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n2","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n3","n3"],"Delay":0,"Distance":0},{"Nodes":["n3","n4"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n1"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n2"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n3"],"Delay":1000000000,"Distance":1000},{"Nodes":["n4","n4"],"Delay":0,"Distance":0}]}
+    sender = "n1"
+    receiver = "n4"
+    startTime = 1e12
+    size = 6
+    priority = 0
+    targetFidelity = 0.95
+    timeout = 1.2e12
+    key_length = 2
+    report = e91(network_config, sender, receiver, key_length)
+    print(report)
+
+# test_e91()

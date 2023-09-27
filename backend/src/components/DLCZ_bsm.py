@@ -10,11 +10,11 @@ from typing import Any, Dict, List
 from numpy import random, outer, add, zeros
 import random as rnd
 
-from .circuit import Circuit
+from ..kernel.circuit import BaseCircuit
 from .detector import Detector
 from .photon import Photon
 from ..kernel.entity import Entity
-from ..kernel._event import Event
+from ..kernel.event import Event
 from ..kernel.quantum_manager import QuantumManagerKet, QuantumManagerDensity
 from ..utils.encoding import *
 from ..utils.quantum_state import QuantumState
