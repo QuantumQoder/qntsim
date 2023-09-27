@@ -22,13 +22,18 @@ def load_topology(network_config_json, backend):
     Timeline.DLCZ=False
     Timeline.bk=True
     print(f'Loading Topology: {network_config_json}')
+    print("timeline class", Timeline)
     
     tl = Timeline(20e12,backend)
+    print("timeline: ", tl)
     logger.info("Timeline initiated with bk protocol")
 
     #Create the topology
     network_topo = Topology("network_topo", tl)
+    print("topology_object: ", network_topo)
     network_topo.load_config_json(network_config_json)
+
+    print("loaded topology")
 
     #Configure the parameters
 
@@ -42,6 +47,8 @@ def load_topology(network_config_json, backend):
         node.network_manager.set_swap_success(node_properties["swap_success_rate"])
         node.network_manager.set_swap_degradation(node_properties["swap_degradation"])
     
+    print("nodes done")
+    
     #Detector Parameters
     if "detector_properties" in network_config_json:
         for node in network_topo.get_nodes_by_type("BSMNode"):
@@ -49,6 +56,8 @@ def load_topology(network_config_json, backend):
             node.bsm.update_detectors_params("count_rate", network_config_json["detector_properties"]["count_rate"])
             node.bsm.update_detectors_params("time_resolution", network_config_json["detector_properties"]["time_resolution"])
         
+    print("detectors done")
+
     #Light Source Parameters
     if "light_source_properties" in network_config_json:
         Qnodes = network_topo.get_nodes_by_type("EndNode")+network_topo.get_nodes_by_type("ServiceNode")
@@ -58,6 +67,9 @@ def load_topology(network_config_json, backend):
             node.lightsource.bandwidth = network_config_json["light_source_properties"]["bandwidth"]
             node.lightsource.mean_photon_num = network_config_json["light_source_properties"]["mean_photon_num"]
             node.lightsource.phase_error = network_config_json["light_source_properties"]["phase_error"]
+    print("sources done")
+    
+    print("returning back")
     
     return network_config_json,tl,network_topo
 

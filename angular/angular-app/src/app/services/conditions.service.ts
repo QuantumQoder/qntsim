@@ -70,6 +70,7 @@ export class ConditionsService {
     // return this.dummytext
   }
   setResult(value: any) {
+    console.log("setting results: ", value)
     this.result = value;
   }
   getapp_id() {

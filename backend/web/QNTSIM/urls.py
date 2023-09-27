@@ -16,27 +16,28 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from main.views import (ApplicationList, ApplicationResult,  # ,log_view
-                        PastResultsList, RunApp, stream_logs,AddGate,BaseCircuit)
+                        PastResultsList, RunApp, stream_logs,AddGate,BaseCircuit,PopulateApplications)
 from rest_framework_simplejwt import views as jwt_views
 from users.views import UserSignup
 from django.views.decorators.csrf import csrf_exempt
 
 
 urlpatterns = [
+    path('populate_apps/',PopulateApplications.as_view()),
     path('api/token/',jwt_views.TokenObtainPairView.as_view(),name ='token_obtain_pair'),
     path('api/token/refresh/',jwt_views.TokenRefreshView.as_view(),name ='token_refresh'),
     path('register/',UserSignup.as_view()),
-    # path('run/', RunApp.as_view()),
-    # path('stream-logs/', stream_logs, name='stream_logs'),
+    path('run/', RunApp.as_view()),
+    path('stream-logs/', stream_logs, name='stream_logs'),
     path('', include('optimization.urls')),
-    # path('admin/', admin.site.urls),    
-    # path('application_list/',ApplicationList.as_view()),
-    # path('result_list/', PastResultsList.as_view()),
-    # path('result/',ApplicationResult.as_view()),
+    path('admin/', admin.site.urls),    
+    path('application_list/',ApplicationList.as_view()),
+    path('result_list/', PastResultsList.as_view()),
+    path('result/',ApplicationResult.as_view()),
     # path('logs/', log_view, name='logs')
     # path('quantum_circuit/',QuantumCircuitExecuter.as_view()),
     path('quantum_gates/',csrf_exempt(AddGate.as_view())),
-    # path('circuit/', BaseCircuit.as_view())
+    path('circuit/', BaseCircuit.as_view())
     # path('circuits/',AddCircuit.as_view()),
     # path('',)
 ]

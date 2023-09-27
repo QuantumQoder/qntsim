@@ -530,6 +530,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       this.simulator.value == "version1" ?
         environment.apiUrl :
         environment.apiUrlNew;
+    console.log("app_id: ", this.app_id)
     if (this.app_id == 11) {
       console.log({ url, req })
       this.apiService.setRequest({ url, req });
@@ -548,7 +549,9 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     console.log("beofre api req:", { url, req })
-    this.apiService.advancedRunApplication(req, url).subscribe({
+    let observer = this.apiService.advancedRunApplication(req, url)
+    console.log("observer: ", observer)
+    observer.subscribe({
       next: (response) => {
         this.con.setResult(response);
 

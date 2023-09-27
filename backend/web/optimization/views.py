@@ -33,8 +33,8 @@ class RunVQE(APIView):
 
         optimizer_details=valid_ser.validate_optimizer_details(request.data["optimizer_details"])
 
-        # authentication_classes = ()
-        # permission_classes = (permissions.AllowAny)
+        authentication_classes = ()
+        permission_classes = (permissions.AllowAny)
         # initialization=request.data["initialization"]#["node1"]
         # com = composer("in")
         # com.get_circuit(deepcopy(initialization))

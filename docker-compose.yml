@@ -1,15 +1,15 @@
-version: '3.7'
+version: '3.3'
 
 services:
 
   web:
     build: backend
     # command: gunicorn --workers=3 --threads=3 QNTSIM.wsgi:application --bind 0.0.0.0:8000
-    command: python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:8001
     volumes:
       - ./backend:/code
     ports:
-      - "8000:8000"
+      - "8001:8001"
     depends_on:
       - db
     # networks:
@@ -20,8 +20,8 @@ services:
     ports:
       - '5432'
     volumes:
-      - ${PWD}/db-data:/var/lib/postgresql/data
-      # - ./data/db:/var/lib/postgresql/data
+      # - ${PWD}/db-data:/var/lib/postgresql/data
+      - ./data/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -37,9 +37,9 @@ services:
     ports:
       - "5050:80"
       
-  ng:
-    container_name: ng1
-    build: angular
-    ports:
-      - "80:80"
-    tty: true
+  # ng:
+  #   container_name: ng1
+  #   build: angular
+  #   ports:
+  #     - "80:80"
+  #   tty: true

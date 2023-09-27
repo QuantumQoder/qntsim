@@ -507,8 +507,8 @@ def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
     start_time = time.time()
     # TODO: Integrate Network Graphs
     print("teleportation running")
-    network_config_json, tl, network_topo = load_topology(
-        network_config, "Qutip")
+    network_config_json, tl, network_topo = load_topology(network_config, "Qutip")
+    print(network_config_json)
 
     alice = network_topo.nodes[sender]
     bob = network_topo.nodes[receiver]

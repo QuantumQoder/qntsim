@@ -69,109 +69,114 @@ class RunApp(APIView):
     permission_classes = (permissions.AllowAny,)  # Allow any user to access
 
     def post(self,request):
-        ############### configuring logger ###############
-        log.set_logger("m")
-        log.set_logger_level('DEBUG')
-        print("handlers:", log.logger.handlers)
-        topology = request.data.get('topology')
-        application_id = request.data.get('application')
-        appSettings = request.data.get('appSettings')
-        debug = request.data.get('debug')
-        
-        
-        modules  = {'physical': ['interferometer',
-                    'spdc_lens',
-                    'beam_splitter',
-                    'DLCZ_bsm',
-                    'light_source',
-                    'circuit',
-                    'bk_memory',
-                    'polarization_measurement',
-                    'bk_bsm',
-                    'switch',
-                    'optical_channel',
-                    'waveplates',
-                    'photon',
-                    'detector',
-                    'DLCZ_memory'],
-                    'link': ['bk_purification',
-                    'DLCZ_generation',
-                    'DLCZ_purification',
-                    'entanglement_protocol',
-                    'bk_swapping',
-                    'DLCZ_swapping',
-                    'bk_generation'],
-                    'network': ['node'],
-                    'transport': ['transport_manager'],
-                    'application': ['ip1_',
-                    'pp',
-                    'ghz',
-                    'qsdc_teleportation',
-                    'mdi_qsdc',
-                    'single_photon_qd',
-                    'ping_pong',
-                    'teleportation',
-                    'e91',
-                    'utils',
-                    'e2e',
-                    'qss',
-                    'ip1',
-                    'qsdc1',
-                    'qdsp',
-                    'ip2'],
-                    "eventSimulation":['timeline']}
-        
-        selected_modules = debug["modules"]#["transport"]
-        print("selected_modules:", selected_modules)
-        for module in selected_modules:
-            for file in modules[module]:
-                log.track_module(file)
-        
-        
-        importlib.reload(qntsim)
-        topology = request.data.get('topology')
-        application_id = request.data.get('application')
-        appSettings = request.data.get('appSettings')
-        application = Applications.objects.filter(id = application_id).values("name").first().get('name')
-        debug = request.data.get('debug')
-        results = {}
-
-        if application == "e91":
-            #print("e91 views")
-            results = e91(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["keyLength"]))
-        elif application == "e2e":
-            print('e2e',appSettings["sender"], appSettings["receiver"], appSettings["startTime"], appSettings["size"], appSettings["priority"], appSettings["targetFidelity"], appSettings["timeout"])
-            results = e2e(topology, appSettings["sender"], appSettings["receiver"], appSettings["startTime"], appSettings["size"], appSettings["priority"], appSettings["targetFidelity"], appSettings["timeout"] )
-        elif application == "ghz":
-            results = ghz(topology, appSettings["endnode1"], appSettings["endnode2"], appSettings["endnode3"], appSettings["middlenode"] )
-        elif application == "ip1":
-            results = ip1(topology, appSettings["sender"]["node"], appSettings["receiver"]["node"], appSettings["sender"]["message"] )
-        elif application == "ping_pong":
-            results = ping_pong(topology=topology, app_settings=appSettings)
-        elif application == "qsdc1":
-            results = qsdc1(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["sequenceLength"]), appSettings["key"] )
-        elif application == "teleportation":
-            results = teleportation(topology, appSettings["sender"], appSettings["receiver"], complex(appSettings["amplitude1"]), complex(appSettings["amplitude2"]) )
-        elif application == "qsdc_teleportation":
-            results = qsdc_teleportation(topology, appSettings["sender"]["node"], appSettings["receiver"]["node"], appSettings["sender"]["message"], appSettings["attack"])
-        elif application == "single_photon_qd":
-            results = qdsp(topology=topology, app_settings=appSettings)
-            # results = single_photon_qd(topology, appSettings["sender"], appSettings["receiver"], appSettings["message1"],appSettings["message2"], appSettings["attack"])
-        elif application == "mdi_qsdc":
-            results = mdi_qsdc(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"], appSettings["attack"])
-        elif application == "ip2":
-            results = ip2_run(topology,appSettings)
+        try:
+            ############### configuring logger ###############
+            log.set_logger("m")
+            log.set_logger_level('DEBUG')
+            print("handlers:", log.logger.handlers)
+            topology = request.data.get('topology')
+            application_id = request.data.get('application')
+            appSettings = request.data.get('appSettings')
+            debug = request.data.get('debug')
             
-        output = results
-        print(debug["logLevel"])
-        debug_levels = {"debug": "DEBUG", "info":"INFO"}
-        print(debug_levels[debug["logLevel"]])
-        log_level = debug_levels[debug["logLevel"]]
-        logs = log.read_from_memory(log.logger, level = log_level)
-        output["logs"] = logs
-        
-        
-        return JsonResponse(output, safe = False)
+            
+            modules  = {'physical': ['interferometer',
+                        'spdc_lens',
+                        'beam_splitter',
+                        'DLCZ_bsm',
+                        'light_source',
+                        'circuit',
+                        'bk_memory',
+                        'polarization_measurement',
+                        'bk_bsm',
+                        'switch',
+                        'optical_channel',
+                        'waveplates',
+                        'photon',
+                        'detector',
+                        'DLCZ_memory'],
+                        'link': ['bk_purification',
+                        'DLCZ_generation',
+                        'DLCZ_purification',
+                        'entanglement_protocol',
+                        'bk_swapping',
+                        'DLCZ_swapping',
+                        'bk_generation'],
+                        'network': ['node'],
+                        'transport': ['transport_manager'],
+                        'application': ['ip1_',
+                        'pp',
+                        'ghz',
+                        'qsdc_teleportation',
+                        'mdi_qsdc',
+                        'single_photon_qd',
+                        'ping_pong',
+                        'teleportation',
+                        'e91',
+                        'utils',
+                        'e2e',
+                        'qss',
+                        'ip1',
+                        'qsdc1',
+                        'qdsp',
+                        'ip2'],
+                        "eventSimulation":['timeline']}
+            
+            selected_modules = debug["modules"]#["transport"]
+            print("selected_modules:", selected_modules)
+            for module in selected_modules:
+                for file in modules[module]:
+                    log.track_module(file)
+            
+            
+            importlib.reload(qntsim)
+            topology = request.data.get('topology')
+            application_id = request.data.get('application')
+            appSettings = request.data.get('appSettings')
+            application = Applications.objects.filter(id = application_id).values("name").first().get('name')
+            debug = request.data.get('debug')
+            results = {}
+
+            if application == "e91":
+                #print("e91 views")
+                results = e91(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["keyLength"]))
+            elif application == "e2e":
+                print('e2e',appSettings["sender"], appSettings["receiver"], appSettings["startTime"], appSettings["size"], appSettings["priority"], appSettings["targetFidelity"], appSettings["timeout"])
+                results = e2e(topology, appSettings["sender"], appSettings["receiver"], appSettings["startTime"], appSettings["size"], appSettings["priority"], appSettings["targetFidelity"], appSettings["timeout"] )
+            elif application == "ghz":
+                results = ghz(topology, appSettings["endnode1"], appSettings["endnode2"], appSettings["endnode3"], appSettings["middlenode"] )
+            elif application == "ip1":
+                results = ip1(topology, appSettings["sender"]["node"], appSettings["receiver"]["node"], appSettings["sender"]["message"] )
+            elif application == "ping_pong":
+                results = ping_pong(topology=topology, app_settings=appSettings)
+            elif application == "qsdc1":
+                results = qsdc1(topology, appSettings["sender"], appSettings["receiver"], int(appSettings["sequenceLength"]), appSettings["key"] )
+            elif application == "teleportation":
+                results = teleportation(topology, appSettings["sender"], appSettings["receiver"], complex(appSettings["amplitude1"]), complex(appSettings["amplitude2"]) )
+            elif application == "qsdc_teleportation":
+                results = qsdc_teleportation(topology, appSettings["sender"]["node"], appSettings["receiver"]["node"], appSettings["sender"]["message"], appSettings["attack"])
+            elif application == "single_photon_qd":
+                results = qdsp(topology=topology, app_settings=appSettings)
+                # results = single_photon_qd(topology, appSettings["sender"], appSettings["receiver"], appSettings["message1"],appSettings["message2"], appSettings["attack"])
+            elif application == "mdi_qsdc":
+                results = mdi_qsdc(topology, appSettings["sender"], appSettings["receiver"], appSettings["message"], appSettings["attack"])
+            elif application == "ip2":
+                results = ip2_run(topology,appSettings)
+                
+            output = results
+            print(debug["logLevel"])
+            debug_levels = {"debug": "DEBUG", "info":"INFO"}
+            print(debug_levels[debug["logLevel"]])
+            log_level = debug_levels[debug["logLevel"]]
+            logs = log.read_from_memory(log.logger, level = log_level)
+            output["logs"] = logs
+            
+            
+            return JsonResponse(output, safe = False)
+        except Exception as e:
+            import traceback
+            traceback.print_tb()
+            return JsonResponse({"status": "failed", "error": str(e)}, status = 500)
 
 
 
@@ -240,6 +245,32 @@ class ApplicationResult(generics.GenericAPIView):
 #         status = quantum_circuit_service(self,request)
 #         return JsonResponse(status)
     
+
+class PopulateApplications(generics.GenericAPIView):
+
+    def get(self,request):
+        try: 
+            data = Applications.objects.all()
+            print(data)
+            lst = [{"name": datum.name, "id": datum.id} for datum in data]
+            return JsonResponse({"success": lst})
+        except Exception as e:
+            return JsonResponse({"status": "failed", "error": str(e)}, status = 500)
+                
+
+    def post(self,request):
+        try: 
+            request_data = request.data
+
+            for app in request_data:
+                application = Applications(
+                        name=app.get("name"),
+                        description=app.get("description")
+                    )
+                application.save()
+            return JsonResponse({"status":"success"})
+        except Exception as e:
+            return JsonResponse({"status":"failed","error":str(e)},status = 500) 
 
 class AddGate(generics.GenericAPIView):
     authentication_classes = ()
