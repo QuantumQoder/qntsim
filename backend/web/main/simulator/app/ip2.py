@@ -8,17 +8,14 @@ from typing import Any, Dict, List, Tuple
 
 from numpy import mean
 from numpy.random import randint
+from qntsim.communication.analyzer_circuits import bell_type_state_analyzer
 from qntsim.communication.attack import ATTACK_TYPE, Attack
 from qntsim.communication.error_analyzer import ErrorAnalyzer
 from qntsim.communication.network import Network
-from qntsim.communication.analyzer_circuits import bell_type_state_analyzer
-from qntsim.communication.security_checks import insert_check_bits, insert_decoy_photons
-from qntsim.communication.utils import to_binary, to_characters
-
-
-
+from qntsim.communication.security_checks import (insert_check_bits,
+                                                  insert_decoy_photons)
 from qntsim.communication.template import Party
-from qntsim.communication.utils import pass_values
+from qntsim.communication.utils import pass_values, to_binary, to_characters
 from qntsim.kernel.circuit import QutipCircuit
 
 logger = logging.getLogger("main_logger.application_layer." + "ip2")
@@ -221,7 +218,7 @@ class Receiver(Party):
         )
         network._strings = [cls.received_msgs]
         print(cls1._isit, cls.received_msgs, network._strings)
-        cls.received_msgs = to_string(strings=[cls.received_msgs], _was_binary=cls1._isit)[0]
+        cls.received_msgs = to_characters(bin_strs=[cls.received_msgs], __was_binary=cls1._isit)[0]
         print(cls1._isit, cls.received_msgs, network._strings)
         err = [
             int(returns[pos]) ^ int(cls1.input_messages.get((cls1.node, cls.node))[pos])

@@ -5,9 +5,9 @@ from functools import partial
 from statistics import mean
 from typing import Any, Dict, List
 
+from qntsim.communication.analyzer_circuits import bell_type_state_analyzer
 from qntsim.communication.network import Network
 from qntsim.communication.protocol import ProtocolPipeline
-from qntsim.communication.analyzer_circuits import bell_type_state_analyzer
 from qntsim.communication.utils import pass_values, to_characters
 from qntsim.kernel.circuit import QutipCircuit
 from qntsim.topology.node import EndNode
@@ -28,7 +28,7 @@ def ping_pong(topology:Dict, app_settings:Dict):
                     ):app_settings.get("sender").get("message")
                 }],
             encode=partial(encode, mode_switch_prob=app_settings.get("sender").get("switchProb", 0.25)),
-            measure=partial(pass_), attack=app_settings.get("attack"))
+            measure=partial(pass_values), attack=app_settings.get("attack"))
         received_msgs, avg_err, std_dev, info_leak, msg_fidelity = protocol(topology=topology, size=lambda x:int(x*5*app_settings.get("sender").get("switchProb", 0.25)), require_entanglement=True, decode=partial(decode, err_threshold=app_settings.get("error_threshold", 0.54)))
         end_time = time.time()
         if "Err_msg" in received_msgs[0]:
@@ -87,7 +87,8 @@ def encode(network: Network, _, msg_index: int, mode_switch_prob: float):
 
 def decode(networks:List[Network], all_returns:List[Any], err_threshold:float):
     network = networks[0]
-    returns = all_returns[0]
+    returns = all_returns[0][0]
+    print("returns: ", returns)
     outputs, ctrl_meas_basis = returns[0], iter(returns[1])
     string = ""
     int_lst = [0]
@@ -109,7 +110,7 @@ def decode(networks:List[Network], all_returns:List[Any], err_threshold:float):
         logger.error("Eavesdropper detected in channel.")
         return {"Err_msg":"Eavesdropper detected in channel."}
     else:
-        return to_string(strings=network._strings, _was_binary=network._is_binary)
+        return to_characters(bin_strs=network._strings, __was_binary=network._is_binary)
 
 if __name__=="__main__":
     topology = {

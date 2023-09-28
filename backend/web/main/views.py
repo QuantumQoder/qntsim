@@ -30,6 +30,8 @@ from main.simulator.topology_funcs import *
 from qntsim.utils import log
 from rest_framework import generics, mixins, permissions
 from rest_framework.views import APIView
+
+
 # from models import 
 # from .services.quantumcircuit_service import getCircuits, quantum_circuit_service, add_gate_service
 def home(request):
@@ -75,9 +77,13 @@ class RunApp(APIView):
             log.set_logger_level('DEBUG')
             print("handlers:", log.logger.handlers)
             topology = request.data.get('topology')
+            print("topology: ", topology)
             application_id = request.data.get('application')
+            print("application_id: ", application_id)
             appSettings = request.data.get('appSettings')
+            print("appSettings: ", appSettings)
             debug = request.data.get('debug')
+            print("debug: ", debug)
             
             
             modules  = {'physical': ['interferometer',
@@ -175,7 +181,7 @@ class RunApp(APIView):
             return JsonResponse(output, safe = False)
         except Exception as e:
             import traceback
-            traceback.print_tb()
+            traceback.print_exc()
             return JsonResponse({"status": "failed", "error": str(e)}, status = 500)
 
 

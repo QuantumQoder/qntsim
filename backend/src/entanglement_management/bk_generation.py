@@ -9,21 +9,25 @@ Entanglement generation is asymmetric:
 
 from enum import Enum, auto
 from math import sqrt
-from typing import List, TYPE_CHECKING, Dict, Any
+from typing import TYPE_CHECKING, Any, Dict, List
 
 if TYPE_CHECKING:
     from ..components.bk_memory import Memory
     from ..topology.node import Node
     from ..components.bk_bsm import SingleAtomBSM
 
-from .entanglement_protocol import EntanglementProtocol
-from ..message import Message
-from ..kernel.event import Event
+import logging
+
 #from ..kernel.process import Process
 from ..kernel.circuit import BaseCircuit
+from ..kernel.event import Event
+from ..message import Message
+from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
+                                              ProtocolType)
 from ..utils import log
-from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
-import logging
+from .entanglement_protocol import EntanglementProtocol
+
+
 # logger = logging.getLogger("main_logger.link_layer." + "bk_generation")
 class GenerationMsgType(Enum):
     """Defines possible message types for entanglement generation."""
@@ -153,12 +157,12 @@ class EntanglementGenerationA(EntanglementProtocol):
 
         self._qstate_key = self.memory.qstate_key
         
-        BaseCircuit =BaseCircuit.create(self.memory.timeline.type)
-        #print("gen circuit",BaseCircuit.create(self.memory.timeline.type))
+        Circuit = BaseCircuit(self.memory.timeline.type)
+        #print("gen circuit",BaseCircuit(self.memory.timeline.type))
         self._plus_state = [sqrt(1/2), sqrt(1/2)]
-        self._flip_circuit = BaseCircuit(1)
+        self._flip_circuit = Circuit(1)
         self._flip_circuit.x(0)
-        self._z_circuit = BaseCircuit(1)
+        self._z_circuit = Circuit(1)
         self._z_circuit.z(0)
         
 

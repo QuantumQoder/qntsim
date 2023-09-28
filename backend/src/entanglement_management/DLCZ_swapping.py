@@ -9,21 +9,23 @@ Also defined in this module is the message type used by these protocols.
 """
 
 from enum import Enum, auto
-from typing import TYPE_CHECKING
 from functools import lru_cache
+from random import random
+from typing import TYPE_CHECKING
 
 import numpy as np
-from random import random
 
 if TYPE_CHECKING:
     from ..components.DLCZ_memory import Memory
     from ..topology.node import Node
 
-from ..message import Message
-from .entanglement_protocol import EntanglementProtocol
-from ..utils import log
 from ..kernel.circuit import BaseCircuit
-from ..topology.message_queue_handler import ManagerType, ProtocolType, MsgRecieverType
+from ..message import Message
+from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
+                                              ProtocolType)
+from ..utils import log
+from .entanglement_protocol import EntanglementProtocol
+
 
 class SwappingMsgType(Enum):
     """Defines possible message types for entanglement generation."""
@@ -115,8 +117,8 @@ class EntanglementSwappingA(EntanglementProtocol):
         self.is_success = False
         self.left_protocol = None
         self.right_protocol = None
-        BaseCircuit =BaseCircuit.create(self.left_memo.timeline.type)
-        #print("swap circuit",BaseCircuit.create(self.left_memo.timeline.type))
+        Circuit = BaseCircuit(self.left_memo.timeline.type)
+        #print("swap circuit",BaseCircuit(self.left_memo.timeline.type))
 
         self.circuit = BaseCircuit(2)
         self.circuit.cx(0, 1)
@@ -303,8 +305,8 @@ class EntanglementSwappingB(EntanglementProtocol):
         self.memories = [hold_memo]
         self.memory = hold_memo
         self.another = None
-        BaseCircuit =BaseCircuit.create(self.memory.timeline.type)
-        #print("swap circuit",BaseCircuit.create(self.memory.timeline.type))
+        Circuit = BaseCircuit(self.memory.timeline.type)
+        #print("swap circuit",BaseCircuit(self.memory.timeline.type))
         self.x_cir = BaseCircuit(1)
         self.x_cir.x(0)
 
