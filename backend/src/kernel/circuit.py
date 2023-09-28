@@ -28,14 +28,27 @@ def validator(func:Callable[["BaseCircuit", [...]], NoneType]) -> Callable:
 
 class BaseCircuit:
     __circuit_class: TypeAlias = Union["QiskitCircuit", "QutipCircuit"]
+
+    # def __new__(cls, *args: Union[Literal["Qiskit", "Qutip"], int]) -> Union["BaseCircuit", __circuit_class]:
+    #     for arg in args:
+    #         match arg:
+    #             case str():
+    #                 cls.__type = arg
+    #                 match cls.__type:
+    #                     case "Qiskit":
+    #                         child_cls = QiskitCircuit
+    #                     case "Qutip":
+    #                         child_cls = QutipCircuit
+    #             case int():
+                    
     
     @overload
-    def __new__(cls, _type:Literal["Qiskit", "Qutip"]) -> __circuit_class: ...
+    def __new__(cls, __type:Literal["Qiskit", "Qutip"]) -> __circuit_class: ...
     
     @overload
-    def __new__(cls, _type:Literal["Qiskit", "Qutip"], size:int) -> "BaseCircuit": ...
+    def __new__(cls, __type:Literal["Qiskit", "Qutip"], size:int) -> "BaseCircuit": ...
     
-    def __new__(cls, _type:Literal["Qiskit", "Qutip"], size:Optional[int] = None) -> Union["BaseCircuit", __circuit_class]:
+    def __new__(cls, __type:Literal["Qiskit", "Qutip"], size:Optional[int] = None) -> Union["BaseCircuit", __circuit_class]:
         """The __new__ of the 'BaseCircuit' class works as an object factory method,
         as well as, a class factory method. Refer to the overloaded type hints.
 
@@ -48,14 +61,14 @@ class BaseCircuit:
         Returns:
             BaseCircuit: The appropriate child class corresponding to type
         """
-        match _type:
+        cls.__type = __type
+        match cls.__type:
             case "Qiskit":
                 child_cls = QiskitCircuit
             case "Qutip":
                 child_cls = QutipCircuit
         if size:
             self = object.__new__(child_cls)
-            self.__type = _type
             self.size = size
             self.gates = []
             self.measured_qubits = []

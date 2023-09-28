@@ -154,7 +154,7 @@ class EntanglementSwappingA(EntanglementProtocol):
         Circuit = BaseCircuit(self.left_memo.timeline.type)
         # #print("swap circuit",BaseCircuit(self.left_memo.timeline.type))
 
-        self.circuit = BaseCircuit(2)
+        self.circuit = Circuit(2)
         self.circuit.cx(0, 1)
         self.circuit.h(0)
         self.circuit.measure(0)

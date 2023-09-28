@@ -54,7 +54,7 @@ symengine
 sympy
 tabulate
 traitlets
-tweedledum
+# tweedledum
 wcwidth
 psycopg2
 qiskit-aer

@@ -713,7 +713,7 @@ class Network:
         else:
             self._strings = ["".join(str(*output.values()) for output in self._outputs)]
         print(self._strings)
-        self.recv_msgs = {rec[1:]:message for rec, message in zip(list(self.messages)[::-1], to_characters(strings=self._strings, _was_binary=self._is_binary))}
+        self.recv_msgs = {rec[1:]:message for rec, message in zip(list(self.messages)[::-1], to_characters(bin_strs=self._strings, __was_binary=self._is_binary))}
         for k, v in self.recv_msgs.items():
             logging.info(f"Received message {k}: {v}")
 
