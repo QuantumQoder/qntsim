@@ -1,11 +1,12 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { map, Subject } from "rxjs";
+import { map, Subject,BehaviorSubject } from "rxjs";
 
 @Injectable({
   providedIn: "root",
 })
 export class ConditionsService {
+  public newApplicationDialog = false;
   public app_id: number = 2;
   public app: string;
   currentSection: any;

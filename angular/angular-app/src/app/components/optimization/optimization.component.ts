@@ -10,6 +10,8 @@ import { QuantumcircuitService } from "src/app/services/quantumcircuit.service";
   styleUrls: ["./optimization.component.less"],
 })
 export class OptimizationComponent implements OnInit {
+  optimizeButton: boolean | null = null;
+  shotsButton: boolean | null = null;
   gatesParams = false;
   generatedImage = {
     presence: false,

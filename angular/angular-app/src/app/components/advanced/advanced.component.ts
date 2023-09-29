@@ -7,6 +7,7 @@ import {
   OnInit,
   ViewChild,
   ViewEncapsulation,
+  ChangeDetectorRef
 } from "@angular/core";
 import { FormBuilder, FormControl, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
@@ -24,6 +25,7 @@ import * as go from "gojs";
 import { DiagramBuilderService } from "src/app/services/diagram-builder.service";
 import { TopologyLoaderService } from "src/app/services/loadTopology.service";
 import { QuantumcircuitService } from "src/app/services/quantumcircuit.service";
+
 // import { DialogService } from "primeng/dynamicdialog";
 
 @Component({
@@ -34,6 +36,7 @@ import { QuantumcircuitService } from "src/app/services/quantumcircuit.service";
   encapsulation: ViewEncapsulation.Emulated,
 })
 export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
+  runApplicationButton:string = "Run Application";
   circuit: boolean = false;
   app: any;
   adornedpart: any;
@@ -99,6 +102,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   };
   newApplication = {
     value: "Optimization",
+    names: {"Optimization":"Single Node","Network":"Multi Mode"},
     options: ["Optimization", "Network"],
   };
   optimizationAlgo = {
@@ -106,6 +110,13 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     options: ["QAOA", "VQE", "VQC"],
     visible: false,
   };
+  optimizationAlgoRadio: any[] = [
+    { name: 'QAOA', key: 'A' },
+    { name: 'VQE', key: 'M' },
+    { name: 'VQC', key: 'P' },
+    { name: 'NEW', key: 'R' }
+];
+  selectedAlgo:any = this.optimizationAlgoRadio[1]
   isLinkParameters: boolean = false;
   linksProps = {
     distance: 70,
@@ -151,14 +162,15 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   app_data: any = [];
   constructor(
     private fb: FormBuilder,
-    private con: ConditionsService,
+    public con: ConditionsService,
     private apiService: ApiServiceService,
     private holdingData: HoldingDataService,
     private _route: Router,
     private diagramStorage: DiagramStorageService,
     private diagramBuilder: DiagramBuilderService,
     private topologyLoader: TopologyLoaderService,
-    private circuitService: QuantumcircuitService
+    private circuitService: QuantumcircuitService,
+    private cd: ChangeDetectorRef
   ) { }
   ngOnDestroy(): void {
     this.diagramStorage.setAppSettingsFormDataAdvanced({
@@ -342,6 +354,16 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     )
   }
   changeApp() {
+    console.log('change app',this.app, this.app_id)
+    if (this.app == 11) {
+      console.log('new app')
+      this.con.newApplicationDialog = true;
+      this.runApplicationButton = 'Next';
+      this.cd.detectChanges();
+    }
+    else{
+      this.runApplicationButton = 'Run Application'
+    }
     localStorage.setItem("app_id", this.app);
     this.app_id = this.app;
     this.simulator.options =
