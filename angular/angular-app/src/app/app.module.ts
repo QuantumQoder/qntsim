@@ -6,6 +6,7 @@ import {
   NgModule, isDevMode,
 } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { RadioButtonModule } from 'primeng/radiobutton';
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RouterModule } from "@angular/router";
@@ -57,6 +58,7 @@ import { OptimizationComponent } from './components/optimization/optimization.co
 import { QuantumCircuitComponent } from "./components/quantum-circuit/quantum-circuit.component";
 import { TopologyLoaderService } from "./services/loadTopology.service";
 import { OptimizationService } from "./services/optimization.service";
+
 // import { OptimizationResultsComponent } from './optimization-results/optimization-results.component';
 // import { AccordionModule } from "primeng/accordion";
 @NgModule({
@@ -116,6 +118,7 @@ import { OptimizationService } from "./services/optimization.service";
       // or after 30 seconds (whichever comes first).
       registrationStrategy: 'registerWhenStable:30000'
     }),
+    RadioButtonModule
     // StoreDevtoolsModule.instrument({
     //   maxAge: 25,
     // }),
