@@ -3,16 +3,16 @@
   <p-dialog header="" [modal]="true" [(visible)]="optimizationParams.visible"
     (onHide)="optimizationParams.visible = false" [style]="{ width: '30vw' }">
     <div class=" d-flex flex-column mx-auto gap-3 my-2" *ngIf="optimizationAlgos.value === 'QAOA'">
-      <label for="numOfLayers" class="form-label">Number of Layers <i class= "ms-1 pi pi-info-circle" pTooltip="Number of layers for the algorithm. One layer consits of conactenation of cost and mixer hamiltonian."></i>
+      <label for="numOfLayers" class="form-label">Number of Layers <i class= "ms-1 fa-solid fa-circle-info fa-xs" pTooltip="Number of layers for the algorithm. One layer consits of conactenation of cost and mixer hamiltonian."></i>
         <!-- {{optimizationParams.params.numOfLayers}} -->
       </label>
       <input type="number" class="form-control" [(ngModel)]="optimizationParams.params.numOfLayers"
         oninput="this.value = Math.abs(this.value)" />
     </div>
     <div class=" d-flex flex-column mx-auto gap-3 my-2">
-      <label for="numOfLayers" class="form-label">Select Optimizer<i class="ms-1 pi pi-info-circle" pTooltip="Classical optimizer for optimization of the parameters"></i></label>
-      <select class="form-select" [(ngModel)]="optimizer.value">
-      <option *ngFor="let data of optimizer.options" [value]="data.header">
+      <label for="numOfLayers" class="form-label">Select Optimizer<i class="ms-1 fa-solid fa-circle-info fa-xs" pTooltip="{{optDescription}}"></i></label>
+      <select class="form-select" [(ngModel)]="optimizer.value" (change)="updateOptDescription()">
+      <option *ngFor="let data of optimizer.options" [value]="data.header"  >
         {{data.header}}<!-- Icon -->
       </option>
       </select>
@@ -111,7 +111,7 @@
     <p-accordionTab *ngFor="let data of optimizationAlgos.options" [header]="data.header" > 
        <ng-template pTemplate="header">
       <!-- You can replace 'pi pi-icon-name' with your desired icon class -->
-      <i class="ms-1 pi pi-info-circle" pTooltip="{{data.description}}"></i> 
+      <i class="ms-1 fa-solid fa-circle-info fa-xs" pTooltip="{{data.description}}"></i> 
     </ng-template>
       <div class="col-10 mx-auto d-flex justify-content-center m-4 overflow-auto">
         <table class="table table-bordered bg-white rounded">

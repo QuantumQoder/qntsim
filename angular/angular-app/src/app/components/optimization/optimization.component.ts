@@ -11,6 +11,7 @@ import { QuantumcircuitService } from "src/app/services/quantumcircuit.service";
 })
 export class OptimizationComponent implements OnInit {
   gatesParams = false;
+  optDescription:string = 'Constrained Optimization BY Linear Approximation (COBYLA) algorithm.'
   generatedImage = {
     presence: false,
     data: "b'UUlTS0lUBgAXAgAAAAAAAAABcQAKaQAIAAAAAgAAAAAAAAAAAAAABAAAAAEAAAAAAAAAAmNpcmN1aXQtOTAAAAAAAAAAAG51bGxxAQAAAAIAAQFxAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAUAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASEdhdGVxAAAAAAAGAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAABAAAAAUNYR2F0ZXEAAAAAcQAAAAEAAA=='",
@@ -140,6 +141,13 @@ export class OptimizationComponent implements OnInit {
         : false;
     console.log(this.tableData);
     return;
+  }
+
+  updateOptDescription(){
+    const newDescription = this.optimizer.options.filter((opt) => {
+      return opt.header === this.optimizer.value
+    }).map(opt => opt.description)
+    this.optDescription = newDescription[0]
   }
 
   reset(){
