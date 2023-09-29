@@ -17,7 +17,6 @@ src/communication/__init__.py
 src/communication/analyzer_circuits.py
 src/communication/attack.py
 src/communication/error_analyzer.py
-src/communication/interface.py
 src/communication/network.py
 src/communication/noise.py
 src/communication/noise_model.py

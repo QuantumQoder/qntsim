@@ -1,12 +1,12 @@
-from copy import deepcopy
 import importlib
 import logging
 import os
 import time
+from copy import deepcopy
 from random import randint, shuffle
 from statistics import mean
 from tokenize import String
-from typing import Any, Dict, List, Literal, Tuple, TypeAlias, Union
+from typing import Any, Dict, List, Literal, Optional, Tuple, TypeAlias, Union
 
 import numpy as np
 import pandas as pd
@@ -535,98 +535,35 @@ def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
     print(report)
     return report
 
-
-def qsdc_teleportation(network_config, sender, receiver, message, attack):
-    logger.info("Teleportation with QSDC")
+def qsdc_teleportation(topology: Dict, sender: str, receiver: str, message: str, attack: Optional[str] = None):
+    print("QSDC_TELEPORTATION\n")
+    print(f"topology map: {topology}\n")
+    print(f"sender: {sender}, receiver: {receiver}, message: {message}, attack: {attack}\n")
     start_time = time.time()
-
-    # messages = {(1, 2):'hello world'}
-    # print("sender, receiver, message, attack",sender, receiver, message, attack)
-    network_config_json, tl, network_topo = load_topology(
-        network_config, "Qutip")
-    # tl.init()
-    topo_json = json_topo(network_config_json)
-    print('network config json', network_topo)
-    with open("topology.json", "w") as outfile:
-        json.dump(topo_json, outfile)
-    print("messages ", sender, receiver, message)
-    messages = {(sender, receiver): message}
-    # attack=None
-    topology = '/code/web/topology.json'
-    print('topology', topology)
-    protocol = ProtocolPipeline(name='qsdc_tel', messages_list=[
-                        messages], label='00', attack=attack)
-    protocol(topology=network_config)
-    # tl.init()
-
-    # print(protocol)
-    # return protocol.recv_msgs_list[0], mean(protocol.mean_list)
-    res = {}
-    res["input_message"] = message
-    # res["input_message2"] = message2
-    print("protocol.recv_msgs_list", protocol.recv_msgs_list)
-    result = list(protocol.recv_msgs_list[0].values())
-    # print(protocol)
-    res["output_message"] = result[0]
-    # res["output_message2"] = protocol.recv_msgs_list[0][2]
-    res["attack"] = attack
-    res["error"] = mean(protocol.mean_list)
-    report = {}
-    end_time = time.time()
-    execution_time = end_time-start_time
-    report = network_graph(protocol.networks[0]._net_topo, [sender], report)
-    report["performance"]["execution_time"] = execution_time
-    # report=network_graph(network_topo,source_node_list,report)
-    # report["performance"]["execution_time"] = execution_time
-    report["application"] = res
-
-    protocol = None
-    return report
-    # network_config_json,tl,network_topo = load_topology(network_config, "Qutip")
-    # alice=network_topo.nodes[sender]
-    # bob = network_topo.nodes[receiver]
-    # qsdc_tel = QSDCTeleportation()
-    # alice,bob,source_node_list=qsdc_tel.roles(alice,bob,len(message))
-    # tl.init()
-    # tl.run()
-    # results = qsdc_tel.run(alice,bob,message, attack)
-    # report={}
-    # report["application"]=results
-    # report=network_graph(network_topo,source_node_list,report)
-    # print(report)
-    # return report
-    # topology = json_topo(network_config)
-    # # print('pwd', os.getcwd())
-    # with open('network_topo.json','w') as fp:
-    #     json.dump(topology,fp, indent=4)
-    # # f = open('/code/web/network_topo.json')
-    # topo = '/code/web/3node.json'
-    # # print('message', [message], type(message),type([message]),attack)
-    # # message = ['hello']
-    # message = [message]
-    # # print('message', message, type(message),type([message]),attack)
-    # protocol = ProtocolPipeline(platform='qntsim',
-    #                     messages_list=[message],
-    #                     topology=topo,
-    #                     backend='Qutip',
-    #                     label='00',
-    #                     attack = attack
-    #                     )
-
-    # # This should be on results page
-    # print('Received messages:', protocol.recv_msgs)
-    # print('Error:', mean(protocol.mean_list))
-    # error = mean(protocol.mean_list)
-    # res ={}
-    # res["input_message"] = message
-    # res["output_message"] = protocol.recv_msgs[0][1]
-    # res["attack"] = attack
-    # res["error"] = error
-    # report = {}
-    # report["application"] = res
-
-    # return report
-
+    network = Network(topology=topology, messages={(sender, receiver): message})
+    network.teleport(None)
+    if attack in ["DoS", "EM", "IR"]:
+        from qntsim.communication.attack import ATTACK_TYPE, Attack
+        Attack.implement(network, None, ATTACK_TYPE[attack].value)
+    network.measure(None)
+    received_messages = network._decode(None)
+    print(f"strings in network: {network._strings}\n")
+    print(f"messages received after decode: {received_messages}\n")
+    from qntsim.communication.error_analyzer import ErrorAnalyzer
+    print(f"returns from ErrorAnalyzer: {ErrorAnalyzer._analyse(network)}\n")
+    _, _, avg_err, err_sd, info_lk, fid = ErrorAnalyzer._analyse(network)
+    execution_time: float = time.time() - start_time
+    response: Dict[str, Any] = {}
+    response["input_message"] = message
+    response["output_message"] = list(received_messages.values())[0]
+    response["attack"] = attack
+    response["error"] = avg_err
+    print(f"generated response: {response}\n")
+    json_response = network_graph(network._net_topo, [sender], {})
+    json_response["performance"]["execution_time"] = execution_time
+    json_response["application"] = response
+    print(f"final json_response: {json_response}\n")
+    return json_response
 
 def single_photon_qd(network_config, sender, receiver, message1, message2, attack):
     logger.info("Single Photon QD")

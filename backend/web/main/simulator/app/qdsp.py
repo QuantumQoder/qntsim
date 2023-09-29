@@ -2,7 +2,6 @@ import time
 from typing import Dict
 
 import numpy as np
-
 from qntsim.communication.error_analyzer import ErrorAnalyzer
 from qntsim.communication.network import Network
 from qntsim.communication.utils import to_binary, to_characters
@@ -49,7 +48,7 @@ def qdsp(topology:Dict, app_settings:Dict):
     print("photons,", photons)
     results = [Photon.measure(basis=basis[photon.name//2], photon=hwp.apply(qubit=photon) if int(msg) else photon) for photon, msg in zip(photons, messages[1])]
     strings = ["".join([str(result^int(char)) for result, char in zip(results, message)]) for message in messages]
-    recv_msgs = to_string(strings=strings, _was_binary=_is_binary)
+    recv_msgs = to_characters(bin_strs=strings, __was_binary=_is_binary)
     network = Network(topology=topology, messages={(app_settings.get("sender").get("node"), app_settings.get("receiver").get("node")):messages[0], (app_settings.get("receiver").get("node"), app_settings.get("sender").get("node")):messages[1]}, require_entanglement=False)
     network._strings = strings
     _, _, err_prct, err_sd, info_lk, msg_fidelity = ErrorAnalyzer._analyse(network=network)

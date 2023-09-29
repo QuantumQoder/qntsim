@@ -5,8 +5,8 @@ Also defined is the message type used by the BBPSSW code.
 """
 
 from enum import Enum, auto
-from typing import List, TYPE_CHECKING
 from functools import lru_cache
+from typing import TYPE_CHECKING, List
 
 from numpy.random import random
 
@@ -14,13 +14,16 @@ if TYPE_CHECKING:
     from ..components.bk_memory import Memory
     from ..topology.node import Node
 
-from ..message import Message
-from .entanglement_protocol import EntanglementProtocol
-from ..utils import log
-from ..kernel.circuit import BaseCircuit
-from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
-
 import logging
+
+from ..kernel.circuit import BaseCircuit
+from ..message import Message
+from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
+                                              ProtocolType)
+from ..utils import log
+from .entanglement_protocol import EntanglementProtocol
+
+
 # logger = logging.getLogger("main_logger.link_layer."+ "bk_swapping")
 class BBPSSWMsgType(Enum):
     """Defines possible message types for entanglement purification"""
@@ -94,8 +97,8 @@ class BBPSSW(EntanglementProtocol):
         self.meas_res = None
         if self.meas_memo is None:
             self.memories.pop()
-        BaseCircuit =BaseCircuit.create(self.kept_memo.timeline.type)
-        #print("pur circuit",BaseCircuit.create(self.kept_memo.timeline.type))
+        Circuit = BaseCircuit(self.kept_memo.timeline.type)
+        #print("pur circuit",BaseCircuit(self.kept_memo.timeline.type))
         self.circuit = BaseCircuit(2)
         self.circuit.cx(0, 1)
         self.circuit.measure(1)

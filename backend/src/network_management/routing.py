@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Dict
 import matplotlib.pyplot as plt
 import networkx as nx
 
+from ..kernel.event import Event
 from ..message import Message
 from ..protocol import StackProtocol
 from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
@@ -21,7 +22,6 @@ from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
 from .reservation import ResourceReservationMessage, RSVPMsgType
 
 if TYPE_CHECKING:
-    from ..kernel.event import Event
     from ..topology.node import Node
     from ..topology.topology import Topology
 

@@ -1,4 +1,3 @@
-import { updateTopology } from "./../store/minimal.actions";
 import { Injectable } from "@angular/core";
 import * as go from "gojs";
 import { Observable, Subject } from "rxjs";
@@ -779,12 +778,16 @@ export class TopologyLoaderService {
       }
     }
     if (app_id == 8) {
-      if (appSettingsForm.get("message1")?.value.length % 2 != 0) {
+      if (nodesSelection.message1.length != nodesSelection.message2.length) {
+        alert("Message length should be same")
+      }
+      console.log(appSettingsForm.get("message")?.value)
+      if (nodesSelection.message1.length % 2 != 0) {
         alert("Message1 length should be even ");
         // this.spinner = false
         return false;
       }
-      if (appSettingsForm.get("message2")?.value.length % 2 != 0) {
+      if (nodesSelection.message2.length % 2 != 0) {
         alert("Message2 length should be even ");
         // this.spinner = false
         return false;

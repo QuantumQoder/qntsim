@@ -16,17 +16,4 @@ Requires-Dist: typing-extensions
 Requires-Dist: rich
 Requires-Dist: pyvis
 Requires-Dist: tabulate
-Requires-Dist: numpy
-Requires-Dist: matplotlib
-Requires-Dist: json5
-Requires-Dist: pandas
-Requires-Dist: qutip
-Requires-Dist: qiskit[all]
-Requires-Dist: fibheap
-Requires-Dist: networkx
-Requires-Dist: aenum
-Requires-Dist: typing-extensions
-Requires-Dist: rich
-Requires-Dist: pyvis
-Requires-Dist: tabulate
 Requires-Dist: django
