@@ -107,19 +107,23 @@ export class QuantumcircuitService {
     "QAOA": [
       {
         "header": "Initialization Circuit",
-        "value": "initialization"
+        "value": "initialization",
+        "description": "Initial quantum state to apply the variational circuit on. It is the ground state of the mixer Hamiltonian."
       },
       {
         "header": "Cost Circuit",
-        "value": "cost"
+        "value": "cost",
+        "description": "It is the unitary circuit corresponding to the cost Hamiltonian which encodes the combinatorial objective function."
       },
       {
         "header": "Mixer Circuit",
-        "value": "mixer"
+        "value": "mixer",
+        "description": "Mixer Hamiltonian serves similar purpose as Driving Hamiltonian in quantum adiabatic optimization. The evolution starts from the ground state of the mixer Hamiltonian and ends in the ground state of the Hamiltonian modelling the combinatorial optimization problem. The mixer Hamiltonian restricts the search to feasible subspace. It should not commute with the problem Hamiltonian. The Mixer circuit is the unitary circuit corresponding to the mixer Hamiltonian."
       },
       {
         "header": "Expectation Circuit",
-        "value": "expectation"
+        "value": "expectation",
+        "description": "Circuit corresponding for the Hamiltonian of which ground state energy is to be calculated."
       }
     ],
     "VQE": [
@@ -129,21 +133,25 @@ export class QuantumcircuitService {
       // },
       {
         "header": "Ansatz Circuit",
-        "value": "ansatz"
+        "value": "ansatz",
+        "description": "The Ansatz used to produce the parameterized trial state, with which the Hamiltonian can be measured."
       },
       {
         "header": "Expectation Circuit",
-        "value": "expectation"
+        "value": "expectation",
+        "description": "Circuit corresponding for the Hamiltonian of which ground state energy is to be calculated."
       }
     ],
     "VQC": [
       {
         "header": "Feature Map Circuit",
-        "value": "feature_map"
+        "value": "feature_map",
+        "description": "hghghghg"
       },
       {
         "header": "Ansatz Circuit",
-        "value": "ansatz"
+        "value": "ansatz",
+        "description": "hghghghg"
       }
     ]
   }

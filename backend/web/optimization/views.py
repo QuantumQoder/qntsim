@@ -18,39 +18,56 @@ class CircuitVisualizer(APIView):
         output = com.get_circuit(request.data, flag="visualization")
         return JsonResponse(output, safe = False)
 
-    
+import time
     
 class RunVQE(APIView):
     
 
     def post(self,request):
+        print("HARE")
         valid_ser = VQESerializer(data=request.data)
+        print("out serializer")
         if valid_ser.is_valid():
             post_data = valid_ser.validated_data
         else:
             print(valid_ser.errors)
 
-
+        print("validated")
         optimizer_details=valid_ser.validate_optimizer_details(request.data["optimizer_details"])
 
-        authentication_classes = ()
-        permission_classes = (permissions.AllowAny)
+        # authentication_classes = ()
+        # permission_classes = (permissions.AllowAny)
         # initialization=request.data["initialization"]#["node1"]
         # com = composer("in")
         # com.get_circuit(deepcopy(initialization))
         # initialization=com.qc
         
-        
+        print(time.time())
         ansatz=request.data["ansatz"]#["node1"]
+        print("ansatz_dict:", ansatz)
         com = composer("az")
         com.get_circuit(deepcopy(ansatz))
         ansatz=com.qc
         # print("ansatz:", ansatz)
         
-        expectation=request.data["expectation"]#["node1"]
+        expectation=request.data["expectation"]
+        for q, gates in expectation.items():
+            if gates[0]["value"] == "x":
+                expectation[q].insert(0, {"value":"h"})
+                expectation[q].append({"value":"h"})
+            elif gates[0]["value"] == "y":
+                expectation[q].insert(0, {"value":"rx","params":{"theta":{"value": np.pi/2, "variable": False}}})
+                expectation[q].append({"value":"rx","params":{"theta":{"value": -np.pi/2, "variable": False}}})
+            else:
+                expectation[q].insert(0, {"value":"i"})
+                expectation[q].append({"value":"i"})
+
+
+        print("expectation:", expectation)
         com = composer("ex")
         com.get_circuit(deepcopy(expectation))
         expectation=com.qc
+        # print("expectation:", expectation)
         
         
         vqa = VQA(
@@ -61,10 +78,12 @@ class RunVQE(APIView):
         
         initial_params=np.random.random(vqa.num_layers*len(vqa.variational_params))
         result,iteration_results = vqa.optimization(args=optimizer_details, initial_params=initial_params)
+        print(time.time())
         output={"fun":result.fun,
          "initial_params":initial_params.tolist(),
          "final_params": result.x.tolist(),
          "graph":iteration_results}
+        print("output:", output)
         return JsonResponse(output, safe = False)
     
     

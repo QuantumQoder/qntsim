@@ -25,11 +25,11 @@ class composer:
     def add_parametarized_gate(self, name, qubits, params, par_name=None):
         angles=[]
         for angle_name, angle_params in params.items():
-            if angle_params["variable"] == "True":
+            if angle_params["variable"] == True:
                 self.variational_params+=1
                 angle =  Parameter(par_name+str(self.variational_params))
             else:
-                angle = float(angle_params["value"])
+                angle = float(angle_params["value"]*np.pi/180)
             angles.append(angle)
         g = getattr(self.qc, name)
         g(*angles,*qubits)
@@ -43,10 +43,10 @@ class composer:
             for q in range(len(layer)):
                 gate = layer[q]
                 name = gate.get("value")
-                if name == "c":
+                if name == "control":
                     values = [item.get('value') for item in layer]
-                    taget_index = next(i for i, value in enumerate(values) if value not in ['i', 'c'])
-                    self.add_controlled_gate(name, layer, index, [q, taget_index])
+                    taget_index = next(i for i, value in enumerate(values) if value not in ['i', 'control'])
+                    self.add_controlled_gate("c", layer, index, [q, taget_index])
                 else:
                     if name != 'i':
                         if [index, q] not in self.ignore:

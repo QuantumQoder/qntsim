@@ -1,22 +1,29 @@
 <div class="container container-xl bg-white p-5">
-  <p-dialog header="Optimizable Circuits" [modal]="true" [(visible)]="optimizationParams.visible"
+  <!-- Optimizable Circuits -->
+  <p-dialog header="" [modal]="true" [(visible)]="optimizationParams.visible"
     (onHide)="optimizationParams.visible = false" [style]="{ width: '30vw' }">
     <div class=" d-flex flex-column mx-auto gap-3 my-2" *ngIf="optimizationAlgos.value === 'QAOA'">
-      <label for="numOfLayers" class="form-label">Number of Repetitions
+      <label for="numOfLayers" class="form-label">Number of Layers <i class= "ms-1 fa-solid fa-circle-info fa-xs" pTooltip="Number of layers for the algorithm. One layer consits of conactenation of cost and mixer hamiltonian."></i>
         <!-- {{optimizationParams.params.numOfLayers}} -->
       </label>
       <input type="number" class="form-control" [(ngModel)]="optimizationParams.params.numOfLayers"
         oninput="this.value = Math.abs(this.value)" />
     </div>
     <div class=" d-flex flex-column mx-auto gap-3 my-2">
-      <label for="numOfLayers" class="form-label">Select Optimizer</label>
-      <select class="form-select" [(ngModel)]="optimizer.value">
-        <option *ngFor="let data of optimizer.options" [value]="data.header">{{data.header}}</option>
+      <label for="numOfLayers" class="form-label">Select Optimizer<i class="ms-1 fa-solid fa-circle-info fa-xs" pTooltip="{{optDescription}}"></i></label>
+      <select class="form-select" [(ngModel)]="optimizer.value" (change)="updateOptDescription()">
+      <option *ngFor="let data of optimizer.options" [value]="data.header"  >
+        {{data.header}}<!-- Icon -->
+      </option>
       </select>
+      <!-- <select class="form-select" [(ngModel)]="optimizer.value">
+        <option *ngFor="let data of optimizer.options" [value]="data.header" pTooltip="{{data.description}}">{{data.header}}
+        </option>
+      </select> -->
 
     </div>
     <div class="d-flex justify-content-center">
-      <button class="btn btn-primary" (click)="sendRequest()">Save</button>
+      <button class="btn btn-primary" (click)="optimizationParams.visible = false">Save</button>
     </div>
   </p-dialog>
   <p-dialog header="Add Parameters" [(visible)]="params.visible" [modal]="true" (onHide)="saveParams()">
@@ -79,7 +86,7 @@
       <!-- <div></div> -->
     </div>
   </p-dialog>
-  <p class="display-3 text-center">Variable Optimization</p>
+  <p class="display-3 text-center">Build Your Application</p>
 
   <!-- <table class="table-bordered">
     <thead>
@@ -101,7 +108,11 @@
   ></p-tabMenu> -->
 
   <p-accordion [activeIndex]="0">
-    <p-accordionTab *ngFor="let data of optimizationAlgos.options" [header]="data.header">
+    <p-accordionTab *ngFor="let data of optimizationAlgos.options" [header]="data.header" > 
+       <ng-template pTemplate="header">
+      <!-- You can replace 'pi pi-icon-name' with your desired icon class -->
+      <i class="ms-1 fa-solid fa-circle-info fa-xs" pTooltip="{{data.description}}"></i> 
+    </ng-template>
       <div class="col-10 mx-auto d-flex justify-content-center m-4 overflow-auto">
         <table class="table table-bordered bg-white rounded">
           <tbody>
@@ -128,6 +139,16 @@
         <button class="btn btn-primary mx-2" (click)="addRow(data.value)">
           Add Qubit
         </button>
+        <button class="btn btn-primary mx-2" (click)="deleteColumn(data.value)">
+          Delete Layer
+        </button>
+        <button class="btn btn-primary mx-2" (click)="deleteRow(data.value)">
+          Delete Qubit
+        </button>
+        <button class="btn btn-primary mx-2" (click)="reset()">
+          Reset
+        </button>
+
         <!-- <button class="btn btn-primary mx-2" (click)="saveTableData()">
           Save
         </button> -->
@@ -135,11 +156,35 @@
     </p-accordionTab>
   </p-accordion>
   <div class="d-flex justify-content-center">
-    <button class="btn btn-primary" (click)="optimizationParams.visible = true">
+    <!-- <button class="btn btn-primary" (click)="optimizationParams.visible = true">
       <div *ngIf="spinner" class="spinner-border text-light" role="status">
         <span class="sr-only">Loading...</span>
       </div>
       <span *ngIf="!spinner"> Optimize </span>
-    </button>
+    </button> -->
+    <div class="mx-4 row">        
+      <div class="form-check col" *ngIf="shotsButton===false || shotsButton===null">
+          <input class="form-check-input" type="radio" name="radioOptions" id="Optimize" (click)="optimizationParams.visible = true;optimizeButton=true">
+          <label class="form-check-label" for="Optimize">
+              Optimize
+          </label>
+      </div>
+  
+      <div class="form-check col" *ngIf="optimizeButton===false || optimizeButton===null">
+          <input class="form-check-input" type="radio" name="radioOptions" id="Shots" (click)="shotsButton = true">
+          <label class="form-check-label" for="Shots">
+             Shots
+          </label>
+      </div>
+      <div class="col" *ngIf="shotsButton===true"><input type="number" title="Number of Shots" [value]="1024" width="20px"></div>
+    </div>
+
+
+
+  </div>
+  <div class="row text-center" *ngIf="shotsButton!==null || optimizeButton!==null">
+    <div class="mt-4 col">
+      <button class=" btn btn-primary" (click)="sendRequest()" >Run Simulation</button>
+    </div>
   </div>
 </div>
