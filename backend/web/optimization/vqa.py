@@ -14,32 +14,39 @@ class VQA:
         self.initialization=initialization
         self.ansatz = ansatz
         self.variational_params=self.ansatz.parameters.data
-        
+        print("var params:", len(self.variational_params))
         self.num_layers=num_layers
         self.num_qubits=self.ansatz.num_qubits
         self.expectation=expectation
+        # print("dict:",self.__dict__)
     def reshape_params(self,params):
         return np.array(params).reshape(self.num_layers,len(self.variational_params))
     def create_circuit(self, params):
+        # print("self.initialization type:", type(self.initialization))
         if self.initialization:
             self.initial_variational_params=self.initialization.parameters.data
             self.vqa_circuit = self.initialization
             for p in range(len(self.initial_variational_params)):
                     self.vqa_circuit=self.vqa_circuit.bind_parameters({self.initial_variational_params[p]:params.pop(p)})
             self.vqa_circuit.barrier()
+            # print("self.vqa_circuit ini:", self.vqa_circuit)
         else:
+            # print("NO ini")
             self.vqa_circuit = QuantumCircuit(self.num_qubits)
         params = self.reshape_params(params)
+        # print("params:", params)
         for l in range(self.num_layers):
             layer=deepcopy(self.ansatz)
             for p in range(len(self.variational_params)):
                 layer=layer.bind_parameters({self.variational_params[p]:params[l][p]})
             self.vqa_circuit = self.vqa_circuit&(layer)
             self.vqa_circuit.barrier()
+        # print("self.vqa_circuit:", self.vqa_circuit)
         return self.vqa_circuit
     def get_exp_value(self):
         op = CircuitOp(self.expectation)
         psi = CircuitStateFn(self.vqa_circuit)
+        # print("psi:", psi)
         return psi.adjoint().compose(op).compose(psi).eval().real
     
     def cost_fun(self, params):
@@ -56,6 +63,7 @@ class VQA:
         def callback_function(xk):
             iteration_results.append(current_cost)
         result = minimize(self.cost_fun, x0=initial_params,  method=args.pop("optimizer", "COBYLA"), callback=callback_function, options={"maxiter":args.pop("maxiter", 1000), "disp":args.pop("disp", True)}, **args)
+        print("res:", result.x)
         return result, iteration_results
     
     

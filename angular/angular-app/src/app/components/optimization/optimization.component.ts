@@ -34,23 +34,24 @@ export class OptimizationComponent implements OnInit {
   optimizationAlgos = {
     value: "",
     options: [],
+    description: ""
   };
   optimizer = {
     value: "COBYLA",
     options: [{
-      header: "Nelder-Mead", description: ""
+      header: "Nelder-Mead", description: "The Nelder-Mead algorithm, also known as the downhill simplex method. Used when gradient information is unavailable."
     }, {
-      header: "Powell", description: ""
+      header: "Powell", description: "The Powell's method, also known as Powell's conjugate direction method. Used when gradient information is unavailable."
     }, {
-      header: "CG", description: ""
+      header: "CG", description: "The Conjugate Gradient method. Used for solving systems of linear equations"
     }, {
-      header: "BFGS", description: ""
+      header: "BFGS", description: "The Broyden-Fletcher-Goldfarb-Shanno. Used for solving unconstrained nonlinear optimization problems."
     }, {
-      header: "L-BFGS-B", description: ""
+      header: "L-BFGS-B", description: "L-BFGS-B is based on the Limited-memory BFGS method, which is a variant of the BFGS algorithm. It differs from BFGS in how it handles limited memory and is designed for problems with a large number of variables."
     }, {
-      header: "COBYLA", description: ""
+      header: "COBYLA", description: "Constrained Optimization BY Linear Approximation (COBYLA) algorithm."
     },
-    { header: "SLSQP", description: "" }]
+    { header: "SLSQP", description: "SLSQP stands for Sequential Least Squares Quadratic Programming. It is a numerical optimization algorithm used for solving constrained nonlinear optimization problems." }]
   }
   selectedCell = {
     nodeName: "",
@@ -141,6 +142,36 @@ export class OptimizationComponent implements OnInit {
     return;
   }
 
+  reset(){
+    this.rows = [0]
+    this.cols = [0,1]
+    this.options = this.service.getGatesLocal();
+    console.log(this.options);
+    this.app_id = localStorage.getItem("app_id");
+    this.requestData = this.apiService.getRequest();
+    this.optimizationAlgos.value = this.service.getOptimizationAlogorithm();
+    this.optimizationAlgos.options = this.service.getCircuitsForOptimization(
+      this.service.getOptimizationAlogorithm()
+    );
+    for (let node of this.optimizationAlgos.options) {
+      this.tableData[node.value] = {
+        data: Array.from({ length: this.rows.length }, () =>
+          Array(this.cols.length).fill({
+            value: "I",
+            params: {
+              theta: { value: 0, variable: false },
+              phi: { value: 0, variable: false },
+              lambda: { value: 0, variable: false },
+            },
+          })
+        ),
+        rows: [...this.rows],
+        cols: [...this.cols],
+      };
+      this.tableData[node.value] = JSON.parse(JSON.stringify(this.tableData[node.value]));
+    }
+  }
+
   addRow(nodeName: string) {
     this.tableData[nodeName].rows.push(this.tableData[nodeName].rows.length);
     const newRow = new Array(this.tableData[nodeName].cols.length).fill({
@@ -152,6 +183,17 @@ export class OptimizationComponent implements OnInit {
       },
     });
     this.tableData[nodeName].data.push(newRow);
+    this.tableData = JSON.parse(JSON.stringify(this.tableData));
+  }
+
+  deleteRow(nodeName: string){
+    console.log('delete row')
+    console.log(this.tableData)
+    console.log(this.tableData[nodeName])
+    console.log(this.tableData[nodeName].data)
+    this.tableData[nodeName].rows.pop()
+    this.tableData[nodeName].data.pop()
+    // this.tableData[nodeName].data.pop()
     this.tableData = JSON.parse(JSON.stringify(this.tableData));
   }
 
@@ -169,6 +211,16 @@ export class OptimizationComponent implements OnInit {
     );
     this.tableData = JSON.parse(JSON.stringify(this.tableData));
   }
+
+  deleteColumn(nodeName: string){
+    this.tableData[nodeName].cols.pop()
+    this.tableData[nodeName].data.forEach((row) =>
+      row.pop()
+    );
+    this.tableData = JSON.parse(JSON.stringify(this.tableData));
+
+  }
+
   saveParams() {
     const { nodeName, rowIndex, colIndex } = this.selectedCell;
     this.tableData[nodeName].data[rowIndex][colIndex].params.theta.value =

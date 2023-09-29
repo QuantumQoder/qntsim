@@ -4,7 +4,6 @@ from scipy.optimize import minimize
 signature = inspect.signature(minimize)
 
 class VQESerializer(serializers.Serializer):
-    initialization = serializers.DictField()
     ansatz = serializers.DictField()
     expectation = serializers.DictField()
     optimizer_details = serializers.DictField()

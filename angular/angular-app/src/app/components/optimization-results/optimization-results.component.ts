@@ -98,7 +98,7 @@ export class OptimizationResultsComponent implements OnInit {
     const result = []
 
     for (let i = 0; i < values.initial_params.length; i++) {
-      result.push({ initial: values.initial_params[i], final: values.initial_params[i] });
+      result.push({ initial: values.initial_params[i], final: values.final_params[i] });
     }
 
     console.log("Result", result)
