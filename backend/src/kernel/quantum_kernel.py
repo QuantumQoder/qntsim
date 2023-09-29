@@ -44,9 +44,9 @@ class QuantumKernel():
 
         QuantumManagerKet_class=None
         if type=='Qiskit':
-            QuantumManagerKet_class=QuantumManagerKetQiskit
+            QuantumManagerKet_class=QiskitManager
         elif type=='Qutip':
-            QuantumManagerKet_class=QuantumManagerKetQutip
+            QuantumManagerKet_class=QutipManager
 
         return QuantumManagerKet_class
 
@@ -111,7 +111,7 @@ class QuantumKernel():
         del self.states[key]
 
 
-class QuantumManagerKetQiskit(QuantumKernel):
+class QiskitManager(QuantumKernel):
     """Class to track and manage quantum states with the ket vector formalism."""
 
     def __init__(self):
@@ -266,7 +266,7 @@ class QuantumManagerKetQiskit(QuantumKernel):
 
 
 
-class QuantumManagerKetQutip(QuantumKernel):
+class QutipManager(QuantumKernel):
     """Class to track and manage quantum states with the ket vector formalism."""
 
     def __init__(self):

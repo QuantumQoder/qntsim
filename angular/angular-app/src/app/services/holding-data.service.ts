@@ -83,7 +83,7 @@ export class HoldingDataService {
       var delay
       for (var i = 0; i < nodes.length; i++) {
         for (var j = 0; j < nodes.length; j++) {
-          tempcc.push([nodes[i].Name, nodes[j].Name]);
+          tempcc.push([nodes[i].name, nodes[j].name]);
         }
       }
       if (tempcc.length != 0) {
@@ -96,9 +96,9 @@ export class HoldingDataService {
             delay = 10000000000;
           }
           ccreq = {
-            Nodes: tempcc[i],
-            Delay: delay,
-            Distance: distance
+            nodes: tempcc[i],
+            delay: delay,
+            distance: distance
           }
           cc.push(ccreq)
         }

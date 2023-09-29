@@ -22,55 +22,14 @@ def load_topology(network_config_json, backend):
     Timeline.DLCZ=False
     Timeline.bk=True
     print(f'Loading Topology: {network_config_json}')
-    print("timeline class", Timeline)
     
     tl = Timeline(20e12,backend)
-    print("timeline: ", tl)
     logger.info("Timeline initiated with bk protocol")
 
     #Create the topology
     network_topo = Topology("network_topo", tl)
-    print("topology_object: ", network_topo)
     network_topo.load_config_json(network_config_json)
 
-    print("loaded topology")
-
-    #Configure the parameters
-
-    #Memory Parameters
-    for node_properties in network_config_json["nodes"]:
-        node = network_topo.nodes[node_properties["Name"]]
-        node.memory_array.update_memory_params("frequency", node_properties["memory"]["frequency"])
-        node.memory_array.update_memory_params("coherence_time", node_properties["memory"]["expiry"])
-        node.memory_array.update_memory_params("efficiency", node_properties["memory"]["efficiency"])
-        node.memory_array.update_memory_params("raw_fidelity", node_properties["memory"]["fidelity"])
-        node.network_manager.set_swap_success(node_properties["swap_success_rate"])
-        node.network_manager.set_swap_degradation(node_properties["swap_degradation"])
-    
-    print("nodes done")
-    
-    #Detector Parameters
-    if "detector_properties" in network_config_json:
-        for node in network_topo.get_nodes_by_type("BSMNode"):
-            node.bsm.update_detectors_params("efficiency", network_config_json["detector_properties"]["efficiency"])
-            node.bsm.update_detectors_params("count_rate", network_config_json["detector_properties"]["count_rate"])
-            node.bsm.update_detectors_params("time_resolution", network_config_json["detector_properties"]["time_resolution"])
-        
-    print("detectors done")
-
-    #Light Source Parameters
-    if "light_source_properties" in network_config_json:
-        Qnodes = network_topo.get_nodes_by_type("EndNode")+network_topo.get_nodes_by_type("ServiceNode")
-        for node in Qnodes:
-            node.lightsource.frequency = network_config_json["light_source_properties"]["frequency"]
-            node.lightsource.wavelength = network_config_json["light_source_properties"]["wavelength"]
-            node.lightsource.bandwidth = network_config_json["light_source_properties"]["bandwidth"]
-            node.lightsource.mean_photon_num = network_config_json["light_source_properties"]["mean_photon_num"]
-            node.lightsource.phase_error = network_config_json["light_source_properties"]["phase_error"]
-    print("sources done")
-    
-    print("returning back")
-    
     return network_config_json,tl,network_topo
 
 def get_entanglement_data(network_topo, src, dst):

@@ -1,13 +1,15 @@
-from random import choices
-import random
-from qntsim.kernel.timeline import Timeline
-Timeline.DLCZ=False
-Timeline.bk=True
-from qntsim.topology.topology import Topology
-from qntsim.kernel.circuit import QutipCircuit
-import numpy as np
 import logging
-logger = logging.getLogger("main_logger.application_layer." + "qsdc1")
+import random
+from copy import deepcopy
+from random import choices
+from typing import Dict, List
+
+import numpy as np
+from qntsim.communication.noise import Noise
+from qntsim.kernel.circuit import QutipCircuit
+from qntsim.utils import log
+
+# logger = logging.getLogger("main_logger.application_layer." + "qsdc1")
 
 class QSDC1():
    
@@ -21,7 +23,7 @@ class QSDC1():
     
     def request_entanglements(self,sender,receiver,n):
         print("sender,receiver,n",sender.name,receiver.name,n)
-        logger.info("requesting entanglement between: "+ sender.name+ " "+receiver.name)
+        log.logger.info("requesting entanglement between: "+ sender.name+ " "+receiver.name)
         sender.transport_manager.request(receiver.owner.name,5e12,n,20e12,0,.5,5e12)
         source_node_list=[sender.name]
         print("sender,receiver,source_node_list",sender,receiver,source_node_list)
@@ -31,7 +33,7 @@ class QSDC1():
         sender=alice
         receiver=bob
         print('sender, receiver',sender.owner.name,receiver.owner.name)
-        logger.info('sender, receiver are '+sender.owner.name+" "+receiver.owner.name)     
+        log.logger.info('sender, receiver are '+sender.owner.name+" "+receiver.owner.name)     
         return self.request_entanglements(sender,receiver,n)
 
 
@@ -158,6 +160,8 @@ class QSDC1():
             removed_bits.append(message[2*pos:2*pos+2])
             thrown_message.append(message[2*pos:2*pos+2])
             choose_keys.append(entangled_keys[pos])
+        print(entangled_keys, "fuck")
+        self.eavesdrop = None
 
         for i in range(len(alice_meas)):
             a_val = list(alice_meas[i].values())[0]
@@ -176,23 +180,26 @@ class QSDC1():
                     self.eavesdrop=True
                 #assert a_val == 1 - b_val
 
-        print("eavesdrop check passed!")
-        logger.info("eavesdrop check passed!")
+        print("eavesdrop check passed!", self.eavesdrop)
+        log.logger.info("eavesdrop check passed!")
         print(alice_meas, bob_meas)
         return choose_keys,removed_bits
 
-    def bell_measure(self,qm, keys):
-        qc=QutipCircuit(2) 
+    def bell_measure(self,qm, keys, noise: Dict[str, List[float]] = {}):
+        qc=QutipCircuit(2)
         qc.cx(0,1)
         qc.h(0)
+        readout = noise.pop("readout", [0, 0])
+        Noise.implement(noise, circuit = qc, keys = keys, quantum_manager = qm)
         qc.measure(0)
         qc.measure(1)
         output=qm.run_circuit(qc,keys)
+        Noise.readout(readout, reasult = output)
         #print(output)
         #print(list(output.values()))
         return output
 
-    def run(self,alice,bob,sequence_length,message):
+    def run(self,alice,bob,sequence_length,message, noise: Dict[str, List[float]] = {}):
         #message = "110011001001010101010100"
         #  convert message before run is called
         # message = string_to_binary(message)
@@ -213,11 +220,11 @@ class QSDC1():
                 continue
             #if (c == len(message)):break
 
-            output = self.bell_measure(qm_alice, [keys, alice_bob_keys_dict[keys]])
+            output = self.bell_measure(qm_alice, [keys, alice_bob_keys_dict[keys]], deepcopy(noise))
             message_received += str(output[keys]) + str(output[alice_bob_keys_dict[keys]])
             c+=2
         final_key = message_received.replace("__", "")
-        logger.info("obtained final key")
+        log.logger.info("obtained final key")
         print("message thrown out because we measure it for eavesdrop check : ",removed_bits)
         print(f"key transmitted : {message}")
         print(f"key shared received : {message_received}")
@@ -237,119 +244,14 @@ class QSDC1():
         print(res)
         return res
 
-# In the request if the runtime is till the simulation, then memory will be sequentially allotted 
-# For quantum router , you can directly change memory size
+if __name__ == "__main__":
+    import json
 
-# Ask if we can divide task for different slots
-# Ask if we can increase memory for each node (currently it is 100)
-# Ask how to take care of phi plus vs phi minus generation
-# generalize to multiple bits
+    from qntsim.layers.application_layer.communication.network import Network
 
-
-# if (aliceMeasurementChoices[i] == 2 and bobMeasurementChoices[i] == 1) or (aliceMeasurementChoices[i] == 3 and bobMeasurementChoices[i] == 2):
-#         aliceKey.append(aliceResults[i]) # record the i-th result obtained by Alice as the bit of the secret key k
-
-
-
-##############################################################################################################
-
-# path (Type : String) -Path to config Json file
-# sender and receiver (Type :string)-nodes in network 
-# backend (Type :string) Qutip (Since entanglements are filtered out based on EPR state)
-# Todo Support on Qiskit
-# message (Type: String)--a bit string
-# message length  should be even
-# sequence length (Type : Integer) should be less than 5
-"""
-def qsdc1(path, sender,receiver,sequence_length,message):
-    import utils
-    from qntsim.kernel.timeline import Timeline 
-    Timeline.DLCZ=False
-    Timeline.bk=True
-    from qntsim.topology.topology import Topology
-    
-    tl = Timeline(20e12,"Qutip")
-    network_topo = Topology("network_topo", tl)
-    network_topo.load_config(path)
-    if (len(message)%2==0):
-        
-        n=int(sequence_length*len(message))
-        alice=network_topo.nodes[sender]
-        bob = network_topo.nodes[receiver]
-        qsdc1=QSDC1()
-        alice,bob=qsdc1.roles(alice,bob,n)
-        tl.init()
-        tl.run()  
-        res = qsdc1.run(alice,bob,sequence_length,message)
-        print(res)
-# jsonConfig (Type : Json) -Json Configuration of network 
-"""
-"""
-def qsdc1(jsonConfig,sender,receiver,sequence_length,message):
-    import utils
-    from qntsim.kernel.timeline import Timeline 
-    Timeline.DLCZ=False
-    Timeline.bk=True
-    from qntsim.topology.topology import Topology
-    
-    report,graph={},{}
-    tl = Timeline(20e12,"Qutip")
-    network_topo = Topology("network_topo", tl)
-    network_topo.load_config_json(jsonConfig)
-    if (len(message)%2==0):
-        
-        n=int(sequence_length*len(message))
-        alice=network_topo.nodes[sender]
-        bob = network_topo.nodes[receiver]
-        qsdc1=QSDC1()
-        alice,bob,source_node_list=qsdc1.roles(alice,bob,n)
-        print(source_node_list)
-        tl.init()
-        tl.run()  
-        res = qsdc1.run(alice,bob,sequence_length,message)
-        print(res)
-    
-    t=1
-    timel ,fidelityl,latencyl,fc_throughl,pc_throughl,nc_throughl=[],[],[],[],[],[]
-    while t < 20:
-        fidelityl= utils.calcfidelity(network_topo,source_node_list,t,fidelityl)
-        
-        latencyl= utils.calclatency(network_topo,source_node_list,t,latencyl)
-        fc_throughl,pc_throughl,nc_throughl= utils.throughput(network_topo,source_node_list,t,fc_throughl,pc_throughl,nc_throughl)
-        t=t+1
-        timel.append(t)
-    
-    graph["latency"]    = latencyl
-    graph["fidelity"]   = fidelityl
-    graph["throughput"] = {}
-    graph["throughput"]["fc"]= fc_throughl  
-    graph["throughput"]["pc"]= pc_throughl
-    graph["throughput"]["nc"]= nc_throughl          #{fc_throughl,pc_throughl,nc_throughl}
-    graph["time"] = timel
-    
-    report["application"]=res
-    report["graph"]=graph
-    return report
-conf= {"nodes": [], "quantum_connections": [], "classical_connections": []}
-memo = {"frequency": 2e3, "expiry": 0, "efficiency": 1, "fidelity": 1}
-node1 = {"Name": "N1", "Type": "end", "noOfMemory": 500, "memory":memo}
-node2 = {"Name": "N2", "Type": "end", "noOfMemory": 500, "memory":memo}
-node3 = {"Name": "N3", "Type": "service", "noOfMemory": 500, "memory":memo}
-conf["nodes"].append(node1)
-conf["nodes"].append(node2)
-conf["nodes"].append(node3)
-qc1 = {"Nodes": ["N1", "N3"], "Attenuation": 1e-5, "Distance": 70}
-qc2 = {"Nodes": ["N2", "N3"], "Attenuation": 1e-5, "Distance": 70}
-conf["quantum_connections"].append(qc1)
-conf["quantum_connections"].append(qc2)
-cc1 = {"Nodes": ["N1", "N1"], "Delay": 0, "Distance": 0}
-cc1 = {"Nodes": ["N2", "N2"], "Delay": 0, "Distance": 0}
-cc1 = {"Nodes": ["N3", "N3"], "Delay": 0, "Distance": 0}
-cc12 = {"Nodes": ["N1", "N2"], "Delay": 1e9, "Distance": 1e3}
-cc13 = {"Nodes": ["N1", "N3"], "Delay": 1e9, "Distance": 1e3}
-cc23 = {"Nodes": ["N2", "N3"], "Delay": 1e9, "Distance": 1e3}
-conf["classical_connections"].append(cc12)
-conf["classical_connections"].append(cc13)
-conf["classical_connections"].append(cc23)
-qsdc1(conf ,"N1", "N2",8,"110011000000111100110011000011")
-"""
+    topology = json.load(open("topology.json", 'r'))
+    network = Network(topology=topology,messages={('node1','node2'):'hello'})
+    nodes = network.nodes
+    alice,bob = nodes[0],nodes[1]
+    aa = QSDC1()
+    aa.run(alice,bob, None,"11001000",noise={"amp_dmp":[0.9]})

@@ -81,7 +81,7 @@ class QuantumChannel(OpticalChannel):
         frequency (float): maximum frequency of qubit transmission (in Hz).
     """
 
-    def __init__(self, name: str, timeline: "Timeline", attenuation: float, distance: int, polarization_fidelity=1, light_speed=2e-4, frequency=8e7):
+    def __init__(self, name: str, timeline: "Timeline", attenuation: float, distance: int, polarization_fidelity=1, light_speed=2e-4, frequency=8e7, **_):
         """Constructor for Quatnum Channel class.
 
         Args:
@@ -201,7 +201,7 @@ class ClassicalChannel(OpticalChannel):
         delay (float): delay in message transmission (default distance / light_speed).
     """
 
-    def __init__(self, name: str, timeline: "Timeline", distance: int, delay=-1):
+    def __init__(self, name: str, timeline: "Timeline", distance: int, delay=-1, **_):
         """Constructor for Classical Channel class.
 
         Args:

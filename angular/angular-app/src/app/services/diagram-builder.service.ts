@@ -40,9 +40,9 @@ export class DiagramBuilderService {
             linkarray.push(from);
             linkarray.push(to);
             let linkData = {
-                Nodes: linkarray,
-                Attenuation: diagramModel.linkDataArray[i].attenuation,
-                Distance: diagramModel.linkDataArray[i].distance,
+                nodes: linkarray,
+                attenuation: diagramModel.linkDataArray[i].attenuation,
+                distance: diagramModel.linkDataArray[i].distance,
                 powerLoss: powerLoss
             }
             links.push(linkData)

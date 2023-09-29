@@ -257,12 +257,11 @@ def eve_e91(network_config, sender, receiver, keyLength):
     return {"Error_Msg": "Couldn't generate required length.Retry Again"}
 
 
-def e91(network_config, sender, receiver, keyLength):
+def e91(network_config, sender, receiver, keyLength, noise: Dict[str, List[float]] = {}):
     logger.info("E91 Quantum Key Distribution")
     print('In e91 network config', network_config)
     start_time = time.time()
-    network_config_json, tl, network_topo = load_topology(
-        network_config, "Qutip")
+    network_config_json, tl, network_topo = load_topology(network_config, "Qutip")
     print('network topo', network_topo)
     trials = 4
     while (trials > 0):
@@ -278,7 +277,7 @@ def e91(network_config, sender, receiver, keyLength):
             alice, bob, source_node_list = e91.roles(alice, bob, n)
             tl.init()
             tl.run()
-            results = e91.run(alice, bob, n)
+            results = e91.run(alice, bob, n, noise)
             if keyLength < len(results["sender_keys"]):
                 results["sender_keys"] = results["sender_keys"][:keyLength]
                 results["receiver_keys"] = results["receiver_keys"][:keyLength]
@@ -394,7 +393,7 @@ def test_direct_transmission():
 
 # test_direct_transmission()
 
-def ghz(network_config, endnode1, endnode2, endnode3, middlenode):
+def ghz(network_config, endnode1, endnode2, endnode3, middlenode, noise: Dict[str, List[float]] = {}):
     logger.info("End-to-End GHZ Generation")
 
     start_time = time.time()
@@ -405,11 +404,10 @@ def ghz(network_config, endnode1, endnode2, endnode3, middlenode):
     charlie = network_topo.nodes[endnode3]
     middlenode = network_topo.nodes[middlenode]
     ghz = GHZ()
-    alice, bob, charlie, middlenode, source_node_list = ghz.roles(
-        alice, bob, charlie, middlenode)
+    alice, bob, charlie, middlenode, source_node_list = ghz.roles(alice, bob, charlie, middlenode)
     tl.init()
     tl.run()
-    results = ghz.run(alice, bob, charlie, middlenode)
+    results = ghz.run(alice, bob, charlie, middlenode, deepcopy(noise))
     results = {k: display_quantum_state(state) for k, state in results.items()}
     report = {}
     report["application"] = results
@@ -470,13 +468,11 @@ def ip1(network_config, sender, receiver, message):
 #         return None
 
 
-def qsdc1(network_config, sender, receiver, sequenceLength, key):
+def qsdc1(network_config, sender, receiver, sequenceLength, key, noise: Dict[str, List[float]] = {}):
     logger.info("Seminal QSDC")
     start_time = time.time()
-    network_config_json, tl, network_topo = load_topology(
-        network_config, "Qutip")
+    network_config_json, tl, network_topo = load_topology(network_config, "Qutip")
     if (len(key) % 2 == 0):
-
         n = int(sequenceLength*len(key))
         alice = network_topo.nodes[sender]
         bob = network_topo.nodes[receiver]
@@ -487,7 +483,7 @@ def qsdc1(network_config, sender, receiver, sequenceLength, key):
         tl.init()
         tl.run()
         print('init and run', network_config_json)
-        results = qsdc1.run(alice, bob, sequenceLength, key)
+        results = qsdc1.run(alice, bob, sequenceLength, key, deepcopy(noise))
         report = {}
         report["application"] = results
         end_time = time.time()
@@ -501,7 +497,7 @@ def qsdc1(network_config, sender, receiver, sequenceLength, key):
         return None
 
 
-def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
+def teleportation(network_config, sender, receiver, amplitude1, amplitude2, noise: Dict[str, List[float]] = {}):
     print("Quantum Teleportation...")
     logger.info("Quantum Teleportation")
     start_time = time.time()
@@ -517,15 +513,12 @@ def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
     print('source node', source_node_list)
     tl.init()
     tl.run()
-    results = tel.run(alice, bob, amplitude1, amplitude2)
+    results = tel.run(alice, bob, amplitude1, amplitude2, deepcopy(noise))
     report = {}
-    results["alice_bob_entanglement"] = display_quantum_state(
-        results["alice_bob_entanglement"])
+    results["alice_bob_entanglement"] = display_quantum_state(results["alice_bob_entanglement"])
     results["random_qubit"] = display_quantum_state(results["random_qubit"])
-    results["bob_initial_state"] = display_quantum_state(
-        results["bob_initial_state"])
-    results["bob_final_state"] = display_quantum_state(
-        results["bob_final_state"])
+    results["bob_initial_state"] = display_quantum_state(results["bob_initial_state"])
+    results["bob_final_state"] = display_quantum_state(results["bob_final_state"])
     report["application"] = results
 
     end_time = time.time()
@@ -535,12 +528,12 @@ def teleportation(network_config, sender, receiver, amplitude1, amplitude2):
     print(report)
     return report
 
-def qsdc_teleportation(topology: Dict, sender: str, receiver: str, message: str, attack: Optional[str] = None):
+def qsdc_teleportation(topology: Dict, sender: str, receiver: str, message: str, attack: Optional[str] = None, noise: Dict[str, List[float]] = {}):
     print("QSDC_TELEPORTATION\n")
     print(f"topology map: {topology}\n")
     print(f"sender: {sender}, receiver: {receiver}, message: {message}, attack: {attack}\n")
     start_time = time.time()
-    network = Network(topology=topology, messages={(sender, receiver): message})
+    network = Network(topology=topology, messages={(sender, receiver): message}, noise = deepcopy(noise))
     network.teleport(None)
     if attack in ["DoS", "EM", "IR"]:
         from qntsim.communication.attack import ATTACK_TYPE, Attack
@@ -551,7 +544,7 @@ def qsdc_teleportation(topology: Dict, sender: str, receiver: str, message: str,
     print(f"messages received after decode: {received_messages}\n")
     from qntsim.communication.error_analyzer import ErrorAnalyzer
     print(f"returns from ErrorAnalyzer: {ErrorAnalyzer._analyse(network)}\n")
-    _, _, avg_err, err_sd, info_lk, fid = ErrorAnalyzer._analyse(network)
+    _, _, avg_err, _, _, _ = ErrorAnalyzer._analyse(network)
     execution_time: float = time.time() - start_time
     response: Dict[str, Any] = {}
     response["input_message"] = message

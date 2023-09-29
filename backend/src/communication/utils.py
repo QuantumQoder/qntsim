@@ -45,7 +45,7 @@ def to_characters(bin_strs: List[str], __was_binary:bool):
 #     messages = bin_dict if __was_binary else {node_seq:"".join("{:c}".format(int(binary[8*i:8*(i+1)], 2)) for i in range(len(binary)//8)) for node_seq, binary in bin_dict.items()}
 #     return messages
 
-def pass_values(_, returns:Any, *args, **kwds) -> Tuple[Any, Tuple[Any], Dict]:
+def pass_values(_, returns:Any, *args, **kwds) -> Tuple[Any, Tuple[Any], Dict[str, Any]]:
     """A do-nothing funciton which passes the arguments from the previous call to the next call
 
     Args:

@@ -246,7 +246,7 @@ class Topology():
             if i!=0:
                 self.nodes["s"+str(i)].service_node = "s"+str(0)
 
-    def load_config_json(self, config) -> None:
+    def load_config_json(self, config: Dict[str, List[Dict[str, Any]]]) -> None:
         #print("lcj_start",config)
         #print()
         """Method to load a network configuration file.
@@ -257,9 +257,9 @@ class Topology():
             config (dictionary): json network configuration
             {
                 "nodes": [{
-                    "Name": "Name of node",
-                    "Type": ["service", "end"],
-                    "noOfMemory": 50, # No of Memories
+                    "name": "name of node",
+                    "type": ["service", "end"],
+                    "memo_size": 50, # No of Memories
                     "memory":{
                         "frequency": 2e4, # Memory Frequency
                         "expiry": 0, # Memory Expiry Time
@@ -268,111 +268,65 @@ class Topology():
                     },
                 }],
                 "quantum_connections": [{
-                    "Nodes": ["N1", "N2"] # Name of connected nodes
-                    "Attenuation": 1e-5,
-                    "Distance": 70,
+                    "nodes": ["N1", "N2"] # name of connected nodes
+                    "attenuation": 1e-5,
+                    "distance": 70,
                 }],
                 "classical_connections": [{
-                    "Nodes": ["N1", "N2"] # Name of connected nodes
-                    "Delay": 1e-5,
-                    "Distance": 1e3,
+                    "nodes": ["N1", "N2"] # name of connected nodes
+                    "delay": 1e-5,
+                    "distance": 1e3,
                 }],
             }
         Side Effects:
             Will modify graph, graph_no_middle, qchannels, and cchannels attributes.
         """
-        for node in config["nodes"]:
-            #print("test check lcj nodes",node,node["Type"],type(node["Type"]))
-            nodeObj = None
-            if node["Type"] == "service":
-                nodeObj = ServiceNode(node["Name"],self.timeline,node["noOfMemory"])
-                #self.add_node(nodeObj)
-            elif node["Type"] == "end":
-                #print("check Type",node["Name"])
-                nodeObj = EndNode(node["Name"],self.timeline,node["noOfMemory"])
-                #self.add_node(nodeObj)
-            
-            
-            if nodeObj is None:
-                return f"Wrong type {node['Type']}"
-            else:
-                #nodeObj.memory_array.update_memory_params("frequency", node["memory"]["frequency"])
-                #nodeObj.memory_array.update_memory_params("coherence_time", node["memory"]["expiry"])
-                #nodeObj.memory_array.update_memory_params("efficiency", node["memory"]["efficiency"])
-                #nodeObj.memory_array.update_memory_params("raw_fidelity", node["memory"]["fidelity"])
-                for arg, val in node.get("memory", {}).items():
-                    nodeObj.memory_array.update_memory_params(arg, val)
-                for arg, val in node.get("lightSource", {}).items():
-                    setattr(nodeObj.lightsource, arg, val)
-                nodeObj.network_manager.set_swap_success(es_swap_success=node.get("swap_success_rate", 1))
-                nodeObj.network_manager.set_swap_degradation(es_swap_degradation=node.get("swap_degradation", 0.99))
-                self.add_node(nodeObj)
-            
-            
-        for cc in config["classical_connections"]:
-           
-            cchannel_params = {
-                "delay": cc["Delay"]/2,  # divide RT time by 2
-                "distance": cc["Distance"]
-            }
-            if cc["Nodes"][0] is cc["Nodes"][1]:
-                continue
-            else:
-                self.add_classical_channel(cc["Nodes"][0], cc["Nodes"][1], **cchannel_params)
-                self.add_classical_channel(cc["Nodes"][1], cc["Nodes"][0], **cchannel_params)
-        
-        for qc in config["quantum_connections"]:
-            
-            qchannel_params = {
-                "attenuation": qc["Attenuation"],
-                "distance": qc["Distance"]
-            }
-            self.add_quantum_connection(qc["Nodes"][0], qc["Nodes"][1], **qchannel_params)
-        
-          
+        for node in config.get("nodes", []):
+            match node.pop("type"):
+                case "service": node_class = ServiceNode
+                case "end": node_class = EndNode
+                case _: node_class = ServiceNode
+            if "name" not in node: node["name"] = ""
+            node_obj = node_class(timeline=self.timeline, **node)
+            for arg_name, value in node.get("memory", {}).items():
+                node_obj.memory_array.update_memory_params(arg_name, value)
+            for key, val in node.get("lightSource", {}).items():
+                setattr(node_obj.lightsource, key, val)
+            node_obj.network_manager.set_swap_success(node.get("swap_success_rate", 1))
+            node_obj.network_manager.set_swap_degradation(node.get("swap_degradation", 0))
+            self.add_node(node_obj)
+
+        for classical_connection in config.get("classical_connections", []):
+            nodes = classical_connection.pop("nodes", [])
+            if nodes[0] != nodes[1]:
+                classical_connection["delay"] /= 2
+                self.add_classical_connection(*nodes, **classical_connection)
+
+        for quantum_connection in config.get("quantum_connections", []):
+            node1, node2 = quantum_connection.get("nodes", [None, None])
+            if type(self.nodes.get(node1)) == EndNode:
+                self.nodes[node2].end_node = node1
+            elif type(self.nodes.get(node1)) == ServiceNode:
+                self.nodes[node2].service_node = node1
+            if type(self.nodes.get(node2)) == EndNode:
+                self.nodes[node1].end_node = node2
+            elif type(self.nodes.get(node2)) == ServiceNode:
+                self.nodes[node1].service_node = node2
+            self.add_quantum_connection(*quantum_connection.pop("nodes", []), **quantum_connection)
+
         # generate forwarding tables
-        #-------------------------------
-        all_pair_dist, G = self.all_pair_shortest_dist()
-        # print('all pair distance', all_pair_dist, G)
-        self.nx_graph=G
-        #print('self.nx_graph',self.nx_graph,self.name)
+        all_pair_dist, self.nx_graph = self.all_pair_shortest_dist()
         
-        #-------------------------------
         for nodeObj in self.nodes.values():
             if type(nodeObj) != BSMNode:
                 nodeObj.all_pair_shortest_dist = all_pair_dist
                 # print(nodeObj.all_pair_shortest_dist)
                 nodeObj.nx_graph=self.nx_graph
                 nodeObj.delay_graph=self.cc_delay_graph
-                nodeObj.neighbors = list(G.neighbors(nodeObj.name))
+                nodeObj.neighbors = list(self.nx_graph.neighbors(nodeObj.name))
             else:
                 for arg, val in config.get("detector", {}).items():
                     setattr(nodeObj.bsm, arg, val)
-        
-        
-        
-        for qc in config["quantum_connections"]:
-            qcnode0 = next(filter(lambda node: node.name == qc["Nodes"][0], self.nodes.values()), None)
-            qcnode1 = next(filter(lambda node: node.name == qc["Nodes"][1], self.nodes.values()), None)
-            #print(qcnode0,qcnode0.name,qcnode1,qcnode1.name)
-            if type(qcnode0) == EndNode:
-                if type(qcnode1) == EndNode:
-                    qcnode0.end_node = qc["Nodes"][1]
-                    qcnode1.end_node = qc["Nodes"][0]
-                else:
-                    qcnode0.service_node = qc["Nodes"][1]
-                    qcnode1.end_node = qc["Nodes"][0]
-            else:
-                if type(qcnode1) == EndNode:
-                    qcnode0.end_node = qc["Nodes"][1]
-                    qcnode1.service_node = qc["Nodes"][0]
-                else:
-                    qcnode0.service_node = qc["Nodes"][1]
-                    qcnode1.service_node = qc["Nodes"][0]
-                    
-            #self.nodes[qc["Nodes"][0]] = qcnode0
-            #self.nodes[qc["Nodes"][1]] = qcnode1
-        
         
     def load_config(self, config_file: str) -> None:
         """Method to load a network configuration file.

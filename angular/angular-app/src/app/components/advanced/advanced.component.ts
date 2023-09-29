@@ -26,6 +26,16 @@ import { TopologyLoaderService } from "src/app/services/loadTopology.service";
 import { QuantumcircuitService } from "src/app/services/quantumcircuit.service";
 // import { DialogService } from "primeng/dynamicdialog";
 
+interface Noise {
+  noiseType: string,
+  probabilities: Number[]
+}
+
+interface City {
+  name: string,
+  code: string
+}
+
 @Component({
   selector: "app-advanced",
   templateUrl: "./advanced.component.html",
@@ -140,6 +150,11 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   };
   nodes: any = [];
   attackOptions = ["DoS", "EM", "IR", "none"];
+  noiseOptions = ["Pauli", "Reset", "Readout", "Amplitude Damping"];
+  noises: Noise[] = [];
+  selectedNoises: any = {};
+  selectedCity!: City[];
+  cities!: City[];
   bellTypeOptions = ["00", "01", "10", "11"];
   channelOptions = [1, 2, 3];
   public selectedLink: any;
@@ -160,6 +175,58 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     private topologyLoader: TopologyLoaderService,
     private circuitService: QuantumcircuitService
   ) { }
+
+  ngOnInit(): void {
+    this.app_data = this.con.getAdvancedAppList();
+    // .subscribe((result: any) => (this.app_data = result));
+    this.app_id = localStorage.getItem("app_id");
+    this.application = localStorage.getItem("app");
+    this.routeFrom = this.holdingData.getRoute();
+    this.app = Number(localStorage.getItem("app_id"));
+    this.simulator.options = this.app == 2 ? [
+      { header: "Version 1", value: "version1" },
+      { header: "Version 2", value: "version2" }] : [
+      { header: "Version 1", value: "version1" }];
+    this.debugOptions.moduleOptions = [
+      { name: "NETWORK", value: "network" },
+      { name: "PHYSICAL", value: "physical" },
+      { name: "LINK", value: "link" },
+      { name: "TRANSPORT", value: "transport" },
+      { name: "APPLICATION", value: "application" },
+      { name: "EVENT SIMULATION", value: "eventSimulation" }];
+    this.debugOptions.loggingLevelOptions = [
+      { name: "DEBUG", value: "debug" },
+      { name: "INFO", value: "info" }];
+    // this.cities = [
+    //   { name: 'New York', code: 'NY' },
+    //   { name: 'Rome', code: 'RM' },
+    //   { name: 'London', code: 'LDN' },
+    //   { name: 'Istanbul', code: 'IST' },
+    //   { name: 'Paris', code: 'PRS' }
+    // ];
+    console.log("noisesOptions: ", this.noiseOptions)
+    for (let noiseIndex in this.noiseOptions) {
+      this.noises.push({ noiseType: this.noiseOptions[noiseIndex], probabilities: [0] })
+      this.selectedNoises[this.noiseOptions[noiseIndex]] = '0'
+    }
+    console.log("noises: ", this.noises)
+    console.log("selected noises: ", this.selectedNoises)
+    this.subscription = this.diagramStorage.currentAdvancedFormData.subscribe(
+      (formData) => {
+        if (formData) {
+          this.appSettingsForm = formData;
+        } else {
+          this.initForm();
+        }
+      }
+    );
+    this.apiService.accessToken({ username: "admin", password: "qwerty" }).subscribe(
+      (res: any) => {
+        localStorage.setItem("access", res.access);
+      }
+    )
+  }
+
   ngOnDestroy(): void {
     this.diagramStorage.setAppSettingsFormDataAdvanced({
       app_id: this.app_id,
@@ -172,10 +239,12 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.subscription.unsubscribe();
   }
+
   @HostListener("window:resize", ["$event"])
   onResize(event: any) {
     this.step = 0;
   }
+
   ngAfterViewInit(): void {
     this.initDiagram();
     this.updateNodes();
@@ -197,16 +266,19 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       $event.preventDefault();
     }
   }
+
   optimize() {
     console.log("Optimization ALgo Value", this.optimizationAlgo.value);
     this.circuitService.setOptimizationAlgorithm(this.optimizationAlgo.value);
     this.optimizationAlgo.visible = false;
     this._route.navigate(["optimization"]);
   }
+
   selectNodeType(adornedpart: any) {
     this.nodeTypeSelect = true;
     this.adornedpart = adornedpart;
   }
+
   updateNodes() {
     var nodesArray = this.myDiagram.model.nodeDataArray;
     this.serviceNodes = [];
@@ -215,9 +287,9 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     this.nodesData = {};
     this.nodes = nodesArray.map((node) => {
       const nodereq = {
-        Name: node.name,
-        Type: node.properties[0].propValue.toLowerCase(),
-        noOfMemory: Number(node.properties[1].propValue),
+        name: node.name,
+        type: node.properties[0].propValue.toLowerCase(),
+        memo_size: Number(node.properties[1].propValue),
         memory: {
           frequency: Number(node.memory[0].propValue),
           expiry: Number(node.memory[1].propValue),
@@ -238,9 +310,9 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       return this.nodesData[node.key];
     });
     for (const [key, value] of Object.entries(this.nodesData)) {
-      if (value["Type"].toLowerCase() == "end") {
+      if (value["type"].toLowerCase() == "end") {
         this.endNodes.push(value);
-      } else if (value["Type"].toLowerCase() == "service") {
+      } else if (value["type"].toLowerCase() == "service") {
         this.serviceNodes.push(value);
       }
     }
@@ -248,99 +320,29 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log("Service Nodes:", this.serviceNodes);
     if (this.endNodes.length != 0) {
       this.nodesSelection.sender =
-        this.endNodes.length > 0 ? this.endNodes[0].Name : "";
+        this.endNodes.length > 0 ? this.endNodes[0].name : "";
       this.nodesSelection.receiver =
         this.endNodes.length > 1
-          ? this.endNodes[1].Name
-          : this.endNodes[0].Name;
+          ? this.endNodes[1].name
+          : this.endNodes[0].name;
       this.nodesSelection.endNode1 =
-        this.endNodes.length > 0 ? this.endNodes[0].Name : "";
+        this.endNodes.length > 0 ? this.endNodes[0].name : "";
       this.nodesSelection.endNode2 =
         this.endNodes.length > 1
-          ? this.endNodes[1].Name
-          : this.endNodes[0].Name;
+          ? this.endNodes[1].name
+          : this.endNodes[0].name;
       this.nodesSelection.endNode3 =
         this.endNodes.length > 2
-          ? this.endNodes[2].Name
+          ? this.endNodes[2].name
           : this.endNodes.length == 2
-            ? this.endNodes[1].Name
-            : this.endNodes[0].Name;
+            ? this.endNodes[1].name
+            : this.endNodes[0].name;
     }
     if (this.serviceNodes.length != 0)
       this.nodesSelection.middleNode =
-        this.serviceNodes.length > 0 ? this.serviceNodes[0].Name : "";
+        this.serviceNodes.length > 0 ? this.serviceNodes[0].name : "";
   }
-  ngOnInit(): void {
-    this.app_data = this.con.getAdvancedAppList();
-    // .subscribe((result: any) => (this.app_data = result));
-    this.app_id = localStorage.getItem("app_id");
-    this.application = localStorage.getItem("app");
-    this.routeFrom = this.holdingData.getRoute();
-    this.app = Number(localStorage.getItem("app_id"));
-    this.simulator.options =
-      this.app == 2
-        ? [
-          { header: "Version 1", value: "version1" },
-          { header: "Version 2", value: "version2" },
-        ]
-        : [
-          {
-            header: "Version 1",
-            value: "version1",
-          },
-        ];
-    this.debugOptions.moduleOptions = [
-      {
-        name: "NETWORK",
-        value: "network",
-      },
-      {
-        name: "PHYSICAL",
-        value: "physical",
-      },
-      {
-        name: "LINK",
-        value: "link",
-      },
-      {
-        name: "TRANSPORT",
-        value: "transport",
-      },
 
-      {
-        name: "APPLICATION",
-        value: "application",
-      },
-      {
-        name: "EVENT SIMULATION",
-        value: "eventSimulation",
-      },
-    ];
-    this.debugOptions.loggingLevelOptions = [
-      {
-        name: "DEBUG",
-        value: "debug",
-      },
-      {
-        name: "INFO",
-        value: "info",
-      },
-    ];
-    this.subscription = this.diagramStorage.currentAdvancedFormData.subscribe(
-      (formData) => {
-        if (formData) {
-          this.appSettingsForm = formData;
-        } else {
-          this.initForm();
-        }
-      }
-    );
-    this.apiService.accessToken({ username: "admin", password: "qwerty" }).subscribe(
-      (res: any) => {
-        localStorage.setItem("access", res.access);
-      }
-    )
-  }
   changeApp() {
     localStorage.setItem("app_id", this.app);
     this.app_id = this.app;
@@ -357,9 +359,11 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
           },
         ];
   }
+
   routeTo() {
     this._route.navigate(["/minimal"]);
   }
+
   parameters() {
     this.app_id = localStorage.getItem("app_id");
     if (
@@ -369,19 +373,12 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         this.nodesSelection,
         this.lightSourceProps,
         this.nodesData,
-        this.myDiagram.model
-      )
-    ) {
+        this.myDiagram.model)) {
       return;
     }
 
-    this.myDiagram.model.modelData["position"] = go.Point.stringify(
-      this.myDiagram.position
-    );
-    this.links = this.diagramBuilder.getQuantumConnections(
-      this.myDiagram.model,
-      this.detectorProps.powerLoss
-    );
+    this.myDiagram.model.modelData["position"] = go.Point.stringify(this.myDiagram.position);
+    this.links = this.diagramBuilder.getQuantumConnections(this.myDiagram.model, this.detectorProps.powerLoss);
     this.nodes = [];
     for (const [key, value] of Object.entries(this.nodesData)) {
       this.nodes.push(value);
@@ -401,8 +398,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       detector: {
         efficiency: this.detectorProps.efficiency,
         count_rate: this.detectorProps.countRate,
-        time_resolution: this.detectorProps.timeResolution,
-      },
+        time_resolution: this.detectorProps.timeResolution
+      }
     };
     const appConfig = {
       1: {
@@ -410,7 +407,6 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         receiver: this.nodesSelection.receiver,
         keyLength: Number(this.appSettingsForm.get("keyLength")?.value),
       },
-
       2: {
         sender: this.nodesSelection.sender,
         receiver: this.nodesSelection.receiver,
@@ -512,6 +508,10 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
         channel: this.nodesSelection.channel,
       },
     };
+    console.log("noises: ", this.noises)
+    for (let app_id in appConfig) {
+      appConfig[app_id].noises = this.noises;
+    }
     this.appSettings = appConfig[this.app_id];
     this.debug.modules = this.debug.modules.map((module) => module.value);
 
@@ -562,9 +562,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
       error: (error) => {
         console.error(`Error: ${error}`);
         this.spinner = false;
-        alert(
-          `Error has occurred! Status Code:${error.status} Status Text:${error.statusText}`
-        );
+        alert(`Error has occurred! Status Code: ${error.status}\nStatus Text: ${error.statusText}`);
       },
       complete: () => {
         this.spinner = false;
@@ -1090,7 +1088,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
           color: "lightblue",
           properties: [
             {
-              propName: "Type",
+              propName: "type",
               propValue: "End",
               nodeType: true,
             },
