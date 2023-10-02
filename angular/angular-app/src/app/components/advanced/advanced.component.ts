@@ -1,13 +1,13 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   HostListener,
   OnDestroy,
   OnInit,
   ViewChild,
-  ViewEncapsulation,
-  ChangeDetectorRef
+  ViewEncapsulation
 } from "@angular/core";
 import { FormBuilder, FormControl, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
@@ -46,7 +46,7 @@ interface City {
   encapsulation: ViewEncapsulation.Emulated,
 })
 export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
-  runApplicationButton:string = "Run Application";
+  runApplicationButton: string = "Run Application";
   circuit: boolean = false;
   app: any;
   adornedpart: any;
@@ -112,7 +112,7 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   };
   newApplication = {
     value: "Optimization",
-    names: {"Optimization":"Single Node","Network":"Multi Mode"},
+    names: { "Optimization": "Single Node", "Network": "Multi Mode" },
     options: ["Optimization", "Network"],
   };
   optimizationAlgo = {
@@ -125,8 +125,8 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
     { name: 'VQE', key: 'M' },
     { name: 'VQC', key: 'P' },
     { name: 'NEW', key: 'R' }
-];
-  selectedAlgo:any = this.optimizationAlgoRadio[1]
+  ];
+  selectedAlgo: any = this.optimizationAlgoRadio[1]
   isLinkParameters: boolean = false;
   linksProps = {
     distance: 70,
@@ -356,14 +356,14 @@ export class AdvancedComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   changeApp() {
-    console.log('change app',this.app, this.app_id)
+    console.log('change app', this.app, this.app_id)
     if (this.app == 11) {
       console.log('new app')
       this.con.newApplicationDialog = true;
       this.runApplicationButton = 'Next';
       this.cd.detectChanges();
     }
-    else{
+    else {
       this.runApplicationButton = 'Run Application'
     }
     localStorage.setItem("app_id", this.app);

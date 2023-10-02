@@ -7,18 +7,65 @@
       <button class="btn btn-primary m-2" (click)="addNode('End')">End</button>
     </div>
   </p-dialog>
-  <p-dialog header="Please select the optimization alogorithms" [(visible)]="optimizationAlgo.visible" [modal]="true">
+  <p-dialog header="Choose Your Experiment" [(visible)]="optimizationAlgo.visible" [modal]="true">
     <div class="d-flex flex-column gap-3 justify-content-center">
       <!-- <button class="btn btn-primary m-2" (click)="addNode('Service')">
         Service
       </button>
       <button class="btn btn-primary m-2" (click)="addNode('End')">End</button> -->
-      <div class="form-group col-8 mx-auto">
-        <label for="attenuation" class="form-label mx-auto">Optimization Algorithm
+      <!-- <div class="form-group col-8 mx-auto">
+        <label for="attenuation" class="form-label mx-auto"
+          >Optimization Algorithm
         </label>
         <select class="form-control" [(ngModel)]="optimizationAlgo.value">
-          <option *ngFor="let data of optimizationAlgo.options" [ngValue]="data">
+          <option
+            *ngFor="let data of optimizationAlgo.options"
+            [ngValue]="data"
+          >
             {{ data }}
+          </option>
+        </select>
+      </div> -->
+      <div class="mx-4">
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="radioOptions" id="QAOA"
+            (click)="optimizationAlgo.value='QAOA'">
+          <label class="form-check-label" for="QAOA">
+            QAOA
+          </label>
+        </div>
+
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="radioOptions" id="VQE"
+            (click)="optimizationAlgo.value='VQE'">
+          <label class="form-check-label" for="VQE">
+            VQE
+          </label>
+        </div>
+
+        <!-- <div class="form-check">
+          <input class="form-check-input" type="radio" name="radioOptions" id="VQC" (click)="optimizationAlgo.value='VQC'">
+          <label class="form-check-label" for="VQC">
+              VQC
+          </label>
+        </div> -->
+
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="radioOptions" id="NEW"
+            (click)="optimizationAlgo.value='NEW'">
+          <label class="form-check-label" for="NEW">
+            New Application
+          </label>
+        </div>
+      </div>
+      <div class="mt-1 col-9 mx-auto">
+        <label for="type" class="form-label font-bold" pTooltip="The sender node of the quantum message or key.">
+          Sender
+          <i class="fa-solid fa-circle-info fa-xs" style="color: #000000"></i>
+        </label>
+        <select class="form-control" formControlName="sender" [(ngModel)]="nodesSelection.sender">
+          <option *ngFor="let data of endNodes" [ngValue]="data.Name">
+            {{ data.Name }}
           </option>
         </select>
       </div>
@@ -94,7 +141,8 @@
           <div class="col mx-2">
             <label class="form-label">Select Application</label>
             <select class="form-control" [(ngModel)]="app" (change)="changeApp()">
-              <option *ngFor="let data of app_data" [ngValue]="data.appId">
+              <option *ngFor="let data of app_data" [ngValue]="data.appId"
+                [ngClass]="{'highlight-new-app':data.appName==='Create a new application'}">
                 {{ data.appName }}
               </option>
             </select>
@@ -288,13 +336,13 @@
                 <form [formGroup]="appSettingsForm">
                   <div class="mt-1 col-9 mx-auto" *ngIf="app_id == 11">
                     <label for="type" class="form-label font-bold"
-                      pTooltip="The sender node of the quantum message or key.">
+                      pTooltip="Select the type of Application to Simulate">
                       Application Type
                       <i class="fa-solid fa-circle-info fa-xs" style="color: #000000"></i>
                     </label>
                     <select class="form-control" formControlName="sender" [(ngModel)]="newApplication.value">
                       <option *ngFor="let data of newApplication.options" [ngValue]="data">
-                        {{ data }}
+                        {{ newApplication.names[data] }}
                       </option>
                     </select>
                   </div>
@@ -629,13 +677,17 @@
                   </div>
                 </div>
               </p-accordionTab>
-              <p-accordionTab header="Common Parameters"
-                *ngIf="app_id == 1 || app_id == 3 || app_id == 4 || app_id == 5 || app_id == 6 || app_id == 9 || app_id == 10">
+              <p-accordionTab header="Common Parameters" *ngIf="
+                  app_id == 10 || app_id == 9 || app_id == 7 || app_id == 6
+                ">
                 <div class="col-9 mx-auto">
-                  <div class="mt-1" *ngIf="app_id == 9 || app_id == 7 || app_id == 10 || app_id == 6">
+                  <div class="mt-1" *ngIf="
+                      app_id == 9 || app_id == 7 || app_id == 10 || app_id == 6
+                    ">
                     <label for="type" class="form-label font-bold"
                       pTooltip="The EPR pair selected out of four possible choices.">
-                      Bell Type <i class="fa-solid fa-circle-info fa-xs" style="color: #000000"></i>
+                      Bell Type
+                      <i class="fa-solid fa-circle-info fa-xs" style="color: #000000"></i>
                     </label>
                     <select class="form-control" [(ngModel)]="nodesSelection.bellType">
                       <option *ngFor="let data of bellTypeOptions" [ngValue]="data">
@@ -651,9 +703,12 @@
                     </label>
                     <input type="number" class="form-control" [(ngModel)]="nodesSelection.errorThreshold" />
                   </div>
-                  <div class="mt-1">
+                  <div class="mt-1" *ngIf="
+                      app_id == 9 || app_id == 7 || app_id == 10 || app_id == 6
+                    ">
                     <label for="type" class="form-label font-bold" pTooltip="External Attack Type">
-                      Attack <i class="fa-solid fa-circle-info fa-xs" style="color: #000000"></i>
+                      Attack
+                      <i class="fa-solid fa-circle-info fa-xs" style="color: #000000"></i>
                     </label>
                     <select class="form-control" [(ngModel)]="nodesSelection.attack">
                       <option *ngFor="let data of attackOptions" [ngValue]="data">
@@ -691,8 +746,8 @@
               <p-accordionTab header="Troubleshooting & Debugging">
                 <div class="mt-1 col-9 mx-auto">
                   <label for="type" class="form-label font-bold" pTooltip="Modules">
-                    Modules <i class="fa-solid fa-circle-info fa-xs" style="color: #000000"></i>
-                  </label>
+                    Modules
+                    <i class="fa-solid fa-circle-info fa-xs" style="color: #000000"></i></label>
                   <p-multiSelect styleClass="form-control" [options]="debugOptions.moduleOptions"
                     [(ngModel)]="debug.modules" defaultLabel="Select Modules" optionLabel="name"></p-multiSelect>
                 </div>
@@ -715,7 +770,7 @@
             </div>
             <div>
               <button class="btn btn-primary btn-custom btn-sm" (click)="parameters()">
-                Run Application
+                {{runApplicationButton}}
               </button>
             </div>
           </div>
@@ -724,3 +779,103 @@
     </div>
   </div>
 </div>
+
+<p-dialog [(visible)]="this.con.newApplicationDialog" [style]="{width: '60vw', height:'70vh'}" [modal]="true">
+  <div class="new-application-dialog">
+    <img src="../../assets/images/QNTSim.png" alt="" width="300px" height="100px">
+    <div>
+      <div class="px-3">
+        <p>Quantum Networks are built upon the principles of Quantum Mechanics, a branch of physics that deals with the
+          bizarre behavior of subatomic particles. Unlike classical networks that rely on bits (0s or 1s), quantum
+          networks use quantum bits or qubits, which can exist in multiple states simultaneously due to phenomenon like
+          superposition and entanglement.
+        </p>
+        <p>Quantum entanglement is an interesting phenomenon where two entangled entities share an inseparable bond,
+          where an effect on one entity immediately projects the consequence on the other entity, even if they are
+          separated by thousands of kilometers. Today, entanglements are practically engineered with qubits, and they
+          form the foundation of Quantum Networks.
+        </p>
+        <p>The primary goal of a Quantum Network is to distribute entanglement efficiently of sufficient good quality
+          which is then used to build applications like- Quantum Key Distribution, Quantum Secure Direct Communication,
+          Blind Quantum Computing, Quantum Sensors Networks, Distributed Quantum Computing and many more.
+        </p>
+        <p>Each node of a Quantum Network can be a small Quantum Processing Unit (QPU) or as powerful as a Quantum
+          Computer by itself. This can be decided by the user depending on their Quantum Network use cases. This also
+          motivates the capability of a Quantum Network simulator to provide individual node’s application emulation as
+          well. A single node can simulate computation of algorithms, quantum simulations, optimization applications
+          with quantum computers.
+        </p>
+        <p>The <i>Create a new application</i> page provides a playground for users to design their own quantum network
+          topology, build applications, and simulate it with QNTSim<sup>TM</sup>. Users can choose the type of
+          application to be simulated- a) single node, or b) multi-node by defining a relevant network topology.
+        </p>
+      </div>
+    </div>
+
+    <p-accordion>
+      <p-accordionTab header="Single Node">
+        <div class="accordian">
+          <img src="../../assets/images/singleNode-cropped.svg" alt="Single Node" width="60%" height="40%">
+
+          <p><i>Single Node</i> will prompt selection of <i>Application Type</i> from the drop-down menu: QAOA, VQE, or
+            New Application. Making the choice will take you to <i>Select Node</i> option in the constructed topology on
+            which the application will be designed. Users can select from the supported application types and confirm
+            the desired end node from the drop-down menu of available end nodes. Clicking on <i>Save</i> button will
+            take you to the circuit construction page. This will take you to <i>Build Your Application</i> window. The
+            complete circuit can be built stitching individual circuits, for example, if you choose <i>QAOA</i> as
+            application type, then you will be prompted to construct <i>Initialization Circuit, Cost Circuit, Mixer
+              Circuit, Expectation Circuit</i>. Instructions, in the form of quantum circuits, can be built using our
+            pre-defined quantum libraries. Qubits can be added using the <i>Add Qubit</i> option and layers can be added
+            using <i>Add Layer</i> option. Quantum Gates can be added on the circuit, selecting from the drop-down menu
+            across each qubit row. Control gates can be added by first selecting the <i>CONTROL</i> qubit from the
+            available qubits and then selecting the target qubit with the operation (X or Z) in the same layer. One can
+            make use of various predefined classical instruction sets as well to build their applications or quantum
+            algorithms like- optimizers, channel information, etc. Once the circuit is constructed you can select the
+            optimizer by clicking on <i>Optimise</i> button. You can input the <i>Number of repetitions</i> and select
+            the optimizer below. As the inputs are finalized, hit <i>Run Simulation</i> to execute your application
+            simulation with QNTSim<sup>TM</sup>.
+          </p>
+          <p>For selection of <i>New as Application Type</i>, it will take to the <i>Build Your Application</i> window.
+            Smaller circuits can be added by clicking on the + icon. The circuit blocks can also be renamed as per the
+            users choice. Once the input circuit is finalized, there are two options to select from <input type="radio"
+              [checked]="true" class="mx-1"><i>Optimise</i> <input type="radio" [checked]="true"
+              class="mx-1"><i>Shots</i>. Selecting <i>Optimise</i> will let the user select from existing classical
+            optimisers and number of repetitions as required by the custom algorithm. Selecting <i>Shots</i> will prompt
+            to input number of shots or iterations of the simulation. Shots are important to generate useful results out
+            of a non-ideal simulation. Click on <i>Run Simulation</i> to execute the application and analyse the results
+            on the Results window.
+          </p>
+        </div>
+      </p-accordionTab>
+      <p-accordionTab header="Multi Node">
+        <div class="accordian">
+          <img src="../../assets/images/multiNode-cropped.svg" alt="Muli Node" width="60%" height="40%">
+          <p>Multi Node will prompt selection of application type from the drop-down menu: <i>Quantum Key Distribution,
+              Multi-party QKD, MDI-QKD, One-way QSDC, Quantum Dialogue (Two-way QSDC), MDI-QSDC, Quantum Secret Sharing,
+              Quantum Conference,</i> and <i>Multi-party QSDC</i>. The selected option will prompt the option for role
+            assignment, for example, selecting <i>One-Way QSDC</i>, will bring up the option of selecting roles:
+            <i>Select Sender</i> and <i>Select Receiver</i> from the defined network topology. The nodes can be selected
+            from the drop-down menu of available nodes. Next, click on <i>Build Your Application</i> button. Multiple
+            nodes in simulation utilize the quantum network stack where various roles distributed across the various
+            layers of the network like Physical Layer, Link Layer, Network Layer and Transport Layer are used for
+            simulation. The user builds the application on the Application Layer in <i>Build your Application</i>
+            window. The selected roles are now reflected as a platform for designing quantum circuits. The application
+            can be designed by constructing relevant circuits using the available quantum libraries. Single qubit gates
+            can be applied next to the qubit row in respective layers. Quantum controlled gates can be applied by first
+            selecting the <i>CONTROL</i> qubit and then selecting the target qubit with the operation (X or Z) in the
+            same layer. More detailed information about different gates and options can be found by clicking on the
+            <i>Get to know me</i> button.
+          </p>
+          <p>Once the protocol is designed, the user can click on <i>Next</i> to fill in the <i>Input Data</i> and
+            <i>Output Data</i> of the simulation, for example, the Input Data can be Sender’s Message and Output Data
+            can be Receiver’s Message in the One-Way QSDC application. The next step is to select Shots <input
+              type="number" style="width: 72px;" [disabled]="true" [value]="1024">, which is the number of repetitions
+            of the simulation to be performed by the user. The shots feature is useful to track noisy results or monitor
+            situations under quantum attacks. As the inputs are finalized, hit <i>Run Simulation</i> to execute your
+            application simulation with QNTSim<sup>TM</sup>.
+          </p>
+        </div>
+      </p-accordionTab>
+    </p-accordion>
+  </div>
+</p-dialog>
