@@ -67,9 +67,9 @@ if __name__=="__main__":
     topology = {
         'nodes': [
             {
-                'Name': 'node1',
-                'Type': 'end',
-                'noOfMemory': 500,
+                'name': 'node1',
+                'type': 'end',
+                'memo_size': 500,
                 'memory': {
                     'frequency': 80000000,
                     'expiry': -1,
@@ -85,9 +85,9 @@ if __name__=="__main__":
                     }
                 },
             {
-                'Name': 'node2',
-                'Type': 'end',
-                'noOfMemory': 500,
+                'name': 'node2',
+                'type': 'end',
+                'memo_size': 500,
                 'memory': {
                     'frequency': 80000000,
                     'expiry': -1,
@@ -105,31 +105,31 @@ if __name__=="__main__":
             ],
         'quantum_connections': [
             {
-                'Nodes': ['node1', 'node2'],
-                'Attenuation': 0.1,
-                'Distance': 70
+                'nodes': ['node1', 'node2'],
+                'attenuation': 0.1,
+                'distance': 70
                 }
             ],
         'classical_connections': [
             {
-                'Nodes': ['node1', 'node1'],
-                'Delay': 0,
-                'Distance': 0
+                'nodes': ['node1', 'node1'],
+                'delay': 0,
+                'distance': 0
                 },
             {
-                'Nodes': ['node1', 'node2'],
-                'Delay': 10000000000,
-                'Distance': 1000
+                'nodes': ['node1', 'node2'],
+                'delay': 10000000000,
+                'distance': 1000
                 },
             {
-                'Nodes': ['node2', 'node1'],
-                'Delay': 10000000000,
-                'Distance': 1000
+                'nodes': ['node2', 'node1'],
+                'delay': 10000000000,
+                'distance': 1000
                 },
             {
-                'Nodes': ['node2', 'node2'],
-                'Delay': 0,
-                'Distance': 0
+                'nodes': ['node2', 'node2'],
+                'delay': 0,
+                'distance': 0
                 }
             ],
         'detector': {

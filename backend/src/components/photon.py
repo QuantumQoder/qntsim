@@ -43,7 +43,13 @@ class Photon():
         self.qstate_key = None
         self.is_null = False
 
-    def entangle(self, photon):
+    def __str__(self) -> str:
+        return f"quantum_state: {self.quantum_state}"
+
+    def __repr__(self) -> str:
+        return f"Photon(name = {self.name}, wavelength = {self.wavelength}, location = {self.location}, encoding_type = {self.encoding_type}, quantum_state = {self.quantum_state}, qstate_key = {self.qstate_key})"
+
+    def entangle(self, photon: "Photon"):
         """Method to entangle photons (see `QuantumState` module)."""
 
         self.quantum_state.entangle(photon.quantum_state)

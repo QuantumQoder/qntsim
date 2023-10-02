@@ -21,8 +21,11 @@ src/communication/network.py
 src/communication/noise.py
 src/communication/noise_model.py
 src/communication/protocol.py
-src/communication/qntemulator.py
+<<<<<<< Updated upstream
+=======
 src/communication/qntsim.py
+src/communication/qntsimulation.py
+>>>>>>> Stashed changes
 src/communication/quantum_network.py
 src/communication/security_checks.py
 src/communication/template.py

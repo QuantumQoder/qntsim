@@ -182,6 +182,7 @@ class Receiver(Party):
         Returns:
             _type_: _description_
         """
+        print(returns)
         if "-1" in returns: return returns
         outputs = "".join(
             str(output) for outputs in returns for output in outputs.values()
@@ -331,8 +332,9 @@ class UTP:
                 state = network.manager.get(m)
                 output: Dict[int, int] = network.manager.run_circuit(circuit, state.keys)
                 Noise.readout(noise.get("readout", [0, 0]), output)
-                outputs.extend(list(output.values()))
+                outputs.append(output)
         log.logger.info("measurement performed by UTP")
+        print(f"outputs: {outputs}")
         return outputs
 
 
