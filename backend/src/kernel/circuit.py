@@ -561,7 +561,7 @@ class QiskitCircuit(Circuit):
         measured_qubits (List[int]): a list of indices of measured qubits.
     """
 
-    def __new__(cls, size:int) -> "Circuit":
+    def __new__(cls, size:int) -> "QiskitCircuit":
         return Circuit.__new__(cls, "qiskit", size)
 
     def parse_circuit(self, circuit:Optional[QuantumCircuit] = None) -> QuantumCircuit:
@@ -714,7 +714,7 @@ class QutipCircuit(Circuit):
                   "iswap":"iSWAP",
                   "cswap":"FREDKIN"}
 
-    def __new__(cls, size:int) -> "Circuit":
+    def __new__(cls, size:int) -> "QutipCircuit":
         return Circuit.__new__(cls, "qutip", size)
 
     def parse_circuit(self, circuit:Optional[QubitCircuit] = None) -> QubitCircuit:
