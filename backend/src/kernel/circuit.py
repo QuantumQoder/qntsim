@@ -1,16 +1,24 @@
 """Models for simulation of quantum circuit.
-This module introduces the BaseCircuit class and it's platform-specific child classes.
-The child classes in the module cannot be instantiated separately. They must be instantiated
-through the BaseCircuit.__new__ dunder.
+
+This module introduces the Circuit base class and it's platform-specific child classes.
+All the gates in the quantum computing field are provided in the base class. The child
+classes are defined to implement the parsing logic specific to the quantum computing
+platform, while also extending the gates from the base class.
+
+Tha Circuit base class also provides a class generator, since the main intuition behind
+the child classes was to separate the parsing logic to each specific logic. Refer to the
+documentation of the specific method.
+
 The qutip library is used to calculate the unitary matrix of a circuit.
 """
 
+from dataclasses import field
 import math
 from copy import deepcopy
 from numbers import Number
-from types import NoneType
-from typing import (Callable, Dict, List, Literal, Optional, Self, TypeAlias,
-                    Union, overload)
+from types import NoneType, new_class
+from typing import (Callable, Dict, List, Literal, Optional, Set, TypeAlias, Union,
+                    overload)
 
 import numpy as np
 from qiskit import QuantumCircuit
@@ -20,23 +28,50 @@ from qutip.qip.operations import (controlled_gate, gate_sequence_product,
                                   qasmu_gate, rz, snot)
 
 
-def validator(func:Callable[["BaseCircuit", [...]], NoneType]) -> Callable:
-    def wrapper(self:"BaseCircuit", *args, **kwargs) -> NoneType:
+def validator(func: Callable[["Circuit", Union[int, float]], NoneType]) -> Callable[["Circuit", Union[int, float]], NoneType]:
+    def wrapper(self: "Circuit", *args, **kwargs) -> NoneType:
         assert all(q < self.size for q in args if isinstance(q, int)), "Qubit index out of bounds"
         return func(self, *args, **kwargs)
     return wrapper
 
-class BaseCircuit():
-    __circuit_class: TypeAlias = Union["QiskitCircuit", "QutipCircuit"]
-    
+class Circuit:
+    """This is the base class containing all the gates available in the field of quantum computing.
+    The constructor of the class acts as a factory method for the base class and it's child classes,
+    while also creating the objects for the corresponding child classes.
+
+    Implementation logic:-
+        After the class has been first time imported, Circuit() will return the Circuit class.
+        Execuitng Circuit(2) will return the instance of the base class. But, once the type has
+        been provided as a string, the class would remember the type and always return the
+        corresponding child class, i.e., Circuit("qiskit") would return the QiskitCircuit class
+        and then executing Circuit(2) would return the object of the QiskitCircuit. This same
+        behaviour can also be achieved by Circuit("qiskit", 2) or Circuit(2, "qiskit"). To override
+        the type, the constructor must be called with either a different type or with None, i.e.,
+        Circuit("qutip") would override the type and return the QutipCircuit class, Circuit(None)
+        will reset the type and return the Circuit class.
+
+    Side effect:-
+        Due to the unique implementation logic, the constructor would return the class/object of the
+        last value provided in the parameter list, i.e., Circuit("qiskit", 2, 3, "qutip") would return
+        an object of QutipCircuit with 3 qubits.
+
+    Returns:
+        _type_: _description_
+    """
+    __type: Optional[str] = None
+    __circuit_classes: TypeAlias = Union["QiskitCircuit", "QutipCircuit"]
+
     @overload
-    def __new__(cls, _type:Literal["Qiskit", "Qutip"]) -> __circuit_class: ...
-    
+    def __new__(cls, args: Union[Literal["qiskit", "qutip"], int]) -> Union["Circuit", __circuit_classes]: ...
+
     @overload
-    def __new__(cls, _type:Literal["Qiskit", "Qutip"], size:int) -> Self: ...
-    
-    def __new__(cls, _type:Literal["Qiskit", "Qutip"], size:Optional[int] = None) -> Union[Self, __circuit_class]:
-        """The __new__ of the 'BaseCircuit' class works as an object factory method,
+    def __new__(cls, args: Literal["qiskit", "qutip"]) -> __circuit_classes: ...
+
+    @overload
+    def __new__(cls, args: int) -> __circuit_classes: ...
+
+    def __new__(cls, *args: Union[Optional[Literal["qiskit", "qutip"]], Optional[int]]) -> Union["Circuit", __circuit_classes]:
+        """The __new__ of the 'Circuit' class works as an object factory method,
         as well as, a class factory method. Refer to the overloaded type hints.
 
         Args:
@@ -46,60 +81,76 @@ class BaseCircuit():
             size (int): the number of qubits used in circuit.
 
         Returns:
-            BaseCircuit: The appropriate child class corresponding to type
+            Circuit: The appropriate child class corresponding to type
         """
-        match _type:
-            case "Qiskit":
-                child_cls = QiskitCircuit
-            case "Qutip":
-                child_cls = QutipCircuit
-        if size:
-            self = object.__new__(child_cls)
-            self.__type = _type
-            self.size = size
-            self.gates = []
-            self.measured_qubits = []
-            self._cache = None
+        size: Optional[int] = 0
+        for arg in args:
+            match arg:
+                case str(): cls.__type = (arg or cls.__type).lower()
+                case int(): size = arg
+                case _: cls.__type = None
+        match cls.__type:
+            case "qiskit": child = QiskitCircuit
+            case "qutip": child = QutipCircuit
+            case _: child = __class__
+        if not isinstance(size, int): raise TypeError("The size, also referred to as the number of qubits, cannot be a non-integer.")
+        if size < 0: raise ValueError("The size, also referred to as the number of qubits, cannot be a negative.")
+        if size > 0:
+            self = object.__new__(child)
+            self.size: int = size
+            self.gates: List[List[Union[str, List[Union[int, float]]]]] = []
+            self.measured_qubits: Set = set()
+            self._cache: Optional[np.ndarray] = None
             return self
-        return child_cls
+        return child
 
-    def __copy__(self) -> Self:
+    @staticmethod
+    def generate_child_class(__type: str, parse_cricuit_func: Callable[["Circuit", type], None]) -> type:
+        return new_class(__type.capitalize() + "Circuit", (__class__), {"size": field(int)}, parse_cricuit_func)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(num_qubits = {self.num_qubits}, gates_applied = {self.gates}, measured_qubits = {self.measured_qubits}, width = {self.num_qubits+self.num_measured_qubits})" # + depth = {self.depth},
+
+    def __copy__(self) -> "Circuit":
         """Creates a new object with the same parameter. This is equivalent to deepcopy.
            Also, executing copy is equivalent to performing deepcopy.
 
         Returns:
-            Self: The duplicated object
+            "Circuit": The duplicated object
         """
         circuit = __class__(self.__type, self.size)
-        circuit.gates = [[gate, [arg for arg in args]] for gate, args in self.gates]
-        circuit.measured_qubits = [qubit for qubit in self.measured_qubits]
-        circuit._cache = deepcopy(self._cache)
+        circuit.gates: List[List[Union[str, List[Union[int, float]]]]] = [[gate, [arg for arg in args]] for gate, args in self.gates]
+        circuit.measured_qubits: Set = set([qubit for qubit in self.measured_qubits])
+        circuit._cache: Optional[np.ndarray] = deepcopy(self._cache)
         return circuit
 
-    def __add__(self, circuit:Self) -> None:
+    def __add__(self, circuit:"Circuit") -> None:
         """Performs in-place (i.e., modifying current object) addition.
         .. warning::
             The function doesn't return the modified object.
             Thus it should be implemented as circuit1 + circuit2 and it would modify circuit1.
             Performing circuit1 = circuit1 + circuit2 would override circuit1 with None.
 
-        Args:
-            circuit (Self): The circuit to be added into this circuit
-        """
-        if circuit.num_qubits > self.num_qubits:
-            self.size = circuit.size
-        self.gates += circuit.gates
-        self.measured_qubits += circuit.measured_qubits
+        Side effect:
+            If the size of the incoming circuit is greater than the size of this circuit,
+            then the size is overridden with the new size.
 
-    def __iadd__(self, circuit:Self) -> Self:
+        Args:
+            circuit ("Circuit"): The circuit to be added into this circuit
+        """
+        if circuit.num_qubits > self.num_qubits: self.num_qubits = circuit.num_qubits
+        self.gates += circuit.gates
+        self.measured_qubits |= circuit.measured_qubits
+
+    def __iadd__(self, circuit:"Circuit") -> "Circuit":
         """To perform circuit += other_circuit
            It basically performs the in-place addition and returns the object to be re-assigned into the same variable
 
         Args:
-            circuit (Self): The circuit to be added into this circuit
+            circuit ("Circuit"): The circuit to be added into this circuit
 
         Returns:
-            Self: Returns this object after modification
+            "Circuit": Returns this object after modification
         """
         self + circuit
         return self
@@ -112,6 +163,10 @@ class BaseCircuit():
             int: number of qubits in the circuit
         """
         return self.size
+
+    @num_qubits.setter
+    def num_qubits(self, __value: int) -> None:
+        self.size = __value
 
     @property
     def num_gates(self) -> int:
@@ -172,15 +227,15 @@ class BaseCircuit():
         """
         return self.num_qubits + self.num_measured_qubits
 
-    def duplicate(self) -> Self:
+    def duplicate(self) -> "Circuit":
         """Return a new circuit object which is the copy of the current circuit
 
         Returns:
-            Self: The duplicated object
+            "Circuit": The duplicated object
         """
         return self.__copy__()
 
-    def reverse_circuit(self, inplace:bool, force_reverse:bool = False) -> Optional[Self]:
+    def reverse_circuit(self, inplace:bool, force_reverse:bool = False) -> Optional["Circuit"]:
         """Reverses the circuit, or returns a new reversed circuit if inplace is True.
 
         Args:
@@ -190,7 +245,7 @@ class BaseCircuit():
                                             Defaults to False.
 
         Returns:
-            Optional[Self]: A new circuit object with reversed gates
+            Optional["Circuit"]: A new circuit object with reversed gates
         """
         if self.measured_qubits:
             assert force_reverse, f"In the presence of measured qubits, set force_reverse = {True}"
@@ -201,55 +256,79 @@ class BaseCircuit():
             circuit.gates.reverse()
             return circuit
 
-    def append_gates(self, gates:List[List[Union[str, List[Number]]]]) -> None:
+    def append_gates(self, gates: List[List[Union[str, List[Union[int, float]]]]]) -> None:
         """Adds new gates into the circuit
 
         Args:
             gates (List[List[Union[str, List[Number]]]]): List of gates needed to be added in the circuit
         """
-        assert self.num_qubits > max(arg for _, args in gates for arg in args if isinstance(arg, int)), f"Maximum numbers of qubits should be less than or equal to {self.num_qubits}."
+        assert max(arg for _, args in gates for arg in args if isinstance(arg, int)) < self.num_qubits, \
+            f"Maximum numbers of qubits should be less than or equal to {self.num_qubits}."
         self.gates += gates
-
-    def combine_circuit(self, circuit:Self, qubit_map:Optional[Dict[int, int]] = None, force_combine:bool = False) -> None:
-        """Compose circuit with incoming_circuit, optionally permuting wires based on the qubit_map (provided or generated)
-
-        Args:
-            circuit (Self): incoming_circuit to be appended
-            qubit_map (Optional[Dict[int, int]], optional): A map of connection between the qubits of incoming_circuit to new_circuit.
-                                                            Defaults to None. {incoming_qubit:new_qubit}
-            force_combine (bool, optional): It's not possible to combine circuits if the number of qubits in the incoming_circuit is more
-                                            than the number of qubits in this_circuit. To do so, one needs to force the combination. In
-                                            such scenario, this_circuit is adjusted so that the combination can take place. Defaults to False.
-        """
-        # If number of qubits of this_circuit (self) is less than the number of qubits in the incoming_circuit (circuit),
-        # then one has to force the combination
-        if self.num_qubits < max(arg for _, args in circuit.gates for arg in args if isinstance(arg, int)):
-            assert force_combine, f"If number of qubits of the incoming circuit is greater than {self.num_qubits}, then set force_combine = {True}"
         
-        # If the qubit_map is not provided, then it's generated from the total number of qubits present in this_circuit (self) or the incoming_circuit (circuit).
-        # If the combination is forced, then it is assumed that the incoming_circuit has more qubits than this_circuit (This is referred as the force_combine assumpiton in the context of this function)
-        qubit_map = qubit_map or {i:i for i in range(circuit.num_qubits if force_combine else self.num_qubits)}
+    def apply_gate(self, gate: str, qubits: List[int], angles: List[float]) -> None:
+        """
+        apply_gate Method to apply gates into the circuit. This can also be used to apply user-defined gates.
+                   although the class would not have any knowledge on the user-defined gate
 
-        # As per the force_combine assumption, an inplace addition is done which then modifies this_circuit (self)
-        if force_combine:
+        :param gate: name of the gate to be applied
+        :type gate: str
+        :param qubits: list of qubits on which the gate can be applied
+        :type qubits: List[int]
+        :param angles: rotation angles to be applied with the gate
+        :type angles: List[float]
+        """
+        if hasattr(self, gate):
+            getattr(self, gate.lower())(*qubits, *[float(angle) for angle in angles])
+            return
+        self.gates.append([gate, qubits + angles])
+
+    def combine_circuit(self, circuit: "Circuit", qubit_map: Optional[Dict[int, int]] = None, force_combine: bool = False) -> None:
+        """
+        combine_circuit Compose circuit with incoming_circuit, optionally permuting wires based on the qubit_map
+
+        :param circuit: incoming_circuit to be appended
+        :type circuit: Circuit
+        :param qubit_map: A map of connection between the qubits of incoming_circuit to new_circuit, of the form {incoming_qubit: this_qubit}, defaults to None
+        :type qubit_map: Optional[Dict[int, int]], optional
+        :param force_combine: It's not possible to combine circuits if the number of qubits in the incoming_circuit is more
+                              than the number of qubits in this_circuit. To do so, one needs to force the combination. In
+                              such scenario, this_circuit is adjusted so that the combination can take place, defaults to False
+        :type force_combine: bool, optional
+        """
+        # If number of qubits of this incoming_circuit (circuit) is greater than the number of qubits in this_circuit (self),
+        # then one has to force the combination
+        if not force_combine:
+            assert circuit.num_qubits <= self.num_qubits, f"If number of qubits of the incoming circuit is greater than {self.num_qubits}, then set force_combine = {True}"
+        # If the qubit_map is not provided then the incoming_circuit is appended into this_circuit
+        if not qubit_map:
             self + circuit
             return
-
-        # If combination is not forced, then assuming that the number of qubits of the incoming_circuit is within the bounds of this_circuit,
-        # gates from the incoming_circuit are applied appropriately based on the qubit_map (provided or generated)
         for gate, args in circuit.gates:
-            getattr(self, gate)(*[qubit_map.get(arg, 0) if isinstance(arg, int) else arg for arg in args])
-        self.measured_qubits = list(set(self.measured_qubits).union(circuit.measured_qubits))
+            qubits = list(filter(lambda x: isinstance(x, int), args))
+            angles = list(filter(lambda x: isinstance(x, float), args))
+            self.apply_gate(gate, [qubit_map.get(qubit, 0) for qubit in qubits], angles)
+        self.measured_qubits |= circuit.measured_qubits
 
-    def append_circuit(self, circuit:Self) -> None:
+    def append_circuit(self, circuit: "Circuit") -> None:
+        """
+        append_circuit Method to append an incoming_circuit into this_circuit. Equivalent to self + circuit
+
+        :param circuit: incoming_circuit to be appended
+        :type circuit: Circuit
+        """
+        assert circuit.num_qubits <= self.num_qubits, f"Number of qubits in the incoming circuit must be less than or equal to {self.num_qubits}"
+        self.combine_circuit(circuit)
+
+    def attach_circuit(self, circuit: "Circuit") -> None:
         """Attach the incoming_circuit with this_circuit, increasing the width (number of qubits) of this circuit
 
         Args:
-            circuit (Self): the incoming circuit needed to attach
+            circuit ("Circuit"): the incoming circuit needed to attach
         """
-        qubit_map = {i:i for i in range(self.num_qubits)}
-        qubit_map.update({circuit.num_qubits+i:circuit.num_qubits+i for i in range(circuit.num_qubits)})
-        self.combine_circuit(circuit=circuit, qubit_map=qubit_map)
+        qubit_map = {i: self.num_qubits + i for i in range(circuit.num_qubits)}
+        self.num_qubits += circuit.num_qubits
+        self.combine_circuit(circuit, qubit_map)
 
     def parse_circuit(self, circuit:Optional[Union[QuantumCircuit, QubitCircuit]] = None) -> Union[QuantumCircuit, QubitCircuit]:
         if circuit:
@@ -262,231 +341,219 @@ class BaseCircuit():
             assert self.num_measured_qubits == num_clbits, f"The number of classical bits in circuit must be equal to {self.num_measured_qubits}."
 
     @validator
-    def i(self, qubit:int) -> None:
+    def i(self, __qubit:int) -> None:
         pass
 
     # Referred as SNOT in QuTIP(4.7)
     @validator
-    def h(self, qubit:int) -> None:
+    def h(self, __qubit:int) -> None:
         """Method to apply single-qubit Hadamard gate on a qubit.
         Args:
             qubit (int): the index of qubit in the circuit.
         """
-        self.gates.append(["h", [qubit]])
+        self.gates.append(["h", [__qubit]])
         
     @validator
-    def x(self, qubit:int) -> None:
+    def x(self, __qubit:int) -> None:
         """Method to apply single-qubit Pauli-X gate on a qubit.
         Args:
             qubit (int): the index of qubit in the circuit.
         """
-        self.gates.append(["x", [qubit]])
+        self.gates.append(["x", [__qubit]])
         
     @validator
-    def y(self, qubit:int) -> None:
+    def y(self, __qubit:int) -> None:
         """Method to apply single-qubit Pauli-Y gate on a qubit.
         Args:
             qubit (int): the index of qubit in the circuit.
         """
-        self.gates.append(["y", [qubit]])
+        self.gates.append(["y", [__qubit]])
         
     @validator
-    def z(self, qubit:int) -> None:
+    def z(self, __qubit:int) -> None:
         """Method to apply single-qubit Pauli-Z gate on a qubit.
         Args:
             qubit (int): the index of qubit in the circuit.
         """
-        self.gates.append(["z", [qubit]])
+        self.gates.append(["z", [__qubit]])
         
     @validator
-    def s(self, qubit:int) -> None:
+    def s(self, __qubit:int) -> None:
         """Method to apply single S gate on a qubit.
         Args:
             qubit (int): the index of qubit in the circuit.
         """
-        self.gates.append(["s", [qubit]])
+        self.gates.append(["s", [__qubit]])
 
     # Not in QuTIP(4.7)
     @validator
-    def sdg(self, qubit:int) -> None:
-        self.gates.append(["sdg", [qubit]])
+    def sdg(self, __qubit:int) -> None:
+        self.gates.append(["sdg", [__qubit]])
         
     @validator
-    def t(self, qubit:int) -> None:
+    def t(self, __qubit:int) -> None:
         """Method to apply single T gate on a qubit.
         Args:
             qubit (int): the index of qubit in the circuit.
         """
-        self.gates.append(["t", [qubit]])
+        self.gates.append(["t", [__qubit]])
         
     # Not in QuTIP(4.7)
     @validator
-    def tdg(self, qubit:int) -> None:
+    def tdg(self, __qubit:int) -> None:
         """Method to apply single TDG gate on a qubit.
         Args:
             qubit (int): the index of qubit in the circuit.
         """
-        self.gates.append(["tdg", [qubit]])
+        self.gates.append(["tdg", [__qubit]])
         
     # Referred as SQRTNOT in QuTIP(4.7)
     @validator
-    def sx(self, qubit:int) -> None:
-        self.gates.append(["sx", [qubit]])
+    def sx(self, __qubit:int) -> None:
+        self.gates.append(["sx", [__qubit]])
         
     # Not in QuTIP(4.7)
     @validator
-    def ch(self, control:int, target:int) -> None:
-        self.gates.append(["ch", [control, target]])
+    def ch(self, __control:int, __target:int) -> None:
+        self.gates.append(["ch", [__control, __target]])
         
     @validator
-    def cx(self, control:int, target:int) -> None:
+    def cx(self, __control:int, __target:int) -> None:
         """Method to apply Control-X gate on three qubits.
         Args:
             control1 (int): the index of control1 in the circuit.
             target (int): the index of target in the circuit.
         """
-        self.gates.append(["cx", [control, target]])
+        self.gates.append(["cx", [__control, __target]])
         
     @validator
-    def cy(self, control:int, target:int) -> None:
-        self.gates.append(["cy", [control, target]])
+    def cy(self, __control:int, __target:int) -> None:
+        self.gates.append(["cy", [__control, __target]])
         
     @validator
-    def cz(self, control:int, target:int) -> None:
-        self.gates.append(["cz", [control, target]])
+    def cz(self, __control:int, __target:int) -> None:
+        self.gates.append(["cz", [__control, __target]])
         
     @validator
-    def cs(self, control:int, target:int) -> None:
-        self.gates.append(["cs", [control, target]])
+    def cs(self, __control:int, __target:int) -> None:
+        self.gates.append(["cs", [__control, __target]])
         
     # Not in QuTIP(4.7)
     @validator
-    def csx(self, control:int, target:int) -> None:
-        self.gates.append(["csx", [control, target]])
+    def csx(self, __control:int, __target:int) -> None:
+        self.gates.append(["csx", [__control, __target]])
         
     @validator
-    def swap(self, qubit1:int, qubit2:int) -> None:
+    def swap(self, __qubit1:int, __qubit2:int) -> None:
         """Method to apply SWAP gate on two qubits.
         Args:
             qubit1 (int): the index of qubit1 in the circuit.
             qubit2 (int): the index of qubit2 in the circuit.
         """
-        self.gates.append(["swap", [qubit1, qubit2]])
+        self.gates.append(["swap", [__qubit1, __qubit2]])
         
     @validator
-    def iswap(self, qubit1:int, qubit2:int) -> None:
-        self.gates.append(["iswap", [qubit1, qubit2]])
+    def iswap(self, __qubit1:int, __qubit2:int) -> None:
+        self.gates.append(["iswap", [__qubit1, __qubit2]])
 
     # Referred as FREDKIN in QuTIP(4.7)
     @validator
-    def cswap(self, control:int, qubit1:int, qubit2:int) -> None:
-        self.gates.append(["cswap", [control, qubit1, qubit2]])
+    def cswap(self, __control:int, __qubit1:int, __qubit2:int) -> None:
+        self.gates.append(["cswap", [__control, __qubit1, __qubit2]])
         
     # Referred as TOFFOLI in QuTIP(4.7)
     @validator
-    def ccx(self, control1:int, control2:int, target:int) -> None:
+    def ccx(self, __control1:int, __control2:int, __target:int) -> None:
         """Method to apply Toffoli gate on three qubits.
         Args:
             control1 (int): the index of control1 in the circuit.
             control2 (int): the index of control2 in the circuit.
             target (int): the index of target in the circuit.
         """
-        self.gates.append(["ccx", [control1, control2, target]])
+        self.gates.append(["ccx", [__control1, __control2, __target]])
 
     # Referred as PHASEGATE in QuTIP(4.7)
     @validator
-    def p(self, qubit:int, theta:float) -> None:
-        self.gates.append(["p", [qubit, theta]])
+    def p(self, __qubit:int, theta:float) -> None:
+        self.gates.append(["p", [__qubit, theta]])
 
     @validator
-    def rx(self, qubit:int, theta:float) -> None:
-        self.gates.append(["rx", [qubit, theta]])
+    def rx(self, __qubit:int, theta:float) -> None:
+        self.gates.append(["rx", [__qubit, theta]])
 
     # Not in QISkit(0.44)
     @validator
-    def ry(self, qubit:int, theta:float) -> None:
-        self.gates.append(["ry", [qubit, theta]])
+    def ry(self, __qubit:int, theta:float) -> None:
+        self.gates.append(["ry", [__qubit, theta]])
 
     @validator
-    def rz(self, qubit:int, theta:float) -> None:
-        self.gates.append(["rz", [qubit, theta]])
+    def rz(self, __qubit:int, theta:float) -> None:
+        self.gates.append(["rz", [__qubit, theta]])
 
     # Referred as CPHASE in QuTIP(4.7)
     @validator
-    def cp(self, control:int, target:int, theta:float) -> None:
-        self.gates.append(["cp", [control, target, theta]])
+    def cp(self, __control:int, __target:int, theta:float) -> None:
+        self.gates.append(["cp", [__control, __target, theta]])
 
     # Not in QuTIP(4.7)
     @validator
-    def crx(self, control:int, target:int, theta:float) -> None:
-        self.gates.append(["crx", [control, target, theta]])
+    def crx(self, __control:int, __target:int, theta:float) -> None:
+        self.gates.append(["crx", [__control, __target, theta]])
 
     # Not in QuTIP(4.7)
     @validator
-    def cry(self, control:int, target:int, theta:float) -> None:
-        self.gates.append(["cry", [control, target, theta]])
+    def cry(self, __control:int, __target:int, theta:float) -> None:
+        self.gates.append(["cry", [__control, __target, theta]])
 
     # Not in QuTIP(4.7)
     @validator
-    def crz(self, control:int, target:int, theta:float) -> None:
-        self.gates.append(["crz", [control, target, theta]])
+    def crz(self, __control:int, __target:int, theta:float) -> None:
+        self.gates.append(["crz", [__control, __target, theta]])
 
     # Not in QuTIP(4.7)
     @validator
-    def rxx(self, qubit1:int, qubit2:int, theta:float) -> None:
-        self.gates.append(["rxx", [qubit1, qubit2, theta]])
+    def rxx(self, __qubit1:int, __qubit2:int, theta:float) -> None:
+        self.gates.append(["rxx", [__qubit1, __qubit2, theta]])
 
     # Not in QuTIP(4.7)
     @validator
-    def ryy(self, qubit1:int, qubit2:int, theta:float) -> None:
-        self.gates.append(["ryy", [qubit1, qubit2, theta]])
+    def ryy(self, __qubit1:int, __qubit2:int, theta:float) -> None:
+        self.gates.append(["ryy", [__qubit1, __qubit2, theta]])
 
     # Not in QuTIP(4.7)
     @validator
-    def rzz(self, qubit1:int, qubit2:int, theta:float) -> None:
-        self.gates.append(["rzz", [qubit1, qubit2, theta]])
+    def rzz(self, __qubit1:int, __qubit2:int, theta:float) -> None:
+        self.gates.append(["rzz", [__qubit1, __qubit2, theta]])
 
     # Not in QISkit(0.44), QuTIP(4.7)
     @validator
-    def rxy(self, qubit1:int, qubit2:int, theta:float) -> None:
-        self.gates.append(["rxy", [qubit1, qubit2, theta]])
+    def rxy(self, __qubit1:int, __qubit2:int, theta:float) -> None:
+        self.gates.append(["rxy", [__qubit1, __qubit2, theta]])
 
     # Referred as QASMU in QuTIP(4.7)
     @validator
-    def u(self, qubit:int, theta:float, phi:float, lam:float) -> None:
-        self.gates.append(["u", [qubit, theta, phi, lam]])
+    def u(self, __qubit:int, theta:float, phi:float, lam:float) -> None:
+        self.gates.append(["u", [__qubit, theta, phi, lam]])
 
     # Not in QuTIP(4.7)
     @validator
-    def cu(self, control:int, target:int, theta:float, phi:float, lam:float, gamma:float) -> None:
-        self.gates.append(["cu", [control, target, theta, phi, lam, gamma]])
-    
-    def measure(self, qubit: int) -> None:
+    def cu(self, __control:int, __target:int, theta:float, phi:float, lam:float, gamma:float=0) -> None:
+        self.gates.append(["cu", [__control, __target, theta, phi, lam, gamma]])
+
+    def measure(self, *qubits: int) -> None:
         """Method to measure quantum bit into classical bit.
         Args:
             qubit (int): the index of qubit in the circuit.
         """
-        self.measured_qubits.append(qubit)
+        self.measured_qubits.update(qubits)
 
-class _Circuit(BaseCircuit):
-    """This class is not supposed to be used outside the current module.
-    The class is defined to override the BaseCircuit.__new__ so that the
-    child classes can be instantiated separately, while inheriting the
-    attributes from the base class <BaseCircuit>.
+    def measure_all(self) -> None:
+        for qubit in range(self.num_qubits): self.measured_qubits.add(qubit)
 
-    Base Class:
-        BaseCircuit (_type_): The base class for the platform-dependent
-                              child classes.
-    """
-    def __new__(cls, size: int) -> Self:
-        self = object.__new__(cls)
-        self.size = size
-        self.gates = []
-        self.measured_qubits = []
-        self._cache = None
-        return self
+    def measure_active(self) -> None:
+        self.measure_all()
 
-class QiskitCircuit(BaseCircuit):
+class QiskitCircuit(Circuit):
     """Class for a quantum circuit.
     Attributes:
         size (int): the number of qubits in the circuit.
@@ -494,15 +561,15 @@ class QiskitCircuit(BaseCircuit):
         measured_qubits (List[int]): a list of indices of measured qubits.
     """
 
-    def __new__(cls, size:int) -> Self:
-        return BaseCircuit.__new__(cls, "Qiskit", size)
+    def __new__(cls, size:int) -> "Circuit":
+        return Circuit.__new__(cls, "qiskit", size)
 
     def parse_circuit(self, circuit:Optional[QuantumCircuit] = None) -> QuantumCircuit:
-        BaseCircuit.parse_circuit(self, circuit)
+        Circuit.parse_circuit(self, circuit)
         circuit = circuit or QuantumCircuit(self.num_qubits, self.num_measured_qubits)
         for gate, args in self.gates:
-            qubits = [arg for arg in args if isinstance(arg, int)]
-            angles = list(set(args) - set(qubits))
+            qubits: List[int] = list(filter(lambda x: isinstance(x, int), args))
+            angles: List[float] = list(filter(lambda x: isinstance(x, float), args))
             if hasattr(circuit, gate):
                 _gate = getattr(circuit, gate)
                 _gate(*angles, *qubits)
@@ -517,7 +584,7 @@ class QiskitCircuit(BaseCircuit):
                                                     [0, -1j*math.sin(angles[0]/2),     math.cos(angles[0]/2), 0],
                                                     [1,                         0,                         0, 1]]),
                                        *qubits)
-        circuit.measure(self.measured_qubits, circuit.cregs)
+        circuit.measure(list(self.measured_qubits), circuit.cregs)
         return circuit
 
     def compile_circuit(self, qc:QuantumCircuit) -> QuantumCircuit:
@@ -560,7 +627,7 @@ class QiskitCircuit(BaseCircuit):
             qc.measure(key_index, i)
         return qc
 
-class QutipCircuit(BaseCircuit):
+class QutipCircuit(Circuit):
     """Class for a quantum circuit.
     Attributes:
         size (int): the number of qubits in the circuit.
@@ -647,11 +714,11 @@ class QutipCircuit(BaseCircuit):
                   "iswap":"iSWAP",
                   "cswap":"FREDKIN"}
 
-    def __new__(cls, size:int) -> Self:
-        return BaseCircuit.__new__(cls, "Qutip", size)
+    def __new__(cls, size:int) -> "Circuit":
+        return Circuit.__new__(cls, "qutip", size)
 
     def parse_circuit(self, circuit:Optional[QubitCircuit] = None) -> QubitCircuit:
-        BaseCircuit.parse_circuit(self, circuit)
+        Circuit.parse_circuit(self, circuit)
         circuit = circuit or QubitCircuit(self.num_qubits, num_cbits=self.num_measured_qubits,
                                           user_gates={"ch":self.__ch,
                                                       "cu":self.__cu,
@@ -662,8 +729,8 @@ class QutipCircuit(BaseCircuit):
                                                       "ryy":self.__ryy,
                                                       "rzz":self.__rzz})
         for gate, args in self.gates:
-            qubits = [arg for arg in args if isinstance(arg, int)]
-            angles = list(set(args) - set(qubits))
+            qubits: List[int] = list(filter(lambda x: isinstance(x, int), args))
+            angles: List[float] = list(filter(lambda x: isinstance(x, float), args))
             circuit.add_gate(self.__gate_map.get(gate), targets=qubits[-1], controls=qubits[:-1], arg_value=angles)
         for i, measured_qubit in enumerate(self.measured_qubits):
             circuit.add_measurement(f"M{i}", targets=measured_qubit, classical_store=i)
