@@ -9,19 +9,18 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 from IPython.display import clear_output
-from joblib import Parallel, delayed, wrap_non_picklable_objects
 from numpy.random import randint
 from pandas import DataFrame
 
-from ..components.circuit import QutipCircuit
+from ..kernel.circuit import QutipCircuit
 from ..kernel.entity import Entity
 from ..kernel.timeline import Timeline
 from ..topology.topology import Topology
 from ..utils import log
-from .circuits import bell_type_state_analyzer
-from .noise import ERROR_TYPE
-from .NoiseModel import noise_model
-from .utils import to_binary, to_string
+from .analyzer_circuits import bell_type_state_analyzer
+from .noise import Noise
+from .noise_model import NoiseModel
+from .utils import to_binary, to_characters
 
 Timeline.bk = True
 Timeline.DLCZ = False
@@ -240,18 +239,18 @@ class Network(Entity):
         self._timeout = timeout
         self.messages = messages
         self._is_binary, self._bin_msgs = to_binary(messages=list(messages.values()))
-        self.__dict__.update(**kwds)
+        self.setattributes(kwds)
         if not hasattr(self, "size"):
             self.size = len(self._bin_msgs[0])
         elif callable(self.size):
             self.size = self.size(len(self._bin_msgs[0]))
-        if hasattr(self, "noise"):
-            self.__dict__.update(
-                {
-                    noise: ERROR_TYPE[noise].value(*probs)
-                    for noise, probs in self.noise.items()
-                }
-            )
+        # if hasattr(self, "noise"):
+        #     self.__dict__.update(
+        #         {
+        #             noise: ERROR_TYPE[noise].value(*probs)
+        #             for noise, probs in self.noise.items()
+        #         }
+        #     )
         # stack = inspect.stack()
         # caller = stack[1][0].f_locals.get("self").__class__.__name__
         # from .protocol import ProtocolPipeline
@@ -270,6 +269,10 @@ class Network(Entity):
             node_index=self.keys_of if hasattr(self, "keys_of") else 0,
             info_state="ENTANGLED",
         )
+
+    def setattributes(self, kwds: Dict[str, Any]) -> None:
+        for name, value in kwds.items():
+            setattr(self, name, value)
 
     def __iter__(self):
         """
@@ -464,7 +467,7 @@ class Network(Entity):
         Returns:
         - QutipCircuit: The QutipCircuit object with the specified error applied.
         """
-        model = noise_model()  # Create a new noise model
+        model = NoiseModel()  # Create a new noise model
 
         # Apply the specified error to the noise model
         match err_type:
@@ -629,6 +632,7 @@ class Network(Entity):
             msg_index (int): Index of the message to be encoded.
             node_index (int, optional): Index of the node encoding the message. Defaults to 0.
         """
+        readout = self.noise.pop("readout", [0, 0])
         alpha = complex(1 / np.sqrt(2))
         bsa = bell_type_state_analyzer(2)
         self._corrections = {}
@@ -640,8 +644,10 @@ class Network(Entity):
                 new_key = self.manager.new([alpha, ((-1) ** int(bin)) * alpha])
                 state = self.manager.get(key)
                 keys = tuple(set(state.keys) - set([key]))
-                outputs = self._add_noise(err_type="readout", qtc=bsa, keys=[new_key, key])
-                self._corrections[keys] = [outputs.get(new_key), outputs.get(key)]
+                Noise.implement(self.noise, circuit = bsa, mem_infos = info, quantum_manager = self.manager, keys = [key, new_key])
+                output: Dict[int, int] = self.manager.run_circuit(bsa, [new_key, key])
+                Noise.readout(readout, output)
+                self._corrections[keys] = [output.get(new_key), output.get(key)]
                 print(key, state.keys, new_key, info.state)
         logger.info("message states")
 
@@ -651,6 +657,7 @@ class Network(Entity):
         Args:
             returns (Any): Returns from the previous function call.
         """
+        readout = self.noise.pop("readout", [0, 0])
         self._outputs = []
         if hasattr(self, "_initials"):
             node = self[0]
@@ -674,13 +681,13 @@ class Network(Entity):
                 if len(keys) > 1:
                     key = max(keys)
                     qtc = QutipCircuit(1)
-                    qtc = self._add_noise(err_type="reset", qtc=qtc)
                     if ~self.state:
                         qtc.h(0)
+                    Noise.implement(self.noise, circuit = qtc, keys = key, quantum_manager = self.manager)
                     qtc.measure(0)
-                    output = self._add_noise(
-                        err_type="readout", qtc=qtc, keys=[key]
-                    ).get(key)
+                    output: Dict[int, int] = self.manager.run_circuit(qtc, [key])
+                    Noise.readout(readout, output)
+                    output = output.get(key)
                 qtc = QutipCircuit(1)
                 qtc = self._add_noise(err_type="reset", qtc=qtc)
                 if output:
@@ -693,11 +700,12 @@ class Network(Entity):
                 if value[0]:
                     qtc.z(0)
                 qtc.h(0)
+                Noise.implement(self.noise, circuit = qtc, keys = keys, quantum_manager = self.manager)
                 qtc.measure(0)
                 key = min(keys)
-                self._outputs.append(
-                    self._add_noise(err_type="readout", qtc=qtc, keys=[key])
-                )
+                output: Dict[int, int] = self.manager.run_circuit(qtc, [key])
+                Noise.readout(readout, output)
+                self._outputs.append(list(output.values()))
 
     # @delayed
     # @wrap_non_picklable_objects
@@ -717,7 +725,7 @@ class Network(Entity):
         else:
             self._strings = ["".join(str(*output.values()) for output in self._outputs)]
         print(self._strings)
-        self.recv_msgs = {rec[1:]:message for rec, message in zip(list(self.messages)[::-1], to_string(strings=self._strings, _was_binary=self._is_binary))}
+        self.recv_msgs = {rec[1:]:message for rec, message in zip(list(self.messages)[::-1], to_characters(bin_strs=self._strings, __was_binary=self._is_binary))}
         for k, v in self.recv_msgs.items():
             logger.info(f"Received message {k}: {v}")
 
