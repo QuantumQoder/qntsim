@@ -1,121 +1,83 @@
-'''
-This file contains different noises, their description and python code to realize them.
-Here following noises are included:
-i. SPAM (State Preparation And Measurement)
-'''
+import math
+import random
+from typing import TYPE_CHECKING, Dict, List, Literal, Optional, Union
 
-from enum import Enum
-from .Error import NoiseError
-    
-_ATOL = 1e-6
+from qntsim.kernel.circuit import Circuit
 
-# def __init__(self) -> None:
-#     pass
+if TYPE_CHECKING:
+    from ..kernel.circuit import QiskitCircuit, QutipCircuit
+    from ..kernel.quantum_kernel import QiskitManager, QutipManager
+    from ..resource_management.memory_manager import MemoryInfo
 
-# @staticmethod
-def _check_probability(probabilities, tolerance):
-    
-    '''
-    Check whether probabilities are valid or not (upto given tolerance).
-    '''
-    
-    if not isinstance(probabilities, list):
-        raise NoiseError("Probabilities should be a list")
-    if not probabilities:
-        raise NoiseError("Input probabilities: Empty")
-    for p in probabilities:
-        if isinstance(p, int) or isinstance(p, float):
-            if p < -tolerance or p > 1 + tolerance:
-                raise NoiseError(f"Probability {p} does not lie in the interval [0, 1]")
-        else:
-            raise NoiseError(f"Probability {p} is not a real number")
-    if abs(sum(probabilities) - 1) > tolerance:
-        raise NoiseError(f"Sum of the probabilities {probabilities} is not 1")
-    pass
+class Noise:
+    """
+    Noise.implement('pauli', [0.5, 0.5], circuit = qc_obj)
+    Noise.implement('readout', [0.5, 0.5], result = result)
+    Noise.implement('reset', [0.5, 0.5], mem_infos = infos)
+    Noise.implement('amp_damp', 0.5, keys = keys, network = network_obj)
+    """
 
-# @staticmethod
-def _scale_probability(probabilities):
-    
-    '''
-    Scales the probability values in proper range
-    '''
-    
-    for i in range(len(probabilities)):
-        if probabilities[i] < 0:
-            probabilities[i] = 0
-        if probabilities[i] > 1:
-            probabilities[i] = 1
-    s = sum(probabilities)
-    if s - 1:
-        for i in range(len(probabilities)):
-            probabilities[i] /= s
-    return probabilities
+    @staticmethod
+    def implement(noise: Dict[Literal["pauli", "readout", "reset", "amp_damp"], Union[float, List[float]]] = {}, **kwds) -> None:
+        for noise_type, probabilities in noise.items():
+            getattr(__class__, noise_type)(probabilities, **kwds)
+        getattr(__class__, "readout")(kwds.pop("readout", [0, 0]), **kwds)
 
-class ReadoutError:
-    
-    '''
-    Readout error can be caracterised by following components:
-    
-    i. Probability of getting 0 when ideal measurement gives 0
-    
-    ii. Probability of getting 1 when ideal measurement gives 0
-    
-    iii. Probability of getting 0 when ideal measurement gives 1
-    
-    iv. Probability of getting 1 when ideal measurement gives 1
-    
-    Note that if 2nd and 3rd probability is given then other two probabilities can be found by
-    subtracting them from 1.
-    '''
-    
-    def __init__(self, p01, p10) -> None:
-        '''
-        Create a readout error for noise model
-        
-        Inputs:
-            p01 [double]: Probability of getting 1 when ideal measurement gives 0
-            p10 [double]: Probability of getting 0 when ideal measurement gives 1
-        '''
-        
-        _check_probability(probabilities = [p01, 1 - p01], tolerance = _ATOL)
-        _check_probability(probabilities = [p10, 1 - p10], tolerance = _ATOL)
-        self.ideal = False
-        if p01 + p10 < _ATOL:
-            self.ideal = True
-        self.probabilities = [_scale_probability([1 - p01, p01]), _scale_probability([p10, 1 - p10])]
-        pass
+    @staticmethod
+    def pauli(err_probs: List[float] = [0, 0, 0, 0],
+              circuit: Optional[Union["QiskitCircuit", "QutipCircuit"]] = None, **_) -> None:
+        print("pauli")
+        if not circuit: return
+        if (array_length := len(err_probs)) < 4: err_probs += [0 for _ in range(4 - array_length)]
+        else: err_probs = err_probs[:4]
+        if random.random() < err_probs[1]: circuit.x(0)
+        if random.random() < err_probs[2]: circuit.y(0)
+        if random.random() < err_probs[3]: circuit.z(0)
 
-class ResetError:
-    
-    '''
-    Reset error can be characterised by following components:
-    
-    i. With probability :math:`p_0` qubit is reset to :math:`\\vert 0 \\rangle`
-    
-    ii. With probability :math:`p_1` qubit is reset to :math:`\\vert 1 \\rangle`
-    
-    iii. With probability :math:`1 - p_0 - p_1` no reset happens
-    
-    Therefore the error map will be :math:`E(\\rho) = (1 - p_0 - p_1) \\rho + \\left(p_0 \\vert 0 \\rangle\\langle 0 \\vert + p_1 \\vert 1 \\rangle\\langle 1 \\vert\\right)`
-    '''
-    
-    def __init__(self, p0, p1) -> None:
-        
-        '''
-        Create a reset error for noise model 
-        
-        Inputs:
-            p0 [double]: Probability of resetting to :math:`\\vert 0 \\rangle`
-            p1 [double]: Probability of resetting to :math:`\\vert 1 \\rangle`
-        '''
-        
-        _check_probability(probabilities = [p0, p1, 1 - p0 - p1], tolerance = _ATOL)
-        self.ideal = False
-        if abs(p0 - 1) < _ATOL:
-            self.ideal = True
-        self.probabilities = _scale_probability([1 - p0 - p1, p0, p1])
-        pass
+    @staticmethod
+    def readout(err_probs: List[float] = [0, 0], result: Optional[Dict[int, int]] = {}, **_) -> None:
+        print("readout")
+        if not result: return
+        if (array_length := len(err_probs)) < 2: err_probs += [0 for _ in range(2 - array_length)]
+        else: err_probs = err_probs[:2]
+        p01, p10 = err_probs
+        matrix: List[List[float]] = [[1-p01, p01],
+                                     [p10, 1-p10]]
+        for key, val in result.items():
+            result[key] = random.choices([0, 1], matrix[val])[0]
 
-class ERROR_TYPE(Enum):
-    reset = ResetError
-    readout = ReadoutError
+    @staticmethod
+    def reset(err: float,
+              mem_infos: Optional[List["MemoryInfo"]] = [],
+              circuit: Optional[Union["QiskitCircuit", "QutipCircuit"]] = None,
+              quantum_manager: Optional[Union["QiskitManager", "QutipManager"]] = None, **_) -> None:
+        print("reset")
+        if not mem_infos or not circuit or not quantum_manager: return
+        if isinstance(err, list): err = err[:1]
+        if not isinstance(mem_infos, list): mem_infos = [mem_infos]
+        qc = circuit.duplicate()
+        qc.measured_qubits = set()
+        for mem_info in mem_infos:
+            if random.random() < err:
+                mem_key = mem_info.memory.qstate_key
+                quantum_manager.run_circuit(qc, [mem_key])
+                mem_info.to_raw()
+
+    @staticmethod
+    def amplitude_damping(gamma: float, keys: Optional[List[float]] = [],
+                          quantum_manager: Optional[Union["QiskitManager", "QutipManager"]] = None, **_) -> None:
+        print("amp_damp")
+        if not keys or not quantum_manager: return
+        if isinstance(gamma, list): gamma = gamma[:1]
+        if isinstance(keys, int): keys = [keys]
+        theta = math.asin(math.sqrt(gamma))
+        print(f"gamma: {gamma}\n")
+        qc = BaseCircuit("Qutip", 2)
+        qc.ry(1,theta)
+        qc.cx(0,1)
+        qc.ry(1,theta)
+        qc.cx(0,1)
+        qc.measure(0)
+        for key in keys:
+            random_key = quantum_manager.new([1, 0])
+            quantum_manager.run_circuit(qc, [random_key, key])
