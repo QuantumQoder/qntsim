@@ -5,20 +5,22 @@ Also defined is the message type used by the BBPSSW code.
 """
 
 from enum import Enum, auto
-from typing import List, TYPE_CHECKING
 from functools import lru_cache
+from typing import TYPE_CHECKING, List
 
 from numpy.random import random
+
+from ..kernel.circuit import Circuit
+from ..message import Message
+from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
+                                              ProtocolType)
+from ..utils import log
+from .entanglement_protocol import EntanglementProtocol
 
 if TYPE_CHECKING:
     from ..components.DLCZ_memory import Memory
     from ..topology.node import Node
 
-from ..message import Message
-from .entanglement_protocol import EntanglementProtocol
-from ..utils import log
-from ..components.circuit import BaseCircuit
-from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
 
 class BBPSSWMsgType(Enum):
     """Defines possible message types for entanglement purification"""
@@ -48,7 +50,7 @@ class BBPSSW(EntanglementProtocol):
     This class provides an implementation of the BBPSSW purification protocol.
     It should be instantiated on a quantum router node.
     Variables:
-        BBPSSW.circuit (Circuit): circuit that purifies entangled memories.
+        BBPSSW.circuit (BaseCircuit): circuit that purifies entangled memories.
     Attributes:
         own (QuantumRouter): node that protocol instance is attached to.
         name (str): label for protocol instance.
@@ -58,7 +60,7 @@ class BBPSSW(EntanglementProtocol):
         meas_res (int): measurement result from circuit.
     """
 
-    #circuit = Circuit(2)
+    #circuit = BaseCircuit(2)
     #circuit.cx(0, 1)
     #circuit.measure(1)
 
@@ -80,9 +82,8 @@ class BBPSSW(EntanglementProtocol):
         self.F = None
         # if self.meas_memo is None:
         #     self.memories.pop()
-        Circuit =BaseCircuit.create(self.own.timeline.type)
-        #print("pur circuit",BaseCircuit.create(self.own.timeline.type))
-        self.circuit = Circuit(2)
+        #print("pur circuit",BaseCircuit(self.own.timeline.type))
+        self.circuit = Circuit(2, self.own.timeline.type)
         self.circuit.cx(0, 1)
         self.circuit.measure(1)
 
