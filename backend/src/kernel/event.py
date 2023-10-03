@@ -4,60 +4,38 @@ This module defines the Event class, which is executed by the timeline.
 Events should be scheduled through the timeline to take effect.
 """
 
-import math
 from functools import partial
-from types import NoneType
-from typing import (TYPE_CHECKING, Any, Callable, List, Optional, Self, Type,
-                    Union, overload)
+from typing import Any, Callable, List, Optional, Union, overload
 
-if TYPE_CHECKING:
-    from .process import Process
+from fibheap import Node
 
 
-class Event:
+class Event(Node):
     @overload
-    def __init__(self, time:int, activation_method:Callable[..., NoneType], act_params:List[Any], priority:float = math.inf, **kwds) -> None: ...
+    def __init__(self, time: int, *, owner: type, activation_method: str, act_params: List[Any], priority: Optional[int] = 0) -> None: ...
 
     @overload
-    def __init__(self, time:int, owner:Type, activation_method:str, act_params:List[Any], priority:float = math.inf) -> None: ...
+    def __init__(self, time: int, *, activation_method: Callable[..., None], act_params: List[Any], priority: Optional[int] = 0, **kwds) -> None: ...
     
     def __init__(self,
                  time: int,
-                 owner: Optional[Type] = None,
-                 activation_method: Union[str, Callable[..., NoneType]] = "",
+                 *,
+                 owner: Optional[type] = None,
+                 activation_method: Union[str, Callable[..., None]] = "",
                  act_params: List[Any] = [],
-                 priority:float = math.inf,
+                 priority: Optional[int] = 0,
                  **kwds) -> None:
-        assert (isinstance(activation_method, str) if owner else
-                callable(activation_method)), ("If owner is provided, then activation_method should of type 'str'." if owner else
-                                               "Without any owner, activation_method should be of type 'Callable'.")
+        assert True
+        Node.__init__(self, (time, priority))
         self.time = time
-        self._is_removed = False
         self.owner = owner
         self.activation = activation_method if owner else partial(activation_method, **kwds)
         self.act_params = act_params
         self.priority = priority
+        self._is_removed = False
 
-    def __eq__(self, another:Self) -> bool:
-        return (self.time == another.time) and (self.priority == another.priority)
+    def __repr__(self) -> str:
+        return f"Event(key = {self.key}, time = {self.time}, priority = {self.priority},\n\towner = {self.owner}, method = {self.activation}, parameters = {self.act_params})"
 
-    def __ne__(self, another:Self) -> bool:
-        return (self.time != another.time) or (self.priority != another.priority)
-
-    def __gt__(self, another:Self) -> bool:
-        return (self.time > another.time) or (self.time == another.time and self.priority > another.priority)
-
-    def __lt__(self, another:Self) -> bool:
-        return (self.time < another.time) or (self.time == another.time and self.priority < another.priority)
-
-        
     def run(self) -> None:
-        return (getattr(self.owner, self.activation) if self.owner else self.activation)(*self.act_params)
-
-    
-
-
-
-
-
-
+        (getattr(self.owner, self.activation) if self.owner else self.activation)(*self.act_params)

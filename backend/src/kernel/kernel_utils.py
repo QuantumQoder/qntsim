@@ -3,16 +3,14 @@ This module defines the EventList class, used by the timeline to order and execu
 EventList is implemented as a min heap ordered by simulation time.
 """
 
-from typing import TYPE_CHECKING
+from typing import List
 
-if TYPE_CHECKING:
-    from ._event import Event
+from fibheap import Fheap
 
-from fibheap import *
-
+from .event import Event
 
 
-class EventList:
+class EventList(Fheap):
     """Class of event list.
     This class is implemented as a min-heap. The event with the lowest time and priority is placed at the top of fibonacci heap.
     
@@ -20,41 +18,44 @@ class EventList:
         data (Fheap()): fibonacci heap storing events as nodes (where node.key = event).
         nodesl(List[Node(event)]):list of all nodes .
     """
+    def __init__(self) -> None:
+        Fheap.__init__(self)
+        self.events: List["Event"] = []
 
-    def __init__(self): 
-        self.data = makefheap()
-        self.nodesl = []
-        self.data_list = []
+    def __len__(self) -> int:
+        return len(self.events)
 
-    def __len__(self):
-        return self.data.num_nodes
+    def __repr__(self) -> str:
+        return f"EventList(num_events = {len(self)})\n\t)" + "\n\t".join(str(event) for event in self.events)
 
-    
-    def push(self, event: "Event") -> "None":
+    def __iter__(self) -> "Event":
+        while not self.is_empty():
+            yield self.pop()
+
+    def push(self, event: "Event") -> None:
         """Method to insert the event into heap ,maintaing min-heap structure.
         The event is converted to heap node , appended to nodesl and inserted into heap.
         """
-        t = Node(event)
-        self.nodesl.append(t)
-        self.data.insert(t)
-        self.data_list.append(event)
+        self.insert(event)
+        self.events.append(event)
 
     def pop(self) -> "Event":
         """Method to extract minium node (i.e, event with min time )
         """
-        return self.data.extract_min().key
-        
-    def isempty(self) -> bool:
-        return self.data.num_nodes == 0
+        return self.extract_min()
+
+    def is_empty(self) -> bool:
+        return self.num_nodes == 0
 
     def remove(self, event: "Event") -> None:
         """Method to remove events from heap.
         The event is set as the invalid state to save the time of removing event from heap.
         """
-        event._is_removed=True
-        self.data_list.remove(event)
+        event._is_removed = True
+        self.events.remove(event)
+        self.delete(event)
 
-    def update_event_time(self, event: "Event", time: int):
+    def update_event_time(self, event: "Event", time: int) -> None:
         """Method to update the timestamp of event and maintain the min-heap structure.
         Search for the event in nodesl,
         if event's time is needed to be:
@@ -64,25 +65,9 @@ class EventList:
                 using decrease_key(node ,key) method of fibonacci heap change the event's time to -1,
                 hence making it min node ,extract it from heap ,update event's time and insert into heap.
         """  
-        if time == event.time:
-            return
-
-        for node in self.nodesl:
-            if node.key==event:
-                if event.time > time :
-                    event.time = time
-                    self.data.decrease_key(node, event)
-                
-                elif event.time < time:
-                    event.time = -1
-                    self.data.decrease_key(node, event)
-                    self.data.extract_min()
-                    event.time=time
-                    t = Node(event)
-                    self.nodesl.append(t)
-                    self.data.insert(t)
-                break
-    
-    def filter_events(self):
-        events = [(event.owner,event.activation, event.act_params[1]) if len(event.act_params)>0 else (event.owner,event.activation) for event in self.data_list]
-        return events
+        if time < event.time:
+            self.decrease_key(event, (time, event.priority))
+        if time > event.time:
+            self.remove(event)
+            new_event = Event(time, owner=event.owner, activation_method=event.activation, act_params=event.act_params, priority=event.priority)
+            self.push(new_event)
