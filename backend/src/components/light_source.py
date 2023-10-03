@@ -4,17 +4,16 @@ This module defines the LightSource class to supply individual photons and the S
 These classes should be connected to one or two entities, respectively, that are capable of receiving photons.
 """
 
-from numpy import random, multiply
 import random as rnd
 
 import numpy as np
+from numpy import multiply, random
 
-
-from .photon import Photon
 from ..kernel.entity import Entity
-from ..kernel._event import Event
-from ..utils.encoding import polarization, single_atom
+from ..kernel.event import Event
 from ..utils import log
+from ..utils.encoding import polarization, single_atom
+from .photon import Photon
 
 
 class LightSource(Entity):

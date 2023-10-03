@@ -7,14 +7,14 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-if TYPE_CHECKING:
-    from ..kernel.timeline import Timeline
-    from ..topology.node import Node
-    from ..components.photon import Photon
-    from ..message import Message
-
-from ..kernel._event import Event
 from ..kernel.entity import Entity
+from ..kernel.event import Event
+
+if TYPE_CHECKING:
+    from ..components.photon import Photon
+    from ..kernel.timeline import Timeline
+    from ..message import Message
+    from ..topology.node import Node
 
 
 class Waveplate(Entity):

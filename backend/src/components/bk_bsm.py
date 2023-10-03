@@ -3,21 +3,21 @@ This module defines a template bell state measurement (BSM) class, as well as im
 Also defined is a function to automatically construct a BSM of a specified type.
 """
 
+import random as rnd
 from abc import abstractmethod
 from typing import Any, Dict, List
 
-from numpy import random, outer, add, zeros
-import random as rnd
+from numpy import add, outer, random, zeros
 
-from .circuit import Circuit
+from ..kernel.circuit import Circuit
+from ..kernel.entity import Entity
+from ..kernel.event import Event
+from ..kernel.quantum_manager import QuantumManagerDensity, QuantumManagerKet
+from ..utils import log
+from ..utils.encoding import *
+from ..utils.quantum_state import QuantumState
 from .detector import Detector
 from .photon import Photon
-from ..kernel.entity import Entity
-from ..kernel._event import Event
-from ..kernel.quantum_manager import QuantumManagerKet, QuantumManagerDensity
-from ..utils.encoding import *
-from ..utils import log
-from ..utils.quantum_state import QuantumState
 
 
 def make_bsm(name, timeline, encoding_type='time_bin', phase_error=0, detectors=[]):
@@ -59,7 +59,8 @@ def _set_memory_with_fidelity(memories: List["Memory"], desired_state):
         #state = zeros((4, 4))
         #for mult, pure in zip(multipliers, possible_states):
         #    state = add(state, mult*outer(pure, pure))
-        qm.set(keys, state)
+        # qm.set(keys, state)
+        pass
 
     else:
         raise Exception("Invalid quantum manager with formalism {}".format(qm.formalism))

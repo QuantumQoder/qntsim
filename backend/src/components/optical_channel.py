@@ -10,17 +10,17 @@ import heapq as hq
 from random import random
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from ..kernel.timeline import Timeline
-    from ..topology.node import Node
-    from ..components.photon import Photon
-    from ..message import Message
-    from ..network_management.request import RRPMsgType
-
-from ..kernel._event import Event
 from ..kernel.entity import Entity
+from ..kernel.event import Event
 from ..network_management.request import RRPMsgType
 from ..utils import log
+
+if TYPE_CHECKING:
+    from ..components.photon import Photon
+    from ..kernel.timeline import Timeline
+    from ..message import Message
+    from ..network_management.request import RRPMsgType
+    from ..topology.node import Node
 
 
 class OpticalChannel(Entity):
@@ -83,7 +83,7 @@ class QuantumChannel(OpticalChannel):
         frequency (float): maximum frequency of qubit transmission (in Hz).
     """
 
-    def __init__(self, name: str, timeline: "Timeline", attenuation: float, distance: int, polarization_fidelity=1, light_speed=2e-4, frequency=8e7):
+    def __init__(self, name: str, timeline: "Timeline", attenuation: float, distance: int, polarization_fidelity=1, light_speed=2e-4, frequency=8e7, **_):
         """Constructor for Quatnum Channel class.
 
         Args:
@@ -211,7 +211,7 @@ class ClassicalChannel(OpticalChannel):
         delay (float): delay in message transmission (default distance / light_speed).
     """
 
-    def __init__(self, name: str, timeline: "Timeline", distance: int, delay=-1):
+    def __init__(self, name: str, timeline: "Timeline", distance: int, delay=-1, **_):
         """Constructor for Classical Channel class.
 
         Args:

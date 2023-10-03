@@ -8,13 +8,14 @@ from math import sqrt
 #from numpy import random
 from random import random
 from typing import TYPE_CHECKING
+
+from ..kernel.entity import Entity
+from ..kernel.event import Event
+
 if TYPE_CHECKING:
     from ..kernel.timeline import Timeline
     from ..components.photon import Photon
     from ..components.detector import Detector
-
-from ..kernel.entity import Entity
-from ..kernel._event import Event
 
 
 class Interferometer(Entity):

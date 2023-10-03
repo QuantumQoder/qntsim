@@ -6,14 +6,13 @@ The switch is usually created as part of a time bin QSDetector object, but may b
 
 from typing import TYPE_CHECKING, List
 
-if TYPE_CHECKING:
-    from ..kernel.timeline import Timeline
-    from ..components.interferometer import Interferometer
-
-from .photon import Photon
 from ..kernel.entity import Entity
-from ..kernel._event import Event
+from ..kernel.event import Event
+from .photon import Photon
 
+if TYPE_CHECKING:
+    from ..components.interferometer import Interferometer
+    from ..kernel.timeline import Timeline
 
 
 class Switch(Entity):

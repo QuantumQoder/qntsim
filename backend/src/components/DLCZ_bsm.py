@@ -4,20 +4,20 @@ This module defines a template bell state measurement (BSM) class, as well as im
 Also defined is a function to automatically construct a BSM of a specified type.
 """
 
+import random as rnd
 from abc import abstractmethod
 from typing import Any, Dict, List
 
-from numpy import random, outer, add, zeros
-import random as rnd
+from numpy import add, outer, random, zeros
 
-from .circuit import Circuit
-from .detector import Detector
-from .photon import Photon
+from ..kernel.circuit import Circuit
 from ..kernel.entity import Entity
-from ..kernel._event import Event
-from ..kernel.quantum_manager import QuantumManagerKet, QuantumManagerDensity
+from ..kernel.event import Event
+from ..kernel.quantum_manager import QuantumManagerDensity, QuantumManagerKet
 from ..utils.encoding import *
 from ..utils.quantum_state import QuantumState
+from .detector import Detector
+from .photon import Photon
 
 
 def make_bsm(name, timeline, encoding_type='time_bin', phase_error=0, detectors=[]):
