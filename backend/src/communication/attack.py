@@ -7,9 +7,8 @@ from joblib import Parallel, delayed, wrap_non_picklable_objects
 from numpy import pi
 from numpy.random import randint, uniform
 
-from ..components.circuit import QutipCircuit
 from .network import Network
-
+from ..kernel.circuit import QutipCircuit
 
 class Attack:
     @staticmethod

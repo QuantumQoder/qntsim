@@ -1,7 +1,7 @@
 from abc import ABC, abstractclassmethod
 from typing import Any, Dict, Tuple
 
-from qntsim.communication import Network
+from qntsim.communication.network import Network
 
 
 class Party(ABC):
