@@ -1,4 +1,4 @@
-from ..components.circuit import QutipCircuit
+from ..kernel.circuit import QutipCircuit
 
 
 def bell_type_state_analyzer(num_qubits:int) -> QutipCircuit:

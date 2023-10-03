@@ -1,13 +1,14 @@
-from .Error import NoiseError
-from warnings import warn
 from random import choices
-    
+from warnings import warn
+
+from .Error import NoiseError
+
 _ATOL = 1e-6
 _1qubit_gates = ['id', 'x', 'h', 'y', 'z', 's', 't', 'tdg', 'ry', 'rx', 'rz']
 _2qubit_gates = ['cx', 'swap']
 _3qubit_gates = ['ccx']
 
-class noise_model:
+class NoiseModel:
 
     def __init__(self) -> None:
         
@@ -79,7 +80,8 @@ class noise_model:
         '''
         
         if not QNTSim:
-            from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
+            from qiskit import (ClassicalRegister, QuantumCircuit,
+                                QuantumRegister)
             q_reg = {}
             size = 0
             c_reg = []
@@ -152,7 +154,7 @@ class noise_model:
         Method to apply readout error on QNTSim
         '''
         
-        from qntsim.components.circuit import QutipCircuit
+        from qntsim.kernel.circuit import QutipCircuit
 #        for key in keys:  # THIS FOR LOOP IS ONLY FOR TESTING PURPOSE AND SHOULD BE REMOVED BEFORE APPLYING THE NOISE IN THE PROTOCOLS
 #            states = manager.get(key).state
 #            if states[1]:
