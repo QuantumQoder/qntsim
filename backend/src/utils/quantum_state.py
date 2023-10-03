@@ -39,6 +39,14 @@ class QuantumState():
         self.state = (complex(1), complex(0))
         self.entangled_states = [self]
 
+    def __str__(self) -> str:
+        state: str = " + ".join(str(amp) + "|" + bin(i)[2:] + ">" for i, amp in enumerate(self.state))
+        return f"state: {state}"
+
+    def __repr__(self) -> str:
+        state: str = " + ".join(str(amp) + "|" + bin(i)[2:] + ">" for i, amp in enumerate(self.state))
+        return f"QuantumState(state = {state}, entangled_states = {self.entangled_states})"
+
     def entangle(self, another_state: "QuantumState"):
         """Method to entangle two quantum states.
 
