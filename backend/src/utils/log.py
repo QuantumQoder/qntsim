@@ -14,13 +14,13 @@ Attributes:
 import logging
 import logging.handlers
 
-# def _init_logger():
-#     lg = logging.getLogger(__name__)
-#     lg.addHandler(logging.NullHandler())
-#     return lg
+def _init_logger():
+    lg = logging.getLogger(__name__)
+    lg.addHandler(logging.NullHandler())
+    return lg
 
 
-# logger = _init_logger()
+logger = _init_logger()
 LOG_FORMAT = '%(asctime)-15s\t%(levelname)-8s\t%(module)s:\t%(message)s'
 _log_modules = []
 
@@ -84,7 +84,7 @@ def set_logger_level(level: str):
     """
 
     global logger
-    logger.setLevel(getattr(logging, level))
+    logger.setLevel(getattr(logging, level.upper()))
 
 
 def track_module(module_name: str):
