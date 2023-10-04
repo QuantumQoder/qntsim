@@ -74,10 +74,9 @@ class RunApp(APIView):
     def post(self, request: Request):
         try:
             ############### configuring logger ###############
-            log.set_logger("m")
-            log.set_logger_level('DEBUG')
-            print("\n\n\n\n")
-            print(f"handlers: {log.logger.handlers}\n")
+            print("\n\n")
+            print("views.py")
+            print("\n\n")
             print(f"request data: {request.data}\n")
 
             modules  = {'physical': ['interferometer',
@@ -140,43 +139,30 @@ class RunApp(APIView):
             print(f"app_settings: {app_settings}\n")
             print(f"noise: {noises}\n")
             print(f"selected_modules: {selected_modules}\n")
+            
+            log.set_logger("m")
+            log.set_logger_level(debug["logLevel"].upper())
             for module in selected_modules:
                 for file in modules[module]:
                     log.track_module(file)
-            results = {}
+            print(f"handlers: {log.logger.handlers}\n")
 
-            if application == "e91":
-                #print("e91 views")
-                results = e91(topology, app_settings["sender"], app_settings["receiver"], int(app_settings["keyLength"]), deepcopy(noises))
-            elif application == "e2e":
-                print('e2e',app_settings["sender"], app_settings["receiver"], app_settings["startTime"], app_settings["size"], app_settings["priority"], app_settings["targetFidelity"], app_settings["timeout"])
-                results = e2e(topology, app_settings["sender"], app_settings["receiver"], app_settings["startTime"], app_settings["size"], app_settings["priority"], app_settings["targetFidelity"], app_settings["timeout"] )
-            elif application == "teleportation":
-                results = teleportation(topology, app_settings["sender"], app_settings["receiver"], complex(app_settings["amplitude1"]), complex(app_settings["amplitude2"]), deepcopy(noises))
-            elif application == "ghz":
-                results = ghz(topology, app_settings["endnode1"], app_settings["endnode2"], app_settings["endnode3"], app_settings["middlenode"], deepcopy(noises))
-            elif application == "qsdc1":
-                results = qsdc1(topology, app_settings["sender"], app_settings["receiver"], int(app_settings["sequenceLength"]), app_settings["key"], deepcopy(noises))
-            elif application == "ping_pong":
-                results = ping_pong(topology=topology, app_settings=app_settings, noise=deepcopy(noises))
-            elif application == "ip1":
-                results = ip1(topology, app_settings["sender"]["node"], app_settings["receiver"]["node"], app_settings["sender"]["message"] )
-            elif application == "single_photon_qd":
-                results = qdsp(topology=topology, app_settings=app_settings)
-                # results = single_photon_qd(topology, appSettings["sender"], appSettings["receiver"], appSettings["message1"],appSettings["message2"], appSettings["attack"])
-            elif application == "qsdc_teleportation":
-                results = qsdc_teleportation(topology, app_settings["sender"]["node"], app_settings["receiver"]["node"], app_settings["sender"]["message"], app_settings["attack"], deepcopy(noises))
-            elif application == "ip2":
-                results = ip2_run(topology,app_settings, deepcopy(noises))
-            elif application == "mdi_qsdc":
-                results = mdi_qsdc(topology, app_settings["sender"], app_settings["receiver"], app_settings["message"], app_settings["attack"])
+            results = {}
+            match application:
+                case "e91": results = e91(topology, app_settings["sender"], app_settings["receiver"], int(app_settings["keyLength"]), deepcopy(noises))
+                case "e2e": results = e2e(topology, app_settings["sender"], app_settings["receiver"], app_settings["startTime"], app_settings["size"], app_settings["priority"], app_settings["targetFidelity"], app_settings["timeout"] )
+                case "teleportation": results = teleportation(topology, app_settings["sender"], app_settings["receiver"], complex(app_settings["amplitude1"]), complex(app_settings["amplitude2"]), deepcopy(noises))
+                case "ghz": results = ghz(topology, app_settings["endnode1"], app_settings["endnode2"], app_settings["endnode3"], app_settings["middlenode"], deepcopy(noises))
+                case "qsdc1": results = qsdc1(topology, app_settings["sender"], app_settings["receiver"], int(app_settings["sequenceLength"]), app_settings["key"], deepcopy(noises))
+                case "ping_pong": results = ping_pong(topology=topology, app_settings=app_settings, noise=deepcopy(noises))
+                case "ip1": results = ip1(topology, app_settings["sender"]["node"], app_settings["receiver"]["node"], app_settings["sender"]["message"] )
+                case "single_photon_qd": results = qdsp(topology=topology, app_settings=app_settings)
+                case "qsdc_teleportation": results = qsdc_teleportation(topology, app_settings["sender"]["node"], app_settings["receiver"]["node"], app_settings["sender"]["message"], app_settings["attack"], deepcopy(noises))
+                case "ip2": results = ip2_run(topology,app_settings, deepcopy(noises))
+                case _: raise Exception("Incorrect application selected")
                 
-            output = results
-            print(debug["logLevel"])
-            debug_levels = {"debug": "DEBUG", "info":"INFO"}
-            print(debug_levels[debug["logLevel"]])
-            log_level = debug_levels[debug["logLevel"]]
-            logs = log.read_from_memory(log.logger, level = log_level)
+            output = deepcopy(results)
+            logs = log.read_from_memory(log.logger, level = debug["logLevel"].upper())
             output["logs"] = logs
             print(f"sending json response: {output}\n\n\n")
             
