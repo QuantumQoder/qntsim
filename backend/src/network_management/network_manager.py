@@ -3,20 +3,11 @@ This module defines the NetworkManager class, an implementation of the SeQUeNCe 
 Also included in this module is the message type used by the network manager and a function for generating network managers with default protocols.
 """
 import itertools
+import logging
 from enum import Enum
 from typing import TYPE_CHECKING, List
 
-if TYPE_CHECKING:
-    from ..topology.node import QuantumRouter
-    from ..protocol import StackProtocol
-    from ..kernel._event import Event
-    from .request import Request
-    from .request import RoutingProtocol 
-    from .request import ReservationProtocol
-
-import logging
-
-from ..kernel._event import Event
+from ..kernel.event import Event
 from ..message import Message
 from ..resource_management.resource_manager import ResourceManagerMsgType
 from ..transport_layer.transport_manager import TransportProtocol
@@ -25,6 +16,12 @@ from .reservation import Reservation, ResourceReservationProtocol, RSVPMsgType
 from .routing import (NewRoutingProtocol, RoutingTableUpdateProtocol,
                       StaticRoutingProtocol)
 from ..utils import log
+
+if TYPE_CHECKING:
+    from ..kernel.event import Event
+    from ..protocol import StackProtocol
+    from ..topology.node import QuantumRouter
+    from .request import Request, ReservationProtocol, RoutingProtocol
 
 # logger = logging.getLogger("main_logger." + "network_manager")
 

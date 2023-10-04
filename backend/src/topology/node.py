@@ -8,6 +8,22 @@ from math import inf
 from time import monotonic_ns
 from typing import TYPE_CHECKING, Any, List
 
+from ..components.detector import QSDetectorPolarization, QSDetectorTimeBin
+from ..components.light_source import LightSource, SPDCSource2
+from ..kernel.entity import Entity
+#from ..kernel.timeline import DLCZ ,bk
+from ..kernel.timeline import Timeline
+from ..network_management.network_manager import NetworkManager
+from ..network_management.request import RRPMsgType
+from ..resource_management.resource_manager import (MsgRecieverType,
+                                                    ResourceManager,
+                                                    ResourceManagerMsgType)
+from ..resource_management.task_manager import TaskManager
+from ..transport_layer.transport_manager import TransportManager
+from ..utils import log
+from ..utils.encoding import *
+from .message_queue_handler import MessageQueueHandler
+
 if TYPE_CHECKING:
     #from ..kernel.timeline import Timeline
     from ..components.optical_channel import ClassicalChannel, QuantumChannel
@@ -15,8 +31,6 @@ if TYPE_CHECKING:
     from ..network_management.reservation import Reservation
     from ..protocol import StackProtocol
     from ..resource_management.memory_manager import MemoryInfo
-#from ..kernel.timeline import DLCZ ,bk
-from ..kernel.timeline import Timeline
 
 if Timeline.DLCZ:
     from ..components.DLCZ_bsm import SingleAtomBSM
@@ -26,23 +40,8 @@ elif Timeline.bk:
     from ..components.bk_bsm import SingleAtomBSM
     from ..components.bk_memory import Memory, MemoryArray
     print("bk node")
-from ..utils import log
 
 log.set_logger("Node")
-
-
-from ..components.detector import QSDetectorPolarization, QSDetectorTimeBin
-from ..components.light_source import LightSource, SPDCSource2
-from ..kernel.entity import Entity
-from ..network_management.network_manager import NetworkManager
-from ..network_management.request import RRPMsgType
-from ..resource_management.resource_manager import (MsgRecieverType,
-                                                    ResourceManager,
-                                                    ResourceManagerMsgType)
-from ..resource_management.task_manager import TaskManager
-from ..transport_layer.transport_manager import TransportManager
-from ..utils.encoding import *
-from .message_queue_handler import MessageQueueHandler
 
 """
 def force_import(backend):
@@ -68,7 +67,7 @@ class Node(Entity):
         protocols (List[Protocol]): list of attached protocols.
     """
 
-    def __init__(self, name: str, timeline: "Timeline"):
+    def __init__(self, name: str, timeline: "Timeline", **_):
         """Constructor for node.
         name (str): name of node instance.
         timeline (Timeline): timeline for simulation.
@@ -189,7 +188,7 @@ class BSMNode(Node):
         eg (EntanglementGenerationB): entanglement generation protocol instance.
     """
 
-    def __init__(self, name: str, timeline: "Timeline", other_nodes: List[str]) -> None:
+    def __init__(self, name: str, timeline: "Timeline", other_nodes: List[str], **_) -> None:
         """Constructor for BSM node.
         Args:
             name (str): name of node.
@@ -272,7 +271,7 @@ class MemoryTimeCard():
 
 class EndNode(Node):
 
-    def __init__(self, name: str, timeline: "Timeline", memo_size=500):
+    def __init__(self, name: str, timeline: "Timeline", memo_size=500, **_):
         super().__init__(name, timeline)
         self.memo_size = memo_size
         self.memory_array = MemoryArray(name + ".MemoryArray", timeline, num_memories=memo_size)
@@ -353,7 +352,7 @@ class EndNode(Node):
 
 class ServiceNode(Node):
 
-    def __init__(self,name: str, timeline: "Timeline",memo_size=500):
+    def __init__(self,name: str, timeline: "Timeline",memo_size=500, **_):
         super().__init__(name, timeline)
         self.memory_array = MemoryArray(name + ".MemoryArray", timeline, num_memories=memo_size)
         self.memory_array.owner = self

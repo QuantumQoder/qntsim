@@ -5,26 +5,30 @@ This includes the Reservation, MemoryTimeCard, and QCap classes, which are used 
 Also included is the definition of the message type used by the reservation protocol.
 """
 
+import itertools
 from enum import Enum, auto
-from typing import List, TYPE_CHECKING
-if TYPE_CHECKING:
-    from ..topology.node import QuantumRouter
-    from ..resource_management.memory_manager import MemoryInfo, MemoryManager
+from typing import TYPE_CHECKING, List
 
-from ..resource_management.rule_manager import Rule
+from ..kernel.event import Event
 from ..kernel.timeline import Timeline
+from ..message import Message
+from ..protocol import StackProtocol
+from ..resource_management.rule_manager import Rule
+
+if TYPE_CHECKING:
+    from ..resource_management.memory_manager import MemoryInfo, MemoryManager
+    from ..topology.node import QuantumRouter
 if Timeline.DLCZ:
-    from ..entanglement_management.DLCZ_generation import EntanglementGenerationA
+    from ..entanglement_management.DLCZ_generation import \
+        EntanglementGenerationA
     from ..entanglement_management.DLCZ_purification import BBPSSW
-    from ..entanglement_management.DLCZ_swapping import EntanglementSwappingA, EntanglementSwappingB
+    from ..entanglement_management.DLCZ_swapping import (EntanglementSwappingA,
+                                                         EntanglementSwappingB)
 elif Timeline.bk:
     from ..entanglement_management.bk_generation import EntanglementGenerationA
     from ..entanglement_management.bk_purification import BBPSSW
-    from ..entanglement_management.bk_swapping import EntanglementSwappingA, EntanglementSwappingB
-from ..message import Message
-from ..protocol import StackProtocol
-from ..kernel._event import Event
-import itertools
+    from ..entanglement_management.bk_swapping import (EntanglementSwappingA,
+                                                       EntanglementSwappingB)
 
 
 class RSVPMsgType(Enum):

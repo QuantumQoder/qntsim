@@ -13,7 +13,7 @@ from numpy import add, outer, random, zeros
 from ..kernel.circuit import Circuit
 from ..kernel.entity import Entity
 from ..kernel.event import Event
-from ..kernel.quantum_manager import QuantumManagerDensity, QuantumManagerKet
+from ..kernel.quantum_manager import DensityManager, QuantumManagerKet
 from ..utils.encoding import *
 from ..utils.quantum_state import QuantumState
 from .detector import Detector
