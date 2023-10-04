@@ -39,7 +39,6 @@ from .app.ping_pong import ping_pong
 from .app.qsdc1 import *
 from .app.qsdc_teleportation import *
 from .app.teleportation import *
-from .app.utils import *
 from .helpers import *
 
 # from contextlib import nullcontext
@@ -97,6 +96,7 @@ def e91(network_config, sender, receiver, keyLength, noise: Dict[str, List[float
     if keyLength < 1 or keyLength > 30: raise Exception("keyLength must be within 0 and 30 .Retry Again")
     start_time = time.time()
     network_config_json, tl, network_topo = load_topology(network_config, "Qutip")
+    n = int(8*keyLength)
     print('network topo', network_topo)
     alice = network_topo.nodes[sender]
     bob = network_topo.nodes[receiver]
