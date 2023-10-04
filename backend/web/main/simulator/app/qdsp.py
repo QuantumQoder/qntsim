@@ -3,10 +3,12 @@ from math import inf
 from typing import Any, Dict
 
 import numpy as np
-from qntsim.communication import ErrorAnalyzer, Network, to_binary, to_string
+from qntsim.communication.error_analyzer import ErrorAnalyzer
+from qntsim.communication.network import Network
+from qntsim.communication.utils import to_binary, to_characters
 from qntsim.components.photon import Photon
 from qntsim.components.waveplates import HalfWaveplate
-from qntsim.kernel._event import Event
+from qntsim.kernel.event import Event
 from qntsim.kernel.timeline import Timeline
 from qntsim.topology.node import EndNode
 from qntsim.topology.topology import Topology
@@ -61,7 +63,7 @@ def qdsp(topology:Dict, app_settings:Dict[str, Dict[str, Any]]):
     logger.info(f"|-------------Simulation Completed!! Message has been safely transferred from {src_node.name} to {dst_node.name}----------------------|")
 
     
-    recv_msgs = to_string(strings=strings, _was_binary=_is_binary)
+    recv_msgs = to_characters(bin_strs=strings, _was_binary=_is_binary)
     end_time = time.time()
     network = Network(topology=topology,
                       messages={(app_settings.get("sender").get("node"),
@@ -85,9 +87,9 @@ if __name__=="__main__":
     topology = {
         'nodes': [
             {
-                'Name': 'node1',
-                'Type': 'end',
-                'noOfMemory': 500,
+                'name': 'node1',
+                'type': 'end',
+                'memo_size': 500,
                 'memory': {
                     'frequency': 80000000,
                     'expiry': -1,
@@ -103,9 +105,9 @@ if __name__=="__main__":
                     }
                 },
             {
-                'Name': 'node2',
-                'Type': 'end',
-                'noOfMemory': 500,
+                'name': 'node2',
+                'type': 'end',
+                'memo_size': 500,
                 'memory': {
                     'frequency': 80000000,
                     'expiry': -1,
@@ -123,31 +125,31 @@ if __name__=="__main__":
             ],
         'quantum_connections': [
             {
-                'Nodes': ['node1', 'node2'],
-                'Attenuation': 0.1,
-                'Distance': 70
+                'nodes': ['node1', 'node2'],
+                'attenuation': 0.1,
+                'distance': 70
                 }
             ],
         'classical_connections': [
             {
-                'Nodes': ['node1', 'node1'],
-                'Delay': 0,
-                'Distance': 0
+                'nodes': ['node1', 'node1'],
+                'delay': 0,
+                'distance': 0
                 },
             {
-                'Nodes': ['node1', 'node2'],
-                'Delay': 10000000000,
-                'Distance': 1000
+                'nodes': ['node1', 'node2'],
+                'delay': 10000000000,
+                'distance': 1000
                 },
             {
-                'Nodes': ['node2', 'node1'],
-                'Delay': 10000000000,
-                'Distance': 1000
+                'nodes': ['node2', 'node1'],
+                'delay': 10000000000,
+                'distance': 1000
                 },
             {
-                'Nodes': ['node2', 'node2'],
-                'Delay': 0,
-                'Distance': 0
+                'nodes': ['node2', 'node2'],
+                'delay': 0,
+                'distance': 0
                 }
             ],
         'detector': {
