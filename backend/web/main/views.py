@@ -160,7 +160,8 @@ class RunApp(APIView):
             elif application == "ping_pong":
                 results = ping_pong(topology=topology, app_settings=app_settings, noise=deepcopy(noises))
             elif application == "ip1":
-                results = ip1(topology, app_settings["sender"]["node"], app_settings["receiver"]["node"], app_settings["sender"]["message"] )
+                results = ip1(topology, app_settings)
+                # results = ip1(topology, app_settings["sender"]["node"], app_settings["receiver"]["node"], app_settings["sender"]["message"] )
             elif application == "single_photon_qd":
                 results = qdsp(topology=topology, app_settings=app_settings)
                 # results = single_photon_qd(topology, appSettings["sender"], appSettings["receiver"], appSettings["message1"],appSettings["message2"], appSettings["attack"])
