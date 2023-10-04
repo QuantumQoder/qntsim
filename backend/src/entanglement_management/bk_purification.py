@@ -29,36 +29,6 @@ class BBPSSWMsgType(Enum):
 
     PURIFICATION_RES = auto()
 
-
-class Message():
-    """Message used by entanglement purification protocols.
-    This message contains all information passed between purification protocol instances.
-    Attributes:
-        msg_type (BBPSSWMsgType): defines the message type.
-        receiver (str): name of destination protocol instance.
-    """
-    def __init__(self, receiver_type: Enum, receiver: Enum, msg_type, **kwargs) -> None:
-
-        self.receiver_type = receiver_type
-        self.receiver = receiver
-        self.msg_type = msg_type
-        self.kwargs = kwargs
-# class BBPSSWMessage(Message):
-#     """Message used by entanglement purification protocols.
-#     This message contains all information passed between purification protocol instances.
-#     Attributes:
-#         msg_type (BBPSSWMsgType): defines the message type.
-#         receiver (str): name of destination protocol instance.
-#     """
-
-#     def __init__(self, msg_type: BBPSSWMsgType, receiver: str, **kwargs):
-#         Message.__init__(self, msg_type, receiver)
-#         if self.msg_type is BBPSSWMsgType.PURIFICATION_RES:
-#             self.meas_res = kwargs['meas_res']
-#         else:
-#             raise Exception("BBPSSW protocol create unknown type of message: %s" % str(msg_type))
-
-
 class BBPSSW(EntanglementProtocol):
     """Purification protocol instance.
     This class provides an implementation of the BBPSSW purification protocol.

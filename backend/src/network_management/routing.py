@@ -5,26 +5,25 @@ Routing tables may be created manually, or generated and installed automatically
 Also included is the message type used by the routing protocol.
 """
 
-from enum import Enum,auto
+import json
+import math
+from enum import Enum, auto
 from platform import node
-from typing import Dict, TYPE_CHECKING
-if TYPE_CHECKING:
-    from ..topology.node import Node 
-    from ..topology.topology import Topology
-    from ..kernel._event import Event
-    
-
+from typing import TYPE_CHECKING, Dict
 
 import matplotlib.pyplot as plt
 import networkx as nx
+
+from ..kernel.event import Event
 from ..message import Message
 from ..protocol import StackProtocol
-from .reservation import RSVPMsgType,ResourceReservationMessage
-import json
-import math
-from ..kernel._event import Event
+from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
+                                              ProtocolType)
+from .reservation import ResourceReservationMessage, RSVPMsgType
 
-from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
+if TYPE_CHECKING:
+    from ..topology.node import Node
+    from ..topology.topology import Topology
 
 class UpdateRoutingMessageType(Enum):
     UPDATE_ROUTING_TABLE=auto()
@@ -35,13 +34,6 @@ class UpdateRoutingMessage(Message):
         self.protocol_type=RoutingTableUpdateProtocol
         # #print('Update routing message',self.receiver,node,vneighbors)
         self.vneighbors=vneighbors
-
-class Message():
-    def __init__(self, receiver_type : Enum, receiver : Enum, msg_type , **kwargs):
-        self.receiver_type =receiver_type
-        self.receiver = receiver
-        self.msg_type = msg_type
-        self.kwargs = kwargs
     
 class StaticRoutingMessage(Message):
     """Message used for communications between routing protocol instances.

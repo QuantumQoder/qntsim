@@ -32,36 +32,6 @@ class SwappingMsgType(Enum):
 
     SWAP_RES = auto()
 
-
-class Message():
-    """Message used by entanglement swapping protocols.
-    This message contains all information passed between swapping protocol instances.
-    Attributes:
-        msg_type (SwappingMsgType): defines the message type.
-        receiver (str): name of destination protocol instance.
-        fidelity (float): fidelity of the newly swapped memory pair.
-        remote_node (str): name of the distant node holding the entangled memory of the new pair.
-        remote_memo (int): index of the entangled memory on the remote node.
-        expire_time (int): expiration time of the new memory pair.
-    """
-
-    def __init__(self, receiver_type: Enum, receiver: Enum, msg_type, **kwargs) -> None:
-
-        self.receiver_type = receiver_type
-        self.receiver = receiver
-        self.msg_type = msg_type
-        self.kwargs = kwargs
-
-   
-
-    def __str__(self):
-        if self.msg_type == SwappingMsgType.SWAP_RES:
-            return "EntanglementSwappingMessage: msg_type: %s; local_memo: %d; fidelity: %.2f; " \
-                   "remote_node: %s; remote_memo: %d; " % (self.msg_type, self.local_memo,
-                                                           self.fidelity, self.remote_node,
-                                                           self.remote_memo)
-
-
 class EntanglementSwappingA(EntanglementProtocol):
     """Entanglement swapping protocol for middle router.
     The entanglement swapping protocol is an asymmetric protocol.

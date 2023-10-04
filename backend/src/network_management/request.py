@@ -1,19 +1,26 @@
+import itertools
+import json
+import logging
+import math
+from enum import Enum, auto
 from typing import TYPE_CHECKING, List
 
+import networkx as nx
 from pyparsing import Path
 
-if TYPE_CHECKING:
-    from ..topology.node import QuantumRouter,Node
-
-from enum import Enum, auto
-
 #from ..network_management.network_manager import NetworkManagerMessage
-import networkx as nx
-
-from ..kernel._event import Event
+from ..kernel.event import Event
 from ..kernel.timeline import Timeline
 from ..message import Message
+from ..resource_management.memory_manager import MemoryInfo, MemoryManager
 from ..resource_management.rule_manager import Rule
+from ..resource_management.task_manager import SubTask, Task, TaskManager
+from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
+                                              ProtocolType)
+from ..utils import log
+
+if TYPE_CHECKING:
+    from ..topology.node import Node, QuantumRouter
 
 if Timeline.DLCZ:
     from ..entanglement_management.DLCZ_generation import \
@@ -24,18 +31,8 @@ if Timeline.DLCZ:
 elif Timeline.bk:
     from ..entanglement_management.bk_generation import EntanglementGenerationA
     from ..entanglement_management.bk_purification import BBPSSW
-    from ..entanglement_management.bk_swapping import EntanglementSwappingA, EntanglementSwappingB
-
-import itertools
-import json
-import logging
-import math
-
-from ..resource_management.memory_manager import MemoryInfo, MemoryManager
-from ..resource_management.task_manager import SubTask, Task, TaskManager
-from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
-                                              ProtocolType)
-from ..utils import log
+    from ..entanglement_management.bk_swapping import (EntanglementSwappingA,
+                                                       EntanglementSwappingB)
 
 # logger = logging.getLogger("main_logger.network_layer." + "request")
 #from ..transport_layer.transport_manager import CongestionMsgType
@@ -241,27 +238,6 @@ class RRPMsgType(Enum):
     FAIL = auto()
     #ABORT = auto()
     #SKIP_ROUTING=auto()
-    
-
-class Message():
-
-    """Message used by Transport layer protocols.
-    This message contains all information passed between transport protocol instances.
-    Messages of different types contain different information.
-    Attributes:
-        msg_type (GenerationMsgType): defines the message type.
-        receiver (str): name of destination protocol instance.
-        src_obj : source node protocol instance
-        dest_obj : destination node protocol instance.
-    """
-
-
-    def __init__(self, receiver_type : Enum, receiver : Enum, msg_type , **kwargs) -> None:
-        
-        self.receiver_type =receiver_type
-        self.receiver = receiver
-        self.msg_type = msg_type
-        self.kwargs = kwargs
 
 class RRMessage(Message):
     """Message used by resource reservation protocol.

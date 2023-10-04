@@ -1,19 +1,21 @@
-import qntsim
-from qntsim.kernel.timeline import Timeline
-from qntsim.kernel._event import Event
+import itertools
 from enum import Enum, auto
 from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from ..topology.node import QuantumRouter,Node
+
+from ..kernel.event import Event
 from ..kernel.timeline import Timeline
+from ..message import Message
+from ..network_management.request import Request
+from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
+                                              ProtocolType)
+
+if TYPE_CHECKING:
+    from ..topology.node import Node, QuantumRouter
+
 if Timeline.DLCZ:
     from ..components.DLCZ_memory import Memory
 elif Timeline.bk:
     from ..components.bk_memory import Memory
-from ..message import Message
-import itertools
-from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
-from ..network_management.request import Request 
 
  
 
@@ -32,28 +34,6 @@ class CongestionMsgType(Enum):
 
     SUCCESS=auto()
     FAIL=auto()
-
- 
-class Message():
-
-    """Message used by Transport layer protocols.
-    This message contains all information passed between transport protocol instances.
-    Messages of different types contain different information.
-    Attributes:
-        msg_type (GenerationMsgType): defines the message type.
-        receiver (str): name of destination protocol instance.
-        src_obj : source node protocol instance
-        dest_obj : destination node protocol instance.
-    """
-
-
-    def __init__(self, receiver_type : Enum, receiver : Enum, msg_type , **kwargs) -> None:
-        
-        self.receiver_type =receiver_type
-        self.receiver = receiver
-        self.msg_type = msg_type
-        self.kwargs = kwargs
-              
 
     
 class TransportManager():

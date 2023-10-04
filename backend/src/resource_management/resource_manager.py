@@ -6,21 +6,24 @@ This module also defines the message type used by the resource manager.
 
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Callable, List
+
+from ..entanglement_management.entanglement_protocol import \
+    EntanglementProtocol
+from ..kernel.timeline import Timeline
+from ..message import Message
+from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
+                                              ProtocolType)
+from ..utils import log
+from .memory_manager import MemoryManager
+from .rule_manager import RuleManager
+
 if TYPE_CHECKING:
     from ..topology.node import QuantumRouter
     from .rule_manager import Rule
-from ..kernel.timeline import Timeline
 if Timeline.DLCZ:
     from ..components.DLCZ_memory import Memory
 elif Timeline.bk:
     from ..components.bk_memory import Memory
-
-from ..entanglement_management.entanglement_protocol import EntanglementProtocol
-from ..message import Message
-from .rule_manager import RuleManager
-from .memory_manager import MemoryManager
-from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
-from ..utils import log
 # logger = logging.getLogger("main_logger.resource_management"+"resource_manager")
 
 class ResourceManagerMsgType(Enum):
@@ -31,31 +34,6 @@ class ResourceManagerMsgType(Enum):
     RELEASE_PROTOCOL = auto()
     RELEASE_MEMORY = auto()
     ABORT = auto()
-
-
-class Message():
-    """Message for resource manager communication.
-    There are four types of ResourceManagerMessage:
-    * REQUEST: request eligible protocols from remote resource manager to pair entanglement protocols.
-    * RESPONSE: approve or reject received request.
-    * RELEASE_PROTOCOL: release the protocol on the remote node
-    * RELEASE_MEMORY: release the memory on the remote node
-    Attributes:
-        ini_protocol (str): name of protocol that creates the original REQUEST message.
-        request_fun (func): a function using ResourceManager to search eligible protocols on remote node (if `msg_type` == REQUEST).
-        is_approved (bool): acceptance/failure of condition function (if `msg_type` == RESPONSE).
-        paired_protocol (str): protocol that is paired with ini_protocol (if `msg-type` == RESPONSE).
-    """
-
-    def __init__(self, receiver_type: Enum, receiver: Enum, msg_type, **kwargs) -> None:
-
-        self.id = None
-        self.receiver_type = receiver_type
-        self.receiver = receiver
-        self.msg_type = msg_type
-        self.kwargs = kwargs
-
-
 
 
 class ResourceManager():
