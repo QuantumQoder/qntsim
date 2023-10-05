@@ -1,4 +1,3 @@
-__all__ = ['routing', 'reservation', 'network_manager']
-
-def __dir__():
-    return sorted(__all__)
+from .network_manager import NetworkManager
+from .routing import (NewRoutingProtocol, RoutingTableUpdateProtocol,
+                      StaticRoutingProtocol)
