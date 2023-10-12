@@ -1,7 +1,3 @@
-__all__ = ['app', 'components', 'entanglement_management', 'kernel', 'network_management', 'qkd', 'resource_management',
-           'topology', 'transport_layer','utils', 'message', 'protocol']
-
-__version__ = '0.2.2'
-
-def __dir__():
-    return sorted(__all__)
+from . import (communication, components, entanglement_management, kernel,
+               log_functions, message, network_management, resource_management,
+               topology, transport_layer, utils)
