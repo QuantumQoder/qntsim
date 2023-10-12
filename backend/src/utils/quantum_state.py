@@ -6,7 +6,7 @@ The class provides interfaces for measurement and entanglement.
 import random as rnd
 from functools import lru_cache
 from math import sqrt
-from typing import Tuple
+from typing import List, Tuple
 
 from numpy import arange, array, cos, identity, kron, outer, pi, sin
 from numpy.random import choice, random, random_sample
@@ -157,7 +157,7 @@ class QuantumState():
         return result
 
     @staticmethod
-    def measure_multiple(basis, states):
+    def measure_multiple(basis: Tuple[Tuple[complex]], states: List["QuantumState"]) -> List[int]:
         """Method to measure multiple qubits in a more complex basis.
 
         May be used for bell state measurement.

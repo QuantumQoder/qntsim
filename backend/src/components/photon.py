@@ -4,6 +4,7 @@ This module defines the Photon class for tracking individual photons.
 Photons may be encoded directly with polarization or time bin schemes, or may herald the encoded state of single atom memories.
 """
 
+from typing import List, Tuple
 from ..utils.encoding import polarization
 from ..utils.quantum_state import QuantumState
 
@@ -63,7 +64,7 @@ class Photon():
         self.quantum_state.set_state(state)
 
     @staticmethod
-    def measure(basis, photon):
+    def measure(basis: Tuple[Tuple[complex]], photon: "Photon") -> int:
         """Method to measure a photon (see `QuantumState` module).
 
         Args:
@@ -77,7 +78,7 @@ class Photon():
         return photon.quantum_state.measure(basis)
 
     @staticmethod
-    def measure_multiple(basis, photons):
+    def measure_entangled(basis: Tuple[Tuple[complex]], photons: List["Photon"]) -> List[int]:
         """Method to measure 2 entangled photons (see `QuantumState` module).
 
         Args:
