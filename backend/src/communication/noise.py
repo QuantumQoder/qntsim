@@ -2,7 +2,7 @@ import math
 import random
 from typing import TYPE_CHECKING, Dict, List, Literal, Optional, Union
 
-from qntsim.kernel.circuit import BaseCircuit
+from qntsim.kernel.circuit import Circuit
 
 if TYPE_CHECKING:
     from ..kernel.circuit import QiskitCircuit, QutipCircuit
@@ -72,7 +72,7 @@ class Noise:
         if isinstance(keys, int): keys = [keys]
         theta = math.asin(math.sqrt(gamma))
         print(f"gamma: {gamma}\n")
-        qc = BaseCircuit("Qutip", 2)
+        qc = Circuit(quantum_manager.__class__.__name__[:-7], 2)
         qc.ry(1,theta)
         qc.cx(0,1)
         qc.ry(1,theta)

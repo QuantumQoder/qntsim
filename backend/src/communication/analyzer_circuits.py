@@ -1,7 +1,7 @@
 from ..kernel.circuit import QutipCircuit
 
 
-def bell_type_state_analyzer(num_qubits:int) -> QutipCircuit:
+def bell_state_analyzer(num_qubits:int) -> QutipCircuit:
     """
     Returns a QutipCircuit for analyzing a Bell-type state of a given number of qubits.
 
@@ -20,7 +20,7 @@ def bell_type_state_analyzer(num_qubits:int) -> QutipCircuit:
     
     return qtc
 
-def xor_type_state_analyzer(num_qubits:int) -> QutipCircuit:
+def xor_state_analyzer(num_qubits:int) -> QutipCircuit:
     qtc = QutipCircuit(num_qubits)
     for i in range(num_qubits-1):
         qtc.cx(i, num_qubits-1)

@@ -1,13 +1,12 @@
 from enum import Enum
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional, TypeAlias, Union
+from typing import Callable, Dict, List, Optional, TypeAlias, Union
 
 import numpy as np
 
 from ..kernel.circuit import Circuit
+from ..kernel.quantum_kernel import QiskitManager, QutipManager
+from ..topology.node import EndNode, ServiceNode
 
-if TYPE_CHECKING:
-    from ..topology.node import EndNode, ServiceNode
-    from ..kernel.quantum_kernel import QiskitManager, QutipManager
 
 class OnMemoryAttack:
     __node_type: TypeAlias = Union[EndNode, ServiceNode]
@@ -52,7 +51,7 @@ class OnMemoryAttack:
                 quantum_manager.run_circuit(circuit, [key])
 
     @staticmethod
-    def entangle_and_measure(node: __node_type, quantum_manager: __manager_type, *args, **kwargs) -> List[int]:
+    def entangle_and_measure(node: __node_type, quantum_manager: __manager_type, *args, **kwargs) -> str:
         """
         entangle_and_measure
 
@@ -61,7 +60,7 @@ class OnMemoryAttack:
         :param quantum_manager: QuantumManager to execute on-memory circuits
         :type quantum_manager: __manager_type
         :return: leakages due to attack
-        :rtype: List[int]
+        :rtype: str
         """
         circuit_type: str = quantum_manager.__class__.__name__[:-7].lower()
         circuit = Circuit(circuit_type, 2)
@@ -72,10 +71,10 @@ class OnMemoryAttack:
             key = mem_info.memory.qstate_key
             new_key = quantum_manager.new([1, 0])
             leaked_bins.append(quantum_manager.run_circuit(circuit, [key, new_key]).get(new_key))
-        return leaked_bins
+        return "".join(leaked_bins)
 
     @staticmethod
-    def intercept_and_resend(node: __node_type, quantum_manager: __manager_type, *args, **kwargs) -> List[int]:
+    def intercept_and_resend(node: __node_type, quantum_manager: __manager_type, *args, **kwargs) -> str:
         """
         intercept_and_resend
 
@@ -104,7 +103,7 @@ class OnMemoryAttack:
                 quantum_manager.run_circuit(circuit, [new_key])
                 quantum_manager.get(key).state = quantum_manager.get(new_key).state
                 quantum_manager.get(new_key).state = np.ndarray([1, 0])
-        return leaked_bins
+        return "".join(leaked_bins)
     
 class ATTACK_TYPE(Enum):
     DS = OnMemoryAttack.denial_of_service
