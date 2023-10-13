@@ -3,6 +3,7 @@
 This module defines the QuantumState class, used by photons and memories to track internal quantum states.
 The class provides interfaces for measurement and entanglement.
 """
+import enum
 import random as rnd
 from functools import lru_cache
 from math import sqrt
@@ -40,11 +41,21 @@ class QuantumState():
         self.entangled_states = [self]
 
     def __str__(self) -> str:
-        state: str = " + ".join(str(amp) + "|" + bin(i)[2:] + ">" for i, amp in enumerate(self.state))
+        state: str = " + ".join((('(' if (amp.real < 0 and amp.imag == 0) or (amp.real == 0 and amp.imag < 0) else '')
+                                 + str(amp.real if amp.imag == 0 else amp)
+                                 + (')' if (amp.real < 0 and amp.imag == 0) or (amp.real == 0 and amp.imag < 0) else '')
+                                 + f"|{bin(i)[2:]}>")
+                                for i, amp in enumerate(self.state)
+                                if amp.real != 0 or amp.imag != 0)
         return f"state: {state}"
 
     def __repr__(self) -> str:
-        state: str = " + ".join(str(amp) + "|" + bin(i)[2:] + ">" for i, amp in enumerate(self.state))
+        state: str = " + ".join((('(' if (amp.real < 0 and amp.imag == 0) or (amp.real == 0 and amp.imag < 0) else '')
+                                 + str(amp.real if amp.imag == 0 else amp)
+                                 + (')' if (amp.real < 0 and amp.imag == 0) or (amp.real == 0 and amp.imag < 0) else '')
+                                 + f"|{bin(i)[2:]}>")
+                                for i, amp in enumerate(self.state)
+                                if amp.real != 0 or amp.imag != 0)
         return f"QuantumState(state = {state}, entangled_states = {self.entangled_states})"
 
     def entangle(self, another_state: "QuantumState"):
