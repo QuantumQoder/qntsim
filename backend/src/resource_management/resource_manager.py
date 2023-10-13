@@ -4,23 +4,28 @@ The manager uses a memory manager and rule manager to track memories and control
 This module also defines the message type used by the resource manager.
 """
 
+import logging
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Callable, List
+
+from ..entanglement_management.entanglement_protocol import \
+    EntanglementProtocol
+from ..kernel.timeline import Timeline
+from ..message import Message
+from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
+                                              ProtocolType)
+from .memory_manager import MemoryManager
+from .rule_manager import RuleManager
+
 if TYPE_CHECKING:
     from ..topology.node import QuantumRouter
     from .rule_manager import Rule
-from ..kernel.timeline import Timeline
+
 if Timeline.DLCZ:
     from ..components.DLCZ_memory import Memory
-elif Timeline.bk:
+elif Timeline.BK:
     from ..components.bk_memory import Memory
 
-from ..entanglement_management.entanglement_protocol import EntanglementProtocol
-from ..message import Message
-from .rule_manager import RuleManager
-from .memory_manager import MemoryManager
-from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
-import logging
 # logger = logging.getLogger("main_logger.resource_management"+"resource_manager")
 
 class ResourceManagerMsgType(Enum):

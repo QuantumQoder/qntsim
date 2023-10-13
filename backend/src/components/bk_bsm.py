@@ -9,10 +9,10 @@ from typing import Any, Dict, List
 
 from numpy import add, outer, random, zeros
 
-from ..kernel.circuit import BaseCircuit
+from ..kernel.circuit import Circuit
 from ..kernel.entity import Entity
 from ..kernel.event import Event
-from ..kernel.quantum_manager import QuantumManagerDensity, QuantumManagerKet
+from ..kernel.quantum_manager import DensityManager, QuantumManagerKet
 from ..utils.encoding import *
 from ..utils.quantum_state import QuantumState
 from .detector import Detector
@@ -199,7 +199,7 @@ class PolarizationBSM(BSM):
         self.photons[0].entangle(self.photons[1])
 
         # measure in bell basis
-        res = Photon.measure_multiple(self.bell_basis, self.photons)
+        res = Photon.measure_entangled(self.bell_basis, self.photons)
 
         # check if we've measured as Phi+ or Phi-; these cannot be measured by the BSM
         if res == 0 or res == 1:
@@ -292,7 +292,7 @@ class TimeBinBSM(BSM):
         self.photons[0].entangle(self.photons[1])
 
         # measure in bell basis
-        res = Photon.measure_multiple(self.bell_basis, self.photons)
+        res = Photon.measure_entangled(self.bell_basis, self.photons)
 
         # check if we've measured as Phi+ or Phi-; these cannot be measured by the BSM
         if res == 0 or res == 1:

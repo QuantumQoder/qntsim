@@ -3,16 +3,17 @@
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
+from ..kernel.timeline import Timeline
+from ..protocol import Protocol
+
 if TYPE_CHECKING:
     from ..topology.node import Node
 
-from ..kernel.timeline import Timeline
 if Timeline.DLCZ:
     from ..components.DLCZ_memory import Memory
-elif Timeline.bk:
+elif Timeline.BK:
     from ..components.bk_memory import Memory
 
-from ..protocol import Protocol
 
 
 class EntanglementProtocol(Protocol):

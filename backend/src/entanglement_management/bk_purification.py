@@ -4,24 +4,23 @@ Success results are pre-determined based on network parameters.
 Also defined is the message type used by the BBPSSW code.
 """
 
+import logging
 from enum import Enum, auto
 from functools import lru_cache
 from typing import TYPE_CHECKING, List
 
 from numpy.random import random
 
-if TYPE_CHECKING:
-    from ..components.bk_memory import Memory
-    from ..topology.node import Node
-
-import logging
-
-from ..kernel.circuit import BaseCircuit
+from ..kernel.circuit import Circuit
 from ..message import Message
 from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
                                               ProtocolType)
 from ..utils import log
 from .entanglement_protocol import EntanglementProtocol
+
+if TYPE_CHECKING:
+    from ..components.bk_memory import Memory
+    from ..topology.node import Node
 
 
 # logger = logging.getLogger("main_logger.link_layer."+ "bk_swapping")
@@ -65,7 +64,7 @@ class BBPSSW(EntanglementProtocol):
     This class provides an implementation of the BBPSSW purification protocol.
     It should be instantiated on a quantum router node.
     Variables:
-        BBPSSW.circuit (BaseCircuit): circuit that purifies entangled memories.
+        BBPSSW.circuit (Circuit): circuit that purifies entangled memories.
     Attributes:
         own (QuantumRouter): node that protocol instance is attached to.
         name (str): label for protocol instance.
@@ -75,7 +74,7 @@ class BBPSSW(EntanglementProtocol):
         meas_res (int): measurement result from circuit.
     """
 
-    #circuit = BaseCircuit(2)
+    #circuit = Circuit(2)
     #circuit.cx(0, 1)
     #circuit.measure(1)
 
@@ -97,9 +96,9 @@ class BBPSSW(EntanglementProtocol):
         self.meas_res = None
         if self.meas_memo is None:
             self.memories.pop()
-        Circuit = BaseCircuit(self.kept_memo.timeline.type)
-        #print("pur circuit",BaseCircuit(self.kept_memo.timeline.type))
-        self.circuit = BaseCircuit(2)
+        circuit_class = Circuit(self.kept_memo.timeline.backend)
+        #print("pur circuit",Circuit(self.kept_memo.timeline.type))
+        self.circuit = circuit_class(2)
         self.circuit.cx(0, 1)
         self.circuit.measure(1)
 

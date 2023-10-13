@@ -24,7 +24,7 @@ if Timeline.DLCZ:
     from ..entanglement_management.DLCZ_purification import BBPSSW
     from ..entanglement_management.DLCZ_swapping import (EntanglementSwappingA,
                                                          EntanglementSwappingB)
-elif Timeline.bk:
+elif Timeline.BK:
     from ..entanglement_management.bk_generation import EntanglementGenerationA
     from ..entanglement_management.bk_purification import BBPSSW
     from ..entanglement_management.bk_swapping import (EntanglementSwappingA,

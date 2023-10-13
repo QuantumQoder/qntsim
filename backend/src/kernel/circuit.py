@@ -12,12 +12,12 @@ documentation of the specific method.
 The qutip library is used to calculate the unitary matrix of a circuit.
 """
 
-from dataclasses import field
 import math
 from copy import deepcopy
+from dataclasses import field
 from types import new_class
-from typing import (Callable, Dict, List, Literal, Optional, Set, TypeAlias, Union,
-                    overload)
+from typing import (Callable, Dict, List, Literal, Optional, Set, TypeAlias,
+                    Union, overload)
 
 import numpy as np
 from qiskit import QuantumCircuit
@@ -265,7 +265,7 @@ class Circuit:
             f"Maximum numbers of qubits should be less than or equal to {self.num_qubits}."
         self.gates += gates
         
-    def apply_gate(self, gate: str, qubits: List[int], angles: List[float]) -> None:
+    def apply_gate(self, gate: str, qubits: Union[int, List[int]], angles: Union[float, List[float]]) -> None:
         """
         apply_gate Method to apply gates into the circuit. This can also be used to apply user-defined gates.
                    although the class would not have any knowledge on the user-defined gate
@@ -277,6 +277,8 @@ class Circuit:
         :param angles: rotation angles to be applied with the gate
         :type angles: List[float]
         """
+        if not isinstance(qubits, list): qubits = [qubits]
+        if not isinstance(angles, list): angles = [angles]
         if hasattr(self, gate):
             getattr(self, gate.lower())(*qubits, *[float(angle) for angle in angles])
             return

@@ -12,18 +12,18 @@ from typing import TYPE_CHECKING, Any, Dict, List
 
 from aenum import Enum
 
-if TYPE_CHECKING:
-    from ..components.DLCZ_memory import Memory
-    from ..topology.node import Node
-    from ..components.DLCZ_bsm import SingleAtomBSM
-
-from ..kernel.circuit import BaseCircuit
+from ..kernel.circuit import Circuit
 from ..kernel.event import Event
 from ..message import Message
 from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
                                               ProtocolType)
 from ..utils import log
 from .entanglement_protocol import EntanglementProtocol
+
+if TYPE_CHECKING:
+    from ..components.DLCZ_bsm import SingleAtomBSM
+    from ..components.DLCZ_memory import Memory
+    from ..topology.node import Node
 
 
 class GenerationMsgType(Enum):
@@ -105,9 +105,9 @@ class EntanglementGenerationA(EntanglementProtocol):
     # TODO: use a function to update resource manager
 
     #_plus_state = [sqrt(1/2), sqrt(1/2)]
-    #_flip_circuit = BaseCircuit(1)
+    #_flip_circuit = Circuit(1)
     #_flip_circuit.x(0)
-    #_z_circuit = BaseCircuit(1)
+    #_z_circuit = Circuit(1)
     #_z_circuit.z(0)
 
 
@@ -147,12 +147,12 @@ class EntanglementGenerationA(EntanglementProtocol):
         self.isSuccess = False
 
         self.state = 0
-        Circuit = BaseCircuit(self.memory.timeline.type)
-        # #print("gen circuit",BaseCircuit(self.memory.timeline.type))
+        circuit_class = Circuit(self.memory.timeline.backend)
+        # #print("gen circuit",Circuit(self.memory.timeline.type))
         self._plus_state = [sqrt(1/2), sqrt(1/2)]
-        self._flip_circuit = BaseCircuit(1)
+        self._flip_circuit = circuit_class(1)
         self._flip_circuit.x(0)
-        self._z_circuit = BaseCircuit(1)
+        self._z_circuit = circuit_class(1)
         self._z_circuit.z(0)
 
     def received_message(self):

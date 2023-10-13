@@ -4,20 +4,20 @@ This module defines a template bell state measurement (BSM) class, as well as im
 Also defined is a function to automatically construct a BSM of a specified type.
 """
 
+import random as rnd
 from abc import abstractmethod
 from typing import Any, Dict, List
 
-from numpy import random, outer, add, zeros
-import random as rnd
+from numpy import add, outer, random, zeros
 
-from ..kernel.circuit import BaseCircuit
-from .detector import Detector
-from .photon import Photon
+from ..kernel.circuit import Circuit
 from ..kernel.entity import Entity
 from ..kernel.event import Event
-from ..kernel.quantum_manager import QuantumManagerKet, QuantumManagerDensity
+from ..kernel.quantum_manager import DensityManager, QuantumManagerKet
 from ..utils.encoding import *
 from ..utils.quantum_state import QuantumState
+from .detector import Detector
+from .photon import Photon
 
 
 def make_bsm(name, timeline, encoding_type='time_bin', phase_error=0, detectors=[]):
@@ -202,7 +202,7 @@ class PolarizationBSM(BSM):
         self.photons[0].entangle(self.photons[1])
 
         # measure in bell basis
-        res = Photon.measure_multiple(self.bell_basis, self.photons)
+        res = Photon.measure_entangled(self.bell_basis, self.photons)
 
         # check if we've measured as Phi+ or Phi-; these cannot be measured by the BSM
         if res == 0 or res == 1:
@@ -301,7 +301,7 @@ class TimeBinBSM(BSM):
         self.photons[0].entangle(self.photons[1])
 
         # measure in bell basis
-        res = Photon.measure_multiple(self.bell_basis, self.photons)
+        res = Photon.measure_entangled(self.bell_basis, self.photons)
 
         # check if we've measured as Phi+ or Phi-; these cannot be measured by the BSM
         if res == 0 or res == 1:

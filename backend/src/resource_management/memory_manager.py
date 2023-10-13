@@ -11,13 +11,15 @@ This is done through instances of the MemoryInfo class, which track a single mem
 """
 
 from typing import TYPE_CHECKING
+
+from ..kernel.timeline import Timeline
+
 if TYPE_CHECKING:
     from .resource_manager import ResourceManager
 
-from ..kernel.timeline import Timeline
 if Timeline.DLCZ:
     from ..components.DLCZ_memory import Memory, MemoryArray
-elif Timeline.bk:
+elif Timeline.BK:
     from ..components.bk_memory import Memory, MemoryArray
 
 class MemoryManager():

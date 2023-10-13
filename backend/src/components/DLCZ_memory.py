@@ -12,17 +12,18 @@ from typing import TYPE_CHECKING, Any, Dict, List
 
 from scipy import stats
 
-if TYPE_CHECKING:
-    from ..entanglement_management.entanglement_protocol import EntanglementProtocol
-    from ..kernel.timeline import Timeline
-    from ..topology.node import QuantumRouter
-
-from ..kernel.circuit import BaseCircuit
+from ..kernel.circuit import Circuit
 from ..kernel.entity import Entity
 from ..kernel.event import Event
 from ..utils.encoding import single_atom
 from ..utils.quantum_state import QuantumState
 from .photon import Photon
+
+if TYPE_CHECKING:
+    from ..entanglement_management.entanglement_protocol import \
+        EntanglementProtocol
+    from ..kernel.timeline import Timeline
+    from ..topology.node import QuantumRouter
 
 
 # array of single atom memories
@@ -116,7 +117,7 @@ class Memory(Entity):
         entangled_memory (Dict[str, Any]): tracks entanglement state of memory.
     """
 
-    #_meas_circuit = BaseCircuit(1)
+    #_meas_circuit = Circuit(1)
     #_meas_circuit.measure(0)
 
     def __init__(self, name: str, timeline: "Timeline", fidelity: float, frequency: float,
@@ -158,9 +159,9 @@ class Memory(Entity):
         self.excited_photon = None
         self.result={}
         self.next_excite_time = 0
-        Circuit = BaseCircuit(self.timeline.type)
-        # #print("memory circuit",BaseCircuit(self.timeline.type))
-        self._meas_circuit = BaseCircuit(1)
+        circuit_class = Circuit(self.timeline.backend)
+        # #print("memory circuit",Circuit(self.timeline.type))
+        self._meas_circuit = circuit_class(1)
         self._meas_circuit.measure(0)
 
 

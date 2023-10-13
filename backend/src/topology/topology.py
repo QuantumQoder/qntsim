@@ -48,8 +48,8 @@ class Topology():
         self.name = name
         self.timeline = timeline
         self.nodes: Dict[str, Union["EndNode", "ServiceNode"]] = {}           # internal node dictionary {node_name : node}
-        self.qchannels = []       # list of quantum channels
-        self.cchannels = []       # list of classical channels
+        self.qchannels: List["QuantumChannel"] = []       # list of quantum channels
+        self.cchannels: List["ClassicalChannel"] = []       # list of classical channels
         
         self.graph = {}           # internal quantum graph representation {node_name : {adjacent_name : distance}}
         self.graph_no_middle = {} # internal quantum graph without bsm nodes {node_name : {adjacent_name : distance}}

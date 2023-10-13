@@ -10,16 +10,16 @@ from typing import TYPE_CHECKING, List
 
 from numpy.random import random
 
-if TYPE_CHECKING:
-    from ..components.DLCZ_memory import Memory
-    from ..topology.node import Node
-
-from ..kernel.circuit import BaseCircuit
+from ..kernel.circuit import Circuit
 from ..message import Message
 from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
                                               ProtocolType)
 from ..utils import log
 from .entanglement_protocol import EntanglementProtocol
+
+if TYPE_CHECKING:
+    from ..components.DLCZ_memory import Memory
+    from ..topology.node import Node
 
 
 class BBPSSWMsgType(Enum):
@@ -50,7 +50,7 @@ class BBPSSW(EntanglementProtocol):
     This class provides an implementation of the BBPSSW purification protocol.
     It should be instantiated on a quantum router node.
     Variables:
-        BBPSSW.circuit (BaseCircuit): circuit that purifies entangled memories.
+        BBPSSW.circuit (Circuit): circuit that purifies entangled memories.
     Attributes:
         own (QuantumRouter): node that protocol instance is attached to.
         name (str): label for protocol instance.
@@ -60,7 +60,7 @@ class BBPSSW(EntanglementProtocol):
         meas_res (int): measurement result from circuit.
     """
 
-    #circuit = BaseCircuit(2)
+    #circuit = Circuit(2)
     #circuit.cx(0, 1)
     #circuit.measure(1)
 
@@ -82,9 +82,9 @@ class BBPSSW(EntanglementProtocol):
         self.F = None
         # if self.meas_memo is None:
         #     self.memories.pop()
-        Circuit = BaseCircuit(self.own.timeline.type)
-        #print("pur circuit",BaseCircuit(self.own.timeline.type))
-        self.circuit = BaseCircuit(2)
+        circuit_class = Circuit(self.own.timeline.backend)
+        #print("pur circuit",Circuit(self.own.timeline.type))
+        self.circuit = circuit_class(2)
         self.circuit.cx(0, 1)
         self.circuit.measure(1)
 

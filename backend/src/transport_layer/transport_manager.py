@@ -1,17 +1,19 @@
-from ..kernel.event import Event
+import itertools
 from enum import Enum, auto
 from typing import TYPE_CHECKING
+
+from ..kernel.event import Event
 from ..kernel.timeline import Timeline
 from ..message import Message
-import itertools
-from ..topology.message_queue_handler import ManagerType, ProtocolType,MsgRecieverType
-from ..network_management.request import Request 
+from ..network_management.request import Request
+from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
+                                              ProtocolType)
 
 if TYPE_CHECKING:
-    from ..topology.node import QuantumRouter,Node
+    from ..topology.node import Node, QuantumRouter
 if Timeline.DLCZ:
     from ..components.DLCZ_memory import Memory
-elif Timeline.bk:
+elif Timeline.BK:
     from ..components.bk_memory import Memory
 
  

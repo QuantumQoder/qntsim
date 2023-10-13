@@ -12,7 +12,12 @@ from pyparsing import Path
 from ..kernel.event import Event
 from ..kernel.timeline import Timeline
 from ..message import Message
+from ..resource_management.memory_manager import MemoryInfo, MemoryManager
 from ..resource_management.rule_manager import Rule
+from ..resource_management.task_manager import SubTask, Task, TaskManager
+from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
+                                              ProtocolType)
+from ..utils import log
 
 if TYPE_CHECKING:
     from ..topology.node import Node, QuantumRouter
@@ -23,16 +28,11 @@ if Timeline.DLCZ:
     from ..entanglement_management.DLCZ_purification import BBPSSW
     from ..entanglement_management.DLCZ_swapping import (EntanglementSwappingA,
                                                          EntanglementSwappingB)
-elif Timeline.bk:
+elif Timeline.BK:
     from ..entanglement_management.bk_generation import EntanglementGenerationA
     from ..entanglement_management.bk_purification import BBPSSW
-    from ..entanglement_management.bk_swapping import EntanglementSwappingA, EntanglementSwappingB
-
-from ..resource_management.memory_manager import MemoryInfo, MemoryManager
-from ..resource_management.task_manager import SubTask, Task, TaskManager
-from ..topology.message_queue_handler import (ManagerType, MsgRecieverType,
-                                              ProtocolType)
-from ..utils import log
+    from ..entanglement_management.bk_swapping import (EntanglementSwappingA,
+                                                       EntanglementSwappingB)
 
 # logger = logging.getLogger("main_logger.network_layer." + "request")
 #from ..transport_layer.transport_manager import CongestionMsgType
