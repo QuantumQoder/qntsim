@@ -12,6 +12,7 @@ src/loggers.py
 src/logging.ini
 src/message.py
 src/protocol.py
+src/types.py
 src/communication/__init__.py
 src/communication/analyzer_circuits.py
 src/communication/attack_on_memory.py

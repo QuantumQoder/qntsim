@@ -1,11 +1,14 @@
 from statistics import mean, stdev
-from typing import List, Optional, Tuple
+from typing import TYPE_CHECKING, List, Optional, Tuple
 
 import numpy as np
 
 from ..log_functions import log_info
 from ..types import Types
 from .utils import to_characters
+
+if TYPE_CHECKING:
+    from .qntsimulation import QNtSimulation
 
 
 class ErrorAnalyzer:
@@ -27,9 +30,8 @@ class ErrorAnalyzer:
         log_info(f"{mean_leakge}% info leaked to attacker")
         return error_list, leaked_list, mean_error, 100 - mean_error, dev_error, mean_leakge
 
-    from .qntsimulation import QNtSimulation
     @classmethod
-    def simulation_analysis(cls, simulation: QNtSimulation) -> Types.messages:
+    def simulation_analysis(cls, simulation: "QNtSimulation") -> Types.messages:
         for binary_packet in simulation.binary_packets:
             output_message = binary_packet.get("output_message", {})
             input_message = [package.get("message", "") for key, package in binary_packet.items() if key != "output_message"]
