@@ -1,24 +1,25 @@
 from abc import abstractmethod
 from copy import copy
-from multiprocessing import Manager
-from typing import List, Dict, Tuple, TYPE_CHECKING
 from math import sqrt
-from qutip.qip.circuit import QubitCircuit, Gate
-from qutip.qip.operations import gate_sequence_product
-from numpy import log2, array, kron, identity, zeros, arange, outer
-from numpy.random import random_sample, choice
-from qiskit import *
-from .quantum_utils import *
-from qiskit import quantum_info
+from multiprocessing import Manager
 from random import random
+from typing import TYPE_CHECKING, Dict, List, Tuple
 
+from numpy import arange, array, identity, kron, log2, outer, zeros
+from numpy.random import choice, random_sample
+from qiskit import *
+from qiskit import quantum_info
+from qutip.qip.circuit import Gate, QubitCircuit
+from qutip.qip.operations import gate_sequence_product
+
+from .quantum_utils import *
 
 """
 def Factory(backend_circuit ="English"):
  
     #Factory Method
     circuits = {
-        "QuTip": BaseCircuit,
+        "QuTip": Circuit,
         "Qiskit": QiskitCircuit
         #"Spanish": SpanishLocalizer,
     }
@@ -76,10 +77,10 @@ class QuantumKernel():
         return self.states[key]
 
     @abstractmethod
-    def run_circuit(self, circuit: "BaseCircuit", keys: List[int]) -> int:
+    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:
         """Method to run a circuit on a given set of quantum states.
         Args:
-            circuit (BaseCircuit): quantum circuit to apply.
+            circuit (Circuit): quantum circuit to apply.
             keys (List[int]): list of keys for quantum states to apply circuit to.
         Returns:
             Dict[int, int]: dictionary mapping qstate keys to measurement results.
@@ -89,7 +90,7 @@ class QuantumKernel():
 
 
     @abstractmethod
-    def _prepare_circuit(self, circuit: "BaseCircuit", keys: List[int]):
+    def _prepare_circuit(self, circuit: "Circuit", keys: List[int]):
         
        pass
 
@@ -134,7 +135,7 @@ class QiskitManager(QuantumKernel):
         #print('new2 circ', circ,self.states[key])
         return key
 
-    def _prepare_circuit(self, circuit: "BaseCircuit", keys: List[int]):
+    def _prepare_circuit(self, circuit: "Circuit", keys: List[int]):
         
         # Create a quantum circuit with or without classical measurement registers based on number of measured qubits
         if len(circuit.measured_qubits)>0:
@@ -179,7 +180,7 @@ class QiskitManager(QuantumKernel):
 
         return all_keys, circ
 
-    def run_circuit(self, circuit: "BaseCircuit", keys: List[int]) -> int:    
+    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:    
         super().run_circuit(circuit, keys)
 
         # Compile the circuit into Qiskit quanutm circuit
@@ -211,7 +212,7 @@ class QiskitManager(QuantumKernel):
         SHOULD NOT be called individually; only from circuit method (unless for unit testing purposes).
         Modifies quantum state of all qubits given by all_keys.
         Args:
-            circ (QuantumCircuit): Quantum BaseCircuit to measure.
+            circ (QuantumCircuit): Quantum Circuit to measure.
             keys (List[int]): list of keys to measure.
             all_keys (List[int]): list of all keys corresponding to circ.
         Returns:
@@ -278,7 +279,7 @@ class QutipManager(QuantumKernel):
         self.states[key] = KetState(amplitudes, [key])
         return key
     
-    def _prepare_circuit(self, circuit: "BaseCircuit", keys: List[int]):
+    def _prepare_circuit(self, circuit: "Circuit", keys: List[int]):
         old_states = []
         all_keys = []
 
@@ -320,7 +321,7 @@ class QutipManager(QuantumKernel):
         swap_mat = gate_sequence_product(swap_circuit.propagators()).full()
         return all_keys, swap_mat
 
-    def run_circuit(self, circuit: "BaseCircuit", keys: List[int]) -> int:
+    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:
         super().run_circuit(circuit, keys)
         #print('run circuit')
         new_state, all_keys, circ_mat = self._prepare_circuit(circuit, keys)

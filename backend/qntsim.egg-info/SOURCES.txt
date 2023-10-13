@@ -12,25 +12,15 @@ src/loggers.py
 src/logging.ini
 src/message.py
 src/protocol.py
-src/communication/Error.py
 src/communication/__init__.py
 src/communication/analyzer_circuits.py
-src/communication/attack.py
+src/communication/attack_on_memory.py
 src/communication/error_analyzer.py
-src/communication/network.py
 src/communication/noise.py
-src/communication/noise_model.py
-src/communication/protocol.py
-<<<<<<< Updated upstream
-=======
 src/communication/qntsim.py
 src/communication/qntsimulation.py
->>>>>>> Stashed changes
-src/communication/quantum_network.py
 src/communication/security_checks.py
 src/communication/template.py
-src/communication/un.py
-src/communication/up.py
 src/communication/utils.py
 src/components/DLCZ_bsm.py
 src/components/DLCZ_memory.py
@@ -55,13 +45,12 @@ src/entanglement_management/bk_generation.py
 src/entanglement_management/bk_purification.py
 src/entanglement_management/bk_swapping.py
 src/entanglement_management/entanglement_protocol.py
-src/kernel/______timeline.py
 src/kernel/__init__.py
-src/kernel/_ds.py
 src/kernel/circuit.py
 src/kernel/entity.py
 src/kernel/event.py
 src/kernel/kernel_utils.py
+src/kernel/quantum.py
 src/kernel/quantum_kernel.py
 src/kernel/quantum_manager.py
 src/kernel/quantum_utils.py
@@ -86,4 +75,3 @@ src/utils/__init__.py
 src/utils/encoding.py
 src/utils/log.py
 src/utils/quantum_state.py
-tests/test_topology.py

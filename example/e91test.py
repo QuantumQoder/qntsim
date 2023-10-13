@@ -7,7 +7,7 @@ from numpy import random
 from qntsim.kernel.timeline import Timeline
 Timeline.DLCZ=False
 Timeline.bk=True
-from qntsim.components.circuit import BaseCircuit
+from qntsim.components.circuit import Circuit
 
 
 #from qntsim.topology.node import QuantumRouter
@@ -112,14 +112,14 @@ for info in bob.resource_manager.memory_manager:
 
 def measurement(qm,choice, key):
     # print('choice',choice)
-    Circuit=BaseCircuit("Qiskit")      
+    circuit=Circuit("Qiskit")      
     if choice == 1: #X observable
-        circ=Circuit(1)
+        circ=circuit(1)
         circ.h(0)
         circ.measure(0)
         output=qm.run_circuit(circ,[key])
     if choice == 2:  #W observable
-        circ=Circuit(1)
+        circ=circuit(1)
         circ.s(0)
         # circ.
         circ.h(0)
@@ -128,11 +128,11 @@ def measurement(qm,choice, key):
         circ.measure(0)
         output=qm.run_circuit(circ,[key])
     if choice == 3:  #Z observable
-        circ=Circuit(1)
+        circ=circuit(1)
         circ.measure(0)
         output=qm.run_circuit(circ,[key])
     if choice == 4: #V observable
-        circ=Circuit(1)
+        circ=circuit(1)
         circ.s(0)
         circ.h(0)
         circ.tdg(0)

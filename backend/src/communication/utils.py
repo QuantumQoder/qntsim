@@ -1,49 +1,35 @@
-import logging
-from typing import Any, Dict, List, Tuple, TypeAlias
+from copy import deepcopy
+from typing import Any, Dict, Tuple
 
-__msg_type:TypeAlias = Dict[Tuple[str], str]
+from ..log_functions import log_info
+from ..types import Types
 
-def to_binary(messages: List[str]):
-    print("converting")
-    __is_binary = all(char in "01" for message in messages for char in message)
-    binary_strings = messages if __is_binary else ["".join("{:08b}".format(ord(char)) for char in message) for message in messages]
-    logging.info("converted")
-    return __is_binary, binary_strings
+__is_binary: Dict[str, bool] = {}
 
-# def to_binary(msg_dict:__msg_type) -> Tuple[bool, __msg_type]:
-#     """Converts any character string to their binary equivalent.
-#     Args:
-#         messages (List[str]): Messages to be converted into binary.
+def to_binary(message_packets: Types.messages) -> Types.messages:
+    global __is_binary
+    __is_binary = {package.get("receiver", ""): all(char in "01"
+                                                    for char in package.get("message", ""))
+                   for packet in message_packets
+                   for package in packet.values()
+                   if isinstance(package, dict)}
+    binary_packets: Types.messages = deepcopy(message_packets)
+    for binary_packet in binary_packets:
+        for binary_message, is_binary in zip(binary_packet.values(), __is_binary):
+            if not is_binary and "message" in binary_message:
+                binary_message["message"] = "".join("{:08b}".format(ord(char)) for char in binary_message.get("message"))
+    log_info("converted messages to binary")
+    return binary_packets
 
-#     Returns:
-#         strings (List[str]): Binary equivalents of the input messages
-
-#     Example:
-#         # print(to_binary(messages={('n1', 'n2'):'h'})
-#     """
-#     print("converting")
-#     __is_binary = all(char in "01" for message in msg_dict.values() for char in message)
-#     binary_strings = msg_dict if __is_binary else {node_seq:"".join("{:08b}".format(ord(char)) for char in message) for node_seq, message in msg_dict.items()}
-#     logging.info("converted")
-#     return __is_binary, binary_strings
-
-def to_characters(bin_strs: List[str], __was_binary:bool):
-    messages = bin_strs if __was_binary else ["".join("{:c}".format(int(binary[8*i:8*(i+1)], 2)) for i in range(len(binary)//8)) for binary in bin_strs]
-    return messages
-
-# def to_characters(bin_dict:__msg_type, __was_binary:bool) -> __msg_type:
-#     """Converts any binary string to their character equivalent.
-
-#     Args:
-#         bin_dict (__msg_type): Binary strings to be converted into character strings
-#         __was_binary (bool): If the input was previously binary.
-#         NOTE: For an independent use of the function, set __was_binary = False
-
-#     Returns:
-#         __msg_type: Messages converted from the binary strings
-#     """
-#     messages = bin_dict if __was_binary else {node_seq:"".join("{:c}".format(int(binary[8*i:8*(i+1)], 2)) for i in range(len(binary)//8)) for node_seq, binary in bin_dict.items()}
-#     return messages
+def to_characters(binary_packets: Types.messages) -> Types.messages:
+    global __is_binary
+    message_packets: Types.messages = deepcopy(binary_packets)
+    for packet in message_packets:
+        package = packet.get("output_message", {})
+        package = {key: binary if __is_binary.get(key) else "".join("{:c}".format(int(binary[8 * i: 8 * (i + 1)], 2)) for i in range(len(binary) // 8))
+                   for key, binary in package.items()}
+    log_info("converted messages to string")
+    return message_packets
 
 def pass_values(_, returns:Any, *args, **kwds) -> Tuple[Any, Tuple[Any], Dict[str, Any]]:
     """A do-nothing funciton which passes the arguments from the previous call to the next call

@@ -43,11 +43,11 @@ __global_circuit_json_type: TypeAlias = Dict[str, __local_circuit_json_type]
 #     return False
 
 # def generate_full_circuit(circuit_json: __global_circuit_json_type,
-#                           circuit_obj_type: Literal["qiskit", "qutip"] = "qiskit") -> BaseCircuit:
-#     circuit: BaseCircuit = BaseCircuit(circuit_obj_type, sum(len(cirq) for cirq in circuit_json.values()))
+#                           circuit_obj_type: Literal["qiskit", "qutip"] = "qiskit") -> Circuit:
+#     circuit: Circuit = Circuit(circuit_obj_type, sum(len(cirq) for cirq in circuit_json.values()))
 #     qubit_pos = -1
 #     for cirq in circuit_json.values():
-#         local_circuit: BaseCircuit = create_circuit_object(cirq, circuit_obj_type)
+#         local_circuit: Circuit = create_circuit_object(cirq, circuit_obj_type)
 #         qubit_map: Dict[int, int] = {}
 #         for i in range(local_circuit.num_qubits):
 #             qubit_pos += 1
@@ -56,8 +56,8 @@ __global_circuit_json_type: TypeAlias = Dict[str, __local_circuit_json_type]
 #     return circuit
 
 # def create_circuit_object(circuit: __local_circuit_json_type,
-#                           circuit_obj_type: Literal["qiskit", "qutip"] = "qiskit") -> BaseCircuit:
-#     circuit: BaseCircuit = BaseCircuit(circuit_obj_type, len(circuit))
+#                           circuit_obj_type: Literal["qiskit", "qutip"] = "qiskit") -> Circuit:
+#     circuit: Circuit = Circuit(circuit_obj_type, len(circuit))
 #     qubit_num = -1
 #     for gates in circuit.values():
 #         qubit_num += 1

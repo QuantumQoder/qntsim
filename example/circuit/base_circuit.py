@@ -1,8 +1,9 @@
-from qntsim.kernel.circuit import BaseCircuit
+from qntsim.kernel.circuit import Circuit
+
 
 def create_ghz_states(num_qubits: int) -> None:
-    circuit1 = BaseCircuit("qiskit", num_qubits)
-    circuit2 = BaseCircuit("qutip", num_qubits)
+    circuit1 = Circuit("qiskit", num_qubits)
+    circuit2 = Circuit("qutip", num_qubits)
     circuit1.h(0)
     circuit2.h(0)
     for i in range(1, num_qubits):

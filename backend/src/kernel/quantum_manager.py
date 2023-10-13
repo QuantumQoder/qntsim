@@ -4,19 +4,19 @@ The states may currently be defined in two possible ways:
     - DensityMatrix (with the QuantumManagerDensity class)
 The manager defines an API for interacting with quantum states.
 """
-
+import math
 from abc import abstractmethod
-from copy import copy
-from typing import List, Dict, Tuple, TYPE_CHECKING
-from math import sqrt
+from typing import Dict, List
 
-from qutip.qip.circuit import QubitCircuit, Gate
-# from qutip.qip.operations import gate_qntsim_product
-from numpy import log2, array, kron, identity, zeros, arange, outer
-from numpy.random import random_sample, choice
-from qiskit import *
-from .quantum_utils import *
-from qiskit import quantum_info
+import numpy as np
+from qiskit import (Aer, ClassicalRegister, QuantumCircuit, QuantumRegister,
+                    execute)
+from qiskit.quantum_info import partial_trace
+
+from .circuit import Circuit
+from .quantum_utils import (measure_entangled_state_with_cache_density,
+                            measure_multiple_with_cache_density,
+                            measure_state_with_cache_density)
 
 
 class QuantumManager():
@@ -51,10 +51,10 @@ class QuantumManager():
         return self.states[key]
 
     @abstractmethod
-    def run_circuit(self, circuit: "BaseCircuit", keys: List[int]) -> int:
+    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:
         """Method to run a circuit on a given set of quantum states.
         Args:
-            circuit (BaseCircuit): quantum circuit to apply.
+            circuit (Circuit): quantum circuit to apply.
             keys (List[int]): list of keys for quantum states to apply circuit to.
         Returns:
             Dict[int, int]: dictionary mapping qstate keys to measurement results.
@@ -64,7 +64,7 @@ class QuantumManager():
 
 
     
-    def _prepare_circuit(self, circuit: "BaseCircuit", keys: List[int]):
+    def _prepare_circuit(self, circuit: "Circuit", keys: List[int]):
         
         # Create a quantum circuit with or without classical measurement registers based on number of measured qubits
         if len(circuit.measured_qubits)>0:
@@ -116,7 +116,7 @@ class QuantumManager():
             amplitudes: Amplitudes to set state to, type determined by type of subclass.
         """
 
-        num_qubits = log2(len(amplitudes))
+        num_qubits = math.log2(len(amplitudes))
         assert num_qubits.is_integer(), "Length of amplitudes should be 2 ** n, where n is the number of keys"
         num_qubits = int(num_qubits)
         assert num_qubits == len(keys), "Length of amplitudes should be 2 ** n, where n is the number of keys"
@@ -139,7 +139,7 @@ class QuantumManagerKet(QuantumManager):
         self.states[key] = QuantumCircuit(QuantumRegister(1, f"k_{key}"))
         return key
 
-    def run_circuit(self, circuit: "BaseCircuit", keys: List[int]) -> int:    
+    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:    
         super().run_circuit(circuit, keys)
 
         # Compile the circuit into Qiskit quanutm circuit
@@ -169,7 +169,7 @@ class QuantumManagerKet(QuantumManager):
         SHOULD NOT be called individually; only from circuit method (unless for unit testing purposes).
         Modifies quantum state of all qubits given by all_keys.
         Args:
-            circ (QuantumCircuit): Quantum BaseCircuit to measure.
+            circ (QuantumCircuit): Quantum Circuit to measure.
             keys (List[int]): list of keys to measure.
             all_keys (List[int]): list of all keys corresponding to circ.
         Returns:
@@ -202,7 +202,7 @@ class QuantumManagerKet(QuantumManager):
             
             # Partially trace out measured qubits. This works because the statevector produced in previous step 
             # already considers the wave function (and ultimately entanglement) collapse due to measurements 
-            new_state = quantum_info.partial_trace(statevector, measured_indices).to_statevector().data
+            new_state = partial_trace(statevector, measured_indices).to_statevector().data
 
             for key in keys:
                 all_keys.remove(key)
@@ -222,7 +222,7 @@ class QuantumManagerKet(QuantumManager):
 
 ############ All the code below is not required and hence not editted ################
 
-class QuantumManagerDensity(QuantumManager):
+class DensityManager(QuantumManager):
     """Class to track and manage states with the density matrix formalism."""
 
     def __init__(self):
@@ -234,7 +234,7 @@ class QuantumManagerDensity(QuantumManager):
         self.states[key] = DensityState(state, [key])
         return key
 
-    def run_circuit(self, circuit: "BaseCircuit", keys: List[int]) -> int:
+    def run_circuit(self, circuit: "Circuit", keys: List[int]) -> int:
         super().run_circuit(circuit, keys)
         new_state, all_keys, circ_mat = super()._prepare_circuit(circuit, keys)
 
@@ -273,7 +273,7 @@ class QuantumManagerDensity(QuantumManager):
         if len(keys) == 1:
             if len(all_keys) == 1:
                 prob_0 = measure_state_with_cache_density(tuple(map(tuple, state)))
-                if random_sample() < prob_0:
+                if np.random.random_sample() < prob_0:
                     result = 0
                     new_state = [[1, 0], [0, 0]]
                 else:
@@ -286,11 +286,11 @@ class QuantumManagerDensity(QuantumManager):
                 state_index = all_keys.index(key)
                 state_0, state_1, prob_0 = measure_entangled_state_with_cache_density(tuple(map(tuple, state)),
                         state_index, num_states)
-                if random_sample() < prob_0:
-                    new_state = array(state_0, dtype=complex)
+                if np.random.random_sample() < prob_0:
+                    new_state = np.array(state_0, dtype=complex)
                     result = 0
                 else:
-                    new_state = array(state_1, dtype=complex)
+                    new_state = np.array(state_1, dtype=complex)
                     result = 1
 
         else:
@@ -305,8 +305,8 @@ class QuantumManagerDensity(QuantumManager):
             new_states, probabilities = measure_multiple_with_cache_density(state_to_measure, len(keys), len_diff)
 
             # choose result, set as new state
-            possible_results = arange(0, 2 ** len(keys), 1)
-            result = choice(possible_results, p=probabilities)
+            possible_results = np.arange(0, 2 ** len(keys), 1)
+            result = np.random.choice(possible_results, p=probabilities)
             new_state = new_states[result]
 
         result_digits = [int(x) for x in bin(result)[2:]]
@@ -331,11 +331,11 @@ class KetState():
         # check formatting
         assert all([abs(a) <= 1.01 for a in amplitudes]), "Illegal value with abs > 1 in ket vector"
         assert abs(sum([a ** 2 for a in amplitudes]) - 1) < 1e-5, "Squared amplitudes do not sum to 1" 
-        num_qubits = log2(len(amplitudes))
+        num_qubits = math.log2(len(amplitudes))
         assert num_qubits.is_integer(), "Length of amplitudes should be 2 ** n, where n is the number of qubits"
         assert num_qubits == len(keys), "Length of amplitudes should be 2 ** n, where n is the number of qubits"
 
-        self.state = array(amplitudes, dtype=complex)
+        self.state = np.array(amplitudes, dtype=complex)
         self.keys = keys
 
     def __str__(self):
@@ -356,15 +356,15 @@ class DensityState():
             keys (List[int]): list of keys to this state in quantum manager.
         """
 
-        state = array(state, dtype=complex)
+        state = np.array(state, dtype=complex)
         if state.ndim == 1:
-            state = outer(state.conj(), state)
+            state = np.outer(state.conj(), state)
 
         # check formatting
-        assert abs(trace(array(state)) - 1) < 0.1, "density matrix trace must be 1"
+        assert abs(np.trace(np.array(state)) - 1) < 0.1, "density matrix trace must be 1"
         for row in state:
             assert len(state) == len(row), "density matrix must be square"
-        num_qubits = log2(len(state))
+        num_qubits = math.log2(len(state))
         assert num_qubits.is_integer(), "Dimensions of density matrix should be 2 ** n, where n is the number of qubits"
         assert num_qubits == len(keys), "Dimensions of density matrix should be 2 ** n, where n is the number of qubits"
 

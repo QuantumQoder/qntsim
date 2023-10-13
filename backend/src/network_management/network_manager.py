@@ -49,7 +49,7 @@ class NetworkManager():
         self.requests={}
         self.networkmap={}
         self.tp_id=None
-        self.schedule_rtup()
+        # self.schedule_rtup()
         self.es_swap_success = 1
         self.es_swap_degradation = 0.99
         # self.net_id=next(self.id)

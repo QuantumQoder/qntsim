@@ -1,14 +1,17 @@
-from random import choices
 import random
+from random import choices
+
 from qntsim.kernel.timeline import Timeline
+
 Timeline.DLCZ=False
 Timeline.bk=True
-from qntsim.topology.topology import Topology
-from qntsim.kernel.circuit import QutipCircuit
-import numpy as np
+import logging
 import math
 
-import logging
+import numpy as np
+from qntsim.kernel.circuit import QutipCircuit
+from qntsim.topology.topology import Topology
+
 logger = logging.getLogger("main_logger.application_layer." + "qsdc_teleportation")
 
 
@@ -83,7 +86,7 @@ class QSDCTeleportation():
     
         a_qm = a.timeline.quantum_manager # quantum manager of the node 'a'
         indices, crz, crx = [], [], []
-        # Qutip BaseCircuit for performing Bell measurement
+        # Qutip Circuit for performing Bell measurement
         qtc = QutipCircuit(2)
         qtc.cx(0, 1)
         qtc.h(0)
