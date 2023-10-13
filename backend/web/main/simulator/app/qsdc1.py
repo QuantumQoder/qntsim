@@ -2,12 +2,13 @@ import logging
 import random
 from copy import deepcopy
 from random import choices
-from typing import Dict, List
+from typing import Dict, List, Literal, Optional
 
 import numpy as np
-from qntsim.communication.noise import Noise
-from qntsim.kernel.circuit import QutipCircuit
 from qntsim.utils import log
+from qntsim.communication import Noise, ATTACK_TYPE, OnMemoryAttack
+from qntsim.kernel import QutipCircuit
+from qntsim.topology import EndNode
 
 # logger = logging.getLogger("main_logger.application_layer." + "qsdc1")
 
@@ -199,7 +200,9 @@ class QSDC1():
         #print(list(output.values()))
         return output
 
-    def run(self,alice,bob,sequence_length,message, noise: Dict[str, List[float]] = {}):
+    def run(self, alice: EndNode, bob: EndNode, message,
+            noise: Dict[str, List[float]] = {},
+            attack: Optional[Literal["DS", "EM", "IR"]] = None):
         #message = "110011001001010101010100"
         #  convert message before run is called
         # message = string_to_binary(message)
@@ -209,6 +212,10 @@ class QSDC1():
         qm_alice = alice.timeline.quantum_manager
 
         protocol_keys = self.generate_QSDC_entanglement(qm_alice, message, entangled_keys,alice_bob_keys_dict )
+        leaked_bins: List[Optional[str]] = []
+        if attack:
+            leaked_bins = [OnMemoryAttack.implement(node, node.timeline.quantum_manager, ATTACK_TYPE[attack].value)
+                           for node in [alice, bob]]
         message_received = ""
         c = 0
         sequence_len = 8

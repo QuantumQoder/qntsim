@@ -238,8 +238,9 @@ def qsdc_teleportation(topology: Dict, sender: str, receiver: str, message: str,
     network = Network(topology=topology, messages={(sender, receiver): message}, noise = deepcopy(noise))
     network.teleport(None)
     if attack in ["DoS", "EM", "IR"]:
-        from qntsim.communication.attack import ATTACK_TYPE, Attack
-        Attack.implement(network, None, ATTACK_TYPE[attack].value)
+        from qntsim.communication.attack_on_memory import (ATTACK_TYPE,
+                                                           OnMemoryAttack)
+        OnMemoryAttack.implement(network, None, ATTACK_TYPE[attack].value)
     network.measure(None)
     received_messages = network._decode(None)
     print(f"strings in network: {network._strings}\n")

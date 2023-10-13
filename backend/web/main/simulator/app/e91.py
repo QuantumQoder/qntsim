@@ -2,13 +2,12 @@ import logging
 import math
 import random
 from copy import deepcopy
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Literal, Optional, Tuple, Union
 
 import numpy as np
-from qntsim.communication.noise import Noise
-from qntsim.kernel.circuit import BaseCircuit
-from qntsim.kernel.quantum_kernel import QiskitManager, QutipManager
-from qntsim.topology.node import EndNode
+from qntsim.communication import ATTACK_TYPE, Noise, OnMemoryAttack, ErrorAnalyzer
+from qntsim.kernel import Circuit, QiskitManager, QutipManager
+from qntsim.topology import EndNode
 
 logger = logging.getLogger("main_logger.application_layer." + "e91")
 
@@ -34,10 +33,13 @@ class E91():
         return self.request_entanglements(sender,receiver,n)
 
     # circuit measurements
-    def measurement(self, qm: Union[QiskitManager, QutipManager],
-                    choice: int, key: int, noise: Dict[str, List[float]] = {}) -> Dict[int, int]:
+    def measurement(self,
+                    qm: Union[QiskitManager, QutipManager],
+                    choice: int,
+                    key: int,
+                    noise: Dict[str, List[float]] = {}) -> Dict[int, int]:
         readout = noise.pop("readout", [0, 0])
-        circ = BaseCircuit("Qutip", 1)
+        circ = Circuit("Qutip", 1)
         if choice % 2 == 0:
             circ.s(0)
             circ.h(0)
@@ -56,7 +58,7 @@ class E91():
     ###Set  entangled state to psi_minus 
     ###TODO: Unitary Operations to change state instead of hard coding value
 
-    def set_state_psi_minus(self, alice: EndNode, bob: EndNode):
+    def set_state_psi_minus(self, alice: EndNode, bob: EndNode) -> Tuple[EndNode, EndNode, Dict[int, int], List[int]]:
         
         qm_alice=alice.timeline.quantum_manager
         qm_bob=bob.timeline.quantum_manager
@@ -93,7 +95,7 @@ class E91():
 
 
     ### Alice measurement of entangled qubits
-    def alice_measurement(self, alice: EndNode, noise: Dict[str, List[float]] = {}):
+    def alice_measurement(self, alice: EndNode, noise: Dict[str, List[float]] = {}) -> Tuple[Dict[int, int], Dict[int, int]]:
         choice=[1,2,3]
         qm_alice=alice.timeline.quantum_manager
         meas_results_alice={} ###entangled key <---> measure result at that qubit MAP
@@ -110,13 +112,13 @@ class E91():
                 alice_choice=random.randint(1, 3)
                 meas_results_alice[key]=self.measurement(qm_alice,alice_choice,key, noise)
                 alice_choice_list[key]=alice_choice
-        Noise.reset(noise.get("reset", 0), alice.resource_manager.memory_manager, BaseCircuit("Qutip", 1), qm_alice)
+        Noise.reset(noise.get("reset", 0), alice.resource_manager.memory_manager, Circuit("Qutip", 1), qm_alice)
 
         return alice_choice_list,meas_results_alice
 
    
     ### Bob measurement of entangled qubits
-    def bob_measurement(self, bob: EndNode, bob_entangled_key: List[int], noise: Dict[str, List[float]] = {}):
+    def bob_measurement(self, bob: EndNode, bob_entangled_key: List[int], noise: Dict[str, List[float]] = {}) -> Tuple[Dict[int, int], Dict[int, int]]:
         choice=[2,3,4]
         qm_bob=bob.timeline.quantum_manager
         meas_results_bob={} ###entangled key <---> measure result at that qubit: MAP
@@ -133,7 +135,7 @@ class E91():
                 bob_choice=random.randint(2, 4)
                 meas_results_bob[key]=self.measurement(qm_bob,bob_choice,key, noise)
                 bob_choice_list[key]=bob_choice
-        Noise.reset(noise.get("reset", 0), bob.resource_manager.memory_manager, BaseCircuit("Qutip", 1), qm_bob)
+        Noise.reset(noise.get("reset", 0), bob.resource_manager.memory_manager, Circuit("Qutip", 1), qm_bob)
         return bob_choice_list,meas_results_bob
 
     
@@ -427,9 +429,14 @@ class E91():
             
 
 
-    def run(self,alice,bob,n, noise: Dict[str, List[float]] = {}):
-
+    def run(self, alice: EndNode, bob: EndNode, n: int,
+            noise: Dict[str, List[float]] = {},
+            attack: Optional[Literal["DS", "EM", "IR"]] = None):
         alice,bob,alice_bob_map,bob_entangled_key=self.set_state_psi_minus(alice,bob)
+        leaked_bins: List[Optional[str]] = []
+        if attack:
+            leaked_bins = [OnMemoryAttack.implement(node, node.timeline.quantum_manager, ATTACK_TYPE[attack].value)
+                           for node in [alice, bob]]
         alice_choice,alice_meas=self.alice_measurement(alice,deepcopy(noise))
         bob_choice,bob_meas=self.bob_measurement(bob,bob_entangled_key,deepcopy(noise))
         key_mismatch=0

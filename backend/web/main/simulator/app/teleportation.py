@@ -1,19 +1,14 @@
 import logging
 import math
 from copy import deepcopy
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Literal, Optional, Tuple, Union
 
 from qiskit import *
-from qiskit.extensions import Initialize
-#from qiskit.ignis.verification import marginal_counts
-from qiskit.quantum_info import random_statevector
-from qntsim.communication.noise import Noise
-from qntsim.kernel.circuit import QutipCircuit
-from qntsim.kernel.quantum_kernel import KetState, QiskitManager, QutipManager
-from qntsim.topology.node import EndNode
+from qntsim.communication import ATTACK_TYPE, Noise, OnMemoryAttack
+from qntsim.kernel import QiskitManager, QutipCircuit, QutipManager
+from qntsim.kernel.quantum_kernel import KetState
+from qntsim.topology import EndNode
 from qntsim.utils import log
-from qutip.qip.circuit import Gate, QubitCircuit
-from qutip.qip.operations import gate_sequence_product
 
 # from tabulate import tabulate
 
@@ -290,7 +285,9 @@ class Teleportation():
         print('bob final state after corrective measures',qm_bob.get(key).state)
         return state.state, qm_bob.get(key).state,gatesl
 
-    def run(self, alice: EndNode, bob: EndNode, A_0, A_1, noise: Dict[str, List[float]] = {}):
+    def run(self, alice: EndNode, bob: EndNode, A_0, A_1,
+            noise: Dict[str, List[float]] = {},
+            attack: Optional[Literal["DS", "EM", "IR"]] = None):
         crz,crx,case, random_qubit,alice_state=self.alice_measurement(A_0,A_1,alice, deepcopy(noise))
         print("Measurement result of random qubit crz",crz)
         log.logger.info(alice.owner.name + " sent measurement results")
@@ -298,6 +295,10 @@ class Teleportation():
         print("Measurement result of alice qubit crx",crx)
         bob_initial_state, bob_final_state,gatesl = self.bob_gates(crz,crx,case,bob, deepcopy(noise))
         log.logger.info(bob.owner.name + " received the final state")
+        leaked_bins: List[Optional[str]] = []
+        if attack:
+            leaked_bins = [OnMemoryAttack.implement(node, node.timeline.quantum_manager, ATTACK_TYPE[attack].value)
+                           for node in [alice, bob]]
         
         # initial entanglement alice_bob_entanglement: alice_bob_entangled_state
         # measurement_result_of_random_qubit near alice's end : meas_rq
